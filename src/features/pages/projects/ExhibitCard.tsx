@@ -92,11 +92,11 @@ function Shot({ img, className, eager }: { img: ProjectImage; className: string;
  * 대표 작품 무대 (16:10, radius 20): 넓은 화면 + 폰 화면이 다 있으면 겹쳐 걸고(약조심), 아니면 표지 한 장을 크게(Greenap).
  * 기기 틀은 그리지 않는다. 1px 선, 위에 놓인 폰 화면에만 그림자 (DESIGN 8장).
  */
-function Stage({ project, eager }: { project: Project; eager: boolean }) {
+function Stage({ project, eager, className = '' }: { project: Project; eager: boolean; className?: string }) {
   const shots = stageShots(projectGallery(project))
   if (shots) {
     return (
-      <div className={c.stage} data-stage="duo" data-morph-media>
+      <div className={`${c.stage} ${className}`} data-stage="duo" data-morph-media>
         <Shot img={shots.wide} className={c.desk} eager={eager} />
         <Shot img={shots.tall} className={c.phone} eager={eager} />
       </div>
@@ -104,7 +104,7 @@ function Stage({ project, eager }: { project: Project; eager: boolean }) {
   }
   const cover = projectCover(project)
   return (
-    <div className={c.stage} data-stage={cover?.kind ?? 'type'} data-morph-media>
+    <div className={`${c.stage} ${className}`} data-stage={cover?.kind ?? 'type'} data-morph-media>
       {cover ? <Shot img={cover} className={c.single} eager={eager} /> : <Plate project={project} className={c.stagePlate} />}
     </div>
   )
@@ -175,6 +175,41 @@ export function ExhibitCard({ project, withProgram = false, level = 4, linkTo }:
           </p>
         )}
         <LiveLink project={project} className={c.raise} />
+      </div>
+    </li>
+  )
+}
+
+/** 기수 탭 안 카드 격자 (넓은 화면 3칸 · 태블릿 2칸 · 폰 1칸) */
+export function ProjectGrid({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <ul className={c.grid} aria-label={label}>
+      {children}
+    </ul>
+  )
+}
+
+/**
+ * 격자 카드 한 장: 그림(16:9) → 이름 → 한 줄 설명(두 줄까지). 카드 전체가 자세히 보기 창(?p=id)을 연다.
+ * 그림은 대표 작품 무대와 같은 규칙 (화면 둘 겹치기 · 표지 한 장 · 로고는 흰 판 가운데).
+ * 그림이 없는 프로젝트는 글자 표지(이름 · 만든 때 · 언어 비율). 사진은 나중에 projects.json 에 채운다.
+ * withProgram: 여러 프로그램이 섞인 방(그 밖의 프로젝트)에서 '2025 · 동국대 봄 축제' 한 줄을 이름 아래에.
+ */
+export function GridCard({ project, withProgram = false, eager = false, level = 4 }: { project: Project; withProgram?: boolean; eager?: boolean; level?: 3 | 4 }) {
+  const Heading = level === 3 ? 'h3' : 'h4'
+  return (
+    <li className={c.card} data-morph="media">
+      <Stage project={project} eager={eager} className={c.thumb} />
+      <div className={c.cardBody}>
+        <Heading className={c.cardName}>
+          <OpenLink project={project} className={c.open} />
+        </Heading>
+        {withProgram && (
+          <p className={c.cardMeta}>
+            <Dotted parts={[<span key="y" className="num">{project.year}</span>, programName(project)]} />
+          </p>
+        )}
+        {project.summary && <p className={c.cardSummary}>{project.summary}</p>}
       </div>
     </li>
   )

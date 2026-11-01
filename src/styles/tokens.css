@@ -44,6 +44,12 @@
   --place-teams: var(--g-yellow);
   --place-recruits: var(--g-green);
   --place-about: #191b1f;
+  /* 장소색을 글자로 쓸 때 (머리말 지금 메뉴): 흰 바탕 4.5:1 이상으로 짙게 */
+  --place-projects-text: #d93025;
+  --place-community-text: #1967d2;
+  --place-teams-text: #b06000;
+  --place-recruits-text: #188038;
+  --place-about-text: #191b1f;
 
   /* 기수색: 4기 주황. '지금 기수' 표시에만 */
   --gen: #ff6309;
@@ -96,7 +102,7 @@
   --head-gap: 56px; /* 섹션 머리 → 내용 */
 
   /* 격자 */
-  --max: 1200px;
+  --max: 1140px;
   --gutter: 24px;
   --side: max(40px, env(safe-area-inset-left, 0px));
   --side-r: max(40px, env(safe-area-inset-right, 0px));

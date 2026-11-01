@@ -36,7 +36,8 @@ export const isPublicProject = (p: Pick<Project, 'repo'>): boolean => Boolean(p.
 export const PUBLIC_PROJECTS: Project[] = PROJECTS.filter(isPublicProject)
 
 /** 공개 프로젝트 숫자 옆에 붙이는 기준 */
-export const projectsBasis = `GitHub ${PUBLIC_ORG} 기준`
+/** 화면에 쓰는 기준 줄. 조직 이름(GDSC-DGU)은 지금 쓰지 않는 이름이라 보이지 않는다 */
+export const projectsBasis = 'GitHub 공개 저장소 기준'
 
 /** 모집 상태와 지난 모집 기록 */
 export const RECRUITING = recruitingJson

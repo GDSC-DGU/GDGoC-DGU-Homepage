@@ -41,7 +41,7 @@ interface StaticItem {
  * 캠퍼스 지도.
  * - 땅 → 정적 물체(건물 · 나무 · 깃발, 앞뒤 순서대로) → 안내판 순서로 쌓는다
  * - 선택 · 호버 · 검색 상태는 CampusState 에서 읽는다 (메뉴 · 패널과 공유)
- * - 사람은 걷지 않는다: 문 앞 · 광장 · 벤치에 몇 명씩 서 있거나 앉아 있다 (scenery)
+ * - 사람 그림은 두지 않는다 (나무 · 벤치만, scenery)
  */
 export function CampusScene({ svgRef, viewBox, pinScale, labelScale, flipRightPins, compactPins = false, highlightSelected = true, className = '' }: Props) {
   const { selected, hovered, hits } = useCampus()
@@ -54,7 +54,8 @@ export function CampusScene({ svgRef, viewBox, pinScale, labelScale, flipRightPi
   const k = labelScale ?? pinScale
 
   // 장소마다 바뀌는 건 selected/hovered/hit 뿐이다. 나무 · 벤치는 한 번만 만든다.
-  const scenery = useMemo<StaticItem[]>(() => sceneryItems(true), [])
+  // 사람 그림은 두지 않는다 (4기 피드백 2026-11: 지도를 깔끔하게)
+  const scenery = useMemo<StaticItem[]>(() => sceneryItems(false), [])
 
   const statics: StaticItem[] = [
     ...scenery,

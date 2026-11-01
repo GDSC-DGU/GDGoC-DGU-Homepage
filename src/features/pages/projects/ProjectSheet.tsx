@@ -5,7 +5,7 @@ import type { Project, ProjectImage } from '@/domain/types'
 import { useModalDialog } from '@/features/layout/useModalDialog'
 import { ExternalLink, Mark } from '../PageParts'
 import { Dotted, LiveLink } from './ExhibitCard'
-import { assetUrl, isWorkImage, languageSegments, monthSpan, outLinks, projectGallery, repoPath } from './exhibit'
+import { assetUrl, languageSegments, monthSpan, outLinks, projectGallery, repoPath } from './exhibit'
 import { LanguageBar } from './Plate'
 import { sheetSearch } from './sheetLink'
 import { morphClose } from './sheetMorph'
@@ -137,7 +137,6 @@ export function ProjectSheet({
             <div className={`${c.body} ${lead ? '' : c.bodyBare}`}>
               <div className={c.leadShot}>
                 {lead && <Shot img={lead} project={p} first />}
-                {!gallery.some(isWorkImage) && <p className={c.noShots}>아직 이 사이트에 옮긴 화면 그림이 없습니다. 저장소에서 코드와 README를 볼 수 있습니다.</p>}
               </div>
 
               <aside className={c.facts} aria-label={`${p.name} 정보`}>
@@ -171,13 +170,12 @@ export function ProjectSheet({
                       <dd className="num">{span}</dd>
                     </div>
                   )}
-                  {(p.contributors || p.commits) && (
-                    // 팀 저장소가 여럿인 프로젝트도 대표 저장소 하나만 센 숫자다 (팀 크기 · 작업량으로 읽히지 않게 기준을 붙인다)
+                  {/* 팀원: projects.json members 에 적힌 이름만 (저장소 기여자 · 커밋 수 대신, 4기 시안 2026-11) */}
+                  {p.members && p.members.length > 0 && (
                     <div>
-                      <dt>저장소</dt>
+                      <dt>팀원</dt>
                       <dd>
-                        <Dotted parts={[p.contributors ? `기여자 ${p.contributors}명` : null, p.commits ? `커밋 ${p.commits}개` : null].filter(Boolean)} />
-                        <span className={c.ddNote}>대표 저장소 기준</span>
+                        <Dotted parts={p.members} />
                       </dd>
                     </div>
                   )}
@@ -190,9 +188,10 @@ export function ProjectSheet({
                     </div>
                   )}
                 </dl>
-                {p.repo && p.statsAsOf && (
+                {p.repo && p.statsAsOf && (span || segs.length > 0) && (
                   <p className={c.basis}>
-                    숫자 · 언어는 대표 저장소 {repoPath(p.repo)} 기준 · GitHub <span className="num">{dotted(p.statsAsOf)}</span>
+                    {/* 저장소 이름만 (조직 이름 'GDSC-DGU' 는 지금 쓰지 않는 이름이라 보이지 않는다) */}
+                    커밋 기간 · 언어는 대표 저장소 {repoPath(p.repo).split('/').pop()} 기준 · GitHub <span className="num">{dotted(p.statsAsOf)}</span>
                   </p>
                 )}
                 {links.length > 0 && (
@@ -224,7 +223,6 @@ export function ProjectSheet({
               )}
             </div>
 
-            {gallery.length > 0 && <p className={c.credit}>그림은 팀이 저장소 README · 파일에 올린 것을 줄여 실었습니다. 그림마다 원본으로 가는 링크가 있습니다.</p>}
 
             {(prev || next) && (
               <nav className={c.walk} aria-label="다른 프로젝트">

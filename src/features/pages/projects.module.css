@@ -1,16 +1,55 @@
 /*
- * 프로젝트 = 전시장 (시안 E). 머리 → 전시실(해 · 프로그램마다 한 방) → 먹색 4기 G-Sprint 띠(projects/sprint.module.css) → JoinStrip.
- * 전시실: 가로 머리 한 줄(2px 먹선 → 큰 해 · 프로그램 | 오른쪽 끝 기수 · 개수) → 대표 작품 크게 → 줄 목록 3칸.
- * 작품 한 점의 모양은 projects/exhibit.module.css, 표지는 projects/plate.module.css.
+ * 프로젝트 = 전시장. 머리 → 기수 탭 → 그 기수의 전시실(해 · 프로그램마다 한 방) → 먹색 4기 G-Sprint 띠(projects/sprint.module.css) → JoinStrip.
+ * 전시실: 가로 머리 한 줄(2px 먹선 → 큰 해 · 프로그램 | 오른쪽 끝 기수 · 개수) → 카드 격자 3칸.
+ * 카드 모양은 projects/exhibit.module.css, 표지는 projects/plate.module.css.
  */
 
-/* ── 머리: 리드 아래 처음 보는 이름 풀이 한 줄 (Solution Challenge) ── */
-.leadNote {
-  display: block;
-  margin-top: 12px;
-  font: var(--t-body);
-  letter-spacing: -0.005em;
-  color: var(--ink-700);
+/* ── 기수 탭: 2px 먹선 아래 3기 · 2기 · 1기, 고른 탭에 2px 밑줄 ── */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-bottom: 48px;
+  padding-top: 32px;
+  border-top: 2px solid var(--ink-900);
+}
+.tab {
+  position: relative;
+  min-height: 48px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--r-tag);
+  background: none;
+  font: 600 22px/32px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-500);
+  cursor: pointer;
+  transition: color var(--dur-hover) var(--ease);
+}
+.tab::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: transparent;
+}
+.tab[aria-selected='true'] {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.tab[aria-selected='true']::after {
+  background: var(--ink-900);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .tab:hover {
+    color: var(--ink-900);
+  }
 }
 
 /* ── 전시실 묶음: 머리 장면 바로 아래부터 (흰 이야기 섹션, 아래는 먹색 띠가 바로 붙는다) ── */
@@ -24,6 +63,12 @@
 }
 .room {
   min-width: 0;
+}
+
+/* 탭의 첫 방: 탭 위 먹선이 머리 선을 대신한다 */
+.rooms > .room:first-child .roomHead {
+  padding-top: 0;
+  border-top: 0;
 }
 
 /* 방 머리 한 줄 */
@@ -76,6 +121,16 @@
 }
 
 @media (max-width: 767px) {
+  .tabs {
+    gap: 4px 4px;
+    margin-bottom: 32px;
+    padding-top: 20px;
+  }
+  .tab {
+    padding-inline: 12px;
+    font-size: 19px;
+    line-height: 28px;
+  }
   .archive {
     --story-top: 32px;
     --story-bottom: 72px;

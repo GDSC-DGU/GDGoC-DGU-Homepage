@@ -1,7 +1,6 @@
 /*
- * 첫 화면 (팀 피드백 2026-10-28): 지도 = 첫 블록 배경(사이트맵), 오른쪽에 짧은 글자 판.
- * 글자 판: 이름 워드마크(h1, 홈 첫 화면에만 쓰는 크기) → 정식 이름 → 짧은 소개 → 버튼 → 모집 상태.
- * 넓은 화면(1024↑)만 겹쳐 놓는다. 그보다 좁으면 글자 판 → 지도 위아래.
+ * 첫 화면 (4기 Figma 시안 2026-11): 가운데 이름(로고 → 'GDGoC DGU') → 정식 이름 → 짧은 소개, 그 아래 캠퍼스 지도를 화면 폭 가득.
+ * 모든 폭에서 글자 → 지도 위아래 (지도를 글자 뒤 배경으로 깔지 않는다).
  */
 .hero {
   position: relative;
@@ -9,58 +8,56 @@
 }
 
 .top {
-  padding-top: 40px;
-  padding-bottom: 24px;
+  padding-top: 128px;
+  padding-bottom: 72px;
+  text-align: center;
 }
 .panel {
-  max-width: 36rem;
+  margin-inline: auto;
 }
 
+/* 이름(꺾쇠 + 글자)은 글자 판 폭보다 넓을 수 있어 h1 을 가운데 정렬 줄로 (판에 맞춰 왼쪽에서 시작하지 않게) */
 .title {
+  display: flex;
+  justify-content: center;
   margin: 0;
 }
-/* 영문 워드마크라 Google Sans Flex (DESIGN 3장). 크기 단계는 --t-hero (styles/tokens.css) */
+/* 영문 워드마크라 Google Sans Flex (DESIGN 3장). 크기 단계는 --t-hero, 가운데 한 줄이라 넓은 화면은 한 단계 크게 */
 .wordmark {
-  display: block;
   font: var(--t-hero);
   letter-spacing: var(--ls-hero);
   color: var(--ink-900);
   white-space: nowrap;
 }
 .fullName {
-  margin-top: 14px;
+  margin-top: 28px;
   text-wrap: balance;
-  font: 600 18px/26px var(--font-kr);
+  font: 700 28px/38px var(--font-kr);
   letter-spacing: -0.01em;
   color: var(--ink-900);
 }
 .lead {
-  margin-top: 16px;
-  font: var(--t-lead);
+  max-width: 44rem;
+  margin: 12px auto 0;
+  font: 400 20px/32px var(--font-kr);
   letter-spacing: -0.01em;
   color: var(--ink-700);
   text-wrap: pretty;
 }
+/* 넓은 화면은 소개 한 줄 */
 .leadLine {
-  display: block;
+  display: inline;
 }
 /* 'Google Developer Groups on Campus' 는 한 덩어리로 (좁으면 '동국대학교' 뒤에서만 줄이 바뀐다) */
 .keep {
   white-space: nowrap;
 }
-.actions {
-  margin-top: 28px;
-}
-.status {
-  margin-top: 32px;
-  max-width: 24rem;
-}
 
-/* ── 지도 (좁은 화면 기본: 글자 판 아래에서 화면 끝까지) ── */
+/* ── 지도: 글자 아래 화면 폭 가득 ── */
 .map {
   position: relative;
   isolation: isolate;
-  height: clamp(360px, 52vw, 520px);
+  height: clamp(420px, 44vw, 640px);
   overflow: hidden;
   overflow: clip;
 }
@@ -72,7 +69,7 @@
   left: 0;
   right: 0;
   z-index: 1;
-  height: 40px;
+  height: 48px;
   pointer-events: none;
 }
 .map::before {
@@ -83,111 +80,69 @@
   bottom: 0;
   background: linear-gradient(rgba(255, 255, 255, 0), var(--paper));
 }
-/* 글자 판 뒤 흰 덮개: 넓은 화면에서만 */
-.wash {
-  display: none;
+
+/* 넓은 화면: 위아래 여백이 넉넉한 만큼 이름도 크게 */
+@media (min-width: 1280px) {
+  .wordmark {
+    font-size: 128px;
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .wordmark {
+    font-size: 108px;
+  }
 }
 
-/* ── 넓은 화면: 지도가 첫 블록 전체, 글자 판은 오른쪽 5칸 ── */
-@media (min-width: 1024px) {
-  .hero {
-    height: clamp(560px, calc(100svh - 64px), 760px);
-  }
-  .map {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    height: auto;
-  }
-  /* 글자 판 줄은 지도 위에 얹되, 빈 곳은 눌러도 지도로 통한다 (건물을 누를 수 있게) */
+@media (max-width: 1023px) {
   .top {
-    position: relative;
-    z-index: 2;
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    align-items: center;
-    height: 100%;
-    padding-block: 32px 56px;
-    pointer-events: none;
+    padding-top: 96px;
+    padding-bottom: 56px;
   }
-  .panel {
-    grid-column: 8 / -1;
-    max-width: none;
-    pointer-events: auto;
+  .wordmark {
+    font-size: 80px;
   }
   .fullName {
-    margin-top: 20px;
-    font-size: 20px;
-    line-height: 30px;
+    margin-top: 22px;
+    font-size: 22px;
+    line-height: 32px;
   }
   .lead {
-    margin-top: 20px;
+    font-size: 18px;
+    line-height: 29px;
   }
-  .actions {
-    margin-top: 36px;
-  }
-  .status {
-    margin-top: 48px;
-  }
-  /*
-   * 흰 덮개: 글자 판 바로 왼쪽(--panel-x, HeroSection 이 잰 값)에서 72px 동안 짙어져 오른쪽 끝까지.
-   * 건물 · 안내판은 장면을 맞출 때 글자 판에서 80px 이상 떨어지므로 덮개에 가리지 않는다.
-   * 미리보기 창(z-index 5)보다는 아래.
-   */
-  .wash {
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: calc(var(--panel-x, 58%) - 72px);
-    right: 0;
-    z-index: 1;
-    background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--paper) 72px);
-    pointer-events: none;
+  .map {
+    height: clamp(360px, 56vw, 480px);
   }
 }
 
-/* 넓지만 낮은 화면(1280×720 노트북): 글자 사이를 좁힌다 */
-@media (min-width: 1024px) and (max-height: 780px) {
-  .actions {
-    margin-top: 28px;
-  }
-  .status {
-    margin-top: 32px;
-  }
-}
-
-/* ── 폰: 위에서 아래로, 글자는 한 줄로 이어서 ── */
+/* ── 폰: 위에서 아래로 ── */
 @media (max-width: 767px) {
   .top {
-    padding-top: 28px;
-    padding-bottom: 20px;
+    padding-top: 64px;
+    padding-bottom: 36px;
+  }
+  .wordmark {
+    font-size: 44px;
   }
   .fullName {
-    margin-top: 12px;
+    margin-top: 14px;
     font-size: 16px;
     line-height: 24px;
   }
   .lead {
-    margin-top: 12px;
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 24px;
   }
   .leadLine {
-    display: inline;
-  }
-  .actions {
-    margin-top: 24px;
-  }
-  .status {
-    margin-top: 24px;
-    max-width: none;
+    display: block;
   }
   .map {
-    height: 300px;
+    height: 320px;
   }
 }
 
-/* ── 밤: 첫 블록 바탕 · 지도 위아래 흐림 · 글자 판 덮개를 밤 바탕색으로. 글자 판은 .on-dark ── */
+/* ── 밤: 첫 블록 바탕 · 지도 위아래 흐림을 밤 바탕색으로. 글자는 .on-dark ── */
 .hero[data-tod='night'] {
   background: #15191f;
 }
@@ -197,8 +152,35 @@
 .hero[data-tod='night'] .map::after {
   background: linear-gradient(rgba(21, 25, 31, 0), #15191f);
 }
-@media (min-width: 1024px) {
-  .hero[data-tod='night'] .wash {
-    background: linear-gradient(to right, rgba(21, 25, 31, 0), #15191f 72px);
+
+/* 아주 좁은 폰(360 미만): 꺾쇠 둘 + 이름이 한 줄에 들어가게 */
+@media (max-width: 379px) {
+  .wordmark {
+    font-size: 36px;
   }
+}
+
+/*
+ * SVG 지도(3D 를 쓰지 않을 때): 미리보기가 열리면 고른 곳이 아닌 건물 · 이름표는 옅어지고 손글씨 메모는 사라진다.
+ * (3D 지도는 world3d 가 같은 일을 한다)
+ */
+.map :global(.campus-iso [data-place]),
+.map :global(.campus-iso [data-place-label]),
+.map :global(.campus-iso [data-pen]) {
+  transition: opacity 280ms var(--ease);
+}
+.map[data-open] :global(.campus-iso [data-pen]) {
+  opacity: 0;
+}
+.map[data-open='about'] :global(.campus-iso [data-place]:not([data-place='about'])),
+.map[data-open='projects'] :global(.campus-iso [data-place]:not([data-place='projects'])),
+.map[data-open='community'] :global(.campus-iso [data-place]:not([data-place='community'])),
+.map[data-open='teams'] :global(.campus-iso [data-place]:not([data-place='teams'])),
+.map[data-open='recruits'] :global(.campus-iso [data-place]:not([data-place='recruits'])),
+.map[data-open='about'] :global(.campus-iso [data-place-label]:not([data-place-label='about'])),
+.map[data-open='projects'] :global(.campus-iso [data-place-label]:not([data-place-label='projects'])),
+.map[data-open='community'] :global(.campus-iso [data-place-label]:not([data-place-label='community'])),
+.map[data-open='teams'] :global(.campus-iso [data-place-label]:not([data-place-label='teams'])),
+.map[data-open='recruits'] :global(.campus-iso [data-place-label]:not([data-place-label='recruits'])) {
+  opacity: 0.3;
 }

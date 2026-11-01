@@ -15,7 +15,7 @@
 
 - **조사는 붙여 씁니다**: `G-Sprint는`, `Camping Seminar를`, `TTS로`, `AI가`, `gdsc.dgu@gmail.com이나`, `@gdg.donggukuniv로`.
 - **화면에 보이는 날짜는 점으로** 씁니다: `2026.08.18`, `2026.09.08–09.10`. `2026-08-18` 모양은 `date` · `start` 같은 날짜 필드에만 씁니다.
-- **한 가지를 한 이름으로**: `Google 기술`(구글 X), `코어 멤버`(Core Member X), `Solution Challenge 2024`, `Solution Challenge 2025 APAC`, `Solution Challenge 2026`, `동국대 Dev Conference 2025`, 10.13 은 `킥오프`.
+- **한 가지를 한 이름으로**: `Google 기술`(구글 X), `코어 멤버`(Core Member X), `Solution Challenge 2024`, `Solution Challenge 2025`, `Solution Challenge 2026`, `동국대 Dev Conference 2025`, 10.13 은 `킥오프`.
 - 기수 연혁의 숫자는 센 만큼만: `Camping Seminar 공개 기록 8건`(events.json 의 그 기수 · 시리즈 줄 수), `Solution Challenge 2026 프로젝트 4개`(projects.json 의 그 기수 · 프로그램 줄 수).
 
 ## 2. 파일별 안내
@@ -74,7 +74,7 @@
 | `id` | 바뀌지 않는 이름 |
 | `name` | 프로젝트 이름 (README 의 이름) |
 | `summary` | 짧은 ~습니다체 한두 문장. **README 에 있는 내용만.** README 에 설명이 없으면 비웁니다 |
-| `program` | 어떤 프로그램에서 만들었는지 (`Solution Challenge 2024`, `Solution Challenge 2025 APAC`, `Solution Challenge 2026`, `G-Sprint` …) |
+| `program` | 어떤 프로그램에서 만들었는지 (`Solution Challenge 2024`, `Solution Challenge 2025`, `Solution Challenge 2026`, `G-Sprint` …) |
 | `year` | 연도 |
 | `generation` | 몇 기 (아래 규칙) |
 | `stack` | 기술 4개까지 (README 나 GitHub 언어 표시 기준) |
@@ -87,7 +87,8 @@ GitHub 숫자와 그림 (모두 선택. 없으면 화면이 알아서 줄입니�
 
 | 필드 | 뜻 |
 |---|---|
-| `contributors` · `commits` | 대표 저장소(`repo`)의 기여자 수 · 커밋 수 |
+| `members` | 팀원 이름 목록 (자세히 보기 창 '팀원' 줄). 본인이 고른 표기 그대로, 공개해도 된다고 확인한 것만 |
+| `contributors` · `commits` | 대표 저장소(`repo`)의 기여자 수 · 커밋 수 (기록용, 화면에는 쓰지 않는다) |
 | `firstCommit` · `lastCommit` | 대표 저장소의 첫 · 마지막 커밋 날짜 `YYYY-MM-DD` (표지의 기간) |
 | `languages` | GitHub 언어 비율 `[{ "name": "Dart", "share": 90.5 }]` (표지 아래 막대) |
 | `statsAsOf` | 위 숫자를 확인한 날 |
@@ -119,7 +120,7 @@ GitHub 숫자와 그림 (모두 선택. 없으면 화면이 알아서 줄입니�
 |---|---|---|
 | Solution Challenge 2024 (`2024-SolutionChallenge-*`) | 2024년 상반기 | 1기 (GDSC) |
 | GDSC DGU 웹사이트 (`gdsc-dgu`, README 2024.03) | 2024년 3월 | 1기 |
-| Solution Challenge 2025 APAC (`2025-APAC-SolutionChallenge-*`) | 2025년 상반기 | 2기 |
+| Solution Challenge 2025 (`2025-APAC-SolutionChallenge-*`, 화면에는 APAC 를 쓰지 않는다: 4기 Organizer 2026-11) | 2025년 상반기 | 2기 |
 | 2025 동국대 봄 축제 웹사이트 (`DGU-2025-Festival-*`) | 2025년 봄 | 2기 |
 | Solution Challenge 2026 (`2026-SDGs-Project-*`, 저장소 이름은 SDGs Project) | 2026년 상반기 | 3기 |
 | G-Sprint (홈페이지 리뉴얼) | 2026년 가을 | 4기 |

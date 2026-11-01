@@ -173,6 +173,15 @@
   padding-top: 40px;
   border-top: 1px solid var(--line);
 }
+/* 전체 프로젝트 보러 가기: 섹션 맨 아래 가운데 */
+.all {
+  display: flex;
+  justify-content: center;
+  margin-top: 56px;
+}
+.all :global(.btn-secondary) {
+  gap: 8px;
+}
 /* 폰 펼치기 버튼은 폰에서만 (전역 .btn-secondary 의 display 를 이기도록 두 단계로) */
 .rest .more {
   display: none;

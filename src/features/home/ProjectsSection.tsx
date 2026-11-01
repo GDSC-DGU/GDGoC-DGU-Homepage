@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { Link } from 'react-router-dom'
 import { CHAPTER, PROJECTS, isPublicProject } from '@/content'
 import { FEATURED_PROJECTS, PROJECTS_STORY } from '@/content/story'
@@ -13,8 +13,8 @@ import { RoughMark } from '@/features/common/RoughMark'
 import s from './projects.module.css'
 
 const BIG = 2
-/** 나머지 목록 id (폰 펼치기 버튼이 가리킨다) */
-const REST_ID = 'home-rest-projects'
+/** 큰 타일 아래 작은 목록에 거는 수 (두 줄 3칸). 전부는 /projects 에서 */
+const REST_SHOWN = 6
 /** GitHub 조직 이름 ('https://github.com/GDSC-DGU' → 'GDSC-DGU') */
 const ORG = CHAPTER.github.replace(/\/+$/, '').split('/').pop() ?? 'GDSC-DGU'
 
@@ -82,15 +82,13 @@ function withNum(template: string, n: number) {
 
 /**
  * 프로젝트 (이야기 섹션): '팀으로 만들어 공개한 서비스 {n}개'.
- * 큰 실물 둘(실제 화면 큰 타일 2장) + 나머지 완성 프로젝트 전부(아이콘 · 이름 · 한 줄 목록, /projects 전시실과 같은 모양)로
- * 크기 위계를 두면서 '지금까지 만든 것'을 다 보여 준다 (팀 피드백 2026-10-28).
- * 폰은 목록을 PROJECTS_STORY.phoneFirst 개만 먼저 보이고 '프로젝트 N개 더 보기' 로 펼친다 (넓은 화면은 처음부터 전부, 버튼 없음).
+ * 대표 작품만: 큰 실물 둘(실제 화면 큰 타일 2장) + 작은 목록 두 줄(아이콘 · 이름 · 한 줄, 로고가 있는 최근 작품 6개).
+ * 전부는 /projects 가 보여 준다 (4기 시안 2026-11). 섹션 맨 아래 가운데 '전체 프로젝트 보러 가기'.
  * 숫자는 projects.json 에서 센다: 공개 저장소가 있는 완성 프로젝트 수 · 그중 Solution Challenge 수. 커밋 합계는 쓰지 않는다.
  * 데이터를 서버에서 받기 전에도 저장소 스냅샷(PROJECTS)으로 먼저 그린다 (섹션이 늦게 끼어들어 화면이 밀리지 않게).
  */
 export function ProjectsSection() {
   const { data } = useProjects()
-  const [expanded, setExpanded] = useState(false)
   const list = (data ?? PROJECTS).filter(isPublicProject)
   const { done, solutionChallenge } = projectCounts(list)
   if (done === 0) return null
@@ -100,19 +98,12 @@ export function ProjectsSection() {
     FEATURED_PROJECTS.big,
     BIG,
   )
-  const rest = restProjects(
+  // 로고 · 그림이 있는 작품을 먼저 (아이콘 줄이 비어 보이지 않게), 그 안에서는 최근 것부터
+  const others = restProjects(
     list,
     big.map((p) => p.id),
   )
-  const hiddenOnPhone = Math.max(0, rest.length - PROJECTS_STORY.phoneFirst)
-
-  // 펼치면 새로 보인 첫 작품으로 초점을 옮긴다 (키보드 · 화면 읽기 사용자가 어디부터인지 알게)
-  const expand = () => {
-    setExpanded(true)
-    requestAnimationFrame(() => {
-      document.getElementById(REST_ID)?.querySelectorAll<HTMLAnchorElement>('li h3 a')[PROJECTS_STORY.phoneFirst]?.focus()
-    })
-  }
+  const rest = [...others.filter((p) => p.cover), ...others.filter((p) => !p.cover)].slice(0, REST_SHOWN)
 
   return (
     <StorySection
@@ -127,11 +118,6 @@ export function ProjectsSection() {
           {fillKeep(line, { sc: solutionChallenge, org: ORG })}
         </span>
       ))}
-      action={
-        <Link className="link-go" to="/projects">
-          {fill(PROJECTS_STORY.more, { n: done })}
-        </Link>
-      }
     >
       {big.length > 0 && (
         <ul className={s.tiles}>
@@ -142,18 +128,20 @@ export function ProjectsSection() {
       )}
       {rest.length > 0 && (
         <div className={s.rest}>
-          <WorkList id={REST_ID} className={s.restList} expanded={expanded} label={PROJECTS_STORY.restLabel}>
+          <WorkList className={s.restList} label={PROJECTS_STORY.restLabel}>
             {rest.map((p) => (
               <ExhibitCard key={p.id} project={p} withProgram level={3} linkTo="/projects" />
             ))}
           </WorkList>
-          {hiddenOnPhone > 0 && !expanded && (
-            <button type="button" className={`btn-secondary ${s.more}`} aria-expanded={false} aria-controls={REST_ID} onClick={expand}>
-              {fill(PROJECTS_STORY.moreOnPhone, { n: hiddenOnPhone })}
-            </button>
-          )}
         </div>
       )}
+      {/* 다 본 뒤에 전체로: 섹션 맨 아래 가운데 */}
+      <div className={s.all}>
+        <Link className="btn-secondary" to="/projects">
+          {fill(PROJECTS_STORY.more, { n: done })}
+          <span aria-hidden="true">→</span>
+        </Link>
+      </div>
     </StorySection>
   )
 }

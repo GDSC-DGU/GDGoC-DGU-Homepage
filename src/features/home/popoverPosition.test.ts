@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { placePopover } from './popoverPosition'
+import { dockInset, placePopover } from './popoverPosition'
 
 const frame = { w: 1440, h: 560 }
 const panel = { w: 340, h: 300 }
@@ -43,5 +43,20 @@ describe('미리보기 자리', () => {
   it('보이는 구간이 패널보다 작으면 틀 안에만 맞춘다', () => {
     const p = placePopover({ anchor: plate(400, 20), panel, frame, visible: { top: 400, bottom: 560 } })
     expect(p.top).toBe(16)
+  })
+})
+
+describe('오른쪽에 붙이기 (dockRight)', () => {
+  it('이름표와 겹치지 않으면 틀 오른쪽 끝선에, 세로는 보이는 구간 가운데', () => {
+    const p = placePopover({ anchor: { left: 300, top: 200, right: 400, bottom: 230 }, panel: { w: 340, h: 300 }, frame: { w: 1440, h: 600 }, dockRight: 150 })
+    expect(p).toEqual({ left: 1440 - 150 - 340, top: 150, side: 'right' })
+  })
+  it('이름표가 그 자리에 걸리면 이름표 옆 규칙으로', () => {
+    const p = placePopover({ anchor: { left: 900, top: 200, right: 1000, bottom: 230 }, panel: { w: 340, h: 300 }, frame: { w: 1440, h: 600 }, dockRight: 150 })
+    expect(p.left).not.toBe(1440 - 150 - 340)
+  })
+  it('본문 틀 오른쪽 끝선까지의 거리', () => {
+    expect(dockInset(1440)).toBe(150)
+    expect(dockInset(1000)).toBe(24)
   })
 })

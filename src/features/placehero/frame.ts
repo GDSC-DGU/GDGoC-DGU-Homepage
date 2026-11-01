@@ -164,6 +164,26 @@ export function wideFrame(place: HeroPlace, state: HeroState, stage: StageSize, 
   return { vb: toViewBox(sx, sy, k, ax, ay, stage), k, anchor: { left: ax, top: ay } }
 }
 
+/** 안내판을 글자 쪽에 둘 때 건물 배율 상한 (넓은 화면에서 건물이 무대를 채우는 크기) */
+export const K_FOCUS_MAX = 2.1
+
+/**
+ * 넓은 화면, 안내판이 글자 쪽에 있을 때 (프로젝트): 지붕 위를 비워 둘 까닭이 없으니 건물을 무대 가운데에 크게 둔다.
+ * 무대는 본문 틀 안에서 끝나고 양옆이 흐려지므로, 양옆 흐림 띠를 빼고 가운데에. 아래는 받침 아래 땅을 남긴다.
+ */
+export function focusFrame(place: HeroPlace, state: HeroState, stage: StageSize, bleed = 0): HeroFrame {
+  const fp = footprintOf(place)
+  const b = subjectBox(place, state)
+  // 양옆 흐림 띠(96) + 24 를 비우고 가운데에 (장면이 화면 끝까지 나가면 그 몫도 뺀다)
+  const pad = { t: 40, b: WIDE.bottom + 12, l: 120, r: 120 + bleed }
+  const availW = Math.max(1, stage.w - pad.l - pad.r)
+  const availH = Math.max(1, stage.h - pad.t - pad.b)
+  const k = Math.max(K_WIDE.min, Math.min(K_FOCUS_MAX, availW / (b.x1 - b.x0), availH / (b.y1 - b.y0)))
+  const vb = toViewBox((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, k, pad.l + availW / 2, pad.t + availH / 2, stage)
+  const [sx, sy] = iso(...(plateAnchor(fp) as [number, number, number]))
+  return { vb, k, anchor: { left: (sx - vb.x) * k, top: (sy - vb.y) * k } }
+}
+
 /** 좁은 화면: 건물(+ 공사 비계)을 무대 가운데에. 안내판은 장면 아래 글 목록이 맡는다 */
 export function narrowFrame(place: HeroPlace, state: HeroState, stage: StageSize): HeroFrame {
   const fp = footprintOf(place)

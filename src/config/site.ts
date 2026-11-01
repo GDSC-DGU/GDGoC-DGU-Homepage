@@ -17,7 +17,13 @@ export const SITE = {
     email: null as string | null,
     linkedin: null as string | null,
     github: null as string | null,
+    /** 꼬리말 '채널 바로가기' 아이콘. 주소가 확인되면 넣는다 (null 이면 아이콘을 숨긴다) */
+    /** 4기 Organizer 확인 (2026-11-01) */
+    youtube: 'https://www.youtube.com/@GDGoCDGU' as string | null,
+    discord: null as string | null,
   },
+  /** 꼬리말 주소 (4기 Organizer 시안, 2026-11-01) */
+  address: '서울시 중구 필동로1길 30 동국대학교 필동관 1층',
 } as const
 
 /** 소개 장소(광장 깃발)의 미리보기 세 줄. 확인된 사실만 (4기 운영 계획 · 일정) */

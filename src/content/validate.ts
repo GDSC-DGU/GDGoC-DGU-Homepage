@@ -145,6 +145,8 @@ export function checkProjects(list: unknown): Checked<Project> {
     requireSource(raw, problems)
     // 저장소 숫자 · 그림 (모두 선택)
     optional(raw, 'demo', (v) => Array.isArray(v) && v.length > 0 && v.every(isHttpsUrl), 'https 주소 목록', problems)
+    // 팀원 이름: 본인이 고른 표기 그대로, 공개해도 된다고 확인한 것만 (자세히 보기 창 '팀원' 줄)
+    optional(raw, 'members', (v) => isStringList(v) && v.length > 0, '이름 목록', problems)
     optional(raw, 'contributors', isPositiveInt, '1 이상의 정수', problems)
     optional(raw, 'commits', isPositiveInt, '1 이상의 정수', problems)
     for (const key of ['firstCommit', 'lastCommit', 'statsAsOf']) optional(raw, key, isValidYmd, 'YYYY-MM-DD', problems)
@@ -165,6 +167,7 @@ export function checkProjects(list: unknown): Checked<Project> {
     if (raw.url !== undefined) p.url = raw.url as string
     p.source = raw.source as string
     if (raw.demo !== undefined) p.demo = [...(raw.demo as string[])]
+    if (raw.members !== undefined) p.members = [...(raw.members as string[])]
     if (raw.contributors !== undefined) p.contributors = raw.contributors as number
     if (raw.commits !== undefined) p.commits = raw.commits as number
     if (raw.firstCommit !== undefined) p.firstCommit = raw.firstCommit as string

@@ -136,7 +136,7 @@ describe('projects.json', () => {
   })
 
   it('공개 프로젝트(PUBLIC_PROJECTS)는 챕터 GitHub 조직 저장소만 센다', () => {
-    expect(projectsBasis).toBe('GitHub GDSC-DGU 기준')
+    expect(projectsBasis).toBe('GitHub 공개 저장소 기준')
     expect(PUBLIC_PROJECTS.length).toBeGreaterThan(0)
     for (const p of PUBLIC_PROJECTS) expect(p.repo?.startsWith('https://github.com/GDSC-DGU/'), p.id).toBe(true)
     // 개인 저장소에서 만드는 홈페이지 리뉴얼은 목록에는 있지만 공개 숫자에서는 빠진다
@@ -146,9 +146,9 @@ describe('projects.json', () => {
     expect(isPublicProject({})).toBe(false)
   })
 
-  it('프로그램 이름은 한 가지로 쓴다 (Solution Challenge 2024 · 2025 APAC · 2026)', () => {
+  it('프로그램 이름은 한 가지로 쓴다 (Solution Challenge 2024 · 2025 · 2026)', () => {
     for (const p of PROJECTS.filter((x) => /solution challenge/i.test(x.program))) {
-      expect(['Solution Challenge 2024', 'Solution Challenge 2025 APAC', 'Solution Challenge 2026'], p.id).toContain(p.program)
+      expect(['Solution Challenge 2024', 'Solution Challenge 2025', 'Solution Challenge 2026'], p.id).toContain(p.program)
     }
   })
 

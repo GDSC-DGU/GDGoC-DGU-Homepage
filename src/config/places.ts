@@ -78,6 +78,13 @@ export const SOON_LABEL = '준비 중'
 /** 메뉴에 보이는 이름: 소개 장소는 메뉴에서 '홈' */
 export const navLabel = (id: PlaceId) => (id === 'about' ? '홈' : PLACE_BY_ID[id].label)
 
+/**
+ * 넓은 화면 머리말 메뉴 (4기 Figma 시안 2026-11): 로고가 홈, 오른쪽에 네 메뉴. 지원 안내는 '지원하기' 로 메뉴 줄 끝에.
+ * 폰 메뉴 시트 · 꼬리말 · 검색은 NAV_ORDER 를 그대로 쓴다.
+ */
+export const HEADER_NAV: readonly PlaceId[] = ['projects', 'community', 'teams', 'recruits']
+export const headerLabel = (id: PlaceId) => (id === 'recruits' ? '지원하기' : navLabel(id))
+
 /** 화면에 칠할 색. 소개 장소의 잉크색은 토큰을 따른다 */
 export const placeColor = (id: PlaceId) => (id === 'about' ? 'var(--ink)' : PLACE_BY_ID[id].color)
 

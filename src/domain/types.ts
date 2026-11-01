@@ -94,7 +94,9 @@ export interface Project {
   source?: string
   /** 데모 영상 주소 (README 에 걸린 YouTube 등). 서비스 주소(url)와 따로 둔다 */
   demo?: string[]
-  /** 대표 저장소(repo)의 GitHub 기여자 수 (statsAsOf 기준) */
+  /** 팀원 이름 (화면 '팀원' 줄). 본인이 고른 표기 그대로 · 공개해도 된다고 확인한 것만 */
+  members?: string[]
+  /** 대표 저장소(repo)의 GitHub 기여자 수 (statsAsOf 기준). 화면에는 쓰지 않는다 */
   contributors?: number
   /** 대표 저장소의 커밋 수 (모든 브랜치, statsAsOf 기준) */
   commits?: number

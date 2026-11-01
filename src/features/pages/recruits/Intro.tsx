@@ -52,7 +52,7 @@ export function Parts() {
           )
         })}
       </ul>
-      {anyExamples && <Note>지난 프로젝트는 GitHub GDSC-DGU 저장소 README에 적힌 기술로 골랐습니다.</Note>}
+      {anyExamples && <Note>지난 프로젝트는 GitHub 저장소 README에 적힌 기술로 골랐습니다.</Note>}
     </>
   )
 }

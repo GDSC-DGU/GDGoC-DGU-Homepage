@@ -1,4 +1,4 @@
-/* ── 머리말: 64px 흰 띠, 위에 붙는다. 내려가면 아래 1px 선 ── */
+/* ── 머리말: 80px 흰 띠(폰 64), 위에 붙는다. 내려가면 아래 1px 선 ── */
 .header {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
@@ -28,7 +28,7 @@
 .bar {
   display: flex;
   align-items: center;
-  height: 64px;
+  height: 80px;
 }
 
 .brand {
@@ -41,6 +41,17 @@
   text-decoration: none;
   flex: none;
 }
+.brandLogo {
+  display: block;
+  width: auto;
+  height: 28px;
+}
+.brandName {
+  font: 700 18px/1 var(--font-num);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+  white-space: nowrap;
+}
 .wordmark {
   font: 700 18px/1 var(--font-num);
   letter-spacing: -0.01em;
@@ -48,9 +59,12 @@
   white-space: nowrap;
 }
 
+.nav {
+  margin-left: auto;
+}
 .nav ul {
   display: flex;
-  gap: 2px;
+  gap: 8px;
 }
 .navLink {
   position: relative;
@@ -59,33 +73,27 @@
   height: 44px;
   padding: 0 12px;
   border-radius: var(--r-control);
-  font: var(--t-ui);
-  color: var(--ink-700);
+  font: 600 16px/24px var(--font-kr);
+  color: var(--ink-900);
   text-decoration: none;
   white-space: nowrap;
   transition: color var(--dur-hover) var(--ease);
 }
+/* 지금 메뉴: 그 장소색(짙게) 글자 (4기 시안). 메뉴 링크에 --active 로 장소를 넘긴다 */
 .navActive {
-  color: var(--ink-900);
+  color: var(--active, var(--ink-900));
 }
-/*
- * 메뉴 밑줄 두 가지 (같은 자리 · 같은 두께):
- * - 지금 페이지(.navBar): 먹색. 페이지를 옮기면 새 메뉴 아래로 미끄러진다
- * - 마우스를 올린 메뉴(::after): 옅은 회색이 가운데에서 펴진다 = '누르면 여기로 밑줄이 온다'
- */
-.navBar,
+/* 마지막 메뉴는 본문 오른쪽 끝선에 글자를 맞춘다 */
+.nav li:last-child .navLink {
+  margin-right: -12px;
+}
+/* 마우스를 올린 메뉴: 옅은 회색 밑줄이 가운데에서 펴진다 (지금 메뉴는 글자색이 말하므로 밑줄 없음) */
 .navLink::after {
   position: absolute;
   left: 12px;
   right: 12px;
   bottom: 6px;
   height: 2px;
-}
-.navBar {
-  background: var(--ink-900);
-  view-transition-name: nav-active;
-}
-.navLink::after {
   content: '';
   background: var(--line-strong);
   opacity: 0;
@@ -98,9 +106,6 @@
   display: none;
 }
 @media (hover: hover) {
-  .navLink:hover {
-    color: var(--ink-900);
-  }
   .navLink:hover::after {
     opacity: 1;
     transform: none;
@@ -111,7 +116,6 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-left: auto;
 }
 .iconBtn {
   display: grid;
@@ -223,6 +227,12 @@
 }
 
 @media (max-width: 900px) {
+  .bar {
+    height: 64px;
+  }
+  .brandLogo {
+    height: 24px;
+  }
   .nav {
     display: none;
   }
@@ -235,6 +245,7 @@
   }
   .tools {
     gap: 0;
+    margin-left: auto;
     margin-right: -12px; /* 아이콘 버튼 안쪽 여백만큼 바깥 줄에 맞춘다 */
   }
   .apply.applyWide {
@@ -429,236 +440,135 @@
 }
 
 /*
- * ── 꼬리말: 먹색 면 (모든 페이지의 같은 끝) ──
- * footer 에 .on-dark 를 달아 글자 · 선 · 포커스 링(#8AB4F8) 단계를 먹색 면 값으로 바꿔 끼운다.
- * 본문(main)이 이야기 섹션(.story, 보통 JoinStrip)으로 끝나면 위 여백 없이 바로 붙는다.
- * 본문이 참고 섹션 · 글로 끝나는 페이지(/recruits · 오류)는 흰 여백(--gap-section)을 둔다.
- * 밑줄은 hover 와 지금 페이지만 (목록 전체에 밑줄을 긋지 않는다).
+ * ── 꼬리말: 옅은 회색 띠 (4기 Figma 시안 2026-11) ──
+ * 왼쪽 이름 · 주소 · 저작권 | 오른쪽 '채널 바로가기' 아이콘. 본문 좌우 끝선(.container)에 맞춘다.
+ * 본문이 옅은 회색 JoinStrip 으로 끝나도 위 1px 선으로 나뉜다.
  */
 .footer {
   margin-top: var(--gap-section);
-  padding: 80px 0 calc(40px + env(safe-area-inset-bottom, 0px));
-  background: var(--band-bg);
-  color: var(--band-ink-2);
+  padding: 48px 0 calc(48px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--line);
+  background: var(--field);
 }
 :global(main):has(> :global(.story):last-child, > :last-child > :global(.story):last-child) + .footer {
   margin-top: 0;
 }
 .footerGrid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: var(--gutter);
-  row-gap: 40px;
-}
-.footerName {
-  grid-column: 1 / span 3;
+  position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px 48px;
 }
-.footer .wordmark {
-  color: var(--band-ink);
+.footerInfo {
+  min-width: 0;
+  max-width: 640px;
 }
-.footerName > span:nth-child(2) {
-  max-width: 17em;
-  font: 400 15px/22px var(--font-kr);
-  color: var(--band-ink-2);
+.footerBrand {
+  font: 800 22px/28px var(--font-num);
+  letter-spacing: 0.01em;
+  color: var(--ink-500);
 }
-.footerCol {
-  grid-column: span 3;
+.footerAddress {
+  margin-top: 6px;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-500);
 }
-.footerCol h2 {
-  margin-bottom: 8px;
-  font: var(--t-meta);
-  color: var(--band-ink-3);
-}
-.footerLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  font: 500 15px/22px var(--font-kr);
-  color: var(--band-ink);
-  text-decoration: none;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-}
-/* 한 줄 행동(메일 쓰기): 글자를 한 단계 굵게 */
-.footerAction {
-  font-weight: 600;
-}
-@media (hover: hover) {
-  .footerLink:hover {
-    text-decoration-line: underline;
-  }
-}
-/* 지금 보고 있는 페이지: 메뉴 활성과 같은 2px 밑줄 */
-.footerLink[aria-current='page'] {
-  text-decoration-line: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 5px;
+.footerCopy {
+  margin-top: 20px;
+  font: 400 13px/20px var(--font-num);
+  color: var(--ink-500);
 }
 
-/* 협업 · 연사 제안: 이름 붙은 한 줄. 주소는 고를 수 있는 글자(한 번 누르면 통째로 선택), 메일 앱은 옆 링크 */
-.contactRow {
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--band-line);
-}
-.contactRow dt {
-  font: 600 15px/22px var(--font-kr);
-  color: var(--band-ink);
-}
-.contactRow dd {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: 12px;
-}
-.address {
-  font-size: 15px;
-  line-height: 22px;
-  font-weight: 500;
-  color: var(--band-ink);
-  -webkit-user-select: all;
-  user-select: all;
-  cursor: text;
-}
-/*
- * 둘러보기 목록 옆 '현재 위치' 작은 지도: 안내판의 현재 위치 지도처럼 옅은 판(radius 14) 위에.
- * 이 페이지 건물만 장소색 (홈은 모두). 목록 첫 줄과 위를 맞춘다.
- * 칸이 좁으면(1024–1279 · 태블릿) 지도가 너무 작아지므로 목록 아래로 내린다.
- */
-.footerBrowse {
-  container: browse / inline-size;
-}
-.browseBody {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-.browseBody > ul {
-  flex: none;
-}
-.here {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  max-width: 200px;
-  margin-top: 6px;
-}
-.miniCampus {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 960 / 580;
-  padding: 4px;
-  border-radius: 14px;
-  background: #f4f6f8;
-  pointer-events: none;
-}
-.hereLabel {
-  font: var(--t-meta);
-  color: var(--band-ink-3);
-}
-@container browse (max-width: 300px) {
-  .browseBody {
-    flex-direction: column;
-    gap: 12px;
-  }
-  .here {
-    width: 100%;
-    max-width: 200px;
-    margin-top: 0;
-  }
-}
-.footerFacts > div {
-  display: flex;
-  gap: 12px;
-  min-height: 40px;
-  align-items: center;
-  font: 500 15px/22px var(--font-kr);
-}
-.footerFacts dt {
-  width: 5.5em;
-  flex: none;
-  font: var(--t-meta);
-  color: var(--band-ink-3);
-}
-.footerFacts dd {
-  color: var(--band-ink);
-}
-.footerNotes {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-direction: column;
+/* 채널 바로가기: 오른쪽 정렬, 아이콘 44px 누르는 자리 (아이콘 그림은 20px) */
+.channels {
+  display: grid;
+  justify-items: end;
   gap: 4px;
-  padding-top: 24px;
-  border-top: 1px solid var(--band-line);
-  font: 400 14px/22px var(--font-kr);
-  color: var(--band-ink-3);
 }
-.footerBottom {
-  grid-column: 1 / -1;
+.channelsTitle {
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.channelList {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 24px;
-  margin-top: -16px;
-  font: var(--t-meta);
-  color: var(--band-ink-3);
+  margin-right: -12px;
 }
+.channel {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-control);
+  color: var(--ink-500);
+  transition:
+    color var(--dur-hover) var(--ease),
+    background-color var(--dur-hover) var(--ease);
+}
+.channel svg {
+  width: 20px;
+  height: 20px;
+}
+.channelFill {
+  fill: currentColor;
+}
+.channelLine {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+@media (hover: hover) {
+  .channel:hover {
+    background: var(--line);
+    color: var(--ink-900);
+  }
+}
+
+/* 운영진 로그인: 오른쪽 아래 구석. 평소 보이지 않고, 키보드 초점이 오거나 마우스를 올리면 보인다 */
 .admin {
+  position: absolute;
+  right: var(--side-r);
+  bottom: -40px;
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  margin-left: auto;
-  color: var(--band-ink-3);
+  min-height: 32px;
+  padding: 0 4px;
+  font: 500 13px/20px var(--font-kr);
+  color: var(--ink-700);
   text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--dur-hover) var(--ease);
+}
+.admin:hover,
+.admin:focus-visible {
+  opacity: 1;
+  text-decoration-line: underline;
   text-underline-offset: 3px;
 }
-@media (hover: hover) {
-  .admin:hover {
-    color: var(--band-ink);
-    text-decoration-line: underline;
-  }
-}
 
-/*
- * 1279 이하: 네 칸이 좁아 '연락'의 주소 · 링크가 두 줄로 꺾이고 ↗ 가 글자에서 떨어진다.
- * 이름을 맨 위 한 줄로 올리고, 아래 세 칸을 내용 길이에 맞춰 4 · 5 · 3 으로 나눈다.
- */
-@media (max-width: 1279px) {
-  .footerName {
-    grid-column: 1 / -1;
-  }
-  .footerCol {
-    grid-column: span 4;
-  }
-  .footerContact {
-    grid-column: span 5;
-  }
-  .footerGen {
-    grid-column: span 3;
-  }
-}
 @media (max-width: 767px) {
   .footer {
-    padding-top: 56px;
+    padding-top: 40px;
   }
   .footerGrid {
-    row-gap: 36px;
+    flex-direction: column;
+    gap: 28px;
   }
-  .footerCol {
-    grid-column: 1 / -1;
+  .channels {
+    justify-items: start;
   }
-  .here {
-    max-width: 180px;
+  .channelList {
+    margin-right: 0;
+    margin-left: -12px;
   }
-  .admin {
-    margin-left: 0;
+  .footerBrand {
+    font-size: 20px;
+  }
+  .footerAddress {
+    font-size: 14px;
   }
 }
 

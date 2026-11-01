@@ -5,7 +5,7 @@ import { CHAPTER, CONTENT_UPDATED_AT, FAQS, GENERATIONS, PUBLIC_PROJECTS } from 
 import { withoutStalePlans } from '@/content/plan'
 import { useSchedule } from '@/data/queries'
 import type { ScheduleEvent } from '@/domain/types'
-import { JoinStrip, StorySection } from '@/features/common'
+import { StorySection } from '@/features/common'
 import { PlaceHero, type DirectoryRow } from '@/features/placehero/PlaceHero'
 import { useToday } from '@/hooks/useToday'
 import { monthDay, weekday } from '@/lib/date'
@@ -38,8 +38,8 @@ const COMMUNITY_COLOR = placeColor('community')
 
 /**
  * 커뮤니티 (시안 E): 건물 앞 머리 → 먹색 '이번 주'(다음 모임 큰 표) → 다가오는 일정(참고, 촘촘한 목록)
- * → 옅은 회색 '세 기수의 1년'(행사 달력, 주장 '세 기수가 연 공개 행사 45번') → 기수별 기록(참고) → 페이지 끝 JoinStrip.
- * 면: 흰(머리) → 먹색 → 흰 → 옅은 회색 → 흰 → 옅은 회색(JoinStrip) → 먹색 꼬리말. 큰 숫자 묶음은 두지 않는다 (숫자는 제목 · 글줄 안에).
+ * → 옅은 회색 '세 기수의 1년'(행사 달력, 주장 '세 기수가 연 공개 행사 45번') → 기수별 기록(참고). 페이지 끝 지원 안내(JoinStrip)는 붙이지 않는다 (4기 시안 2026-11).
+ * 면: 흰(머리) → 먹색 → 흰 → 옅은 회색 → 흰 → 회색 꼬리말. 큰 숫자 묶음은 두지 않는다 (숫자는 제목 · 글줄 안에).
  * 날짜가 지났는데 계획으로만 남은 일정은 처음부터 뺀다 (content/plan.ts).
  * 우리끼리 말은 화면에 처음 나오는 자리에서 한 번만 풀어 쓴다: 다가오는 일정 → 기수 요약 · 기록 순서.
  */
@@ -191,8 +191,6 @@ export function CommunityPage() {
         {loading || failed || <Archive gens={GENS} past={past} today={today} explained={explainedAbove} />}
         <PageSources items={sources} updated={<>일정 <span className="num">{dotDate(CONTENT_UPDATED_AT)}</span> 갱신</>} />
       </Section>
-
-      <JoinStrip />
     </div>
   )
 }
