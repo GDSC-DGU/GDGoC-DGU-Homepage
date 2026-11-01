@@ -1,0 +1,186 @@
+/*
+ * 관리자 로그인 (P-ACM-01). 관리자 화면 중 이 화면만 태블릿 · 모바일도 맞춘다 (명세).
+ * 실제 계정을 받는 화면처럼 보이지 않게: 맨 위에 '예시 화면' 안내, 예시 계정 버튼이 먼저, 아이디 입력은 '명세 흐름 보기'.
+ */
+.page {
+  display: grid;
+  place-items: start center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 56px 16px 72px;
+  background: var(--field);
+}
+.page:focus {
+  outline: none;
+}
+.card {
+  display: grid;
+  gap: 24px;
+  width: min(100%, 460px);
+  padding: 32px;
+  border: 1px solid var(--field-line);
+  border-radius: 20px;
+  background: var(--paper);
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font: 700 18px/24px var(--font-num);
+  letter-spacing: -0.02em;
+}
+.brand span {
+  font: 600 14px/20px var(--font-kr);
+  letter-spacing: 0;
+  color: var(--ink-500);
+}
+.title {
+  margin-top: -12px;
+  font: 700 26px/36px var(--font-kr);
+  letter-spacing: -0.015em;
+}
+.notice {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  font: 500 15px/24px var(--font-kr);
+}
+.noticeTag {
+  justify-self: start;
+}
+.sectionTitle {
+  margin-bottom: 10px;
+  font: 700 16px/24px var(--font-kr);
+}
+.accounts {
+  display: grid;
+  gap: 8px;
+}
+.account {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--paper);
+  text-align: left;
+  font: 600 16px/24px var(--font-kr);
+  color: var(--ink-900);
+  cursor: pointer;
+  transition:
+    background var(--dur-hover) var(--ease),
+    border-color var(--dur-hover) var(--ease);
+}
+.account:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+.accountNote {
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+.form {
+  display: grid;
+  gap: 16px;
+}
+.alert {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--adm-danger-soft);
+  font: 500 15px/22px var(--font-kr);
+  color: var(--adm-danger-ink);
+}
+.alertLine {
+  display: flex;
+  gap: 8px;
+}
+.alertLine svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--adm-danger);
+}
+.alertHint {
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.hint {
+  font: 400 14px/22px var(--font-kr);
+  color: var(--ink-500);
+}
+.hint code {
+  font: 500 14px/22px var(--font-num);
+  color: var(--ink-700);
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.textButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .account:hover:not(:disabled) {
+    border-color: var(--ink-900);
+    background: var(--subtle);
+  }
+  .textButton:hover {
+    color: var(--ink-900);
+  }
+}
+@media (max-width: 479px) {
+  .page {
+    padding: 24px 12px 48px;
+  }
+  .card {
+    padding: 24px 20px;
+  }
+}
+
+/* ── 비밀번호 변경 팝업 ── */
+.pwForm {
+  display: grid;
+  gap: 16px;
+}
+.pwNote {
+  padding: 10px 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  font: 400 14px/22px var(--font-kr);
+  color: var(--ink-700);
+}

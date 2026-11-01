@@ -1,0 +1,374 @@
+/*
+ * 관리자 화면 배치 부품: 페이지 머리 · 판(Panel) · 툴바 · 검색 · 거르기 탭 · 탭 · 상태 배지 · 빈 상태.
+ * 관리자 화면은 '도구'라 정보 밀도를 높인다: 제목 28, 본문 15, 큰 숫자 · 큰 장면 없음.
+ */
+
+/* ── 페이지 머리 ── */
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px 24px;
+  margin-bottom: 24px;
+}
+.headerText {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  min-height: 32px;
+  margin-bottom: 2px;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.title {
+  font: var(--t-h2);
+  letter-spacing: var(--ls-h2);
+  color: var(--ink-900);
+}
+.description {
+  max-width: 48em;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.meta {
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+@media (hover: hover) {
+  .back:hover {
+    color: var(--ink-900);
+    text-decoration-line: underline;
+  }
+}
+@media (max-width: 767px) {
+  .header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .actions {
+    justify-content: flex-start;
+  }
+}
+
+/* ── 판: 한 영역을 묶는 흰 판 (대시보드 카드 · 콘텐츠 영역) ── */
+.panel {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
+}
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.panelHead.flat {
+  border-bottom: 0;
+  padding-bottom: 4px;
+}
+.panelTitle {
+  font: 700 17px/26px var(--font-kr);
+  letter-spacing: -0.01em;
+}
+.panelDesc {
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.panelBody {
+  padding: 16px 20px 20px;
+}
+.panelBody.flush {
+  padding: 0;
+}
+
+/* ── 툴바: 검색 · 거르기 · 정렬 · 선택한 것에 할 일 ── */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+.toolbarStart,
+.toolbarEnd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+.toolbarEnd {
+  margin-left: auto;
+}
+.total {
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.total strong {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+
+.search {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--ink-500);
+  pointer-events: none;
+}
+.searchInput {
+  width: 280px;
+  max-width: 100%;
+  min-height: 40px;
+  padding: 8px 12px 8px 36px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--paper);
+  font: 400 15px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+.searchInput::placeholder {
+  color: var(--ink-500);
+}
+.searchInput:focus {
+  border-color: var(--ink-900);
+}
+
+/* 거르기 탭 (분류 · 관리 유형 · 결과): 하나만 눌림. 개수는 숫자 글꼴 */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--paper);
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+  cursor: pointer;
+  transition:
+    background var(--dur-hover) var(--ease),
+    color var(--dur-hover) var(--ease);
+}
+.filter[aria-pressed='true'] {
+  border-color: var(--ink-900);
+  background: var(--ink-900);
+  color: #fff;
+}
+.filterCount {
+  font: 500 13px/1 var(--font-num);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+@media (hover: hover) {
+  .filter:hover:not([aria-pressed='true']) {
+    background: var(--subtle);
+    color: var(--ink-900);
+  }
+}
+
+/* 선택 줄: 'N개 선택됨' + 할 일 */
+.bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 40px;
+  padding: 4px 4px 4px 14px;
+  border-radius: 10px;
+  background: var(--field);
+}
+.bulkCount {
+  font: 600 14px/20px var(--font-kr);
+}
+
+/* ── 탭 (화면 안 영역 바꾸기 · 주소가 다른 탭) ── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  font: 600 15px/22px var(--font-kr);
+  color: var(--ink-500);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tab[aria-selected='true'],
+.tab[aria-current='page'] {
+  color: var(--ink-900);
+}
+.tab[aria-selected='true']::after,
+.tab[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 2px;
+  background: var(--ink-900);
+}
+.tab:focus-visible {
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .tab:hover {
+    color: var(--ink-900);
+  }
+}
+
+/* ── 상태 배지: 글자 + 모양 (색만으로 구분하지 않는다) ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding: 0 8px 0 6px;
+  border-radius: var(--r-tag);
+  background: var(--field);
+  font: 600 13px/18px var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.badge svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.badge[data-tone='success'] {
+  color: var(--ink-900);
+}
+.badge[data-tone='danger'] {
+  background: var(--adm-danger-soft);
+  color: var(--adm-danger-ink);
+}
+.badge[data-tone='danger'] svg {
+  color: var(--adm-danger);
+}
+.badge[data-tone='warning'] {
+  background: var(--adm-warn-soft);
+  color: var(--adm-warn-ink);
+}
+.badge[data-tone='warning'] svg {
+  color: var(--adm-warn);
+}
+.badge[data-tone='pending'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.badge[data-tone='locked'] {
+  background: var(--ink-900);
+  color: #fff;
+}
+.badge[data-tone='muted'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-500);
+}
+.badge[data-tone='neutral'] {
+  padding-left: 8px;
+}
+
+/* ── 빈 상태 ── */
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 40px 16px;
+  text-align: center;
+}
+.emptyTitle {
+  font: 600 16px/24px var(--font-kr);
+  color: var(--ink-900);
+}
+.emptyDesc {
+  max-width: 32em;
+  font: 400 14px/22px var(--font-kr);
+  color: var(--ink-500);
+}
+.emptyAction {
+  margin-top: 10px;
+}
+
+/* ── 만드는 중 자리 ── */
+.placeholder {
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-card);
+  background: var(--paper);
+}
+.placeholderTitle {
+  font: 700 18px/28px var(--font-kr);
+}
+.placeholderFacts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px 20px;
+  font: 400 15px/24px var(--font-kr);
+}
+.placeholderFacts dt {
+  font-weight: 600;
+  color: var(--ink-700);
+}
+.placeholderFacts code {
+  font: 500 14px/24px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (max-width: 767px) {
+  .placeholderFacts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .placeholderFacts dd {
+    margin-bottom: 8px;
+  }
+}

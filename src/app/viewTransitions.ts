@@ -17,6 +17,8 @@ const CLEAR_AFTER_MS = 2500
  */
 export const SLIDE_ORDER: readonly PlaceId[] = ['about', 'projects', 'community', 'teams', 'recruits']
 
+const isAdminPath = (path: string) => path === '/admin' || path.startsWith('/admin/')
+
 /** '/projects' → 'projects', '/' → 'about'. 장소가 아닌 주소(/admin, 없는 주소)는 null */
 export function placeOfPath(pathname: string): PlaceId | null {
   const path = pathname.replace(/\/+$/, '') || '/'
@@ -27,12 +29,15 @@ export function placeOfPath(pathname: string): PlaceId | null {
 /**
  * 어떤 전환을 쓸지. 모든 메뉴 이동이 같은 규칙(좌우 밀기)을 따른다:
  * 머리말 순서에서 오른쪽으로 가면 'forward', 왼쪽으로 가면 'back', 장소가 아닌 주소가 끼면 'fade'.
+ * 관리자 화면끼리(/admin/…)는 전환하지 않는다(null).
  * 주소 이름(pathname)이 같으면(?p= 로 자세히 보기 창만 여닫기 등) 전환하지 않는다(null).
  */
 export function transitionKind(from: string, to: string): 'forward' | 'back' | 'fade' | null {
   const a = from.replace(/\/+$/, '') || '/'
   const b = to.replace(/\/+$/, '') || '/'
   if (a === b) return null
+  // 관리자 화면 안에서는 전환 없이 바로 바꾼다 (도구 화면: 사이드바는 그대로, 본문만 즉시)
+  if (isAdminPath(a) && isAdminPath(b)) return null
   const i = SLIDE_ORDER.indexOf(placeOfPath(a) as PlaceId)
   const j = SLIDE_ORDER.indexOf(placeOfPath(b) as PlaceId)
   if (i < 0 || j < 0 || i === j) return 'fade'

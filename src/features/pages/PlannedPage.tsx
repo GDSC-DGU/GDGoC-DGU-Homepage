@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { PAGE_PLANS, type PagePlan, type PagePlanId } from '@/config/pages'
 import { NAV_ORDER, PLACE_BY_ID, navLabel, placeColor } from '@/config/places'
-import { SHOW_PLAN, SITE } from '@/config/site'
+import { SHOW_PLAN } from '@/config/site'
 import { CONTENT_UPDATED_AT } from '@/content'
 import type { PlaceId } from '@/domain/types'
 import { JoinStrip, TEAMS_WILL_HAVE } from '@/features/common'
@@ -10,7 +10,7 @@ import { PlaceHero } from '@/features/placehero/PlaceHero'
 import { useToday } from '@/hooks/useToday'
 import { DetourLink } from './community/Signage'
 import { dateLabel } from './format'
-import { ExternalLink, Mark, PageHead, Section } from './PageParts'
+import { Mark, PageHead, Section } from './PageParts'
 import s from './pages.module.css'
 
 /** 지금 열려 있는 페이지와 그 페이지에서 볼 수 있는 것 */
@@ -83,40 +83,8 @@ const LEADS: Partial<Record<PagePlanId, ReactNode>> = {
   ),
 }
 
-/** 준비 중 페이지 '지금 상태': 지금 상태 · 여는 시기 · 먼저 알릴 곳 (DESIGN 10장 '미정인 것은 세 가지') */
-function StatusFacts({ what }: { what?: ReactNode }) {
-  return (
-    <dl className={s.facts}>
-      {what && (
-        <div>
-          <dt>생길 것</dt>
-          <dd>{what}</dd>
-        </div>
-      )}
-      <div>
-        <dt>지금 상태</dt>
-        <dd>준비하고 있습니다.</dd>
-      </div>
-      <div>
-        <dt>여는 시기</dt>
-        <dd>아직 정하지 않았습니다.</dd>
-      </div>
-      <div>
-        <dt>먼저 알리는 곳</dt>
-        <dd>
-          열리면{' '}
-          <ExternalLink href={SITE.links.instagram} className={s.inlineLink}>
-            인스타그램 {SITE.links.instagramHandle}
-          </ExternalLink>
-          에 가장 먼저 알립니다.
-        </dd>
-      </div>
-    </dl>
-  )
-}
-
 /**
- * 아직 열지 않은 페이지 (/teams, /admin).
+ * 아직 열지 않은 페이지 (/teams).
  * 무엇이 될지 · 지금 상태 · 여는 시기(미정) · 먼저 알릴 곳만 적는다 (DESIGN 10장).
  * 지도에 건물이 있는 장소(팀원 찾기)는 짧게: 공사 중인 건물 머리 → JoinStrip 변형 하나('팀원 찾기는 준비하고 있습니다'
  * + 소식 받기 · 지원 안내 보기 | 열리면 생길 것 세 줄) → 꼬리말. 지금 상태 · 여는 시기 · 먼저 알릴 곳은 JoinStrip 한 줄이 말한다.
@@ -131,23 +99,8 @@ export function PlannedPage({ id }: { id: PagePlanId }) {
     </>
   )
 
-  if (!place) {
-    // 운영진 화면(/admin): 방문자용 페이지가 아니므로 최소한만
-    return (
-      <div className={`container ${s.page}`}>
-        <PageHead mark="var(--ink-900)" eyebrow={plan.sub} title={plan.title} lead={plan.lead} meta={meta} />
-        <Section id="status" title="지금 상태">
-          <StatusFacts />
-          <p className={s.backHome}>
-            <Link className="link" to="/">
-              홈으로 가기
-            </Link>
-          </p>
-        </Section>
-        {SHOW_PLAN && <PlanNotes id={id} plan={plan} />}
-      </div>
-    )
-  }
+  // 지금 계획된 페이지는 모두 지도 장소(팀원 찾기). 관리자 화면(/admin)은 features/admin 이 따로 그린다
+  if (!place) return <NotFoundPage />
 
   return (
     <div className={`container ${s.page}`}>

@@ -3,7 +3,7 @@ import { PAGE_PLAN_IDS } from '@/config/pages'
 import { HomePage } from '@/features/home/HomePage'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { ErrorPage } from '@/features/pages/ErrorPage'
-import { CampusPreview, CommunityPage, NotFoundPage, NowPreview, PlannedPage, ProjectsPage, RecruitsPage } from './lazyPages'
+import { AdminApp, CampusPreview, CommunityPage, NotFoundPage, NowPreview, PlannedPage, ProjectsPage, RecruitsPage } from './lazyPages'
 import { enableViewTransitions } from './viewTransitions'
 
 /** 다 만든 페이지. 준비 중 페이지를 실제로 만들면 여기로 옮긴다 */
@@ -31,6 +31,11 @@ const routes: RouteObject[] = [
     errorElement: <ErrorPage />,
     children: [...BUILT_ROUTES, ...PLANNED_ROUTES, ...PREVIEW_ROUTES, { path: '*', element: <NotFoundPage /> }],
   },
+  /**
+   * 관리자 화면 (/admin, /admin/login, /admin/boards/teams …): 공개 사이트 틀(머리말 · 꼬리말 · 페이지 전환) 밖의 관리자 전용 틀.
+   * 코드는 들어올 때 받는다 (공개 페이지 첫 JS 에 넣지 않음). 하위 주소는 features/admin/routes.tsx, 화면 목록은 features/admin/screens.ts.
+   */
+  { path: 'admin/*', element: <AdminApp />, errorElement: <ErrorPage /> },
 ]
 
 /**

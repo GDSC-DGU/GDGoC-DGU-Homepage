@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react'
 import type { PagePlanId } from '@/config/pages'
-import { CAMPUS_PREVIEW, COMMUNITY_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, type PageModule } from './pageModules'
+import { ADMIN_APP, CAMPUS_PREVIEW, COMMUNITY_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, type PageModule } from './pageModules'
 
 /**
  * 첫 화면(홈)만 처음 받는 파일에 넣고, 나머지 페이지는 들어갈 때 받는다.
@@ -35,6 +35,7 @@ const Planned = lazyPage(PLANNED_PAGE, (m) => m.PlannedPage)
 const NotFound = lazyPage(PLANNED_PAGE, (m) => m.NotFoundPage)
 const Now = lazyPage(NOW_PREVIEW, (m) => m.NowPreview)
 const Campus = lazyPage(CAMPUS_PREVIEW, (m) => m.CampusPreview)
+const Admin = lazyPage(ADMIN_APP, (m) => m.AdminRoot)
 
 export function ProjectsPage() {
   return <Projects />
@@ -56,4 +57,8 @@ export function NowPreview() {
 }
 export function CampusPreview() {
   return <Campus />
+}
+/** 관리자 화면 (/admin/*, 공개 사이트 틀 밖) */
+export function AdminApp() {
+  return <Admin />
 }

@@ -157,7 +157,8 @@ export function SiteFooter() {
           <span>
             © <span className="num">2026</span> {SITE.shortName}
           </span>
-          <Link className={s.admin} to="/admin">
+          {/* 관리자 화면 (예시 화면 · 예시 데이터). 로그인한 상태면 대시보드로 바로 간다 */}
+          <Link className={s.admin} to="/admin/login">
             운영진 로그인
           </Link>
         </div>

@@ -29,6 +29,8 @@ export const RECRUITS_PAGE = pageModule(() => import('@/features/pages/RecruitsP
 export const PLANNED_PAGE = pageModule(() => import('@/features/pages/PlannedPage'))
 export const NOW_PREVIEW = pageModule(() => import('@/features/now/NowPreview'))
 export const CAMPUS_PREVIEW = pageModule(() => import('@/features/campus/CampusPreview'))
+/** 관리자 화면 (/admin/*): 틀 · 로그인 · 대시보드 · 공통 부품 · 구역 화면 한 덩어리. 미리 받지 않는다 (방문자는 거의 들어가지 않음) */
+export const ADMIN_APP = pageModule(() => import('@/features/admin/AdminRoot'))
 
 /**
  * 메뉴에 있는 페이지 파일을 미리 받는다 (홈을 다 그린 뒤 한가할 때, AppLayout).
