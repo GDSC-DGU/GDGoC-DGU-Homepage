@@ -7,7 +7,6 @@ import { FLAG_BASE, FLAG_CLOTH, FLAG_POLE } from './geometry'
 import { FLAG_AT } from './layout'
 import { corners, cyl, dots, slab, sphere } from './anatomy/kit'
 import { Dots, Solid } from './anatomy/draw'
-import { DIGITS } from './flagDigits'
 import s from './campus.module.css'
 
 /** 깃발에 쓰는 기수 숫자: '4기' → '4' */
@@ -69,10 +68,13 @@ interface Props {
   onHover: (id: PlaceId | null) => void
 }
 
+/** 깃발 천의 GDG 로고 (public/brand/gdg-logo.png, 가로:세로 = 640:310) */
+const LOGO_RATIO = 310 / 640
+
 /**
  * 광장 한가운데 깃발 = GDGoC DGU 소개.
- * 기수색(주황) 천에 기수 숫자를 먹색으로. 천은 깃대에서 화면 오른쪽 위(-y)로 펼쳐지고,
- * 숫자도 천과 같은 면에 눕혀 쓴다 (skewY 대신 matrix 로 아이소 면에 맞춤).
+ * 흰 천에 GDG 로고 (4기 Organizer 요청 2026-11). 천은 깃대에서 화면 오른쪽 위(-y)로 펼쳐지고,
+ * 로고도 천과 같은 면에 눕혀 그린다 (skewY 대신 matrix 로 아이소 면에 맞춤). 로고는 꾸밈이라 읽지 않는다.
  */
 export const FlagPlaza = memo(function FlagPlaza({ place, selected, hovered, dim, onSelect, onHover }: Props) {
   const flagRef = useRef<SVGGElement>(null)
@@ -128,28 +130,11 @@ export const FlagPlaza = memo(function FlagPlaza({ place, selected, hovered, dim
         >
           <polygon className={s.cloth} points={cloth} />
           <polygon className={s.clothEdge} points={cloth} />
-          {/* 기수 숫자는 글자가 아니라 그림으로 그린다 (버튼 이름 'GDGoC DGU 4기 소개 열기' 와 따로 읽히지 않게) */}
-          <g
-            className={s.clothNum}
-            transform={`matrix(1 -0.5 0 1 ${(bx + 1 + len / 2).toFixed(1)} ${(c0 - len / 4 + ch / 2).toFixed(1)})`}
-          >
-            <GenDigit n={GEN_NUMBER} />
+          <g transform={`matrix(1 -0.5 0 1 ${(bx + 1 + len / 2).toFixed(1)} ${(c0 - len / 4 + ch / 2).toFixed(1)})`} aria-hidden="true">
+            <image href={`${import.meta.env.BASE_URL}brand/gdg-logo.png`} x={(-len * 0.36).toFixed(1)} y={(-len * 0.36 * LOGO_RATIO).toFixed(1)} width={(len * 0.72).toFixed(1)} height={(len * 0.72 * LOGO_RATIO).toFixed(1)} preserveAspectRatio="xMidYMid meet" />
           </g>
         </g>
       </g>
     </g>
   )
 })
-
-
-function GenDigit({ n }: { n: string }) {
-  const step = 11.5
-  const x0 = (-(n.length - 1) * step) / 2
-  return (
-    <>
-      {[...n].map((d, i) => (
-        <path key={i} d={DIGITS[d] ?? ''} transform={`translate(${x0 + i * step} 0)`} />
-      ))}
-    </>
-  )
-}

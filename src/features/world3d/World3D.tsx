@@ -4,6 +4,7 @@ import { AccumulativeShadows, RandomizedLight } from '@react-three/drei'
 import { Color, type Group, type Material, type Mesh, type OrthographicCamera } from 'three'
 import { PLACE_BY_ID, PLACES } from '@/config/places'
 import type { PlaceId } from '@/domain/types'
+import { useReducedMotion } from '@/hooks/useMediaQuery'
 import { shade } from '@/lib/iso'
 import { FLOOR } from '@/features/campus/geometry'
 import { FLAG_AT } from '@/features/campus/layout'
@@ -13,7 +14,7 @@ import { Labels3D } from './Labels3D'
 import { readPalette, type Palette } from './palette'
 import { Benches3D, Building3D, Flag3D, Ground3D, Trees3D } from './parts'
 import { PenNotes3D } from './PenNotes3D'
-import { People3D } from './People3D'
+import { Peeps3D } from './Peeps3D'
 import { aimAt, basis, easeInOut, ISO_AZ, ISO_EL, mixPose, parseViewBox, poseFromViewBox, project, world, Z_SCALE, type Pose } from './projection'
 import s from './world3d.module.css'
 
@@ -152,10 +153,18 @@ function setCursor(c: string) {
   if (el) el.style.cursor = c
 }
 
-function Scene(props: World3DProps & { onPick: (id: PlaceId) => void; focus: PlaceId | null; portal: RefObject<HTMLDivElement | null>; probe: HTMLSpanElement | null }) {
+function Scene(
+  props: World3DProps & {
+    onPick: (id: PlaceId) => void
+    focus: PlaceId | null
+    portal: RefObject<HTMLDivElement | null>
+    probe: HTMLSpanElement | null
+  },
+) {
   const { viewBox, phone, narrow, penScale, night, season, sprint, selected, hovered, hits, previewOpen, genLabel, genNumber, onHover, onReady, onPick, focus, focusArea, portal, probe } = props
   const camera = useThree((st) => st.camera) as OrthographicCamera
   const size = useThree((st) => st.size)
+  const reduceMotion = useReducedMotion()
   const invalidate = useThree((st) => st.invalidate)
   const gl = useThree((st) => st.gl)
   const vb = useMemo(() => parseViewBox(viewBox), [viewBox])
@@ -222,6 +231,31 @@ function Scene(props: World3DProps & { onPick: (id: PlaceId) => void; focus: Pla
     applyWalk(walk.current)
     invalidate()
   }, [pal, applyWalk, invalidate])
+
+  // 건물을 고르면: 나머지 건물 · 깃발은 회색 · 땅색 쪽으로 물러나고(0.42초), 닫으면 돌아온다
+  const focusDim = useRef<{ v: number; keep: PlaceId | null }>({ v: 0, keep: null })
+  useEffect(() => {
+    const st = focusDim.current
+    if (focus) {
+      st.keep = focus
+      fadeGroup(buildings.current[focus], 0, ground)
+    }
+    const from = st.v
+    const to = focus ? 1 : 0
+    let t0: number | null = null
+    let raf = 0
+    const step = (t: number) => {
+      t0 ??= t
+      const k = Math.min(1, (t - t0) / 420)
+      st.v = from + (to - from) * easeInOut(k)
+      for (const p of PLACES) if (p.id !== st.keep) fadeGroup(buildings.current[p.id], st.v * 0.8, ground)
+      invalidate()
+      if (k < 1) raf = requestAnimationFrame(step)
+      else if (to === 0) st.keep = null
+    }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [focus, ground, invalidate])
 
   // 고른 장소로 날아가기 / 돌아오기
   const flyTo = useCallback(
@@ -381,7 +415,8 @@ function Scene(props: World3DProps & { onPick: (id: PlaceId) => void; focus: Pla
         <Labels3D active={labelActive} hits={hits} compact={narrow} flip={narrow} genLabel={genLabel} onPick={onPick} onOver={over} onOut={out} portal={portal} />
         <PenNotes3D compact={narrow} scale={penScale} portal={portal} />
       </group>
-      {baked && <People3D night={night} />}
+      {/* 말뚝 사람 (그림자를 다 구운 뒤에 둔다: 굽는 동안 움직이는 것이 있으면 바닥에 얼룩이 남는다) */}
+      {baked && <Peeps3D night={night} phone={phone} moving={!reduceMotion} />}
     </>
   )
 }
@@ -445,8 +480,9 @@ export default function World3D(props: World3DProps) {
       >
         {probe && <Scene {...props} onPick={onPick} focus={focus} portal={labelsRef} probe={probe} />}
       </Canvas>
-      {/* 안내판 · 손글씨(HTML) 층: 캔버스와 같은 자리. 빈 곳은 눌러도 캔버스로 통한다 */}
-      <div ref={labelsRef} className={s.labels} />
+      {/* 안내판 · 손글씨(HTML) 층: 캔버스와 같은 자리. 빈 곳은 눌러도 캔버스로 통한다.
+          건물을 고르면(data-focus) 다른 안내판은 옅어지고 손글씨 메모는 사라진다 */}
+      <div ref={labelsRef} className={s.labels} data-focus={focus ?? undefined} />
     </>
   )
 }

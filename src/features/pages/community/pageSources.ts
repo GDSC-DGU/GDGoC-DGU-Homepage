@@ -24,7 +24,7 @@ const HOST_LABEL: Record<string, string> = {
   'instagram.com': '인스타그램',
   'forms.gle': '지원서(forms.gle)',
   'linktr.ee': 'Linktree',
-  'github.com': 'GitHub GDSC-DGU',
+  'github.com': 'GitHub',
 }
 
 const textName = (src: string) =>

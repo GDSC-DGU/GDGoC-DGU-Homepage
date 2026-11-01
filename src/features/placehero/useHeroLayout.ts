@@ -20,6 +20,8 @@ export function useHeroLayout(
   stageRef: RefObject<HTMLElement | null>,
   plateRef: RefObject<HTMLElement | null>,
   wide: boolean,
+  /** 장면을 오른쪽 화면 끝까지 넓힐지 (false 면 본문 틀 안에서 끝난다) */
+  bleedOn = true,
 ): HeroLayout {
   const [layout, setLayout] = useState<HeroLayout>({ bleed: 0, stage: { w: 0, h: 0 }, plate: null })
   useLayoutEffect(() => {
@@ -33,8 +35,9 @@ export function useHeroLayout(
       const client = Math.min(de.clientWidth, Math.floor(de.getBoundingClientRect().width))
       const hr = header.getBoundingClientRect()
       const sr = stage.getBoundingClientRect()
-      const bleed = wide ? Math.max(0, Math.floor(client - hr.right)) : 0
-      const w = Math.round(wide ? Math.min(client, hr.right + bleed) - sr.left : sr.width)
+      const out = wide && bleedOn
+      const bleed = out ? Math.max(0, Math.floor(client - hr.right)) : 0
+      const w = Math.round(out ? Math.min(client, hr.right + bleed) - sr.left : sr.width)
       const pr = plateRef.current?.getBoundingClientRect()
       const next: HeroLayout = { bleed, stage: { w, h: Math.round(sr.height) }, plate: pr ? { w: Math.round(pr.width), h: Math.round(pr.height) } : null }
       setLayout((prev) => (same(prev, next) ? prev : next))
@@ -46,6 +49,6 @@ export function useHeroLayout(
     ro.observe(header)
     if (plateRef.current) ro.observe(plateRef.current)
     return () => ro.disconnect()
-  }, [headerRef, stageRef, plateRef, wide])
+  }, [headerRef, stageRef, plateRef, wide, bleedOn])
   return layout
 }

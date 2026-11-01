@@ -12,12 +12,13 @@ import { useToday } from '@/hooks/useToday'
 import { iso } from '@/lib/iso'
 import { useCampus } from '@/state/useCampus'
 import { shortDay } from './homeData'
-import { placePopover, type PopoverPlacement, type Rect } from './popoverPosition'
+import { dockInset, placePopover, type PopoverPlacement, type Rect } from './popoverPosition'
 import { revealElement, scrollToSection } from './scrollTo'
 import s from './popover.module.css'
 
 const LATEST = 3
-const HEADER = 64
+/** 머리말 아래 끝 (넓은 화면 80, 폰 64): 실제로 잰다 */
+const headerBottom = () => document.querySelector('[data-site-header]')?.getBoundingClientRect().bottom ?? 64
 
 /** 지도 위 이름표 자리 (틀 기준 px). 이름표가 없으면 건물 위 이름표가 있을 점 */
 function anchorOf(frame: HTMLElement, id: PlaceId): Rect | null {
@@ -119,7 +120,8 @@ export function PlacePopover({ frameRef, sheet }: Props) {
     const frame = frameRef.current
     if (!open || !sheet || !frame) return
     const top = frame.getBoundingClientRect().top
-    if (top < HEADER - 8 || top > HEADER + 80) revealElement(frame, 'start', true)
+    const hb = headerBottom()
+    if (top < hb - 8 || top > hb + 80) revealElement(frame, 'start', true)
   }, [open, sheet, selected, frameRef])
 
   // 자리를 잡은 뒤(보이게 된 뒤)에야 초점을 옮길 수 있다
@@ -153,8 +155,9 @@ export function PlacePopover({ frameRef, sheet }: Props) {
       const anchor = anchorOf(frame, selected)
       if (!anchor) return
       const fr = frame.getBoundingClientRect()
-      const visible = { top: HEADER - fr.top, bottom: window.innerHeight - fr.top }
-      setPos(placePopover({ anchor, panel: { w: panel.offsetWidth, h: panel.offsetHeight }, frame: { w: fr.width, h: fr.height }, visible }))
+      const visible = { top: headerBottom() - fr.top, bottom: window.innerHeight - fr.top }
+      // 넓은 화면: 건물 옆이 아니라 지도 오른쪽(본문 오른쪽 끝선)에 붙여 연다 (4기 피드백 2026-11)
+      setPos(placePopover({ anchor, panel: { w: panel.offsetWidth, h: panel.offsetHeight }, frame: { w: fr.width, h: fr.height }, visible, dockRight: dockInset(fr.width) }))
     }
     place()
     let raf = 0
@@ -190,7 +193,7 @@ export function PlacePopover({ frameRef, sheet }: Props) {
     fitted.current = selected
     const r = panel.getBoundingClientRect()
     const below = r.bottom - (window.innerHeight - 16)
-    const above = HEADER + 16 - r.top
+    const above = headerBottom() + 16 - r.top
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
     // 아래로 내리되 패널 위가 머리말 밑으로 들어가지 않을 만큼만
     if (below > 0) window.scrollBy({ top: Math.min(below, -above), behavior })

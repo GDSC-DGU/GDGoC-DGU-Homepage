@@ -162,6 +162,15 @@
   top: 0;
   overflow: visible;
   pointer-events: none;
+  transition: opacity 280ms var(--ease);
+}
+
+/* 건물을 골라 다가가면: 손글씨는 사라지고, 고른 곳이 아닌 안내판은 옅어진다 */
+.labels[data-focus] .pen {
+  opacity: 0;
+}
+.labels[data-focus] .pin:not([data-on]) {
+  opacity: 0.28;
 }
 
 /* 밤: 지시선은 먹색이면 땅에 묻히므로 옅은 회색 (SVG 안내판과 같게). 판은 흰 그대로 */

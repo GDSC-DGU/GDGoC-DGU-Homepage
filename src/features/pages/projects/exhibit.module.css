@@ -287,6 +287,61 @@
   bottom: 20%;
 }
 
+/* ───────────── 기수 탭 카드 격자: 넓은 화면 3칸 · 태블릿 2칸 · 폰 1칸 ───────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px var(--gutter);
+}
+/* 카드: 그림(16:9) → 이름 → 한 줄 설명. 1px 괘선 틀, 그림자 없음 */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
+  transition: border-color var(--dur-hover) var(--ease);
+}
+.card:has(.open:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.stage.thumb {
+  flex: none;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+}
+.stage.thumb::after {
+  display: none;
+}
+.cardBody {
+  flex: 1;
+  padding: 16px 20px 20px;
+}
+.cardName {
+  font: 700 19px/28px var(--font-kr);
+  letter-spacing: -0.015em;
+  color: var(--ink-900);
+}
+.cardMeta {
+  margin-top: 2px;
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.cardSummary {
+  display: -webkit-box;
+  margin-top: 6px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+
 /* ───────────── hover · 초점 (마우스가 있는 화면에서만) ───────────── */
 @media (hover: hover) {
   .feature:hover .open,
@@ -302,6 +357,12 @@
   .work:hover .icon {
     border-color: var(--ink-500);
   }
+  .card:hover {
+    border-color: var(--line-strong);
+  }
+  .card:hover .open {
+    text-decoration-line: underline;
+  }
   .liveLink:hover {
     text-decoration-line: underline;
   }
@@ -311,6 +372,10 @@
     transform: translateY(-6px);
   }
   .feature:hover .single {
+    transform: scale(var(--media-zoom));
+  }
+  .card:hover .single,
+  .card:hover .desk {
     transform: scale(var(--media-zoom));
   }
 }
@@ -432,5 +497,26 @@
   .single,
   .cue::after {
     transition: none;
+  }
+}
+
+/* 카드 격자: 태블릿 2칸 · 폰 1칸 */
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 20px;
+  }
+}
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .cardBody {
+    padding: 14px 16px 18px;
+  }
+  .cardName {
+    font-size: 18px;
+    line-height: 26px;
   }
 }

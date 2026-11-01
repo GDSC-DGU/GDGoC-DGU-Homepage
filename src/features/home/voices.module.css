@@ -1,19 +1,315 @@
-/* 사람: 멤버가 한 말 (괘선 목록). 비어 있으면 섹션째 숨는다 */
-.voices {
-  border-top: 1px solid var(--ink-900);
+/*
+ * 홈 Interview (4기 피드백 2026-11): 옅은 회색 면.
+ * 넓은 화면: 왼쪽 4칸 = 제목 · 큰 번호(01 / 10) · 남은 시간 줄 · 멈춤 · 이전 · 다음 | 오른쪽 7칸 = 한 사람 카드.
+ * 좁은 화면: 제목 → 카드 → 번호 · 버튼. 카드는 한 칸에 겹쳐 놓고 지금 사람만 보인다 (옆에서 살짝 밀려 들어온다).
+ */
+.section {
+  --story-top: 112px;
+  --story-bottom: 112px;
+  overflow: hidden;
+  overflow: clip;
 }
-.voice {
-  padding-block: 24px;
-  border-bottom: 1px solid var(--line);
+.head {
+  text-align: left;
 }
-.voice blockquote {
-  margin: 0;
-  max-width: 38em;
-  font: var(--t-lead);
+.title {
+  font: 700 40px/48px var(--font-num);
+  letter-spacing: -0.02em;
   color: var(--ink-900);
 }
-.voice figcaption {
-  margin-top: 8px;
-  font: var(--t-meta);
+.sub {
+  margin-top: 10px;
+  font: 400 17px/27px var(--font-kr);
   color: var(--ink-700);
+}
+
+.carousel {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+  grid-template-areas:
+    'head stage'
+    'meta stage';
+  grid-template-rows: auto 1fr;
+  column-gap: 80px;
+}
+.headArea {
+  grid-area: head;
+  align-self: end;
+}
+.metaArea {
+  grid-area: meta;
+  align-self: start;
+  margin-top: 48px;
+}
+.stage {
+  grid-area: stage;
+  position: relative;
+  display: grid;
+  touch-action: pan-y;
+  user-select: none;
+}
+.card {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 360px;
+  margin: 0;
+  padding: 48px 56px 40px;
+  border-radius: var(--r-media);
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(25, 27, 31, 0.04), 0 12px 32px rgba(25, 27, 31, 0.07);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 520ms var(--ease),
+    transform 620ms cubic-bezier(0.2, 0.7, 0, 1),
+    visibility 0s linear 620ms;
+}
+.card[data-side='before'] {
+  transform: translateX(-40px);
+}
+.card[data-side='after'] {
+  transform: translateX(40px);
+}
+.card[data-side='current'] {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 520ms var(--ease) 80ms,
+    transform 620ms cubic-bezier(0.2, 0.7, 0, 1) 80ms,
+    visibility 0s;
+}
+.figure {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
+}
+.sampleTag {
+  align-self: flex-start;
+  margin-bottom: 12px;
+  padding: 2px 8px;
+  border-radius: var(--r-tag);
+  background: var(--field);
+  font: 600 13px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+/* 큰 따옴표: 파트 색 */
+.qmark {
+  display: block;
+  height: 40px;
+  font: 700 80px/1 var(--font-num);
+  color: var(--pc);
+}
+.quote {
+  flex: 1;
+  margin: 14px 0 0;
+}
+/* 핵심 한 줄: 인터뷰 제목처럼 */
+.headline {
+  font: 700 28px/40px var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  text-wrap: balance;
+}
+.body {
+  margin-top: 16px;
+  font: 400 18px/31px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-700);
+  text-wrap: pretty;
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+/* 이름 동그라미: 파트 색 옅은 판 + 먹색 글자 */
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pc) 18%, var(--paper));
+  font: 700 15px/1 var(--font-kr);
+  color: var(--ink-900);
+}
+.whoText {
+  display: grid;
+}
+.name {
+  font: 700 17px/25px var(--font-kr);
+  color: var(--ink-900);
+}
+.meta {
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+
+/* 큰 번호: 01 / 10 */
+.counter {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.now {
+  font: 700 64px/1 var(--font-num);
+  letter-spacing: -0.03em;
+  color: var(--ink-900);
+}
+.total {
+  font: 600 20px/1 var(--font-num);
+  color: var(--ink-500);
+}
+/* 다음 사람까지 남은 시간: 번호 아래 2px 줄이 왼쪽에서 차오른다 (저절로 넘어가는 동안만) */
+.progress {
+  position: relative;
+  display: block;
+  width: min(100%, 280px);
+  height: 2px;
+  margin-top: 20px;
+  border-radius: 1px;
+  background: var(--line);
+  overflow: hidden;
+}
+.progress > span {
+  position: absolute;
+  inset: 0;
+  background: var(--ink-900);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.progress > span[data-running] {
+  animation: fill var(--t) linear both;
+}
+@keyframes fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* 멈춤 · 이전 · 다음 */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+.ctrl {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink-900);
+  cursor: pointer;
+  transition: border-color var(--dur-hover) var(--ease);
+}
+.ctrl svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ctrl:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.ctrl:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .ctrl:not(:disabled):hover {
+    border-color: var(--ink-500);
+  }
+}
+/* 태블릿 · 폰: 제목 → 카드 → 번호 · 버튼 (가운데) */
+@media (max-width: 1023px) {
+  .carousel {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'head'
+      'stage'
+      'meta';
+    grid-template-rows: auto;
+    row-gap: 32px;
+  }
+  .head {
+    text-align: center;
+  }
+  .metaArea {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 20px;
+    margin-top: 0;
+  }
+  .now {
+    font-size: 40px;
+  }
+  .total {
+    font-size: 16px;
+  }
+  .progress {
+    order: 3;
+    width: 100%;
+    margin-top: 0;
+  }
+  .controls {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    --story-top: 72px;
+    --story-bottom: 72px;
+  }
+  .title {
+    font-size: 30px;
+    line-height: 38px;
+  }
+  .card {
+    min-height: 380px;
+    padding: 32px 24px 28px;
+  }
+  .qmark {
+    height: 30px;
+    font-size: 60px;
+  }
+  .headline {
+    font-size: 21px;
+    line-height: 31px;
+  }
+  .body {
+    font-size: 16px;
+    line-height: 27px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card[data-side='current'] {
+    transition: none;
+  }
+  .progress {
+    display: none;
+  }
 }

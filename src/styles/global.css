@@ -28,7 +28,7 @@ html {
  */
 :where(main, footer),
 :where(main, footer) * {
-  scroll-margin-top: 80px;
+  scroll-margin-top: 96px;
 }
 /* 창(검색 · 폰 메뉴)이 열려 있는 동안 뒤 페이지가 스크롤되지 않게 */
 html:has(dialog[open]) {

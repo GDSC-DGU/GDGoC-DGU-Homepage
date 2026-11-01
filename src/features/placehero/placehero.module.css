@@ -74,7 +74,8 @@
 /* 홈 지도와 같은 방법: 장면 가장자리만 종이색으로 녹인다 (그림 위에 겹칠 뿐) */
 .stage::before,
 .stage::after,
-.fadeTop {
+.fadeTop,
+.fadeRight {
   content: '';
   position: absolute;
   z-index: 1;
@@ -100,6 +101,14 @@
   top: 0;
   height: 40px;
   background: linear-gradient(var(--paper), rgba(255, 255, 255, 0));
+}
+/* 본문 틀 안에서 끝나는 장면(plateLow)의 오른쪽 흐림: 왼쪽과 같은 폭 */
+.fadeRight {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 96px;
+  background: linear-gradient(270deg, var(--paper), rgba(255, 255, 255, 0));
 }
 
 /* ── 건물 안내판: 지붕 한 점 → 1px 지시선 → 판 (지도 이름표를 펼친 모양) ── */
@@ -303,6 +312,29 @@
   from {
     fill: #bccad8;
   }
+}
+
+/*
+ * 안내판을 글자 아래에 두는 머리 (plateAt='text', 프로젝트):
+ * 제목 → 한 줄(회색) → 안내판. 장면에는 건물만 서 있다. 넓은 화면에서만 (1024 미만은 안내판을 그리지 않는다).
+ */
+.wide.plateLow .place {
+  margin-right: 0;
+}
+.wide.plateLow .text {
+  align-self: start;
+  padding-top: 56px;
+}
+.wide.plateLow .title {
+  font: 800 56px/68px var(--font-kr);
+}
+.plateLow .lead {
+  margin-top: 12px;
+  color: var(--ink-700);
+}
+.plate.textPlate {
+  position: static;
+  margin-top: 48px;
 }
 
 /* ── 1280 미만 넓은 화면: 장면을 조금 낮게, 안내판을 조금 좁게 (건물이 너무 작아지지 않게) ── */

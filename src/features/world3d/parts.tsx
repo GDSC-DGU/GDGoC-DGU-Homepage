@@ -5,7 +5,6 @@ import { AdditiveBlending, CanvasTexture, DoubleSide, PlaneGeometry, SRGBColorSp
 import { PLACES } from '@/config/places'
 import type { Footprint, Place, PlaceId } from '@/domain/types'
 import { shade } from '@/lib/iso'
-import { DIGITS } from '@/features/campus/flagDigits'
 import { entryPath, FLAG_BASE, FLAG_CLOTH, FLAG_POLE, FLOOR, PAD } from '@/features/campus/geometry'
 import { BENCHES, FLAG_AT, GRID as N, GROUND_FAR as F, LAWNS, PLAZA, WALK_BAND } from '@/features/campus/layout'
 import { ROOF_RISE, SAW_TEETH, SCREEN } from '@/features/campus/roofs/heights'
@@ -383,30 +382,31 @@ export const Building3D = memo(
 /* ── 광장 깃발 ─────────────────────────────────────────── */
 
 /** 기수 숫자를 그린 깃발 천 무늬 (글자가 아니라 FlagPlaza 의 숫자 그림을 그대로) */
-function flagTexture(gen: string, cloth: string, ink: string): CanvasTexture {
+/** 깃발 천의 GDG 로고 (public/brand/gdg-logo.png) */
+const FLAG_LOGO = `${import.meta.env.BASE_URL}brand/gdg-logo.png`
+
+/** 흰 천 + GDG 로고 (4기 Organizer 요청 2026-11). 로고 그림을 받으면 그려 넣고 loaded 를 부른다 (다시 그리기) */
+function flagTexture(loaded: () => void): CanvasTexture {
   const W = 290
   const H = 184
   const c = document.createElement('canvas')
   c.width = W
   c.height = H
   const g = c.getContext('2d')!
-  g.fillStyle = cloth
+  g.fillStyle = '#ffffff'
   g.fillRect(0, 0, W, H)
-  g.strokeStyle = ink
-  g.lineWidth = 2.6
-  const step = 11.5
-  const x0 = (-(gen.length - 1) * step) / 2
-  g.translate(W / 2, H / 2)
-  g.scale(4.2, 4.2)
-  ;[...gen].forEach((dg, i) => {
-    g.save()
-    g.translate(x0 + i * step, 0)
-    g.stroke(new Path2D(DIGITS[dg] ?? ''))
-    g.restore()
-  })
   const t = new CanvasTexture(c)
   t.colorSpace = SRGBColorSpace
   t.anisotropy = 4
+  const img = new Image()
+  img.onload = () => {
+    const w = W * 0.72
+    const h = (w * img.naturalHeight) / img.naturalWidth
+    g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h)
+    t.needsUpdate = true
+    loaded()
+  }
+  img.src = FLAG_LOGO
   return t
 }
 
@@ -424,12 +424,13 @@ function clothGeometry(len: number, ch: number): PlaneGeometry {
   return g
 }
 
-export const Flag3D = memo(function Flag3D({ gen, pal, onOver, onOut, onPick, active }: { gen: string; pal: Palette; active: boolean; onOver: (id: PlaceId) => void; onOut: (id: PlaceId) => void; onPick: (id: PlaceId) => void }) {
+export const Flag3D = memo(function Flag3D({ pal, onOver, onOut, onPick, active }: { gen: string; pal: Palette; active: boolean; onOver: (id: PlaceId) => void; onOut: (id: PlaceId) => void; onPick: (id: PlaceId) => void }) {
   const [fx, fy] = FLAG_AT
   const pole = FLAG_POLE / 32
   const top = FLAG_BASE + pole
   const ch = FLAG_CLOTH.h
-  const tex = useMemo(() => flagTexture(gen, pal.gen, pal.onGen), [gen, pal.gen, pal.onGen])
+  const invalidate = useThree((st) => st.invalidate)
+  const tex = useMemo(() => flagTexture(() => invalidate()), [invalidate])
   const geo = useMemo(() => clothGeometry(FLAG_CLOTH.len, ch), [ch])
   const poleColor = pal.night ? '#8a909a' : pal.ink500
   return (
@@ -459,7 +460,8 @@ export const Flag3D = memo(function Flag3D({ gen, pal, onOver, onOut, onPick, ac
           <meshLambertMaterial color={poleColor} />
         </mesh>
         <mesh geometry={geo} position={[fx + 0.02, top - 0.1 - ch / 2, fy - 0.02]} castShadow>
-          <meshLambertMaterial map={tex} side={DoubleSide} color={pal.night ? '#b8a69a' : '#ffffff'} />
+          {/* 빛을 받지 않는 재질: 깃발이 빛을 등져도 흰 천 · 로고 색이 그대로 (밤에만 조금 어둡게) */}
+          <meshBasicMaterial map={tex} side={DoubleSide} color={pal.night ? '#c9ccd2' : '#ffffff'} toneMapped={false} />
         </mesh>
       </Lift>
     </group>

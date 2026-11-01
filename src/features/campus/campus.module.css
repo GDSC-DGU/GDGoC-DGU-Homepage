@@ -72,9 +72,9 @@
 /* 깃발: 기수색 천 + 먹색 숫자 */
 .pole { stroke: var(--ink-500); stroke-width: 2; stroke-linecap: round; }
 .finial { fill: var(--ink-500); }
-.cloth { fill: var(--gen); }
-.clothEdge { fill: none; stroke: #c24f0b; stroke-width: 0.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-.clothNum { fill: none; stroke: var(--on-gen); stroke-width: 2.6; stroke-linecap: butt; stroke-linejoin: miter; }
+/* 깃발: 흰 천 + GDG 로고 (FlagPlaza) */
+.cloth { fill: #ffffff; }
+.clothEdge { fill: none; stroke: #c9cdd2; stroke-width: 0.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 /* 세션에 한 번, 깃발이 화면에 들어오면 천이 깃대를 따라 올라간다. 튕김 없음 */
 .lowered { transform: translateY(var(--drop, 40px)); }
 .raise { animation: raise 700ms ease 160ms both; }
