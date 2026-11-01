@@ -16,6 +16,7 @@
 | 하위 페이지 머리 장면 · 건물 상태 | `features/placehero/` (`frame.ts` 자리, `look.ts` 상태) | 같은 장면을 다른 viewBox 로, 상태는 데이터에서 계산 |
 | 프로젝트 그림 · GitHub 숫자 | `content/projects.json` 의 `cover` · `images` · `languages` … | 내용과 코드 분리 |
 | 아직 안 만든 페이지 | `config/pages.ts` → 라우터가 자동 연결 | 설정에서 라우트 만들기 |
+| 관리자 화면 (예시 데이터) | `features/admin` (구역별 `data/<구역>/` Repository · seed, 권한 `data/permissions.ts`) → [ADMIN.md](ADMIN.md) | Repository + 예시 store, 늦게 받는 한 덩어리 |
 
 ## 1. 지도 = 메뉴 (데이터 주도 설정)
 
@@ -109,6 +110,7 @@ flowchart LR
 ## 11. 처음 받는 파일을 줄인다
 
 - 홈만 처음 받는 파일에 넣고, 프로젝트 · 커뮤니티 · 지원 안내 · 준비 중 페이지는 들어갈 때 받습니다 (`app/lazyPages.tsx`).
+- 관리자 화면(`/admin/*`)은 공개 사이트 틀 밖의 별도 틀이고, 들어갈 때 한 덩어리로 받습니다 (미리 받지 않음, [ADMIN.md](ADMIN.md) 6장).
 - 받는 동안 머리말 · 꼬리말은 그대로 두고 본문 자리 높이만 잡아 둡니다.
 - 파일 하나로 묶어야 하는 미리보기(아티팩트)는 `VITE_SINGLE_FILE=1` 로 다시 한 파일로 합칩니다.
 

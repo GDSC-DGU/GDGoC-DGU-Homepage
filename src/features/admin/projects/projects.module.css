@@ -1,0 +1,159 @@
+/*
+ * 프로젝트 관리 (P-APJ-01 · 02).
+ */
+
+/* ── 목록 ── */
+.bulkRow {
+  margin-bottom: 12px;
+}
+.listHead:focus {
+  outline: none;
+}
+.thumb {
+  display: block;
+  width: 96px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--field);
+}
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* 썸네일이 없을 때: 글자 표지 (공개 사이트 카드도 같은 자리에 글자 표지를 쓴다) */
+.noThumb {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  font: 500 13px/18px var(--font-kr);
+  color: var(--ink-500);
+}
+.titleCell {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.title {
+  font: 600 15px/22px var(--font-kr);
+}
+.summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.when {
+  font: 400 14px/20px var(--font-num);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.none {
+  color: var(--ink-500);
+}
+.rowActions {
+  display: inline-flex;
+  gap: 8px;
+}
+/* 좁을 때: [수정] [삭제]를 위아래로 (가로로 넘기지 않게) */
+.rowActionsStack {
+  flex-direction: column;
+  align-items: flex-end;
+}
+.thumbSmall {
+  width: 72px;
+}
+.stack {
+  display: grid;
+  gap: 2px;
+}
+
+/* ── 등록 · 수정 ── */
+.metaPart::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  margin: 0 10px;
+  background: var(--line-strong);
+  vertical-align: -1px;
+}
+.form {
+  display: grid;
+  gap: 24px;
+  max-width: 760px;
+}
+.card {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
+}
+.cardTitle {
+  font: 700 17px/26px var(--font-kr);
+  letter-spacing: -0.01em;
+}
+.cardHead {
+  display: grid;
+  gap: 2px;
+}
+.cardDesc {
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.row2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px 16px;
+}
+/* 올리기 칸의 [파일 선택]이 회색 면 위에서도 버튼으로 보이게 (공통 FileDrop 개선 전까지, NOTES.md) */
+.drop :global(.btn-secondary) {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.genField {
+  max-width: 240px;
+}
+.formError {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--adm-danger-soft);
+  font: 500 15px/22px var(--font-kr);
+  color: var(--adm-danger-ink);
+}
+.formError svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--adm-danger);
+}
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.state {
+  padding: 48px 0;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-500);
+}
+
+@media (max-width: 767px) {
+  .row2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .card {
+    padding: 16px;
+  }
+}

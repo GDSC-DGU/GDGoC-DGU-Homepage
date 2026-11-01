@@ -21,6 +21,12 @@ describe('페이지 전환 (메뉴 순서대로 좌우 밀기)', () => {
     expect(transitionKind('/', '/admin')).toBe('fade')
     expect(transitionKind('/nope', '/projects')).toBe('fade')
   })
+  it('관리자 화면끼리는 전환하지 않는다 (사이드바 메뉴는 바로 바뀐다)', () => {
+    expect(transitionKind('/admin', '/admin/users')).toBeNull()
+    expect(transitionKind('/admin/login', '/admin')).toBeNull()
+    expect(transitionKind('/admin/users', '/')).toBe('fade')
+    expect(transitionKind('/administrator', '/admin')).toBe('fade')
+  })
   it('하위 주소도 그 장소로 본다', () => {
     expect(placeOfPath('/recruits/faq')).toBe('recruits')
     expect(placeOfPath('/')).toBe('about')

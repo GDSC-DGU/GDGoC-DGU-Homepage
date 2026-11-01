@@ -2,7 +2,8 @@ import type { PreviewPlace } from '@/data/repositories'
 
 /**
  * 아직 만들지 않은 페이지의 계획. 배범서 '기획 구체화'(노션)와 Figma 와이어프레임 화면 번호를 따른다.
- * 여기 있는 페이지 중 router.tsx 의 BUILT_ROUTES 에 없는 것은 자동으로 '준비 중' 페이지가 된다 (지금: teams · admin).
+ * 여기 있는 페이지 중 router.tsx 의 BUILT_ROUTES 에 없는 것은 자동으로 '준비 중' 페이지가 된다 (지금: teams).
+ * 관리자 화면(/admin)은 여기 없다: 예시 화면으로 만들었다 (features/admin, docs/ADMIN.md).
  * projects · community · recruits 는 실제 페이지가 있어 lead 는 쓰이지 않고, 기획 메모로만 남긴다.
  * 페이지를 실제로 만들면: 여기서 지우고 → features/ 에 페이지를 만들고 → router.tsx 의 BUILT_ROUTES 에 넣는다.
  */
@@ -56,13 +57,6 @@ export const PAGE_PLANS = {
     wireframe: '05 · 05-1 · 05-2',
     features: ['모집 일정 이미지', '지원하기 (지원 기간이 아니면 안내 팝업)', '지원서 작성'],
     open: ['지원서를 직접 받을지, Google Forms로 연결할지', '지원 자격 · 선발 절차 · 활동 시간 문구'],
-  },
-  admin: {
-    title: '관리자',
-    sub: '운영진 전용',
-    lead: '운영진이 Google 계정으로 로그인해 게시판 글과 행사 일정을 관리하는 화면입니다. 방문자가 쓰는 페이지는 아닙니다.',
-    wireframe: '06 · 07 · 07-1~07-4',
-    features: ['관리자 로그인 (Google 로그인)', '대시보드: 접속자 수 · 새 글 · 새 댓글 · 행사 일정', '팀원 찾기 · 커뮤니티 게시판 관리', '사용자 관리 (추가, 고유 ID)', '지원폼 작성 (선택)'],
   },
 } satisfies Record<string, PagePlan>
 
