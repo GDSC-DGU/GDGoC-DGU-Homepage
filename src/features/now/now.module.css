@@ -572,6 +572,19 @@
 .cellEvents li[data-rest] {
   color: var(--ink-700);
 }
+/* 여러 날 일정이 이어지는 날: 이름 없이 장소색 띠 */
+.cellEvents li[data-cont] {
+  align-items: center;
+  min-height: 18px;
+}
+.contBar {
+  flex: 1;
+  height: 4px;
+  margin-top: 0 !important;
+  border-radius: 2px;
+  background: var(--c);
+  opacity: 0.5;
+}
 .cellTitle {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -678,6 +691,13 @@
   }
   .cellEvents li > i {
     margin-top: 0;
+  }
+  .cellEvents li[data-cont] {
+    min-height: 0;
+  }
+  .contBar {
+    flex: none;
+    width: 12px;
   }
   /* 칸에는 표식만: 제목은 화면 읽기용으로 남긴다 */
   .cellTitle {

@@ -9,6 +9,7 @@ import { errorMessage } from '../data/common/errors'
 import type { DashboardData, DashboardScheduleItem } from '../data/dashboard/dashboard'
 import { adminKeys } from '../data/queryKeys'
 import { useAdminRepos } from '../data/useAdminData'
+import { ADMIN_SAMPLE } from '../sample'
 import { adminPath } from '../screens'
 import { Button, PageHeader, Panel, StatusBadge, formatDay, formatNumber, formatPeriod, relativeTime } from '../ui'
 import { useNow } from './useNow'
@@ -57,7 +58,7 @@ function Metrics({ data }: { data: DashboardData | undefined }) {
         <span className={s.unit}>{unit}</span>
       </span>
     )
-  const example = data?.visitors.isExample ? <span className={s.exampleTag}>예시 값</span> : null
+  const boards = (n: { teams: number; community: number } | undefined) => (n ? (ADMIN_SAMPLE || n.community > 0 ? `Teams ${n.teams} · Community ${n.community}` : `Teams ${n.teams}`) : ' ')
   return (
     <section aria-labelledby="metrics-title">
       <h2 id="metrics-title" className="visually-hidden">
@@ -65,31 +66,35 @@ function Metrics({ data }: { data: DashboardData | undefined }) {
       </h2>
       <dl className={s.metrics} aria-busy={!data || undefined}>
         <div className={s.metric}>
-          <dt>오늘 접속자{example}</dt>
-          <dd>{v(data?.visitors.today, '명')}</dd>
+          <dt>모집 중인 팀원 찾기 글</dt>
+          <dd>
+            {v(data?.teams.open, '개')}
+            <span className={s.sub}>{data ? '홈페이지 팀원 찾기 기준' : ' '}</span>
+          </dd>
         </div>
         <div className={s.metric}>
-          <dt>이번 주 접속자{example}</dt>
-          <dd>{v(data?.visitors.week, '명')}</dd>
+          <dt>마감 임박</dt>
+          <dd>
+            {v(data?.teams.closingSoon, '개')}
+            <span className={s.sub}>{data ? '종료일까지 3일 이하' : ' '}</span>
+          </dd>
         </div>
         <div className={s.metric}>
           <dt>새로운 게시글</dt>
           <dd>
             {v(data ? data.newPosts.teams + data.newPosts.community : undefined, '개')}
-            <span className={s.sub}>{data ? `Teams ${data.newPosts.teams} · Community ${data.newPosts.community}` : ' '}</span>
+            <span className={s.sub}>{boards(data?.newPosts)}</span>
           </dd>
         </div>
         <div className={s.metric}>
           <dt>새로운 댓글</dt>
           <dd>
             {v(data ? data.newComments.teams + data.newComments.community : undefined, '개')}
-            <span className={s.sub}>{data ? `Teams ${data.newComments.teams} · Community ${data.newComments.community}` : ' '}</span>
+            <span className={s.sub}>{boards(data?.newComments)}</span>
           </dd>
         </div>
       </dl>
-      <p className={s.note}>
-        새로운 게시글 · 댓글은 최근 {data?.windowHours ?? 24}시간 기준입니다. 접속자 수는 집계 방식이 정해지지 않아(F-COM-002) 예시 값을 보여 줍니다.
-      </p>
+      <p className={s.note}>새로운 게시글 · 댓글은 최근 {data?.windowHours ?? 24}시간 안에 올라온 것입니다 (홈페이지 팀원 찾기의 &lsquo;새 글&rsquo; 표시와 같은 기준).</p>
     </section>
   )
 }
@@ -123,7 +128,7 @@ export function DashboardPage() {
 
   return (
     <>
-      <PageHeader title="대시보드" description="홈페이지 이용 현황과 새 글 · 댓글 · 다가오는 일정을 한눈에 봅니다." meta={`오늘 ${formatDay(today)} 기준`} />
+      <PageHeader title="대시보드" description="팀원 찾기 모집 현황과 새 글 · 댓글 · 다가오는 일정을 한눈에 봅니다." meta={`오늘 ${formatDay(today)} 기준`} />
       <Metrics data={summary.data} />
 
       <div className={s.grid}>
@@ -162,7 +167,7 @@ export function DashboardPage() {
             </QueryState>
           </Panel>
 
-          <Panel title="새로운 댓글" description="Teams · Community 최신 5개" flush>
+          <Panel title="새로운 댓글" description={ADMIN_SAMPLE ? 'Teams · Community 최신 5개' : 'Teams 최신 5개'} flush>
             <QueryState query={summary} empty={(d) => d.recentComments.length === 0} emptyText="최근 댓글이 없습니다.">
               {(d) => (
                 <ul className={s.list}>

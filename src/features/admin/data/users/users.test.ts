@@ -20,6 +20,7 @@ import {
   recentRange,
   RESEND_GAP_MS,
 } from './rules'
+import { SAMPLE_ACCOUNTS } from '@/features/teams/data/sampleSeed'
 import { createUsersSeed } from './seed'
 import type { AdminUser } from './types'
 
@@ -53,17 +54,21 @@ describe('예시 사용자 (seed)', () => {
   const seed = createUsersSeed({ now: NOW })
   const by = (pred: (u: AdminUser) => boolean) => seed.users.filter(pred)
 
-  it('상태가 골고루 섞여 있다 (대기 · 초기화됨 · 링크 만료 · 발송 실패 · 잠김 · 비활성)', () => {
+  it('상태가 골고루 섞여 있다 (대기 · 초기화됨 · 링크 만료 · 잠김 · 비활성)', () => {
     const expired = (u: AdminUser) => !!u.pinLinkExpiresAt && Date.parse(u.pinLinkExpiresAt) <= NOW
     expect(by((u) => u.pinStatus === 'pending' && !expired(u)).length).toBeGreaterThan(0)
-    expect(by((u) => u.pinStatus === 'pending' && expired(u)).length).toBeGreaterThan(0)
     expect(by((u) => u.pinStatus === 'reset' && !expired(u)).length).toBeGreaterThan(0)
     expect(by((u) => u.pinStatus === 'reset' && expired(u)).length).toBeGreaterThan(0)
-    expect(by((u) => u.pinMailFailed).length).toBeGreaterThan(0)
     expect(by((u) => u.status === 'locked' && u.lockReason === 'pin').length).toBeGreaterThan(0)
     expect(by((u) => u.status === 'locked' && u.lockReason === 'password' && u.type !== 'General').length).toBeGreaterThan(0)
     expect(by((u) => u.status === 'inactive' && !!u.deactivatedAt).length).toBeGreaterThanOrEqual(2)
     expect(by((u) => u.type === 'Lead' && u.status === 'active').length).toBe(2)
+  })
+
+  it('General 멤버 = 공개 팀원 찾기의 계정 (이름 · 학번 · 기수가 같다). PIN 을 설정하지 않은 계정만 대기', () => {
+    const general = by((u) => u.type === 'General')
+    expect(general.map((u) => [u.name, u.studentId, u.generation])).toEqual(SAMPLE_ACCOUNTS.map((a) => [a.name, a.studentId, a.generation]))
+    for (const a of SAMPLE_ACCOUNTS) expect(general.find((u) => u.studentId === a.studentId)!.pinStatus === 'pending', a.name).toBe(a.pin === null)
   })
 
   it('학번 · 아이디가 겹치지 않고, 대기 · 초기화됨은 링크 만료 시각이 있다', () => {
@@ -157,19 +162,19 @@ describe('사용자 목록 (API-AMB-001 · 002)', () => {
     expect(all.pageSize).toBe(20)
     expect(all.totalPages).toBe(2)
     expect(all.items.slice(0, 2).map((u) => u.type)).toEqual(['Lead', 'Lead'])
-    expect(all.counts).toEqual({ all: 24, Lead: 2, Core: 4, General: 18 })
+    expect(all.counts).toEqual({ all: 21, Lead: 2, Core: 4, General: 15 })
     expect(all.activeLeads).toBe(2)
     expect(all.pinNotSet).toBe(all.pin.pending + all.pin.reset)
-    expect(all.pin).toMatchObject({ expired: 2, mailFailed: 1 })
+    expect(all.pin).toMatchObject({ expired: 1, mailFailed: 0 })
   })
 
   it('검색: 이름 · 전체 학번 · 이메일 · 관리자 아이디 (화면에는 가린 학번만)', async () => {
     const { repos } = await signedIn()
-    expect((await repos.users.list({ q: '2026000105' })).items.map((u) => u.name)).toEqual(['예시 멤버 05'])
+    expect((await repos.users.list({ q: '2025000105' })).items.map((u) => u.name)).toEqual(['장하윤'])
     expect((await repos.users.list({ q: 'COREF' })).items.map((u) => u.name)).toEqual(['운영진F'])
     expect((await repos.users.list({ q: 'member12@' })).total).toBe(1)
     expect((await repos.users.list({ q: '없는 사람' })).total).toBe(0)
-    expect((await repos.users.list({ q: '예시', type: 'Core' })).total).toBe(0)
+    expect((await repos.users.list({ q: '김민준', type: 'Core' })).total).toBe(0)
   })
 
   it('수정 팝업의 전체 학번은 수정할 수 있는 사람만 (Core 는 Lead · Core 를 못 본다)', async () => {
@@ -180,12 +185,12 @@ describe('사용자 목록 (API-AMB-001 · 002)', () => {
 
   it('선택 비활성화: 규칙에 걸린 사람은 빼고, 이력 · 삭제 예정일을 남긴다 (F-AMB-004)', async () => {
     const { repos, user, lastHistory } = await signedIn('core-b')
-    const r = await repos.users.setStatus(['user-member-01', 'user-admin-b', 'user-admin-e', 'user-member-10'], 'inactive')
+    const r = await repos.users.setStatus(['user-member-01', 'user-admin-b', 'user-admin-e', 'user-member-11'], 'inactive')
     expect(r.changed).toBe(1)
     expect(r.skipped.map((x) => x.reason)).toEqual(['자기 자신은 비활성화할 수 없습니다.', 'Core 계정은 General 사용자만 비활성화할 수 있습니다.', '이미 비활성 상태입니다.'])
     expect(user('user-member-01')).toMatchObject({ status: 'inactive', deactivatedAt: new Date(NOW).toISOString() })
     expect(lastHistory()[0]).toMatchObject({ action: 'deactivate', kind: 'deactivate', actor: { name: '운영진B' }, target: { maskedStudentId: '2026****01' } })
-    const row = (await repos.users.list({ q: '예시 멤버 01' })).items[0]
+    const row = (await repos.users.list({ q: '김민준' })).items[0]
     expect(row.purgeAt).toBe(purgeAtOf(new Date(NOW).toISOString()))
   })
 })
@@ -217,7 +222,7 @@ describe('사용자 추가 · 수정 (API-AMB-004~007)', () => {
 
   it('관리 유형 변경은 Lead 만: General → Core 면 아이디 · 임시 비밀번호, Core → General 이면 관리자 로그인 계정 비활성', async () => {
     const core = await signedIn('core-b')
-    const m2 = { name: '예시 멤버 02', email: 'member02@example.com', generation: 4, loginId: 'newcore', status: undefined }
+    const m2 = { name: '이서연', email: 'member02@example.com', generation: 4, loginId: 'newcore', status: undefined }
     expect((await rejects(core.repos.users.update('user-member-02', { ...m2, type: 'Core' }))).code).toBe('FORBIDDEN')
 
     const { repos, user, lastHistory } = await signedIn()
@@ -236,12 +241,12 @@ describe('사용자 추가 · 수정 (API-AMB-004~007)', () => {
   it('정보 수정 · 재활성화: 바뀐 칸만 이력에 (값 대신 칸 이름), 바뀐 게 없으면 이력 없음', async () => {
     const { repos, user, store, lastHistory } = await signedIn()
     const before = store.get('users').history.length
-    await repos.users.update('user-member-10', { name: '예시 멤버 10', email: 'member10@example.com', generation: 3, type: 'General', loginId: null })
+    await repos.users.update('user-member-11', { name: '신예은', email: 'member11@example.com', generation: 2, type: 'General', loginId: null })
     expect(store.get('users').history.length).toBe(before)
-    await repos.users.update('user-member-10', { name: '예시 멤버 10', email: 'new10@example.com', generation: 4, type: 'General', loginId: null, status: 'active' })
-    expect(user('user-member-10')).toMatchObject({ status: 'active', deactivatedAt: null, email: 'new10@example.com' })
+    await repos.users.update('user-member-11', { name: '신예은', email: 'new11@example.com', generation: 3, type: 'General', loginId: null, status: 'active' })
+    expect(user('user-member-11')).toMatchObject({ status: 'active', deactivatedAt: null, email: 'new11@example.com' })
     expect(lastHistory(2).map((h) => [h.action, h.detail])).toEqual([
-      ['update', '정보 수정 (이메일 · 기수 3기 → 4기)'],
+      ['update', '정보 수정 (이메일 · 기수 2기 → 3기)'],
       ['reactivate', '비활성 → 활성 · 개인정보 삭제 일정 취소'],
     ])
   })
@@ -260,16 +265,16 @@ describe('사용자 추가 · 수정 (API-AMB-004~007)', () => {
 describe('PIN · 잠금 (API-AMB-008~010)', () => {
   it('링크 재발송: 새 링크 72시간, 같은 사용자 1분 간격(429), 결과를 이력에', async () => {
     const { repos, clock, user, lastHistory } = await signedIn()
-    const r = await repos.users.resendPinMail('user-member-08')
+    const r = await repos.users.resendPinMail('user-member-99')
     expect(r.mail).toBe('sent')
     expect(r.user).toMatchObject({ pinLinkExpired: false, pinMailFailed: false })
     expect(r.user.pinMailRetryAt).toBe(new Date(NOW + RESEND_GAP_MS).toISOString())
     expect(lastHistory()[0]).toMatchObject({ action: 'pin-mail', detail: 'PIN 설정 링크 재발송 · 발송 완료', mail: 'sent' })
     clock.now = NOW + 30_000
-    expect((await rejects(repos.users.resendPinMail('user-member-08'))).code).toBe('RATE_LIMITED')
+    expect((await rejects(repos.users.resendPinMail('user-member-99'))).code).toBe('RATE_LIMITED')
     clock.now = NOW + RESEND_GAP_MS
-    await repos.users.resendPinMail('user-member-08')
-    expect(user('user-member-08').pinMailSentAt).toBe(new Date(NOW + RESEND_GAP_MS).toISOString())
+    await repos.users.resendPinMail('user-member-99')
+    expect(user('user-member-99').pinMailSentAt).toBe(new Date(NOW + RESEND_GAP_MS).toISOString())
     expect((await rejects(repos.users.resendPinMail('user-member-01'))).code).toBe('CONFLICT')
   })
 
@@ -327,7 +332,7 @@ describe('다른 구역이 쓰는 입구', () => {
     const before = store.get('users').history.length
     const target = store.get('users').users.find((u) => u.id === 'user-member-01')!
     const [h] = recordUserHistory(store, { actor: SYSTEM_ACTOR, target, action: 'bulk-register', detail: '최종 합격자 일괄 등록 (5기)', mail: 'sent' }, new Date(NOW).toISOString())
-    expect(h).toMatchObject({ kind: 'add', target: { name: '예시 멤버 01', maskedStudentId: '2026****01' }, mail: 'sent' })
+    expect(h).toMatchObject({ kind: 'add', target: { name: '김민준', maskedStudentId: '2026****01' }, mail: 'sent' })
     expect(store.get('users').history.length).toBe(before + 1)
   })
 
@@ -355,13 +360,14 @@ describe('다른 구역이 쓰는 입구', () => {
 
   it('purgeExpiredUsers: 비활성 1년이 지나면 목록에서 지우고 이력의 이름을 탈퇴한 사용자로 (F-SYS-005)', () => {
     const seed = createUsersSeed({ now: NOW })
-    const target = seed.users.find((u) => u.id === 'user-member-11')!
+    // 가장 먼저 비활성화된 사람 (삭제 예정일이 가장 이르다)
+    const target = seed.users.filter((u) => u.deactivatedAt).sort((a, b) => a.deactivatedAt!.localeCompare(b.deactivatedAt!))[0]
     const later = Date.parse(purgeAtOf(target.deactivatedAt)!)
     expect(purgeExpiredUsers(seed, later - 1).purged).toBe(0)
     const { state, purged } = purgeExpiredUsers(seed, later)
     expect(purged).toBe(1)
-    expect(state.users.some((u) => u.id === 'user-member-11')).toBe(false)
-    const mine = state.history.filter((h) => h.target.userId === 'user-member-11')
+    expect(state.users.some((u) => u.id === target.id)).toBe(false)
+    const mine = state.history.filter((h) => h.target.userId === target.id)
     expect(mine.every((h) => h.target.name === PURGED_NAME && h.target.maskedStudentId === '-')).toBe(true)
     expect(mine.at(-1)).toMatchObject({ action: 'purge', actor: { kind: 'system' } })
   })

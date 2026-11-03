@@ -16,8 +16,9 @@ export interface Review {
   id: string
   /** 사진. 없으면 기본 이미지 (F-ACT-009) */
   photoUrl: string | null
-  generation: number
-  /** 예시 이름: '예시 멤버 01' */
+  /** 활동한 기수. 비워 두면 홈 카드에 기수를 붙이지 않는다 (공개 홈 Interview 와 같은 규칙, content/story.ts) */
+  generation: number | null
+  /** 본인이 고른 표기 (실명 · 성만 · 이니셜) */
   name: string
   /** 트랙 / 파트 */
   track: string
@@ -55,7 +56,7 @@ export interface ReviewInput {
   photoFileId: string | null
   /** 수정할 때 기존 사진을 그대로 두려면 photoFileId 대신 이 주소를 넘긴다 */
   photoUrl?: string | null
-  generation: number
+  generation: number | null
   name: string
   track: string
   content: string

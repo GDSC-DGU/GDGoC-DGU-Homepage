@@ -99,16 +99,25 @@ export function MonthCalendar({ id, events: all, today }: Props) {
                   )}
                   {list.length > 0 && (
                     <ul className={s.cellEvents}>
-                      {list.map((e) => (
-                        <li key={e.id} data-rest={e.kind === 'rest' || undefined}>
-                          {e.kind === 'rest' ? (
-                            <i className={`${s.restSq} ${s.phoneOnly}`} aria-hidden="true" />
-                          ) : (
-                            <i className="mark" style={{ '--c': placeColor(e.place) } as CSSProperties} aria-hidden="true" />
-                          )}
-                          <span className={s.cellTitle}>{e.title}</span>
-                        </li>
-                      ))}
+                      {list.map((e) => {
+                        // 여러 날 일정은 첫날과 각 주의 첫 칸에만 이름을 쓰고, 나머지 날은 이어지는 띠만 (같은 이름이 한 달 내내 반복되지 않게)
+                        const cont = Boolean(e.endDate && e.endDate !== e.date && c.ymd !== e.date && i !== 0)
+                        return cont ? (
+                          <li key={e.id} data-cont="">
+                            <i className={s.contBar} style={{ '--c': placeColor(e.place) } as CSSProperties} aria-hidden="true" />
+                            <span className="visually-hidden">{e.title}</span>
+                          </li>
+                        ) : (
+                          <li key={e.id} data-rest={e.kind === 'rest' || undefined}>
+                            {e.kind === 'rest' ? (
+                              <i className={`${s.restSq} ${s.phoneOnly}`} aria-hidden="true" />
+                            ) : (
+                              <i className="mark" style={{ '--c': placeColor(e.place) } as CSSProperties} aria-hidden="true" />
+                            )}
+                            <span className={s.cellTitle}>{e.title}</span>
+                          </li>
+                        )
+                      })}
                     </ul>
                   )}
                 </div>

@@ -27,6 +27,8 @@ export const PROJECTS_PAGE = pageModule(() => import('@/features/pages/ProjectsP
 export const COMMUNITY_PAGE = pageModule(() => import('@/features/pages/CommunityPage'))
 export const RECRUITS_PAGE = pageModule(() => import('@/features/pages/RecruitsPage'))
 export const PLANNED_PAGE = pageModule(() => import('@/features/pages/PlannedPage'))
+/** 팀원 찾기: 목록 · 글 · 쓰기 한 덩어리 */
+export const TEAMS_PAGE = pageModule(() => import('@/features/teams'))
 export const NOW_PREVIEW = pageModule(() => import('@/features/now/NowPreview'))
 export const CAMPUS_PREVIEW = pageModule(() => import('@/features/campus/CampusPreview'))
 /** 관리자 화면 (/admin/*): 틀 · 로그인 · 대시보드 · 공통 부품 · 구역 화면 한 덩어리. 미리 받지 않는다 (방문자는 거의 들어가지 않음) */
@@ -40,5 +42,5 @@ export const ADMIN_APP = pageModule(() => import('@/features/admin/AdminRoot'))
 export function preloadPages() {
   const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData
   if (saveData) return
-  for (const page of [PROJECTS_PAGE, COMMUNITY_PAGE, RECRUITS_PAGE, PLANNED_PAGE]) page.load().catch(() => {})
+  for (const page of [PROJECTS_PAGE, COMMUNITY_PAGE, RECRUITS_PAGE, TEAMS_PAGE, PLANNED_PAGE]) page.load().catch(() => {})
 }

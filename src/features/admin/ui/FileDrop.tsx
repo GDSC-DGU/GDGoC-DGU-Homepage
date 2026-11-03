@@ -1,3 +1,4 @@
+import { ADMIN_SAMPLE } from '../sample'
 import { useId, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from 'react'
 import { acceptAttr, checkFile, fileSizeLabel, type FileRule } from '../data/common/fileRules'
 import { Button } from './Button'
@@ -13,7 +14,7 @@ export function AdminImage({ src, alt, className, style }: { src: string; alt: s
   if (broken === src)
     return (
       <span className={s.imageMissing} role={alt ? 'img' : undefined} aria-label={alt ? `${alt} (그림을 불러오지 못함)` : undefined}>
-        예시 화면이라 새로고침하면 올린 그림이 사라집니다
+        {ADMIN_SAMPLE ? '예시 화면이라 새로고침하면 올린 그림이 사라집니다' : '그림을 불러오지 못했습니다. 다시 올려 주세요.'}
       </span>
     )
   return <img src={src} alt={alt} className={className} style={style} loading="lazy" onError={() => setBroken(src)} />

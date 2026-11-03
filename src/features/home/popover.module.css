@@ -169,3 +169,9 @@
     animation: none;
   }
 }
+
+/* 앞으로 열릴 일정 (지난 기록 사이에서 구별되게) */
+.soon {
+  font: 600 12px/18px var(--font-kr);
+  color: var(--ink-500);
+}

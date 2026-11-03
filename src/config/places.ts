@@ -1,4 +1,5 @@
 import type { Place, PlaceId } from '@/domain/types'
+import { PROTOTYPE } from './site'
 
 /**
  * 지도 = 메뉴.
@@ -41,7 +42,9 @@ export const PLACES: readonly Place[] = [
     sub: '멤버끼리 팀 꾸리기',
     path: '/teams',
     color: '#fbbc04',
-    description: '멤버끼리 스터디 · 프로젝트 · 공모전 팀원을 찾는 게시판입니다. 아직 준비 중이고, 동아리 지원은 지원 안내에서 합니다.',
+    description: PROTOTYPE
+      ? '멤버끼리 스터디 · 프로젝트 · 공모전 팀원을 찾는 게시판입니다. 동아리 지원은 지원 안내에서 합니다.'
+      : '멤버끼리 스터디 · 프로젝트 · 공모전 팀원을 찾는 게시판입니다. 아직 준비 중이고, 동아리 지원은 지원 안내에서 합니다.',
     footprint: { x: 0.9, y: 9.7, w: 3.4, d: 3.4, h: 0.95, door: 'R', roof: 'arch', pinGap: 0.7 },
   },
   {
@@ -72,7 +75,7 @@ export const NAV_ORDER: readonly PlaceId[] = ['about', 'projects', 'community', 
 export const APPLY_PLACE: PlaceId = 'recruits'
 
 /** 아직 열지 않은 장소: 메뉴 이름 옆에 작은 '준비 중' 표시를 붙인다 */
-export const SOON_PLACES: ReadonlySet<PlaceId> = new Set<PlaceId>(['teams'])
+export const SOON_PLACES: ReadonlySet<PlaceId> = new Set<PlaceId>(PROTOTYPE ? [] : ['teams'])
 export const SOON_LABEL = '준비 중'
 
 /** 메뉴에 보이는 이름: 소개 장소는 메뉴에서 '홈' */
@@ -83,7 +86,8 @@ export const navLabel = (id: PlaceId) => (id === 'about' ? '홈' : PLACE_BY_ID[i
  * 폰 메뉴 시트 · 꼬리말 · 검색은 NAV_ORDER 를 그대로 쓴다.
  */
 export const HEADER_NAV: readonly PlaceId[] = ['projects', 'community', 'teams', 'recruits']
-export const headerLabel = (id: PlaceId) => (id === 'recruits' ? '지원하기' : navLabel(id))
+/** 모집 중일 때만 '지원하기' (모집 전 · 후에 행동 버튼처럼 보이면 지원 안내 페이지의 '아직 열리지 않았습니다'와 어긋난다: 전체 점검 2026-11-03) */
+export const headerLabel = (id: PlaceId, recruitingOpen = false) => (id === 'recruits' && recruitingOpen ? '지원하기' : navLabel(id))
 
 /** 화면에 칠할 색. 소개 장소의 잉크색은 토큰을 따른다 */
 export const placeColor = (id: PlaceId) => (id === 'about' ? 'var(--ink)' : PLACE_BY_ID[id].color)

@@ -1,5 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest'
+import { EVENTS } from '@/content'
 import type { ScheduleEvent } from '@/domain/types'
+import { closingSoon, isNew, statusOf } from '@/features/teams/data/rules'
+import { createSampleSeed } from '@/features/teams/data/sampleSeed'
 import { createSessionStore } from '../auth/session'
 import { createBoardsSeed } from '../boards/seed'
 import type { BoardsState } from '../boards/types'
@@ -17,9 +20,10 @@ const ev = (id: string, date: string, extra: Partial<ScheduleEvent> = {}): Sched
 
 describe('대시보드 게시판 요약 (F-ACM-005~007)', () => {
   const boards = createBoardsSeed({ now: NOW })
+  const sampleBoards = createBoardsSeed({ now: NOW, sample: true })
 
   it('Teams · Community 를 합쳐 최신순 5개, 삭제 제외', () => {
-    const sum = summarizeBoards(boards, NOW)
+    const sum = summarizeBoards(sampleBoards, NOW)
     expect(sum.recentPosts).toHaveLength(5)
     const times = sum.recentPosts.map((p) => p.createdAt)
     expect([...times].sort().reverse()).toEqual(times)
@@ -28,12 +32,15 @@ describe('대시보드 게시판 요약 (F-ACM-005~007)', () => {
     expect(sum.recentComments[0].postTitle).not.toBe('')
   })
 
-  it('새로운 게시글 · 댓글은 최근 24시간 기준으로 게시판별로 센다', () => {
+  it("새로운 게시글 · 댓글 · 모집 현황은 공개 /teams 와 같은 규칙 ('N 새 글' · 모집 중 · 마감 임박)", () => {
     const sum = summarizeBoards(boards, NOW)
-    const day = NOW - 24 * 3_600_000
-    expect(sum.newPosts.teams).toBe(boards.posts.filter((p) => p.board === 'teams' && Date.parse(p.createdAt) >= day).length)
-    expect(sum.newPosts.community).toBeGreaterThan(0)
-    expect(sum.newComments.teams + sum.newComments.community).toBe(boards.comments.filter((c) => Date.parse(c.createdAt) >= day).length)
+    const pub = createSampleSeed('2026-11-01', NOW)
+    expect(sum.newPosts.teams).toBe(pub.posts.filter((p) => isNew(p.createdAt, NOW)).length)
+    expect(sum.newPosts.teams).toBeGreaterThan(0)
+    expect(sum.newComments.teams).toBe(pub.comments.filter((c) => isNew(c.createdAt, NOW)).length)
+    const status = pub.posts.map((p) => ({ endDate: p.endDate, status: statusOf(p.endDate, p.closedByAuthor, '2026-11-01') }))
+    expect(sum.teams).toEqual({ open: status.filter((x) => x.status === '모집중').length, closingSoon: status.filter((x) => closingSoon(x.endDate, x.status, '2026-11-01')).length })
+    expect(summarizeBoards(sampleBoards, NOW).newPosts.community).toBeGreaterThan(0)
   })
 
   it('게시글을 지우면 그 글과 달린 댓글이 대시보드에서 빠진다', () => {
@@ -64,8 +71,8 @@ describe('대시보드 행사 일정 (F-ACM-008)', () => {
   it('관리자 Community 세션 · 행사 글의 기간과 게시한 지원폼의 마감을 더한다 (같은 날이면 마감 먼저)', () => {
     const boards = createBoardsSeed({ now: NOW })
     const withPost: BoardsState = {
-      ...boards,
-      posts: [...boards.posts, { ...boards.posts[0], id: 'new', board: 'community', category: '행사', title: '새 행사', startDate: '2026-11-20', endDate: '2026-11-21', deleted: null }],
+      posts: [{ ...boards.posts[0], id: 'new', board: 'community', category: '행사', title: '새 행사', startDate: '2026-11-20', endDate: '2026-11-21', deleted: null }],
+      comments: [],
     }
     const form: RecruitFormState = { ...noForm, published: { generation: 5, startDate: '2026-11-10', endDate: '2026-11-20', questions: [] } }
     const items = dashboardSchedule([ev('a', '2026-11-02')], withPost, form, '2026-11-01')
@@ -77,9 +84,12 @@ describe('대시보드 행사 일정 (F-ACM-008)', () => {
     expect(items[2]).toMatchObject({ source: 'post', endDate: '2026-11-21' })
   })
 
-  it('seed 의 관리자 세션 · 행사 글은 지난 기간이라 실제 일정만 보인다', () => {
+  it('동아리 일정에서 옮겨 온 seed 글은 일정과 겹쳐 두 번 나오지 않는다', () => {
     const boards = createBoardsSeed({ now: NOW })
-    expect(dashboardSchedule([], boards, noForm, '2026-11-01')).toEqual([])
+    const items = dashboardSchedule(EVENTS, boards, noForm, '2026-11-01')
+    expect(items.length).toBeGreaterThan(0)
+    expect(items.every((x) => x.source === 'calendar')).toBe(true)
+    expect(new Set(items.map((x) => `${x.date}|${x.title}`)).size).toBe(items.length)
   })
 })
 
@@ -91,7 +101,7 @@ describe('대시보드 예시 저장소 = 게시판 store 를 같이 읽는다',
     const repos = createMockAdminRepositories({ store, session, now: () => NOW })
     await repos.auth.login({ loginId: 'lead-a', password: 'example1234' })
     const before = await repos.dashboard.get()
-    expect(before.visitors.isExample).toBe(true)
+    expect(before.teams.open).toBeGreaterThan(0)
     const target = before.recentPosts[0]
     await repos.boards.deletePosts(target.board, [target.id])
     const after = await repos.dashboard.get()

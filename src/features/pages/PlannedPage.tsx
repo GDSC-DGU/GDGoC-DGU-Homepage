@@ -12,12 +12,14 @@ import { DetourLink } from './community/Signage'
 import { dateLabel } from './format'
 import { Mark, PageHead, Section } from './PageParts'
 import s from './pages.module.css'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 /** 지금 열려 있는 페이지와 그 페이지에서 볼 수 있는 것 */
 const OPEN_PAGES: Partial<Record<PlaceId, string>> = {
   about: '캠퍼스 지도로 보는 GDGoC DGU 소개',
   projects: 'G-Sprint 진행 상황과 지난 프로젝트',
   community: '다가오는 일정과 기수별 행사 기록',
+  teams: '프로젝트 · 스터디 팀원 모집 글',
   recruits: '모집 소식 · 지난 모집 기록 · 연락처',
 }
 
@@ -92,6 +94,7 @@ const LEADS: Partial<Record<PagePlanId, ReactNode>> = {
 export function PlannedPage({ id }: { id: PagePlanId }) {
   const today = useToday()
   const plan: PagePlan = PAGE_PLANS[id]
+  usePageTitle(plan.title)
   const place = 'place' in plan ? plan.place : undefined
   const meta = (
     <>
@@ -131,13 +134,14 @@ export function PlannedPage({ id }: { id: PagePlanId }) {
 /** 없는 주소. 머리말 · 꼬리말 안에서 보인다 */
 export function NotFoundPage() {
   const { pathname } = useLocation()
+  usePageTitle('페이지 없음')
   return (
     <div className={`container ${s.page}`}>
       <PageHead
         wide
         eyebrow={<span className="num">404</span>}
         title="이 주소에는 페이지가 없습니다"
-        lead="주소가 바뀌었거나 아직 만들지 않은 페이지입니다. 아래에서 찾던 곳을 골라 주세요."
+        lead="주소가 바뀌었거나 없는 페이지입니다. 아래에서 찾던 곳을 골라 주세요."
         meta={
           <>
             요청한 주소 <code className={s.path}>{pathname}</code>

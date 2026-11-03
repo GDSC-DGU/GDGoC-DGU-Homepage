@@ -4,6 +4,9 @@ import type { PreviewPlace, Repositories } from '@/data/repositories'
 import { REVIEWS, TEAMS_STATUS } from '@/data/mock/fixtures'
 import type { ArchiveDoc, Faq, PreviewItem, Project, ScheduleEvent } from '@/domain/types'
 import { kstToday } from '@/lib/date'
+import { withoutStalePlans } from '@/content/plan'
+import { PROTOTYPE } from '@/config/site'
+import { createSampleSeed } from '@/features/teams/data/sampleSeed'
 import { createKeywordSearch } from '@/services/search/keywordSearch'
 import { expandKeywords } from '@/services/search/synonyms'
 
@@ -56,7 +59,8 @@ export function buildArchive(
 
 /** 커뮤니티: 가장 가까운 다음 일정 하나 → 최근 지난 행사. 모자라면 다음 일정을 더 채운다. 휴회는 뺀다 */
 export function communityPreview(events: readonly ScheduleEvent[], today: string, limit: number): PreviewItem[] {
-  const list = events.filter((e) => e.place === 'community' && e.kind !== 'rest')
+  // 날짜가 지났는데 계획으로만 남은 일정(열렸는지 확인되지 않음)은 지난 기록으로 보이지 않게 뺀다 (커뮤니티 페이지와 같은 규칙)
+  const list = withoutStalePlans(events, today).filter((e) => e.place === 'community' && e.kind !== 'rest')
   const upcoming = list.filter((e) => (e.endDate ?? e.date) >= today).sort((a, b) => a.date.localeCompare(b.date))
   const past = list.filter((e) => (e.endDate ?? e.date) < today).sort((a, b) => b.date.localeCompare(a.date))
   const picked = [...upcoming.slice(0, 1), ...past, ...upcoming.slice(1)].slice(0, limit)
@@ -114,13 +118,22 @@ export interface SnapshotOptions {
  * 공개 페이지용 구현: 저장소에 들어 있는 JSON 스냅샷(src/content)을 읽는다.
  * 서버가 꺼져 있어도 사이트가 보이게 하는 기본값이다. 서버 API 는 http 구현이 맡는다.
  * 팀원 모집(teams) 게시판은 아직 열지 않아서, 지어낸 글 대신 날짜 없는 상태 줄(TEAMS_STATUS)을 보여 준다.
+ * 프로토타입 보기(config/site.ts PROTOTYPE)에서는 게시판과 같은 프로토타입 글의 최근 몇 개를 보여 준다.
  */
+function teamsPreview(today: string, limit: number): PreviewItem[] {
+  if (!PROTOTYPE) return TEAMS_STATUS.slice(0, limit).map((p) => ({ ...p }))
+  return createSampleSeed(today, Date.now())
+    .posts.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, limit)
+    .map((p) => ({ id: p.id, title: p.title, date: kstToday(new Date(p.createdAt)), tag: p.category }))
+}
+
 export function createSnapshotRepositories({ today = () => kstToday() }: SnapshotOptions = {}): Repositories {
   const previews: Record<PreviewPlace, (limit: number) => PreviewItem[]> = {
     community: (limit) => communityPreview(EVENTS, today(), limit),
     projects: (limit) => projectsPreview(PROJECTS, EVENTS, today(), limit),
     recruits: (limit) => recruitsPreview(RECRUITING, limit),
-    teams: (limit) => TEAMS_STATUS.slice(0, limit).map((p) => ({ ...p })),
+    teams: (limit) => teamsPreview(today(), limit),
   }
   return {
     schedule: { list: async () => EVENTS.map((e) => ({ ...e })) },

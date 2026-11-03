@@ -1,6 +1,8 @@
+import { ADMIN_SAMPLE } from '../../sample'
 import { seedTools, type SeedContext } from '../common/seedContext'
 import type { ActorRef } from '../common/types'
 import { kstDateTime, kstToIso, PROMPT_VERSION, SCORING_MODEL, simulateScoreItems, sumScore } from './rules'
+import { TEAM_PARTS } from '@/features/teams/data/types'
 import type {
   Applicant,
   ApplicantHistoryEntry,
@@ -17,8 +19,8 @@ import type {
   ResultStage,
 } from './types'
 
-/** seed 모양을 바꾸면 1 올린다 (2: 5기 모집 진행 예시 — 게시본 · 평가 기준 · 지원자 25명 · 발송 기록) */
-export const RECRUIT_SEED_VERSION = 2
+/** seed 모양을 바꾸면 1 올린다 (3: 공개 사이트와 맞춤 — 5기 지원폼은 임시 저장(게시 전) · 지원자 0명) */
+export const RECRUIT_SEED_VERSION = 3
 
 /** 고정 질문 (F-ARC-001 · 005): 이름 · 학번 · 학과 · 이메일. 삭제 · 유형 변경 불가 */
 export const FIXED_QUESTIONS: readonly FormQuestion[] = [
@@ -28,15 +30,18 @@ export const FIXED_QUESTIONS: readonly FormQuestion[] = [
   { id: 'q-email', title: '이메일', type: 'short', required: true, options: [], fixed: true },
 ]
 
-/** 예시 지원폼 질문 (고정 질문 뒤) */
+/** 지원 파트: 4기 네 파트 (공개 지원 안내 · 팀원 찾기와 같은 이름 · 순서) */
+export const PART_OPTIONS: readonly string[] = (['frontend', 'backend', 'ai', 'design'] as const).map((id) => TEAM_PARTS.find((p) => p.id === id)!.name)
+
+/** 지원폼 질문 (고정 질문 뒤). 정기 모임 요일 · 시각은 공개 지원 안내와 같다 (매주 화요일 18:00) */
 const QUESTIONS: FormQuestion[] = [
-  { id: 'q-track', title: '지원 분야를 골라 주세요.', type: 'choice', required: true, options: ['Frontend', 'Backend', 'AI · Data', 'Design · PM'], fixed: false },
+  { id: 'q-track', title: '지원 파트를 골라 주세요.', type: 'choice', required: true, options: [...PART_OPTIONS], fixed: false },
   { id: 'q-motivation', title: '지원 동기를 적어 주세요. (500자 이내)', type: 'long', required: true, options: [], fixed: false },
   { id: 'q-experience', title: '팀으로 무언가를 만들어 본 경험과 그때 맡은 역할을 적어 주세요.', type: 'long', required: true, options: [], fixed: false },
   { id: 'q-plan', title: '이번 기수에서 해 보고 싶은 활동과 그 이유를 적어 주세요.', type: 'long', required: true, options: [], fixed: false },
   {
     id: 'q-session',
-    title: '정기 세션(목요일 저녁)에 참석할 수 있나요?',
+    title: '정기 세션(매주 화요일 18:00)에 참석할 수 있나요?',
     type: 'choice',
     required: true,
     options: ['모두 참석할 수 있음', '대부분 참석할 수 있음', '참석이 어려운 주가 있음'],
@@ -167,8 +172,102 @@ const PLANS_25: Plan[] = [
 /** 인젝션 예는 13번 지원자 */
 const INJECTION_NO = 13
 
-/** 모집 예시 데이터. 시각은 seed 를 만든 때(now)에서 거꾸로 센다 (예시 데이터 처음으로 = 지금 기준). 주인: 2단계 모집 담당 */
+/**
+ * 모집 처음 데이터 (공개 사이트와 같게): 5기 모집은 아직 열리지 않았다 (src/content/recruiting.json, 공개 지원 안내 '5기 모집은 아직 열리지 않았습니다').
+ * - 지원폼: 5기 임시 저장본만 (게시 전, 지원 기간 미정). 질문은 공개 지원 안내와 같은 사실(화요일 18:00 · 네 파트)
+ * - 평가 기준 · 메일 템플릿: 모집 전에 미리 만들어 둔 것
+ * - 지원자 · 처리 이력 · 발송 기록: 없음 (지어내지 않는다. 지원자 관리는 빈 상태 안내를 보여 준다)
+ * 주인: 2단계 모집 담당.
+ */
 export function createRecruitSeed(ctx: SeedContext): RecruitState {
+  const sample = ctx.sample ?? ADMIN_SAMPLE
+  const { ago, by } = seedTools(ctx)
+  const draftAt = ago({ days: 2, hours: 5 })
+  const criteriaAt = ago({ days: 2, hours: 4 })
+  return {
+    form: {
+      draft: { generation: 5, startDate: null, endDate: null, questions: [...FIXED_QUESTIONS, ...QUESTIONS].map((q) => ({ ...q, options: [...q.options] })) },
+      draftSaved: by('A', draftAt),
+      published: null,
+      publishedStamp: null,
+    },
+    criteria: { items: CRITERIA_V2.map((c) => ({ ...c, questionIds: [...c.questionIds], guide: sample ? c.guide : c.guide.replace(SAMPLE_GUIDE_MARK, '') })), version: 1, updated: by('A', criteriaAt) },
+    applicants: [],
+    history: [],
+    templates: mailTemplates(ctx, sample),
+    batches: [],
+  }
+}
+
+/** 평가 가이드 끝의 예시 표시 (예시 화면에서만) */
+const SAMPLE_GUIDE_MARK = ' (예시 기준)'
+
+/**
+ * 메일 템플릿 (기본 4종 + 직접 만든 1개). 면접 장소는 {{면접장소}} 변수 (면접 일정에 적은 장소).
+ * sample 이면 제목 · 서명에 예시 표시를 붙인다.
+ */
+function mailTemplates(ctx: SeedContext, sample: boolean): MailTemplate[] {
+  const { dayOffset, by } = seedTools(ctx)
+  const at = (day: number, hhmm: string) => kstToIso(dayOffset(day), hhmm)
+  const subjectMark = sample ? '[예시] ' : ''
+  const tplAt = at(10, '16:20')
+  const template = (id: string, name: string, result: MailResult, subject: string, body: string, isDefault = true, who: Who = 'A', when = tplAt): MailTemplate => ({
+    id,
+    name,
+    result,
+    isDefault,
+    subject,
+    body,
+    updated: by(who, when),
+  })
+  const sign = `\n\nGDGoC DGU 운영진 드림${sample ? ' (예시 메일: 실제로 보내지 않습니다)' : ''}`
+  return [
+    template(
+      'tpl-doc-pass',
+      '서류 합격 · 면접 안내',
+      '서류 합격',
+      `${subjectMark}GDGoC DGU {{기수}} 서류 전형 결과 안내`,
+      `{{이름}}님, 안녕하세요.\n\n{{기수}} 모집에 지원해 주셔서 감사합니다. 서류 전형에 합격하셨습니다.\n\n면접 일시: {{면접일시}} (30분)\n면접 장소: {{면접장소}}\n\n일정이 어려우면 이 메일에 답장으로 알려 주세요.${sign}`,
+    ),
+    template(
+      'tpl-doc-fail',
+      '서류 불합격 안내',
+      '서류 불합격',
+      `${subjectMark}GDGoC DGU {{기수}} 서류 전형 결과 안내`,
+      `{{이름}}님, 안녕하세요.\n\n{{기수}} 모집에 지원해 주셔서 감사합니다. 아쉽게도 이번에는 함께하지 못하게 되었습니다.\n다음 모집에서 다시 만나기를 바랍니다.${sign}`,
+    ),
+    template(
+      'tpl-int-fail',
+      '면접 불합격 안내',
+      '면접 불합격',
+      `${subjectMark}GDGoC DGU {{기수}} 면접 결과 안내`,
+      `{{이름}}님, 안녕하세요.\n\n면접에 참여해 주셔서 감사합니다. 아쉽게도 이번에는 함께하지 못하게 되었습니다.${sign}`,
+    ),
+    template(
+      'tpl-final-pass',
+      '최종 합격 안내',
+      '최종 합격',
+      `${subjectMark}GDGoC DGU {{기수}} 최종 합격 안내`,
+      `{{이름}}님, 최종 합격을 축하드립니다.\n\n곧 {{이메일}}로 홈페이지 PIN 설정 링크가 따로 갑니다. 첫 모임 안내도 이어서 보내 드립니다.${sign}`,
+    ),
+    template(
+      'tpl-doc-pass-online',
+      '서류 합격 · 온라인 면접 안내',
+      '서류 합격',
+      `${subjectMark}GDGoC DGU {{기수}} 서류 합격 · 온라인 면접 안내`,
+      `{{이름}}님, 안녕하세요.\n\n서류 전형에 합격하셨습니다. 면접은 온라인으로 진행합니다.\n\n면접 일시: {{면접일시}} (30분)\n접속 주소는 면접 하루 전에 보내 드립니다.${sign}`,
+      false,
+      'B',
+      at(8, '13:05'),
+    ),
+  ]
+}
+
+/**
+ * 테스트 · 흐름 확인용 모집 진행 데이터 (지원 기간 20일 전 ~ 9일 전, 끝남 · 지원자 25명 · 발송 기록).
+ * 누가 봐도 예시: 이름 '예시 지원자 01', 학번 '20261000NN', 주소 @example.com, 답변 '(예시 답변)'. 화면의 처음 데이터로는 쓰지 않는다.
+ */
+export function createRecruitSampleSeed(ctx: SeedContext): RecruitState {
   const { ago, dayOffset, by } = seedTools(ctx)
   const at = (day: number, hhmm: string) => kstToIso(dayOffset(day), hhmm)
   const actor = (who: Who | 'system', when: string): ActorRef => by(who, when).by
@@ -180,57 +279,7 @@ export function createRecruitSeed(ctx: SeedContext): RecruitState {
   const criteria = { items: CRITERIA_V2, version: 2, updated: by('A', v2At) }
 
   // ── 메일 템플릿 (기본 4종 + 직접 만든 1개) ──
-  const tplAt = at(10, '16:20')
-  const template = (id: string, name: string, result: MailResult, subject: string, body: string, isDefault = true, who: Who = 'A', when = tplAt): MailTemplate => ({
-    id,
-    name,
-    result,
-    isDefault,
-    subject,
-    body,
-    updated: by(who, when),
-  })
-  const sign = '\n\nGDGoC DGU 운영진 드림 (예시 메일: 실제로 보내지 않습니다)'
-  const templates: MailTemplate[] = [
-    template(
-      'tpl-doc-pass',
-      '서류 합격 · 면접 안내',
-      '서류 합격',
-      '[예시] GDGoC DGU {{기수}} 서류 전형 결과 안내',
-      `{{이름}}님, 안녕하세요.\n\n{{기수}} 모집에 지원해 주셔서 감사합니다. 서류 전형에 합격하셨습니다.\n\n면접 일시: {{면접일시}} (30분)\n면접 장소: 예시 강의실 (예시관 101호)\n\n일정이 어려우면 이 메일에 답장으로 알려 주세요.${sign}`,
-    ),
-    template(
-      'tpl-doc-fail',
-      '서류 불합격 안내',
-      '서류 불합격',
-      '[예시] GDGoC DGU {{기수}} 서류 전형 결과 안내',
-      `{{이름}}님, 안녕하세요.\n\n{{기수}} 모집에 지원해 주셔서 감사합니다. 아쉽게도 이번에는 함께하지 못하게 되었습니다.\n다음 모집에서 다시 만나기를 바랍니다.${sign}`,
-    ),
-    template(
-      'tpl-int-fail',
-      '면접 불합격 안내',
-      '면접 불합격',
-      '[예시] GDGoC DGU {{기수}} 면접 결과 안내',
-      `{{이름}}님, 안녕하세요.\n\n면접에 참여해 주셔서 감사합니다. 아쉽게도 이번에는 함께하지 못하게 되었습니다.${sign}`,
-    ),
-    template(
-      'tpl-final-pass',
-      '최종 합격 안내',
-      '최종 합격',
-      '[예시] GDGoC DGU {{기수}} 최종 합격 안내',
-      `{{이름}}님, 최종 합격을 축하드립니다.\n\n곧 {{이메일}}로 홈페이지 PIN 설정 링크가 따로 갑니다. 첫 모임 안내도 이어서 보내 드립니다.${sign}`,
-    ),
-    template(
-      'tpl-doc-pass-online',
-      '서류 합격 · 온라인 면접 안내',
-      '서류 합격',
-      '[예시] GDGoC DGU {{기수}} 서류 합격 · 온라인 면접 안내',
-      `{{이름}}님, 안녕하세요.\n\n서류 전형에 합격하셨습니다. 면접은 온라인으로 진행합니다.\n\n면접 일시: {{면접일시}} (30분)\n접속 주소는 면접 하루 전에 보내 드립니다.${sign}`,
-      false,
-      'B',
-      at(8, '13:05'),
-    ),
-  ]
+  const templates = mailTemplates(ctx, true)
   const defaultTemplate = (r: MailResult) => templates.find((t) => t.result === r && t.isDefault)!
 
   // ── 지원자 · 처리 이력 ──

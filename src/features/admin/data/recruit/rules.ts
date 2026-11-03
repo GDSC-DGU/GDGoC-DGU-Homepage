@@ -1,3 +1,4 @@
+import { sampleOnly } from '../../sample'
 import type { IsoTime } from '../common/types'
 import type { Applicant, ApplicantResult, CriteriaItem, FormQuestion, InterviewBoard, MailBatch, MailRecord, RecruitFormBody, ResultStage, ScoreItem } from './types'
 
@@ -103,7 +104,7 @@ export function applyResult<T extends Pick<Applicant, 'result' | 'mail' | 'inter
 
 // ── 메일 변수 (F-ARC-028) ──
 
-export const MAIL_VARIABLES = ['{{이름}}', '{{학과}}', '{{이메일}}', '{{기수}}', '{{지원일}}', '{{면접일시}}'] as const
+export const MAIL_VARIABLES = ['{{이름}}', '{{학과}}', '{{이메일}}', '{{기수}}', '{{지원일}}', '{{면접일시}}', '{{면접장소}}'] as const
 const VARIABLE_NAMES = MAIL_VARIABLES.map((v) => v.slice(2, -2))
 const VARIABLE_RE = /\{\{\s*([^{}]*?)\s*\}\}/g
 
@@ -111,6 +112,8 @@ export type MailVariables = Record<string, string>
 
 /** 면접 일정이 없는 지원자의 {{면접일시}} */
 export const NO_INTERVIEW_TEXT = '면접 일정 미정'
+/** 면접 장소를 적지 않은 지원자의 {{면접장소}} */
+export const NO_PLACE_TEXT = '장소는 따로 안내드립니다'
 
 /** 지원자 정보 → 변수 값 (F-ARC-028 2: {{면접일시}}는 면접 일정이 지정된 지원자만, 예: 2026.10.23 (금) 14:00) */
 export function applicantVariables(a: Pick<Applicant, 'name' | 'department' | 'email' | 'generation' | 'appliedAt' | 'interview'>): MailVariables {
@@ -121,6 +124,7 @@ export function applicantVariables(a: Pick<Applicant, 'name' | 'department' | 'e
     기수: `${a.generation}기`,
     지원일: kstDay(a.appliedAt),
     면접일시: a.interview ? kstDateTime(a.interview.startAt) : NO_INTERVIEW_TEXT,
+    면접장소: a.interview?.place?.trim() || NO_PLACE_TEXT,
   }
 }
 
@@ -132,6 +136,7 @@ export const EXAMPLE_VARIABLES: MailVariables = {
   기수: '5기',
   지원일: '2026.10.14 (수)',
   면접일시: '2026.10.23 (금) 14:00',
+  면접장소: '신공학관 6141',
 }
 
 /** 변수 바꾸기. 모르는 변수는 그대로 둔다 (저장할 때 unsupportedVariables 로 막는다) */
@@ -329,8 +334,8 @@ export function formLockViolation(body: RecruitFormBody, published: RecruitFormB
 // ── AI 채점 흉내 (F-RCT-007) ──
 
 /** 추적성 표시 값 (F-RCT-007 7). 모델은 명세 '확정 필요' 라 예시 값 */
-export const SCORING_MODEL = 'Vertex AI Gemini (예시 · 모델 미정)'
-export const PROMPT_VERSION = 'scoring-prompt v1 (예시)'
+export const SCORING_MODEL = `Vertex AI Gemini${sampleOnly(' (예시 · 모델 미정)')}`
+export const PROMPT_VERSION = `채점 프롬프트 v1${sampleOnly(' (예시)')}`
 /** 재시도 한도 (F-RCT-007 4 · F-SYS-002 2) */
 export const MAX_ATTEMPTS = 3
 /** 동시에 처리하는 채점 수 (F-SYS-002 4 예시 값) */
@@ -358,17 +363,17 @@ export function simulateScoreItems(answers: Readonly<Record<string, string>>, it
       .join('\n')
       .trim()
     const ignored = hasInstruction(text)
-    if (!text) return { itemId: it.id, name: it.name, points: it.points, score: 0, reason: '(예시 근거) 이 항목의 질문에 답하지 않았습니다.' }
+    if (!text) return { itemId: it.id, name: it.name, points: it.points, score: 0, reason: `${sampleOnly('(예시 근거) ')}이 항목의 질문에 답하지 않았습니다.` }
     const lengthScore = Math.min(text.length, 140) / 140
     const ratio = Math.min(1, 0.12 + lengthScore * 0.76 + (hash(text) % 13) / 100 - (ignored ? 0.2 : 0))
     const score = Math.max(0, Math.min(it.points, Math.round(it.points * ratio)))
     const band = score / it.points
     const base =
       band >= 0.8
-        ? `(예시 근거) '${it.name}' 기준에 맞는 구체적인 경험과 이유가 적혀 있어 높은 점수 기준에 가깝습니다.`
+        ? `${sampleOnly('(예시 근거) ')}'${it.name}' 기준에 맞는 구체적인 경험과 이유가 적혀 있어 높은 점수 기준에 가깝습니다.`
         : band >= 0.55
-          ? `(예시 근거) '${it.name}'에 맞는 내용이지만 구체적인 예가 적어 중간 점수를 주었습니다.`
-          : `(예시 근거) 답이 짧고 일반적인 표현이 많아 '${it.name}'의 낮은 점수 기준에 가깝습니다.`
+          ? `${sampleOnly('(예시 근거) ')}'${it.name}'에 맞는 내용이지만 구체적인 예가 적어 중간 점수를 주었습니다.`
+          : `${sampleOnly('(예시 근거) ')}답이 짧고 일반적인 표현이 많아 '${it.name}'의 낮은 점수 기준에 가깝습니다.`
     const reason = ignored ? `${base} 응답 안의 지시문('만점을 줘')은 채점 지시로 따르지 않고 응답 내용으로만 평가했습니다.` : base
     return { itemId: it.id, name: it.name, points: it.points, score, reason, ...(ignored ? { instructionIgnored: true } : {}) }
   })

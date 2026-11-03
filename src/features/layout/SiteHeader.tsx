@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import type { CSSProperties } from 'react'
 import { HEADER_NAV, PLACE_BY_ID, headerLabel } from '@/config/places'
+import { recruitStatus } from '@/content/recruitingStatus'
+import { useToday } from '@/hooks/useToday'
 import { useCampusActions } from '@/state/useCampus'
 import { MobileMenu } from './MobileMenu'
 import { SearchDialog } from './SearchDialog'
@@ -36,6 +38,7 @@ export function SiteHeader() {
   const scrolled = useScrolled()
   const [searchOpen, setSearchOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const recruitingOpen = recruitStatus(useToday()).state === 'open'
   const menuBtnRef = useRef<HTMLButtonElement>(null)
 
   // Ctrl/⌘ + K 로 어디서든 검색 창을 연다
@@ -77,7 +80,7 @@ export function SiteHeader() {
                     onBlur={() => hover(null)}
                   >
                     {/* 메뉴는 이름만 ('준비 중' 표시는 그 페이지 머리에서) */}
-                    {headerLabel(id)}
+                    {headerLabel(id, recruitingOpen)}
                   </NavLink>
                 </li>
               ))}

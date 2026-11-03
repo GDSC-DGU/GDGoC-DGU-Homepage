@@ -1,3 +1,4 @@
+import { ADMIN_SAMPLE, sampleOnly } from '../sample'
 import { forwardRef, useId, useRef, useState } from 'react'
 import { pinMailContent } from '../data/users/mail'
 import { Button, formatDateTimeLong } from '../ui'
@@ -52,7 +53,7 @@ export const CredentialBox = forwardRef<HTMLButtonElement, { loginId: string; pa
           이 팝업을 닫으면 임시 비밀번호를 다시 볼 수 없습니다. 다시 받으려면 Lead가 [비밀번호 초기화]를 해야 합니다. 첫 로그인 때 새 비밀번호로 바꿔야 합니다.
         </span>
       </p>
-      <p className={s.note}>예시 화면이라 이 비밀번호는 어디에도 저장하지 않으며, 실제 로그인에는 쓸 수 없습니다.</p>
+      {ADMIN_SAMPLE && <p className={s.note}>예시 화면이라 이 비밀번호는 어디에도 저장하지 않으며, 실제 로그인에는 쓸 수 없습니다.</p>}
     </section>
   )
 })
@@ -62,7 +63,7 @@ export function MailPreview({ to, name, studentId, kind, expiresAt }: { to: stri
   const mail = pinMailContent({ name, studentId }, kind, expiresAt)
   return (
     <details className={s.mail}>
-      <summary>보낸 안내 메일 보기 (예시)</summary>
+      <summary>보낸 안내 메일 보기</summary>
       <div className={s.mailBody}>
         <dl className={s.facts}>
           <div>
@@ -80,7 +81,7 @@ export function MailPreview({ to, name, studentId, kind, expiresAt }: { to: stri
         <p className={s.mailLink}>
           <span className={s.fakeButton}>{mail.linkLabel}</span>
           <span>
-            <span className="num">{formatDateTimeLong(mail.expiresAt)}</span>까지 (예시 링크라 누를 수 없습니다)
+            <span className="num">{formatDateTimeLong(mail.expiresAt)}</span>까지{sampleOnly(' (예시 링크라 누를 수 없습니다)')}
           </span>
         </p>
       </div>

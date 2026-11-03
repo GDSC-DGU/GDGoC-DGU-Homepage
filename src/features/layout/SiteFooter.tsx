@@ -50,11 +50,11 @@ export function SiteFooter() {
       <div className={`container ${s.footerGrid}`}>
         <div className={s.footerInfo}>
           <p className={s.footerBrand} lang="en">
-            GDGoC DONGGUK
+            GDGoC Dongguk
           </p>
           <p className={s.footerAddress}>{SITE.address}</p>
           <p className={s.footerCopy} lang="en">
-            Copyright © <span className="num">2026</span> Google Developer Groups on Campus DGU. All rights reserved.
+            Copyright © <span className="num">2026</span> {SITE.fullName}. All rights reserved.
           </p>
         </div>
 

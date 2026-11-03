@@ -4,7 +4,7 @@ import type { ScheduleEvent } from '@/domain/types'
 import { StoryHead } from '@/features/common'
 import { LedTicket } from '@/features/signboard/LedBoard'
 import { monthDay, weekday } from '@/lib/date'
-import { REGULAR_SESSION, type WeekState } from './thisWeek'
+import { REGULAR_SESSION, isPeriod, type WeekState } from './thisWeek'
 import c from './community.module.css'
 
 /** '10.27 화' (숫자는 Google Sans Flex) */
@@ -44,7 +44,8 @@ export function WeekBand({ week, timeOf, regular }: { week: WeekState; timeOf: (
   const { status, meet, rest, meeting, others, next } = week
   const big = status === 'meet' ? meeting[0] : next
   const time = big ? timeOf(big) : null
-  const meta = big ? [time, big.venue ?? '장소 미정'].filter(Boolean).join(' · ') : ''
+  // 여러 날에 걸친 기간(G-Sprint 팀별 개발 기간 등)은 한 장소에서 모이는 일정이 아니라 장소 줄을 달지 않는다
+  const meta = big ? [time, big.venue ?? (isPeriod(big) ? null : '장소 추후 공지')].filter(Boolean).join(' · ') : ''
   const sameWeek = others.filter((e) => e !== big)
 
   const lines: ReactNode[] = []
@@ -63,6 +64,7 @@ export function WeekBand({ week, timeOf, regular }: { week: WeekState; timeOf: (
       </>,
     )
   } else if (status === 'meet') {
+    if (isPeriod(meeting[0])) lines.push(<>이 기간에는 전체 세션 없이 팀별로 개발합니다.</>)
     if (meeting.length > 1) lines.push(<>같은 날 {meeting.slice(1).map((e) => e.title).join(' · ')}도 있습니다.</>)
     if (next)
       lines.push(
@@ -103,7 +105,7 @@ export function WeekBand({ week, timeOf, regular }: { week: WeekState; timeOf: (
           {big && (
             <LedTicket
               size="large"
-              kicker={status === 'meet' ? '이번 주 모임' : '다음 모임'}
+              kicker={status === 'meet' ? (isPeriod(big) ? '지금 진행 중' : '이번 주 모임') : '다음 모임'}
               date={big.date}
               endDate={big.endDate}
               title={big.title}

@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useId, useRef, useState, type ReactNode, type Ref } from 'react'
-import { BOARD_LABEL, COMMUNITY_CATEGORIES, type BoardId, type CommentRow, type CommunityCategory, type PostListQuery, type PostRow } from '../data/boards/types'
+import { deadlineLabel } from '@/features/teams/data/rules'
+import { useToday } from '@/hooks/useToday'
+import { BOARD_LABEL, type BoardId, type CommentRow, type PostCategory, type PostListQuery, type PostRow } from '../data/boards/types'
 import { errorMessage } from '../data/common/errors'
 import { adminKeys } from '../data/queryKeys'
 import { useAdminRepos } from '../data/useAdminData'
+import { ADMIN_SAMPLE } from '../sample'
 import { adminPath, screenById } from '../screens'
 import {
   BulkBar,
@@ -22,6 +25,7 @@ import {
   formatDate,
   formatDateTime,
   formatNumber,
+  formatPeriod,
   useConfirm,
   useToast,
   type Column,
@@ -29,8 +33,10 @@ import {
 import { PostPreviewDialog } from './PostPreviewDialog'
 import { keepPrevious, selectedDeleteConfirm, useClampPage, useCompactTable, useFocusAfterRefetch, useSelection } from './listHooks'
 import { useAction } from './useAction'
+import { authorText, boardCategories, partsText } from './display'
 import { useListParams } from './useListParams'
 import s from './boards.module.css'
+
 
 function SectionHead({ id, headingRef, title, children }: { id: string; headingRef: Ref<HTMLHeadingElement>; title: string; children?: ReactNode }) {
   return (
@@ -45,7 +51,7 @@ function SectionHead({ id, headingRef, title, children }: { id: string; headingR
 
 /* ─────────────────────────── 게시글 ─────────────────────────── */
 
-type CategoryFilter = 'all' | CommunityCategory
+type CategoryFilter = 'all' | PostCategory
 
 function PostsSection({ board }: { board: BoardId }) {
   const repos = useAdminRepos()
@@ -53,9 +59,11 @@ function PostsSection({ board }: { board: BoardId }) {
   const confirm = useConfirm()
   const lp = useListParams()
   const headingId = useId()
+  const today = useToday()
 
-  const rawCategory = lp.get('category') as CommunityCategory
-  const category: CategoryFilter = board === 'community' && COMMUNITY_CATEGORIES.includes(rawCategory) ? rawCategory : 'all'
+  const categories = boardCategories(board)
+  const rawCategory = lp.get('category') as PostCategory
+  const category: CategoryFilter = categories.includes(rawCategory) ? rawCategory : 'all'
   const q = lp.get('q')
   const page = lp.num('page')
   const highlight = lp.get('post')
@@ -148,19 +156,40 @@ function PostsSection({ board }: { board: BoardId }) {
             width: '136px',
             cell: (p: PostRow) => (
               <span className={s.stack}>
-                <span className={`${s.author} ${p.byAdmin ? s.adminAuthor : ''}`}>{p.authorName}</span>
+                <span className={`${s.author} ${p.byAdmin ? s.adminAuthor : ''}`}>{authorText(p)}</span>
                 <span className={s.when}>{formatDate(p.createdAt)}</span>
               </span>
             ),
           },
         ]
       : [
-          { key: 'author', header: '작성자', width: '128px', cell: (p: PostRow) => <span className={`${s.author} ${p.byAdmin ? s.adminAuthor : ''}`}>{p.authorName}</span> },
+          { key: 'author', header: '작성자', width: '120px', cell: (p: PostRow) => <span className={`${s.author} ${p.byAdmin ? s.adminAuthor : ''}`}>{authorText(p)}</span> },
           { key: 'createdAt', header: '작성일', width: '148px', cell: (p: PostRow) => <span className={s.when}>{formatDateTime(p.createdAt)}</span> },
         ]),
-    board === 'teams'
-      ? { key: 'comments', header: '댓글 수', cell: (p) => <span className={s.count}>{formatNumber(p.commentCount)}</span>, width: '80px', align: 'end' }
-      : { key: 'views', header: '조회수', cell: (p) => <span className={s.count}>{formatNumber(p.views)}</span>, width: '80px', align: 'end' },
+    ...(board === 'teams'
+      ? [
+          {
+            key: 'recruit',
+            header: '모집',
+            width: '132px',
+            cell: (p: PostRow) => (
+              <span className={s.stack}>
+                <span className={s.recruit}>
+                  <StatusBadge tone={p.recruitStatus === '모집중' ? 'success' : 'muted'}>{p.recruitStatus ?? '-'}</StatusBadge>
+                  {p.recruitStatus && p.endDate && deadlineLabel(p.endDate, p.recruitStatus, today) && <span className={s.dday}>{deadlineLabel(p.endDate, p.recruitStatus, today)}</span>}
+                </span>
+                <span className={s.when}>
+                  {partsText(p.parts)} · {p.headcount ? `${p.headcount}명` : '인원 미정'}
+                </span>
+              </span>
+            ),
+          },
+          { key: 'comments', header: '댓글', cell: (p: PostRow) => <span className={s.count}>{formatNumber(p.commentCount)}</span>, width: '64px', align: 'end' as const },
+        ]
+      : [
+          // 공개 사이트에는 Community 글 화면이 없어 조회수 대신 일정(세션 · 행사 기간)을 보여 준다
+          { key: 'period', header: '일정', width: '148px', cell: (p: PostRow) => <span className={s.when}>{p.startDate ? formatPeriod(p.startDate, p.endDate) : '-'}</span> },
+        ]),
     {
       key: 'actions',
       header: '관리',
@@ -178,23 +207,21 @@ function PostsSection({ board }: { board: BoardId }) {
   return (
     <section className={s.section} aria-labelledby={headingId}>
       <SectionHead id={headingId} headingRef={focus.ref} title="게시글">
-        {board === 'community' && (
+        {board === 'community' && ADMIN_SAMPLE && (
           <span className={s.legend}>
             <span className={s.swatch} aria-hidden="true" />
             음영 줄은 운영진이 쓴 공지 · 세션 · 행사 글입니다.
           </span>
         )}
       </SectionHead>
-      {board === 'community' && (
-        <div className={s.filterRow}>
-          <FilterTabs<CategoryFilter>
-            label="분류"
-            options={[{ value: 'all', label: '전체' }, ...COMMUNITY_CATEGORIES.map((c) => ({ value: c, label: c }))]}
-            value={category}
-            onChange={(v) => change({ category: v === 'all' ? null : v, page: null })}
-          />
-        </div>
-      )}
+      <div className={s.filterRow}>
+        <FilterTabs<CategoryFilter>
+          label="분류"
+          options={[{ value: 'all', label: '전체' }, ...categories.map((c) => ({ value: c, label: c }))]}
+          value={category}
+          onChange={(v) => change({ category: v === 'all' ? null : v, page: null })}
+        />
+      </div>
       <Toolbar
         start={<SearchBox label={`${BOARD_LABEL[board]} 게시글 검색`} placeholder="제목 · 내용 · 작성자" value={q} onSearch={(v) => change({ q: v || null, page: null })} />}
         end={posts.data && <TotalCount total={posts.data.total} searching={searching} />}
@@ -225,9 +252,9 @@ function PostsSection({ board }: { board: BoardId }) {
           )
         }
         empty={emptyText}
-        rowTone={(p) => (p.byAdmin ? 'shaded' : undefined)}
+        rowTone={(p) => (ADMIN_SAMPLE && p.byAdmin ? 'shaded' : undefined)}
         selection={{ selected: selection.selected, onChange: selection.set, label: (p) => `${p.title} 선택` }}
-        minWidth={compact ? 680 : 860}
+        minWidth={compact ? 680 : board === 'teams' ? 940 : 860}
       />
       {posts.data && (
         <Pagination
@@ -306,7 +333,7 @@ function CommentsSection({ board }: { board: BoardId }) {
       width: compact ? '136px' : '128px',
       cell: (c) => (
         <span className={`${s.stack} ${c.id === highlight ? s.hl : ''}`}>
-          <span className={s.author}>{c.authorName}</span>
+          <span className={s.author}>{authorText(c)}</span>
           {compact && <span className={s.when}>{formatDate(c.createdAt)}</span>}
         </span>
       ),
@@ -422,13 +449,16 @@ export function BoardManagePage({ board }: { board: BoardId }) {
         title={screen.title}
         description={
           board === 'teams'
-            ? 'Teams 게시글과 댓글을 찾아보고, 부적절한 글은 삭제합니다. 삭제한 글은 홈페이지 목록에서 사라집니다.'
-            : 'Community 게시글과 댓글을 분류별로 찾아보고 삭제합니다. 공지 · 세션 · 행사는 [글쓰기]에서 운영진 이름으로 올립니다.'
+            ? '홈페이지 팀원 찾기 게시글과 댓글을 찾아보고, 부적절한 글은 삭제합니다. 삭제한 글은 홈페이지 목록에서 사라집니다.'
+            : ADMIN_SAMPLE
+              ? 'Community 게시글과 댓글을 분류별로 찾아보고 삭제합니다. 공지 · 세션 · 행사는 [글쓰기]에서 운영진 이름으로 올립니다.'
+              : '운영진이 올린 공지 · 세션 · 행사 글을 분류별로 찾아보고 삭제합니다. 새 글은 [글쓰기]에서 운영진 이름으로 올립니다.'
         }
         actions={board === 'community' ? <ButtonLink to={adminPath.communityWrite}>글쓰기</ButtonLink> : undefined}
       />
       <PostsSection board={board} />
-      <CommentsSection board={board} />
+      {/* 공개 사이트의 Community 에는 댓글이 없다: 댓글 관리는 Teams 와 예시 화면에서만 */}
+      {(board === 'teams' || ADMIN_SAMPLE) && <CommentsSection board={board} />}
     </>
   )
 }

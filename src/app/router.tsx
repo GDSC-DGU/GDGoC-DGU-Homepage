@@ -3,7 +3,7 @@ import { PAGE_PLAN_IDS } from '@/config/pages'
 import { HomePage } from '@/features/home/HomePage'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { ErrorPage } from '@/features/pages/ErrorPage'
-import { AdminApp, CampusPreview, CommunityPage, NotFoundPage, NowPreview, PlannedPage, ProjectsPage, RecruitsPage } from './lazyPages'
+import { AdminApp, CampusPreview, CommunityPage, NotFoundPage, NowPreview, PlannedPage, ProjectsPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
 import { enableViewTransitions } from './viewTransitions'
 
 /** 다 만든 페이지. 준비 중 페이지를 실제로 만들면 여기로 옮긴다 */
@@ -12,10 +12,15 @@ const BUILT_ROUTES: RouteObject[] = [
   { path: 'projects', element: <ProjectsPage /> },
   { path: 'community', element: <CommunityPage /> },
   { path: 'recruits', element: <RecruitsPage /> },
+  // 팀원 찾기: 백엔드 전에는 예시 게시판 (features/teams/data/teamsRepo.ts 의 TEAMS_SAMPLE)
+  { path: 'teams', element: <TeamsPage /> },
+  { path: 'teams/write', element: <TeamsWritePage mode="create" /> },
+  { path: 'teams/:postId', element: <TeamsPostPage /> },
+  { path: 'teams/:postId/edit', element: <TeamsWritePage mode="edit" /> },
 ]
 const BUILT = new Set(BUILT_ROUTES.map((r) => r.path))
 
-/** 작업 중 컴포넌트를 혼자 띄워 보는 주소 (배포본에도 있지만 메뉴에는 없다) */
+/** 작업 중 컴포넌트를 혼자 띄워 보는 주소 (개발 서버에서만. 배포본에서는 404) */
 const PREVIEW_ROUTES: RouteObject[] = [
   { path: '__preview/now', element: <NowPreview /> },
   { path: '__preview/campus', element: <CampusPreview /> },
@@ -29,7 +34,7 @@ const routes: RouteObject[] = [
     element: <AppLayout />,
     // 화면을 그리다 오류가 나면 흰 화면 대신 안내를 보여준다
     errorElement: <ErrorPage />,
-    children: [...BUILT_ROUTES, ...PLANNED_ROUTES, ...PREVIEW_ROUTES, { path: '*', element: <NotFoundPage /> }],
+    children: [...BUILT_ROUTES, ...PLANNED_ROUTES, ...(import.meta.env.DEV ? PREVIEW_ROUTES : []), { path: '*', element: <NotFoundPage /> }],
   },
   /**
    * 관리자 화면 (/admin, /admin/login, /admin/boards/teams …): 공개 사이트 틀(머리말 · 꼬리말 · 페이지 전환) 밖의 관리자 전용 틀.

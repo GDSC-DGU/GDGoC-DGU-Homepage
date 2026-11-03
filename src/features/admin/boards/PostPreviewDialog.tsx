@@ -3,7 +3,9 @@ import { actorLabel } from '../data/common/accounts'
 import { fileSizeLabel } from '../data/common/fileRules'
 import { BOARD_LABEL, PERIOD_CATEGORIES, type CommunityCategory, type PostRow } from '../data/boards/types'
 import { Button, Dialog, StatusBadge, formatDateTime, formatNumber, formatPeriod } from '../ui'
+import { ADMIN_SAMPLE } from '../sample'
 import { IconFile } from '../ui/icons'
+import { authorText, partsText } from './display'
 import s from './boards.module.css'
 
 /**
@@ -45,7 +47,7 @@ export function PostPreviewDialog({ post, onClose, onDelete, deleting }: { post:
           <dl className={s.facts}>
             <dt>작성자</dt>
             <dd>
-              {p.authorName}
+              {authorText(p)}
               {p.byAdmin && <StatusBadge tone="neutral">관리자 게시글</StatusBadge>}
             </dd>
             <dt>작성일</dt>
@@ -60,14 +62,26 @@ export function PostPreviewDialog({ post, onClose, onDelete, deleting }: { post:
             )}
             {withPeriod && (
               <>
-                <dt>기간</dt>
+                <dt>{p.board === 'teams' ? '모집 기간' : '일정'}</dt>
                 <dd className="num">{formatPeriod(p.startDate!, p.endDate)}</dd>
               </>
             )}
-            <dt>조회 · 댓글</dt>
-            <dd>
-              조회 <span className="num">{formatNumber(p.views)}</span> · 댓글 <span className="num">{formatNumber(p.commentCount)}</span>
-            </dd>
+            {p.board === 'teams' && (
+              <>
+                <dt>파트 · 인원</dt>
+                <dd>
+                  {partsText(p.parts)} · {p.headcount ? `${p.headcount}명` : '인원 미정'}
+                </dd>
+              </>
+            )}
+            {(p.board === 'teams' || ADMIN_SAMPLE) && (
+              <>
+                <dt>조회 · 댓글</dt>
+                <dd>
+                  조회 <span className="num">{formatNumber(p.views)}</span> · 댓글 <span className="num">{formatNumber(p.commentCount)}</span>
+                </dd>
+              </>
+            )}
             {p.posted && (
               <>
                 <dt>게시한 계정</dt>

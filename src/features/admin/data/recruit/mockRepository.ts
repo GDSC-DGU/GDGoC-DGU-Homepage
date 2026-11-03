@@ -534,7 +534,7 @@ export function createMockRecruitRepository(ctx: MockContext): RecruitRepository
         return { interviewers, interviews }
       }),
 
-    saveInterview: (id, { startAt, interviewerIds }) =>
+    saveInterview: (id, { startAt, interviewerIds, place }) =>
       respond(() => {
         const actor = requireActor(ctx)
         const a = findApplicant(id)
@@ -558,8 +558,9 @@ export function createMockRecruitRepository(ctx: MockContext): RecruitRepository
           throw new AdminRepoError('CONFLICT', `${clash.map(userName).join(', ')}에게 이 시간에 다른 면접이 있어 저장하지 않았습니다. 다른 시각이나 담당자를 골라 주세요.`, {
             detail: { interviewerIds: clash },
           })
-        const slot = { startAt: new Date(startAt).toISOString(), interviewerIds: ids }
-        if (a.interview && a.interview.startAt === slot.startAt && a.interview.interviewerIds.join() === ids.join()) return toDetail(a)
+        const where = place?.trim()
+        const slot = { startAt: new Date(startAt).toISOString(), interviewerIds: ids, ...(where ? { place: where } : {}) }
+        if (a.interview && a.interview.startAt === slot.startAt && a.interview.interviewerIds.join() === ids.join() && (a.interview.place ?? '') === (where ?? '')) return toDetail(a)
         updateOne({ ...a, interview: slot }, [{ actor, content: `면접 일정 ${a.interview ? '변경' : '지정'}: ${interviewText(a.interview, userName)} → ${interviewText(slot, userName)}` }])
         return toDetail(findApplicant(id))
       }),

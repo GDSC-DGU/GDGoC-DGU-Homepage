@@ -1,3 +1,4 @@
+import { PROTOTYPE } from '@/config/site'
 import { describe, expect, it } from 'vitest'
 import { EVENTS, FAQS, PROJECTS, RECRUITING } from '@/content'
 import { createMockRepositories } from '@/data/mock/mockRepositories'
@@ -53,8 +54,12 @@ describe('미리보기 (지도 패널의 최신 3개)', () => {
     expect(teams.length).toBeGreaterThan(0)
     for (const t of teams) {
       expect(t.sample, t.id).toBeUndefined()
-      expect(t.date, t.id).toBeUndefined()
-      expect(t.label, t.id).toBeTruthy()
+      // 프로토타입 보기(개발 · 테스트)는 게시판의 최근 글, 공개 배포는 날짜 없는 상태 줄
+      if (PROTOTYPE) expect(t.date, t.id).toBeTruthy()
+      else {
+        expect(t.date, t.id).toBeUndefined()
+        expect(t.label, t.id).toBeTruthy()
+      }
     }
     expect(await repos.previews.latest('recruits', 2)).toHaveLength(2)
   })

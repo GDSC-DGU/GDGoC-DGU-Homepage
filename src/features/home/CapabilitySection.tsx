@@ -81,7 +81,7 @@ export function CapabilitySection() {
       className={s.section}
       placeColor={null}
       title="GDGoC DGU 역량"
-      sub="네 파트로 나뉘어 각자의 분야를 깊게 파고, G-Sprint에서는 팀을 꾸려 기획부터 배포까지 하나의 서비스를 직접 만듭니다."
+      sub="네 파트로 나뉘어 각자의 분야를 깊게 파고, G‑Sprint에서는 팀을 꾸려 기획부터 배포까지 하나의 서비스를 직접 만듭니다."
     >
       <ul className={s.cards}>
         {CARDS.map((c) => {

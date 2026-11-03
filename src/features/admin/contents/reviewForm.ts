@@ -6,7 +6,7 @@ import { validateReviewInput } from '../data/contents/mockRepository'
  */
 export interface ReviewDraft {
   photo: { url: string; fileId: string | null } | null
-  /** select 값 ('' = 고르지 않음) */
+  /** select 값 ('' = 기수 없이) */
   generation: string
   name: string
   track: string
@@ -16,8 +16,11 @@ export interface ReviewDraft {
 
 /** 칸별 오류 (예시 저장소 · 서버와 같은 규칙, F-ACT-007 1) */
 export function validateReviewForm(d: ReviewDraft): Record<string, string> {
-  return validateReviewInput({ photoFileId: null, generation: Number(d.generation) || 0, name: d.name, track: d.track, content: d.content, isPublic: d.isPublic })
+  return validateReviewInput({ photoFileId: null, generation: generationOf(d.generation), name: d.name, track: d.track, content: d.content, isPublic: d.isPublic })
 }
+
+/** select 값 → 기수 ('' 이면 null) */
+export const generationOf = (v: string): number | null => (v ? Number(v) : null)
 
 /** 홈 공개 · 비공개 수 ('공개 4 · 비공개 2') */
 export function publicSummary(list: readonly { isPublic: boolean }[]): string {

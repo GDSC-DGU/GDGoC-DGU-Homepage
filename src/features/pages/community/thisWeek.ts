@@ -22,6 +22,9 @@ export const REGULAR_SESSION = {
   faqId: 'when-sessions',
 } as const
 
+/** 여러 날에 걸친 기간인지 (G-Sprint 팀별 개발 기간 · 동지톤 등) */
+export const isPeriod = (e: Pick<ScheduleEvent, 'date' | 'endDate'>) => Boolean(e.endDate && e.endDate !== e.date)
+
 const dow = (ymd: string) => new Date(dayValue(ymd)).getUTCDay()
 const endOf = (e: Pick<ScheduleEvent, 'date' | 'endDate'>) => e.endDate ?? e.date
 const covers = (e: Pick<ScheduleEvent, 'date' | 'endDate'>, ymd: string) => e.date <= ymd && endOf(e) >= ymd

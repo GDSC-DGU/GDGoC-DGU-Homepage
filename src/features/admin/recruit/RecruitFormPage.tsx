@@ -1,3 +1,4 @@
+import { sampleOnly } from '../sample'
 import { useQuery } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -182,14 +183,14 @@ export function RecruitFormPage() {
     if (!criteriaReady) return toast.error('평가 기준을 먼저 저장해 주세요. 평가 기준이 있어야 게시할 수 있습니다.')
     const ok = await confirm({
       title: '지원폼을 게시할까요?',
-      body: `홈페이지 Recruits의 지원서 양식과 지원 기간(${formatPeriod(body.startDate!, body.endDate)})이 이 내용으로 바뀌고, 종료일은 홈 캘린더에 '지원 마감'으로 표시됩니다. 예시 화면이라 실제 홈페이지는 바뀌지 않습니다.`,
+      body: `홈페이지 Recruits의 지원서 양식과 지원 기간(${formatPeriod(body.startDate!, body.endDate)})이 이 내용으로 바뀌고, 종료일은 홈 캘린더에 '지원 마감'으로 표시됩니다.${sampleOnly(' 예시 화면이라 실제 홈페이지는 바뀌지 않습니다.')}`,
       confirmLabel: '게시',
     })
     if (!ok) return
     try {
       await publish.run(body)
       setBaseline(snapshot(edit))
-      toast.success(`${body.generation}기 지원폼을 게시했습니다. (예시: 실제 홈페이지는 바뀌지 않습니다)`)
+      toast.success(`${body.generation}기 지원폼을 게시했습니다.${sampleOnly(' (예시: 실제 홈페이지는 바뀌지 않습니다)')}`)
     } catch (e) {
       handleError(e)
     }

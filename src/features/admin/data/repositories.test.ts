@@ -27,7 +27,7 @@ describe('예시 저장소 공통', () => {
     const storage = memoryStorage()
     const store = createAdminStore({ storage, now: () => NOW })
     const repos = createMockAdminRepositories({ store, session: createSessionStore(storage), now: () => NOW })
-    expect((await rejects(repos.boards.deletePosts('teams', ['tp-01']))).code).toBe('UNAUTHORIZED')
+    expect((await rejects(repos.boards.deletePosts('teams', ['post-23']))).code).toBe('UNAUTHORIZED')
   })
 
   it('돌려받은 값을 고쳐도 store 는 그대로다 (복사본)', async () => {
@@ -41,23 +41,25 @@ describe('예시 저장소 공통', () => {
 describe('게시판 (API-ABD)', () => {
   it('Community 공지는 전체 · 검색어 없음일 때만 위에 고정, 분류 · 검색으로 거른다', async () => {
     const { repos } = await signedIn()
+    await repos.boards.createCommunityPost({ category: '공지', title: '새 공지', startDate: null, endDate: null, content: '내용', attachmentIds: [] })
     const all = await repos.boards.listPosts('community', {})
-    expect(all.items[0].category).toBe('공지')
-    expect(all.items.filter((p) => p.category === '공지').length).toBe(2)
-    expect(all.items[1].category).toBe('공지')
-    const info = await repos.boards.listPosts('community', { category: '정보 공유' })
-    expect(info.items.every((p) => p.category === '정보 공유')).toBe(true)
-    const found = await repos.boards.listPosts('teams', { q: '예시 멤버 02' })
-    expect(found.total).toBe(1)
+    const notices = all.items.filter((p) => p.category === '공지')
+    expect(notices.length).toBeGreaterThanOrEqual(2)
+    expect(all.items.slice(0, notices.length).every((p) => p.category === '공지' && p.pinned)).toBe(true)
+    const sessions = await repos.boards.listPosts('community', { category: '세션' })
+    expect(sessions.total).toBeGreaterThan(0)
+    expect(sessions.items.every((p) => p.category === '세션')).toBe(true)
+    const found = await repos.boards.listPosts('teams', { q: '장하윤' })
+    expect(found.total).toBe(2)
   })
 
   it('게시글을 지우면 삭제 상태(누가 · 언제) + 달린 댓글도 숨김', async () => {
     const { repos, store } = await signedIn()
-    expect(await repos.boards.deletePosts('teams', ['tp-01', 'cp-01'])).toEqual({ deleted: 1 })
-    const post = store.get('boards').posts.find((p) => p.id === 'tp-01')!
+    expect(await repos.boards.deletePosts('teams', ['post-23', 'cp-4th-ot'])).toEqual({ deleted: 1 })
+    const post = store.get('boards').posts.find((p) => p.id === 'post-23')!
     expect(post.deleted).toEqual({ by: { kind: 'admin', id: 'user-admin-a', name: '운영진A', role: 'Lead' }, at: new Date(NOW).toISOString() })
-    expect(store.get('boards').comments.filter((c) => c.postId === 'tp-01').every((c) => c.deleted)).toBe(true)
-    expect((await repos.boards.listComments('teams', {})).items.some((c) => c.postId === 'tp-01')).toBe(false)
+    expect(store.get('boards').comments.filter((c) => c.postId === 'post-23').every((c) => c.deleted)).toBe(true)
+    expect((await repos.boards.listComments('teams', {})).items.some((c) => c.postId === 'post-23')).toBe(false)
   })
 
   it("관리자 글은 '운영진' 이름으로, 세션 · 행사는 기간 필수", async () => {

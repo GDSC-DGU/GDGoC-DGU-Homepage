@@ -1,6 +1,6 @@
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react'
 import type { PagePlanId } from '@/config/pages'
-import { ADMIN_APP, CAMPUS_PREVIEW, COMMUNITY_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, type PageModule } from './pageModules'
+import { ADMIN_APP, CAMPUS_PREVIEW, COMMUNITY_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, TEAMS_PAGE, type PageModule } from './pageModules'
 
 /**
  * 첫 화면(홈)만 처음 받는 파일에 넣고, 나머지 페이지는 들어갈 때 받는다.
@@ -31,6 +31,9 @@ function lazyPage<M, P extends object>(page: PageModule<M>, pick: (m: M) => Comp
 const Projects = lazyPage(PROJECTS_PAGE, (m) => m.ProjectsPage)
 const Community = lazyPage(COMMUNITY_PAGE, (m) => m.CommunityPage)
 const Recruits = lazyPage(RECRUITS_PAGE, (m) => m.RecruitsPage)
+const TeamsList = lazyPage(TEAMS_PAGE, (m) => m.TeamsListPage)
+const TeamsPost = lazyPage(TEAMS_PAGE, (m) => m.TeamsPostPage)
+const TeamsWrite = lazyPage(TEAMS_PAGE, (m) => m.TeamsWritePage)
 const Planned = lazyPage(PLANNED_PAGE, (m) => m.PlannedPage)
 const NotFound = lazyPage(PLANNED_PAGE, (m) => m.NotFoundPage)
 const Now = lazyPage(NOW_PREVIEW, (m) => m.NowPreview)
@@ -45,6 +48,18 @@ export function CommunityPage() {
 }
 export function RecruitsPage() {
   return <Recruits />
+}
+/** 팀원 찾기 목록 (/teams) */
+export function TeamsPage() {
+  return <TeamsList />
+}
+/** 팀원 모집 글 (/teams/:postId) */
+export function TeamsPostPage() {
+  return <TeamsPost />
+}
+/** 모집 글 쓰기 (/teams/write) · 고치기 (/teams/:postId/edit) */
+export function TeamsWritePage({ mode }: { mode: 'create' | 'edit' }) {
+  return <TeamsWrite mode={mode} />
 }
 export function PlannedPage({ id }: { id: PagePlanId }) {
   return <Planned id={id} />

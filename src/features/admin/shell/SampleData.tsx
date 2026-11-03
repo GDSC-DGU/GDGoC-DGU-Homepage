@@ -1,12 +1,17 @@
+import { ADMIN_SAMPLE } from '../sample'
 import { useResetExampleData } from '../data/useAdminData'
 import { useConfirm, useToast } from '../ui'
 import s from './shell.module.css'
 
 /**
- * '예시 화면 · 예시 데이터' 표시 (공개 사이트에도 보이는 관리자 화면이라 늘 보인다, BRIEF) + '예시 데이터 처음으로'.
+ * '예시 화면 · 예시 데이터' 표시 + '예시 데이터 처음으로'. 예시 화면(프로토타입을 끈 공개 배포)에서만 보인다 (sample.ts).
  * 처음으로: 이 탭에서 바꾼 모든 예시 데이터를 seed 로 되돌린다. 로그인은 그대로.
  */
 export function SampleData() {
+  return ADMIN_SAMPLE ? <SampleBox /> : null
+}
+
+function SampleBox() {
   const confirm = useConfirm()
   const toast = useToast()
   const reset = useResetExampleData()

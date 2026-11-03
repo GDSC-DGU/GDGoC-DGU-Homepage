@@ -16,7 +16,7 @@ import { OverviewToggle } from './community/OverviewToggle'
 import { dotDate, pageSources } from './community/pageSources'
 import { PageSources } from './community/Signage'
 import { explainedTerms, firstMentions, mentionKey } from './community/terms'
-import { REGULAR_SESSION, regularTime, weekState } from './community/thisWeek'
+import { REGULAR_SESSION, isPeriod, regularTime, weekState } from './community/thisWeek'
 import { Upcoming } from './community/Upcoming'
 import { useHashScroll } from './community/useHashScroll'
 import { WeekBand } from './community/WeekBand'
@@ -26,6 +26,7 @@ import { Section, StateLine } from './PageParts'
 import { pastEvents } from './records'
 import s from './pages.module.css'
 import c from './community/community.module.css'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 const EMPTY: ScheduleEvent[] = []
 
@@ -44,6 +45,7 @@ const COMMUNITY_COLOR = placeColor('community')
  * 우리끼리 말은 화면에 처음 나오는 자리에서 한 번만 풀어 쓴다: 다가오는 일정 → 기수 요약 · 기록 순서.
  */
 export function CommunityPage() {
+  usePageTitle(PLACE_BY_ID.community.label)
   const today = useToday()
   const { data, isPending, isError, refetch } = useSchedule()
   const events = useMemo(() => withoutStalePlans(data ?? EMPTY, today), [data, today])
@@ -72,7 +74,7 @@ export function CommunityPage() {
     status === 'rest'
       ? `${monthDay(meet)} ${weekday(meet)} · 휴회`
       : status === 'meet'
-        ? `${monthDay(meet)} ${weekday(meet)} · 모임`
+        ? `${monthDay(meet)} ${weekday(meet)} · ${isPeriod(week.meeting[0]) ? '팀별 개발' : '모임'}`
         : status === 'quiet'
           ? `${monthDay(meet)} ${weekday(meet)} · 일정 미공개`
           : '잡힌 일정 없음'

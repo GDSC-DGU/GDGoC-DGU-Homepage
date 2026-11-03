@@ -1,3 +1,4 @@
+import { sampleOnly } from '../sample'
 import { useQuery } from '@tanstack/react-query'
 import { useId, useRef, useState } from 'react'
 import { actorLabel, adminKeys, errorMessage, isAdminRepoError, useAdminRepos } from '../data'
@@ -115,7 +116,7 @@ export function MailTemplatesPage() {
     if (!current) return
     try {
       const r = await test.run(current.id)
-      toast.success(`테스트 메일을 ${r.to}(로그인한 운영진 계정)로 보냈습니다. 예시 화면이라 실제로 보내지 않으며, 지원자 메일 상태와 처리 이력에는 영향이 없습니다.`)
+      toast.success(`테스트 메일을 ${r.to}(로그인한 운영진 계정)로 보냈습니다.${sampleOnly(' 예시 화면이라 실제로 보내지 않습니다.')} 지원자 메일 상태와 처리 이력에는 영향이 없습니다.`)
     } catch (e) {
       toast.error(errorMessage(e))
     }
@@ -250,7 +251,7 @@ export function MailTemplatesPage() {
                 limit={3000}
                 value={edit.body}
                 error={errors.body}
-                help="{{면접일시}}는 면접 일정이 지정된 지원자만 바뀝니다 (예: 2026.10.23 (금) 14:00). 없으면 '면접 일정 미정'."
+                help="{{면접일시}}는 면접 일정이 지정된 지원자만 바뀝니다 (예: 2026.10.23 (금) 14:00). 없으면 '면접 일정 미정'. {{면접장소}}는 면접 일정에 적은 장소, 없으면 '장소는 따로 안내드립니다'."
                 onFocus={() => setLastField('body')}
                 onChange={(e) => setEdit({ ...edit, body: e.target.value })}
               />
