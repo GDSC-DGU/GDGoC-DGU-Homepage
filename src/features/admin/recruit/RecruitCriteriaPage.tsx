@@ -325,7 +325,11 @@ export function RecruitCriteriaPage() {
         </div>
         <Checkbox
           label={`기존 지원자 점수 다시 산정 (${received}건)`}
-          description="체크하면 이미 접수된 지원서를 새 기준으로 다시 채점합니다. 체크하지 않으면 기존 점수는 그대로 두고, 이후 접수되는 지원서부터 새 기준을 씁니다."
+          description={
+            received === 0
+              ? '아직 접수된 지원서가 없습니다. 저장한 기준은 첫 지원서부터 쓰입니다.'
+              : '체크하면 이미 접수된 지원서를 새 기준으로 다시 채점합니다. 체크하지 않으면 기존 점수는 그대로 두고, 이후 접수되는 지원서부터 새 기준을 씁니다.'
+          }
           checked={rescore}
           disabled={received === 0}
           onChange={(e) => setRescore(e.target.checked)}

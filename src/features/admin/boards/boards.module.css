@@ -118,6 +118,17 @@
 .count {
   font: 500 15px/22px var(--font-num);
 }
+/* Teams 모집 칸: 상태 + D-day, 아래 파트 · 인원 */
+.recruit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.dday {
+  font: 600 13px/20px var(--font-num);
+  color: var(--ink-900);
+}
 .muted {
   color: var(--ink-500);
 }

@@ -44,13 +44,19 @@ const remove = useMutation({ mutationFn: (ids: string[]) => repos.boards.deleteP
 - 화면은 **repos 만** 씁니다 (store 를 직접 읽지 않기: 서버로 바꿔도 화면 코드가 그대로이도록).
 - 저장 · 삭제가 store 를 바꾸면 `['admin']` 쿼리가 **저절로 다시 불립니다**. mutation 뒤 invalidate 는 필요 없습니다.
 - 쿼리 key 는 꼭 `adminKeys.section(…)` 으로 (`'admin'` 으로 시작해야 위 자동 갱신 · '처음으로'가 먹습니다).
-- 구역 파일 네 개: `data/<구역>/types.ts`(명세 API 모양) · `seed.ts`(예시 데이터) · `repository.ts`(인터페이스 = API 한 줄씩) · `mockRepository.ts`(예시 구현).
+- 구역 파일 네 개: `data/<구역>/types.ts`(명세 API 모양) · `seed.ts`(처음 데이터) · `repository.ts`(인터페이스 = API 한 줄씩) · `mockRepository.ts`(예시 구현).
   - mock 은 `respond(() => …)` 로 감쌉니다 (200–400ms 지연 + 복사본). 쓰기 전에 `requireActor(ctx)` (누가 했는지 기록에 씀).
   - 자기 slice 만: `ctx.store.get('users')` · `ctx.store.set('users', (s) => …)`. 다른 구역은 읽기만.
   - 실패는 `throw new AdminRepoError('CONFLICT', '명세 안내 문구')` → 화면은 `errorMessage(e)`. 칸별 오류는 `{ fields: { email: '…' } }`.
-  - 모집 mock 은 읽기 · 임시 저장 · 게시 · 템플릿 읽기만 채웠고 나머지는 `notReady('F-ARC-…')` 입니다.
+  - 모집 mock 도 모든 API 를 흉내 냅니다. 처음 데이터는 지원자 0명이라, 결과 · 메일 · 채점 흐름 테스트는 `createRecruitSampleSeed`(지원자 25명)를 store 에 넣어 씁니다.
 - seed 모양(필드)을 바꾸면 그 seed.ts 의 `*_SEED_VERSION` 을 1 올립니다 (탭에 남은 옛 데이터가 그 구역만 새 seed 로 바뀜).
-- 예시 이름 규칙: `운영진A` · `예시 멤버 01` · `예시 지원자 01`, 학번 `2026000101`, 이메일 `@example.com`, 내용에 '예시'. `screens.test.ts` 가 확인합니다.
+- 처음 데이터는 **공개 사이트와 같은 자료**에서 만듭니다 (지어내지 않기):
+  - Teams 글 · 댓글 · 작성자 = 공개 팀원 찾기의 프로토타입 데이터(`features/teams/data/sampleSeed.ts`), General 사용자 = 그 `SAMPLE_ACCOUNTS`
+  - Community 공지 · 세션 · 행사 = 지금 기수의 공개 일정(`content/events.json`), 리뷰 = 홈 Interview(`content/story.ts` voices), 프로젝트 = `content/projects.json`
+  - 모집 = `content/recruiting.json` 기준 (5기 모집 전: 지원폼 임시 저장본 · 지원자 0명). 관리자 계정은 `운영진A` 같은 역할 이름, 이메일은 `@example.com`
+- '예시' 표시는 `sample.ts` 의 `ADMIN_SAMPLE`(= `!PROTOTYPE`, 팀원 찾기의 `TEAMS_SAMPLE` 과 같은 규칙)일 때만: 탭 제목 '(예시)' · 사이드바 '예시 화면' · 로그인 화면의 예시 계정 안내 · 문구 끝의 '예시 화면이라 …'(`sampleOnly('…')`).
+  프로토타입 보기(개발 · 테스트 · `VITE_PROTOTYPE=true`)에서는 운영 중인 화면처럼 보이고, 로그인은 '운영진 계정으로 들어가기' 버튼 하나입니다.
+  공개 사이트에 없는 자리(Community 회원 글 · 댓글, 홈 소개 이미지 · 모집 포스터)도 예시 화면에서만 보입니다. `screens.test.ts` 가 두 경우를 확인합니다.
 - `data/users/seed.ts` 맨 앞의 예시 관리자 계정(`ADMIN_ACCOUNT_SEED`)은 지우지 마세요 (로그인이 깨집니다).
 - 서버 일(메일 발송 · 업로드 · AI 채점)은 흉내만: 진행 표시 → 결과. 실제 네트워크 요청 금지. 업로드는 `repos.uploads.upload(file, 'projectThumbnail')` (object URL).
 
@@ -155,5 +161,6 @@ maskStudentId('2026000042')  // '2026****42'
 - 문구는 ~습니다체, 명세 안내 문구가 있으면 그대로. 13px 미만 한글 금지.
 - 색만으로 상태를 말하지 않기 (StatusBadge · 음영 행에는 글자도). 장소색(구글 4색)은 관리자 화면에 쓰지 않음.
 - 누르는 곳 44 (표 안 작은 버튼 32 + 사이 8). 키보드로 모든 기능.
-- 공개 사이트가 쓰지 않는 react-router 부품(`Routes` · `Route` · `Navigate` · `Form` · `useBlocker` …)은 쓰지 않습니다: 공개 페이지와 같이 받는 공통 파일이 커집니다. 이동은 `useNavigate` · `<Redirect>`(`shell/Redirect`) · `<Link>`.
+- 공개 사이트가 쓰지 않는 react-router 부품(`Routes` · `Route` · `Navigate` · `Form` …)은 쓰지 않습니다: 공개 페이지와 같이 받는 공통 파일이 커집니다. 이동은 `useNavigate` · `<Redirect>`(`shell/Redirect`) · `<Link>`.
+  `useBlocker` 는 공개 팀원 찾기 글쓰기도 쓰므로 써도 됩니다 (작성 중 이탈 확인: `boards/useLeaveGuard.ts`).
 - 새 라이브러리는 꼭 필요할 때만 (기초 담당과 먼저 이야기).

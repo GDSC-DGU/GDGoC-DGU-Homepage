@@ -60,15 +60,13 @@ export function ReviewsPanel({ data }: { data: ContentsState }) {
             cell: (r: Review) => (
               <span className={s.stack}>
                 <span className={s.nowrap}>{r.name}</span>
-                <span className={s.sub}>
-                  {r.generation}기 · {r.track}
-                </span>
+                <span className={s.sub}>{r.generation ? `${r.generation}기 · ${r.track}` : r.track}</span>
               </span>
             ),
           },
         ]
       : [
-          { key: 'generation', header: '기수', width: '72px', nowrap: true, cell: (r: Review) => `${r.generation}기` },
+          { key: 'generation', header: '기수', width: '72px', nowrap: true, cell: (r: Review) => (r.generation ? `${r.generation}기` : '-') },
           { key: 'name', header: '이름', rowHeader: true, width: '128px', cell: (r: Review) => <span className={s.nowrap}>{r.name}</span> },
           { key: 'track', header: '트랙 / 파트', width: '120px', cell: (r: Review) => r.track },
         ]),

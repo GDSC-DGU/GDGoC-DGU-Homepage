@@ -21,6 +21,7 @@ import { ShareAction } from './recruits/ShareAction'
 import { statusView } from './recruits/status'
 import s from './pages.module.css'
 import r from './recruits.module.css'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 /** 처음부터 펼쳐 둘 질문: 모집이 열리지 않은 동안 가장 먼저 묻는 것 */
 const OPEN_FAQ = ['when-recruit']
@@ -70,6 +71,7 @@ function StatusActions({ st, primary }: { st: RecruitStatus; primary: 'apply' | 
  * 연락처는 꼬리말과 '문의' 질문에 있어 따로 섹션을 두지 않는다.
  */
 export function RecruitsPage() {
+  usePageTitle(PLACE_BY_ID.recruits.label)
   const today = useToday()
   const { data } = useSchedule()
   // 일정은 저장소 스냅샷과 같은 내용이다. 서버에서 받기 전에도 한 해 일정을 그릴 수 있게 스냅샷으로 먼저 그린다

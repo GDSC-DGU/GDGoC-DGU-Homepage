@@ -29,6 +29,9 @@ import {
 } from '../ui'
 import s from './projects.module.css'
 
+/** 등록일: 옮겨 온 기록에 날짜가 없으면 '-' */
+const createdText = (p: AdminProject) => (p.createdAtUnknown ? '-' : formatDate(p.createdAt))
+
 /** 수정 화면에서 목록으로 돌아올 때 쓰는 기억 (검색어 · 쪽) */
 export interface ProjectListReturn {
   listSearch: string
@@ -123,14 +126,14 @@ export function ProjectListPage() {
             cell: (p: AdminProject) => (
               <span className={s.stack}>
                 <span>{generationText(p)}</span>
-                <span className={s.when}>{formatDate(p.createdAt)}</span>
+                <span className={s.when}>{createdText(p)}</span>
               </span>
             ),
           },
         ]
       : [
           { key: 'generation', header: '기수', width: '80px', nowrap: true, cell: generationText },
-          { key: 'createdAt', header: '등록일', width: '112px', cell: (p: AdminProject) => <span className={s.when}>{formatDate(p.createdAt)}</span> },
+          { key: 'createdAt', header: '등록일', width: '112px', cell: (p: AdminProject) => <span className={s.when}>{createdText(p)}</span> },
         ]),
     {
       key: 'public',

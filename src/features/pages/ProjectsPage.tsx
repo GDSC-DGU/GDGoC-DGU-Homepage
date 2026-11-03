@@ -20,6 +20,8 @@ import { isSheetState, SHEET_PARAM } from './projects/sheetLink'
 import { SprintBand } from './projects/SprintBand'
 import s from './pages.module.css'
 import p from './projects.module.css'
+import { PLACE_BY_ID } from '@/config/places'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 const EMPTY: Project[] = []
 
@@ -62,6 +64,7 @@ function RoomSection({ room, first }: { room: Room; first: boolean }) {
  * 탭: ?gen → 주소 #방 → 열린 창의 작품 → 가장 최근 기수.
  */
 export function ProjectsPage() {
+  usePageTitle(PLACE_BY_ID.projects.label)
   const today = useToday()
   const [params, setParams] = useSearchParams()
   const location = useLocation()

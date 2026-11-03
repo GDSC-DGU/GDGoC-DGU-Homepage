@@ -12,10 +12,13 @@ export const INTRO_IMAGE_MIN = 1
 /** 후기 최대 글자 수 (F-ACT-007 1) */
 export const REVIEW_CONTENT_MAX = 200
 
-/** 리뷰 입력 확인 (F-ACT-007): 기수 · 이름 · 트랙/파트 · 후기 필수, 후기 200자 이내 */
+/**
+ * 리뷰 입력 확인 (F-ACT-007): 이름 · 트랙/파트 · 후기 필수, 후기 200자 이내.
+ * 기수는 선택 (공개 홈은 확인되지 않은 기수를 붙이지 않는다: 4기 Organizer 결정, content/story.ts)
+ */
 export function validateReviewInput(input: ReviewInput): Record<string, string> {
   const e: Record<string, string> = {}
-  if (!Number.isInteger(input.generation) || input.generation < 1) e.generation = '기수를 골라 주세요.'
+  if (input.generation !== null && (!Number.isInteger(input.generation) || input.generation < 1)) e.generation = '기수를 다시 골라 주세요.'
   if (!input.name.trim()) e.name = '이름을 입력해 주세요.'
   if (!input.track.trim()) e.track = '트랙 / 파트를 입력해 주세요.'
   if (!input.content.trim()) e.content = '후기를 입력해 주세요.'

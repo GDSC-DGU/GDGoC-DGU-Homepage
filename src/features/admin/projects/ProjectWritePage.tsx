@@ -10,7 +10,7 @@ import type { AdminProject } from '../data/projects/types'
 import { adminKeys } from '../data/queryKeys'
 import { useAdminRepos } from '../data/useAdminData'
 import { adminPath } from '../screens'
-import { Button, ButtonLink, Checkbox, EmptyState, FileDrop, PageHeader, SelectField, TextField, focusFirstInvalid, formatDateTime, hasErrors, useConfirm, useToast } from '../ui'
+import { Button, ButtonLink, Checkbox, EmptyState, FileDrop, PageHeader, SelectField, TextField, focusFirstInvalid, formatDate, formatDateTime, hasErrors, useConfirm, useToast } from '../ui'
 import { IconErrorMark } from '../ui/icons'
 import type { ProjectListReturn } from './ProjectListPage'
 import { GENERATION_OPTIONS, PROJECT_SUMMARY_MAX, draftChanged, draftFromProject, emptyProjectDraft, toProjectInput, validateProjectDraft, type ProjectDraft } from './projectForm'
@@ -139,9 +139,16 @@ function ProjectForm({ project }: { project?: AdminProject }) {
   // 등록한 계정 · 시각, 수정한 계정 · 시각 (F-APJ-004 4 · 006 3)
   const meta = project ? (
     <>
-      <span>
-        등록 {actorLabel(project.created.by)} · <span className="num">{formatDateTime(project.created.at)}</span>
-      </span>
+      {project.created.by.kind === 'system' ? (
+        // 예전 기록을 옮겨 온 프로젝트: 시각은 원래 기록의 날짜(첫 커밋)뿐이라 날짜만, 없으면 '-'
+        <span>
+          기존 기록 이전 · <span className="num">{project.createdAtUnknown ? '-' : formatDate(project.created.at)}</span>
+        </span>
+      ) : (
+        <span>
+          등록 {actorLabel(project.created.by)} · <span className="num">{formatDateTime(project.created.at)}</span>
+        </span>
+      )}
       {project.updated && (
         <span className={s.metaPart}>
           마지막 수정 {actorLabel(project.updated.by)} · <span className="num">{formatDateTime(project.updated.at)}</span>
@@ -205,7 +212,7 @@ function ProjectForm({ project }: { project?: AdminProject }) {
             </h2>
             <p className={s.cardDesc}>팀원과 주소는 선택입니다. 주소는 https:// 로 시작해야 합니다.</p>
           </div>
-          <TextField label="팀원" value={draft.members} onChange={(e) => update('members', e.target.value)} help="쉼표로 구분해 적습니다. 예: 예시 멤버 01, 예시 멤버 02" autoComplete="off" />
+          <TextField label="팀원" value={draft.members} onChange={(e) => update('members', e.target.value)} help="팀원 이름을 쉼표로 구분해 적습니다." autoComplete="off" />
           <div className={s.row2}>
             <TextField label="GitHub 저장소 URL" type="url" inputMode="url" placeholder="https://github.com/…" value={draft.githubUrl} onChange={(e) => update('githubUrl', e.target.value)} error={errors.githubUrl} autoComplete="off" />
             <TextField label="서비스 · 데모 URL" type="url" inputMode="url" placeholder="https://" value={draft.serviceUrl} onChange={(e) => update('serviceUrl', e.target.value)} error={errors.serviceUrl} autoComplete="off" />

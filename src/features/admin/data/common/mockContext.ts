@@ -1,3 +1,4 @@
+import { sampleOnly } from '../../sample'
 import type { AdminStore } from '../store'
 import { AdminRepoError } from './errors'
 import type { ActorRef, FileRef } from './types'
@@ -29,7 +30,7 @@ export async function respond<T>(work: () => T): Promise<T> {
   const [min, max] = options.latency
   if (max > 0) await wait(min + Math.random() * (max - min))
   if (options.failureRate > 0 && Math.random() < options.failureRate) {
-    throw new AdminRepoError('NETWORK', '연결이 끊겼습니다 (예시 실패). 잠시 후 다시 시도해 주세요.')
+    throw new AdminRepoError('NETWORK', `연결이 끊겼습니다${sampleOnly(' (예시 실패)')}. 잠시 후 다시 시도해 주세요.`)
   }
   const value = work()
   return value === undefined ? value : structuredClone(value)

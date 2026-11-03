@@ -1,3 +1,4 @@
+import { sampleOnly } from '../sample'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -38,7 +39,7 @@ export function MailFlowDialog({ open, onClose, batchId, onStarted }: MailFlowPr
       title={title}
       description={
         phase === 'compose'
-          ? '전형 결과별 발송 대상과 템플릿을 확인하고 보냅니다. 예시 화면이라 실제로 메일을 보내지 않습니다.'
+          ? `전형 결과별 발송 대상과 템플릿을 확인하고 보냅니다.${sampleOnly(' 예시 화면이라 실제로 메일을 보내지 않습니다.')}`
           : phase === 'sending'
             ? '팝업을 닫아도 발송은 계속됩니다. 끝나면 지원자 관리에 결과가 보입니다.'
             : undefined

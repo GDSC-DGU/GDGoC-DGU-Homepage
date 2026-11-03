@@ -3,6 +3,7 @@ import { createSessionStore } from '../auth/session'
 import type { AdminRepoError } from '../common/errors'
 import { setMockOptions } from '../common/mockContext'
 import { createMockAdminRepositories } from '../repositories'
+import { createAdminSeed } from '../seed'
 import { createAdminStore, memoryStorage } from '../store'
 import { RECRUIT_SIM } from './mockRepository'
 import {
@@ -29,7 +30,7 @@ import {
   validateCriteria,
   validateForm,
 } from './rules'
-import { createRecruitSeed, FIXED_QUESTIONS } from './seed'
+import { createRecruitSampleSeed, createRecruitSeed, FIXED_QUESTIONS, PART_OPTIONS } from './seed'
 import type { Applicant, CriteriaItem, RecruitFormBody } from './types'
 
 const NOW = Date.parse('2026-11-01T03:00:00Z')
@@ -38,7 +39,8 @@ afterEach(() => vi.useRealTimers())
 
 async function signedIn(loginId: 'lead-a' | 'core-b' = 'lead-a') {
   const storage = memoryStorage()
-  const store = createAdminStore({ storage, now: () => NOW })
+  // 흐름 확인용 모집 진행 데이터 (지원자 25명): 화면의 처음 데이터(지원자 0명)로는 결과 · 메일 · 채점 흐름을 볼 수 없다
+  const store = createAdminStore({ storage, now: () => NOW, seed: (ctx) => ({ ...createAdminSeed(ctx), recruit: createRecruitSampleSeed(ctx) }) })
   const repos = createMockAdminRepositories({ store, session: createSessionStore(storage), now: () => NOW })
   await repos.auth.login({ loginId, password: 'example1234' })
   const applicant = (id: string) => store.get('recruit').applicants.find((a) => a.id === id)!
@@ -53,8 +55,40 @@ const rejects = (p: Promise<unknown>) =>
     (e: AdminRepoError) => e,
   )
 
-const seed = createRecruitSeed({ now: NOW })
+const seed = createRecruitSampleSeed({ now: NOW })
 const byNo = (n: number) => seed.applicants[n - 1]
+
+describe('모집 처음 데이터 = 공개 지원 안내와 같다 (5기 모집 전)', () => {
+  const real = createRecruitSeed({ now: NOW })
+  it('5기 지원폼은 임시 저장본만 (게시 전 · 지원 기간 미정), 지원자 · 이력 · 발송 기록 없음', () => {
+    expect(real.form).toMatchObject({ published: null, publishedStamp: null, draft: { generation: 5, startDate: null, endDate: null } })
+    expect(real.form.draftSaved?.by.kind).toBe('admin')
+    expect(real.applicants).toEqual([])
+    expect(real.history).toEqual([])
+    expect(real.batches).toEqual([])
+  })
+  it('질문은 공개 사실: 정기 세션 매주 화요일 18:00, 네 파트', () => {
+    const qs = real.form.draft!.questions
+    expect(qs.find((q) => q.id === 'q-session')?.title).toContain('화요일 18:00')
+    expect(qs.find((q) => q.id === 'q-track')?.options).toEqual(['Frontend', 'Backend', 'AI/ML', 'Product Design'])
+    expect(PART_OPTIONS).toHaveLength(4)
+  })
+  it("프로토타입 보기에서는 예시 표시가 없고, 면접 장소는 {{면접장소}} 변수", () => {
+    const text = JSON.stringify([createRecruitSeed({ now: NOW, sample: false }).templates, createRecruitSeed({ now: NOW, sample: false }).criteria])
+    expect(text).not.toContain('예시')
+    expect(real.templates.find((t) => t.id === 'tpl-doc-pass')!.body).toContain('{{면접장소}}')
+    expect(JSON.stringify(createRecruitSeed({ now: NOW, sample: true }).templates)).toContain('예시')
+  })
+  it('지원자 관리 처음 화면: 접수 0건', async () => {
+    const storage = memoryStorage()
+    const store = createAdminStore({ storage, now: () => NOW })
+    const repos = createMockAdminRepositories({ store, session: createSessionStore(storage), now: () => NOW })
+    await repos.auth.login({ loginId: 'lead-a', password: 'example1234' })
+    const list = await repos.recruit.listApplicants({})
+    expect(list.total).toBe(0)
+    expect(list.counts['전체']).toBe(0)
+  })
+})
 
 describe('모집 예시 데이터 (seed)', () => {
   it('지원자 25명: 이름 · 학번 · 이메일이 누가 봐도 예시, 답변에 (예시 답변)', () => {
@@ -65,7 +99,7 @@ describe('모집 예시 데이터 (seed)', () => {
       expect(a.studentId).toMatch(/^\d{10}$/)
       expect(a.answers['q-motivation']).toContain('(예시 답변)')
     }
-    expect(createRecruitSeed({ now: NOW })).toEqual(seed)
+    expect(createRecruitSampleSeed({ now: NOW })).toEqual(seed)
   })
 
   it('게시본 · 평가 기준(합계 100) · 결과별 인원 · 채점 상태가 서로 맞다', () => {
@@ -352,7 +386,7 @@ describe('메일 (F-ARC-012 · 018~023 · 028)', () => {
     expect(defaults.map((x) => x.id)).toEqual([t.id])
     expect((await rejects(recruit.saveTemplate(t.id, { ...input, body: 'x', isDefault: false }))).code).toBe('CONFLICT')
     expect(await recruit.sendTestMail(t.id)).toEqual({ to: 'admin-a@example.com', subject: '5기 안내' })
-    expect(store.get('recruit').history.length).toBe(createRecruitSeed({ now: NOW }).history.length)
+    expect(store.get('recruit').history.length).toBe(createRecruitSampleSeed({ now: NOW }).history.length)
   })
 })
 

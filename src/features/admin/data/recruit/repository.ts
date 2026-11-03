@@ -63,7 +63,7 @@ export interface RecruitRepository {
   /** API-ARC-030 GET /api/admin/interviews?from&to (KST 'YYYY-MM-DD') */
   interviews(range: { from: string; to: string }): Promise<InterviewBoard>
   /** API-ARC-031 PUT /api/admin/applicants/{applicantId}/interview */
-  saveInterview(applicantId: string, body: { startAt: string; interviewerIds: string[] }): Promise<ApplicantDetail>
+  saveInterview(applicantId: string, body: { startAt: string; interviewerIds: string[]; place?: string }): Promise<ApplicantDetail>
   // 메일
   /** API-ARC-012 GET /api/admin/mail/targets?excludeSent */
   mailTargets(excludeSent: boolean): Promise<MailTarget[]>

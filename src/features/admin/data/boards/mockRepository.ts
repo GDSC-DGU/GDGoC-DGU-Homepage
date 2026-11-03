@@ -1,3 +1,5 @@
+import { statusOf } from '@/features/teams/data/rules'
+import { kstToday } from '@/lib/date'
 import { AdminRepoError } from '../common/errors'
 import { byNewest, matchesQuery, newId, paginate } from '../common/list'
 import { isoNow, requireActor, respond, type MockContext } from '../common/mockContext'
@@ -35,7 +37,9 @@ export function createMockBoardsRepository(ctx: MockContext): BoardsRepository {
   const live = <T extends { deleted: unknown }>(x: T) => !x.deleted
 
   const commentCount = (s: BoardsState, postId: string) => s.comments.filter((c) => c.postId === postId && live(c)).length
-  const toRow = (s: BoardsState, p: AdminPost, pinned = false): PostRow => ({ ...p, commentCount: commentCount(s, p.id), pinned })
+  /** Teams 모집 상태는 볼 때마다 다시 정한다 (종료일 다음 날 0시에 자동 마감: 공개 /teams 와 같은 규칙) */
+  const recruitStatusOf = (p: AdminPost) => (p.board === 'teams' && p.endDate ? statusOf(p.endDate, !!p.closedByAuthor, kstToday(new Date(ctx.now()))) : p.recruitStatus)
+  const toRow = (s: BoardsState, p: AdminPost, pinned = false): PostRow => ({ ...p, recruitStatus: recruitStatusOf(p), commentCount: commentCount(s, p.id), pinned })
 
   return {
     listPosts: (board, query) =>

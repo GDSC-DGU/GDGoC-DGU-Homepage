@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ADMIN_SAMPLE } from '../sample'
 import { GENERATIONS } from '@/content'
 import type { AdminProject } from '../data/projects/types'
 import { GENERATION_OPTIONS, draftChanged, draftFromProject, emptyProjectDraft, fileNameOf, toProjectInput, validateProjectDraft } from './projectForm'
@@ -42,7 +43,7 @@ describe('프로젝트 등록 · 수정 폼 (P-APJ-02)', () => {
 
   it('썸네일 파일 이름 · 기수 고르기', () => {
     expect(fileNameOf('/gdg/project-images/a%20b.webp?v=1')).toBe('a b.webp')
-    expect(fileNameOf('data:image/svg+xml,...')).toBe('예시 이미지')
+    expect(fileNameOf('data:image/svg+xml,...')).toBe(ADMIN_SAMPLE ? '예시 이미지' : '이미지')
     expect(fileNameOf('blob:http://x/1')).toBe('올린 이미지')
     expect(GENERATION_OPTIONS.map((o) => o.value)).toEqual(GENERATIONS.map((g) => String(g.n)))
   })

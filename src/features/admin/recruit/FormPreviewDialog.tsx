@@ -1,3 +1,4 @@
+import { sampleOnly } from '../sample'
 import { useId, useRef } from 'react'
 import { kstDay } from '../data/recruit/rules'
 import type { FormQuestion } from '../data/recruit/types'
@@ -132,7 +133,7 @@ export function FormPreviewDialog({ open, onClose, form }: { open: boolean; onCl
 
           <section ref={privacyRef} tabIndex={-1} className={s.privacy} aria-labelledby={`${base}-privacy`}>
             <h4 id={`${base}-privacy`} className={s.privacyTitle}>
-              개인정보 처리방침 (요약 · 예시)
+              개인정보 처리방침 (요약{sampleOnly(' · 예시')})
             </h4>
             <dl className={s.privacyList}>
               <dt>수집 항목</dt>

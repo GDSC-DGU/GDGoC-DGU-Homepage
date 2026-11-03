@@ -1,8 +1,12 @@
 import { beforeAll, describe, expect, it } from 'vitest'
+import { EVENTS } from '@/content'
+import { statusOf } from '@/features/teams/data/rules'
+import { createSampleSeed, SAMPLE_ACCOUNTS } from '@/features/teams/data/sampleSeed'
 import { createSessionStore } from '../auth/session'
 import type { AdminRepoError } from '../common/errors'
 import { setMockOptions } from '../common/mockContext'
 import { createMockAdminRepositories } from '../repositories'
+import { createAdminSeed } from '../seed'
 import { createAdminStore, memoryStorage } from '../store'
 import { validateCommunityPostInput } from './mockRepository'
 import { createBoardsSeed } from './seed'
@@ -12,9 +16,10 @@ const NOW = Date.parse('2026-11-01T03:00:00Z')
 const TODAY = '2026-11-01'
 beforeAll(() => setMockOptions({ latency: [0, 0], failureRate: 0 }))
 
-async function signedIn() {
+/** sample: 예시 화면 seed (Community 회원 글 · 댓글까지 있는 쪽) */
+async function signedIn(sample = false) {
   const storage = memoryStorage()
-  const store = createAdminStore({ storage, now: () => NOW })
+  const store = createAdminStore({ storage, now: () => NOW, seed: (ctx) => createAdminSeed({ ...ctx, sample }) })
   const repos = createMockAdminRepositories({ store, session: createSessionStore(storage), now: () => NOW })
   await repos.auth.login({ loginId: 'core-b', password: 'example1234' })
   return { store, repos }
@@ -30,14 +35,51 @@ const input = (extra: Partial<CommunityPostInput> = {}): CommunityPostInput => (
 
 describe('게시판 seed', () => {
   const seed = createBoardsSeed({ now: NOW })
+  const sampleSeed = createBoardsSeed({ now: NOW, sample: true })
   const teams = seed.posts.filter((p) => p.board === 'teams')
   const community = seed.posts.filter((p) => p.board === 'community')
 
-  it('페이지 나누기를 볼 만큼 (게시판마다 글 20개 이상, 댓글 10개 이상)', () => {
-    expect(teams.length).toBeGreaterThan(20)
-    expect(community.length).toBeGreaterThan(20)
-    expect(seed.comments.filter((c) => c.board === 'teams').length).toBeGreaterThan(10)
-    expect(seed.comments.filter((c) => c.board === 'community').length).toBeGreaterThan(10)
+  it('Teams = 공개 팀원 찾기(/teams)와 같은 글 · 작성자(이름 · 기수) · 시각 · 조회수 · 파트 · 인원 · 댓글', () => {
+    const pub = createSampleSeed(TODAY, NOW)
+    const people = new Map(SAMPLE_ACCOUNTS.map((a) => [a.studentId, a]))
+    expect(teams.map((p) => p.id).sort()).toEqual(pub.posts.map((p) => p.id).sort())
+    for (const p of pub.posts) {
+      const mine = teams.find((x) => x.id === p.id)!
+      const a = people.get(p.authorId)!
+      expect(mine, p.id).toMatchObject({ title: p.title, content: p.content, createdAt: p.createdAt, views: p.views, parts: p.parts, headcount: p.headcount, authorName: a.name, authorGeneration: a.generation })
+      expect(mine.recruitStatus, p.id).toBe(statusOf(p.endDate, p.closedByAuthor, TODAY))
+      expect(seed.comments.filter((c) => c.postId === p.id).length, p.id).toBe(pub.comments.filter((c) => c.postId === p.id).length)
+    }
+  })
+
+  it('Community = 지금 기수의 공개 일정(events.json)을 운영진 글로. 회원 글 · 댓글은 예시 화면에서만', () => {
+    const generation = Math.max(...EVENTS.map((e) => e.generation ?? 0))
+    for (const p of community) {
+      expect(['공지', '세션', '행사']).toContain(p.category)
+      expect(p).toMatchObject({ authorName: '운영진', byAdmin: true })
+      expect(p.posted?.by.kind).toBe('admin')
+      const e = EVENTS.find((x) => `cp-${x.id}` === p.id)!
+      expect(e.generation, p.id).toBe(generation)
+      if (p.category !== '공지') expect(p, p.id).toMatchObject({ title: e.title, startDate: e.date })
+      expect(Date.parse(p.createdAt) <= NOW, p.id).toBe(true)
+    }
+    expect(community.length).toBeGreaterThan(3)
+    expect(seed.comments.some((c) => c.board === 'community')).toBe(false)
+    const members = sampleSeed.posts.filter((p) => p.board === 'community' && !p.byAdmin)
+    expect(members.length).toBeGreaterThan(0)
+    expect(members.every((p) => ['정보 공유', '기타'].includes(p.category))).toBe(true)
+    expect(sampleSeed.comments.some((c) => c.board === 'community')).toBe(true)
+  })
+
+  it('작성자는 모두 사용자 목록에 있는 사람 (관리자 글은 운영진)', () => {
+    for (const sample of [false, true]) {
+      const all = createAdminSeed({ now: NOW, sample })
+      const names = new Set(all.users.users.map((u) => `${u.name}|${u.generation}`))
+      for (const x of [...all.boards.posts, ...all.boards.comments]) {
+        if ('byAdmin' in x && x.byAdmin) continue
+        expect(names.has(`${x.authorName}|${x.authorGeneration}`), `${x.id} ${x.authorName}`).toBe(true)
+      }
+    }
   })
 
   it('번호는 게시판마다 오래된 글부터 1, 2, 3 …', () => {
@@ -48,23 +90,13 @@ describe('게시판 seed', () => {
   })
 
   it('댓글은 글보다 늦게 쓰였고, 글과 같은 게시판이다', () => {
-    const byId = new Map(seed.posts.map((p) => [p.id, p]))
-    for (const c of seed.comments) {
+    const byId = new Map(sampleSeed.posts.map((p) => [p.id, p]))
+    for (const c of sampleSeed.comments) {
       const post = byId.get(c.postId)!
       expect(post, c.id).toBeDefined()
       expect(c.board, c.id).toBe(post.board)
       expect(c.createdAt > post.createdAt, c.id).toBe(true)
     }
-  })
-
-  it('관리자 글(공지 · 세션 · 행사)은 운영진 이름 + 게시한 계정 기록, 세션 · 행사는 지난 기간', () => {
-    for (const p of community.filter((x) => x.byAdmin)) {
-      expect(['공지', '세션', '행사']).toContain(p.category)
-      expect(p.authorName).toBe('운영진')
-      expect(p.posted?.by.kind).toBe('admin')
-      if (p.category !== '공지') expect(p.endDate! < TODAY, p.id).toBe(true)
-    }
-    expect(community.filter((p) => !p.byAdmin).every((p) => ['정보 공유', '기타'].includes(p.category))).toBe(true)
   })
 
   it('Teams 모집 상태: 종료일이 지나면 마감, 직접 마감한 글은 종료일 전에도 마감', () => {
@@ -89,7 +121,7 @@ describe('게시글 목록 (F-ABD-001 · 002 · 006~008, API-ABD-001)', () => {
   })
 
   it('Community 공지는 전체 탭 · 검색어 없음일 때 모든 페이지 맨 위에 고정된다', async () => {
-    const { repos, store } = await signedIn()
+    const { repos, store } = await signedIn(true)
     const notices = store.get('boards').posts.filter((p) => p.board === 'community' && p.category === '공지')
     const others = store.get('boards').posts.filter((p) => p.board === 'community' && p.category !== '공지')
     const p1 = await repos.boards.listPosts('community', {})
@@ -103,21 +135,23 @@ describe('게시글 목록 (F-ABD-001 · 002 · 006~008, API-ABD-001)', () => {
     // 다른 탭 · 검색에서는 고정하지 않는다
     const tab = await repos.boards.listPosts('community', { category: '공지' })
     expect(tab.items.every((p) => !p.pinned)).toBe(true)
-    const search = await repos.boards.listPosts('community', { q: '예시' })
+    const search = await repos.boards.listPosts('community', { q: '안내' })
     expect(search.items.every((p) => !p.pinned)).toBe(true)
   })
 
   it('분류 + 검색어를 함께 적용, 검색 범위는 제목 · 내용 · 작성자', async () => {
     const { repos } = await signedIn()
-    const sessions = await repos.boards.listPosts('community', { category: '세션', q: '주차' })
+    const sessions = await repos.boards.listPosts('community', { category: '세션', q: '파트 세션' })
     expect(sessions.total).toBeGreaterThan(0)
-    expect(sessions.items.every((p) => p.category === '세션' && p.title.includes('주차'))).toBe(true)
+    expect(sessions.items.every((p) => p.category === '세션' && p.title.includes('파트 세션'))).toBe(true)
     // 작성자 이름 (한 사람이 쓴 글 여러 개)
-    const byAuthor = await repos.boards.listPosts('teams', { q: '예시 멤버 07' })
+    const byAuthor = await repos.boards.listPosts('teams', { q: '박지호' })
     expect(byAuthor.total).toBeGreaterThan(1)
-    expect(byAuthor.items.every((p) => p.authorName === '예시 멤버 07')).toBe(true)
+    expect(byAuthor.items.every((p) => p.authorName === '박지호')).toBe(true)
     // 내용
-    expect((await repos.boards.listPosts('teams', { q: '관리자 화면을 보여 주려고' })).total).toBeGreaterThan(10)
+    const byContent = await repos.boards.listPosts('teams', { q: '디스코드' })
+    expect(byContent.total).toBeGreaterThan(2)
+    expect(byContent.items.every((p) => `${p.title}${p.content}`.includes('디스코드'))).toBe(true)
     // 관리자 글은 '운영진'으로만 찾힌다 (관리자 개인 이름으로는 안 찾힘, F-TEM-003 2)
     expect((await repos.boards.listPosts('community', { q: '운영진' })).items.every((p) => p.byAdmin)).toBe(true)
     expect((await repos.boards.listPosts('community', { q: '운영진A' })).total).toBe(0)
@@ -126,11 +160,11 @@ describe('게시글 목록 (F-ABD-001 · 002 · 006~008, API-ABD-001)', () => {
 
   it('댓글 수는 살아 있는 댓글만 센다', async () => {
     const { repos, store } = await signedIn()
-    const before = (await repos.boards.listPosts('teams', { q: '알고리즘 스터디' })).items[0]
-    expect(before.commentCount).toBe(1)
+    const before = (await repos.boards.listPosts('teams', { q: '분실물 찾기 앱' })).items[0]
+    expect(before.commentCount).toBe(3)
     const commentId = store.get('boards').comments.find((c) => c.postId === before.id)!.id
     await repos.boards.deleteComments([commentId])
-    expect((await repos.boards.listPosts('teams', { q: '알고리즘 스터디' })).items[0].commentCount).toBe(0)
+    expect((await repos.boards.listPosts('teams', { q: '분실물 찾기 앱' })).items[0].commentCount).toBe(2)
   })
 })
 
@@ -138,25 +172,25 @@ describe('게시글 · 댓글 삭제 (F-ABD-003 · 005 · 009 · 012)', () => {
   it('선택 삭제: 삭제 상태로만 바꾸고(누가 · 언제), 다른 게시판 글은 건드리지 않는다', async () => {
     const { repos, store } = await signedIn()
     const before = store.get('boards').posts.length
-    expect(await repos.boards.deletePosts('community', ['cp-03', 'cp-05', 'tp-04'])).toEqual({ deleted: 2 })
+    expect(await repos.boards.deletePosts('community', ['cp-4th-ot', 'cp-4th-git', 'post-21'])).toEqual({ deleted: 2 })
     const posts = store.get('boards').posts
     expect(posts).toHaveLength(before)
-    expect(posts.find((p) => p.id === 'cp-03')?.deleted).toEqual({ by: { kind: 'admin', id: 'user-admin-b', name: '운영진B', role: 'Core' }, at: new Date(NOW).toISOString() })
-    expect(posts.find((p) => p.id === 'tp-04')?.deleted).toBeNull()
+    expect(posts.find((p) => p.id === 'cp-4th-ot')?.deleted).toEqual({ by: { kind: 'admin', id: 'user-admin-b', name: '운영진B', role: 'Core' }, at: new Date(NOW).toISOString() })
+    expect(posts.find((p) => p.id === 'post-21')?.deleted).toBeNull()
     // 다시 지워도 셈에 들어가지 않는다
-    expect(await repos.boards.deletePosts('community', ['cp-03'])).toEqual({ deleted: 0 })
+    expect(await repos.boards.deletePosts('community', ['cp-4th-ot'])).toEqual({ deleted: 0 })
   })
 
   it('지운 글은 목록 · 전체 개수에서 빠지고, 달린 댓글도 댓글 목록에서 빠진다', async () => {
     const { repos } = await signedIn()
-    const total = (await repos.boards.listPosts('community', {})).total
-    const comments = (await repos.boards.listComments('community', { pageSize: 100 })).items
-    expect(comments.some((c) => c.postId === 'cp-03')).toBe(true)
-    await repos.boards.deletePosts('community', ['cp-03'])
-    expect((await repos.boards.listPosts('community', {})).total).toBe(total - 1)
-    const after = await repos.boards.listComments('community', { pageSize: 100 })
-    expect(after.items.some((c) => c.postId === 'cp-03')).toBe(false)
-    expect(after.total).toBe(comments.length - comments.filter((c) => c.postId === 'cp-03').length)
+    const total = (await repos.boards.listPosts('teams', {})).total
+    const comments = (await repos.boards.listComments('teams', { pageSize: 100 })).items
+    expect(comments.some((c) => c.postId === 'post-23')).toBe(true)
+    await repos.boards.deletePosts('teams', ['post-23'])
+    expect((await repos.boards.listPosts('teams', {})).total).toBe(total - 1)
+    const after = await repos.boards.listComments('teams', { pageSize: 100 })
+    expect(after.items.some((c) => c.postId === 'post-23')).toBe(false)
+    expect(after.total).toBe(comments.length - comments.filter((c) => c.postId === 'post-23').length)
   })
 
   it('댓글 목록은 최신순 10개씩, 게시글 제목을 함께 준다. 삭제는 상태만 바꾼다', async () => {
@@ -166,7 +200,8 @@ describe('게시글 · 댓글 삭제 (F-ABD-003 · 005 · 009 · 012)', () => {
     expect(page.totalPages).toBeGreaterThan(1)
     const times = page.items.map((c) => c.createdAt)
     expect([...times].sort().reverse()).toEqual(times)
-    expect(page.items.every((c) => c.postTitle.includes('예시'))).toBe(true)
+    const titles = new Map(store.get('boards').posts.map((p) => [p.id, p.title]))
+    expect(page.items.every((c) => c.postTitle === titles.get(c.postId))).toBe(true)
     const ids = page.items.slice(0, 2).map((c) => c.id)
     expect(await repos.boards.deleteComments(ids)).toEqual({ deleted: 2 })
     expect(store.get('boards').comments.filter((c) => ids.includes(c.id)).every((c) => c.deleted?.by.kind === 'admin')).toBe(true)

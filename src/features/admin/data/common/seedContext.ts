@@ -8,6 +8,11 @@ import { ADMIN_ACCOUNT_SEED, actorOf, SYSTEM_ACTOR } from './accounts'
  */
 export interface SeedContext {
   now: number
+  /**
+   * 예시 화면(프로토타입을 끈 공개 배포)용 seed 인지. 비우면 지금 빌드의 값(ADMIN_SAMPLE).
+   * true 면 공개 사이트에 없는 자리(Community 회원 글 · 댓글)도 예시로 채운다. 테스트는 두 값을 모두 넘겨 본다
+   */
+  sample?: boolean
 }
 
 export interface SeedTools {

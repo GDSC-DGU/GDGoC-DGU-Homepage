@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { RECRUITING } from '@/content'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { actorLabel, adminKeys, errorMessage, useAdminRepos } from '../data'
 import { batchCounts } from '../data/recruit/rules'
@@ -9,6 +10,7 @@ import { adminPath } from '../screens'
 import {
   BulkBar,
   DataTable,
+  EmptyState,
   FilterTabs,
   PageHeader,
   Pagination,
@@ -20,7 +22,7 @@ import {
   formatDate,
   formatDateTime,
   formatDateTimeLong,
-  formatNumber,
+  formatPeriod,
   objectParticle,
   useConfirm,
   useToast,
@@ -194,14 +196,14 @@ export function ApplicantsPage() {
   )
   const wide: Column<ApplicantRow>[] = [
     { key: 'no', header: '번호', cell: (r) => <span className="num">{r.no}</span>, width: '56px', align: 'end' },
-    { key: 'department', header: '학과', cell: (r) => r.department, width: '136px' },
     {
       key: 'name',
-      header: '이름 · 이메일',
+      header: '이름 · 학과 · 이메일',
       rowHeader: true,
       cell: (r) => (
         <span className={`${s.stack} ${s.nameCell}`}>
           {nameLink(r)}
+          <span className={s.sub}>{r.department}</span>
           <span className={`${s.sub} ${s.breakAll}`}>{r.email}</span>
         </span>
       ),
@@ -209,8 +211,8 @@ export function ApplicantsPage() {
     { key: 'appliedAt', header: '지원일', cell: appliedCell, width: '104px' },
     { key: 'score', header: '점수', cell: (r) => <ScoreCell score={r.score} currentVersion={version} />, nowrap: true, width: '92px' },
     { key: 'result', header: '전형 결과', cell: resultCell, width: '148px' },
-    { key: 'processed', header: '처리자', cell: processedCell, width: '132px' },
-    { key: 'mail', header: '메일 상태', cell: mailCell, width: '120px' },
+    { key: 'processed', header: '처리자', cell: processedCell, width: '128px' },
+    { key: 'mail', header: '메일 상태', cell: mailCell, width: '132px' },
     { key: 'actions', header: '관리', hideHeader: true, cell: deleteButton, width: '72px' },
   ]
   const narrow: Column<ApplicantRow>[] = [
@@ -250,6 +252,8 @@ export function ApplicantsPage() {
     { key: 'actions', header: '관리', hideHeader: true, cell: deleteButton },
   ]
 
+  /** 이번 모집에 접수된 지원서가 아직 없다 (삭제 포함 0건) */
+  const noneYet = !!counts && counts['전체'] === 0
   const tabs = RESULT_TABS.map((t) => ({ value: t, label: t === 'all' ? '전체' : t, count: counts ? counts[t === 'all' ? '전체' : t] : undefined }))
   const failedCount = data?.failedMailCount ?? 0
   const sendingNow = data?.sending
@@ -265,10 +269,12 @@ export function ApplicantsPage() {
         description="접수된 지원서를 결과별로 보고, 결과를 처리하고, 결과 메일을 보냅니다. 점수는 AI 채점 참고 점수이며 합격 여부는 운영진이 정합니다."
         actions={
           <>
-            <Button variant="secondary" onClick={() => register.open(null)}>
+            <Button variant="secondary" disabledReason={noneYet ? NO_APPLICANTS_REASON : undefined} onClick={() => register.open(null)}>
               합격자 사용자 등록
             </Button>
-            <Button onClick={() => openMail(sendingNow ? sendingNow.batchId : null)}>{sendingNow ? '발송 진행 보기' : '이메일 일괄 발송'}</Button>
+            <Button disabledReason={noneYet && !sendingNow ? NO_APPLICANTS_REASON : undefined} onClick={() => openMail(sendingNow ? sendingNow.batchId : null)}>
+              {sendingNow ? '발송 진행 보기' : '이메일 일괄 발송'}
+            </Button>
           </>
         }
       />
@@ -373,10 +379,10 @@ export function ApplicantsPage() {
             </span>
           ) : undefined
         }
-        empty={params.q ? '검색 결과가 없습니다.' : params.result !== 'all' ? `${params.result} 지원자가 없습니다.` : '접수된 지원서가 없습니다.'}
+        empty={params.q ? '검색 결과가 없습니다.' : params.result !== 'all' ? `${params.result} 지원자가 없습니다.` : <NoApplicants />}
         selection={{ selected, onChange: setSelected, label: (r) => `${r.name} 선택` }}
         columns={compact ? narrow : wide}
-        minWidth={compact ? 660 : 1040}
+        minWidth={compact ? 660 : 960}
       />
       {data && (
         <Pagination
@@ -389,9 +395,9 @@ export function ApplicantsPage() {
           label="지원자 목록 페이지"
         />
       )}
-      <p className={s.footNote}>
-        {data ? `${formatNumber(data.counts['전체'])}명 중 ${formatNumber(data.total)}명` : ''} · 점수 옆 'v1'은 지금과 다른 평가 기준으로 산정한 점수입니다 (지원서 상세에서 다시 산정).
-      </p>
+      {rows?.some((r) => r.score.criteriaVersion !== null && r.score.criteriaVersion !== version) && (
+        <p className={s.footNote}>점수 옆 'v1' 같은 표시는 지금과 다른 평가 기준으로 산정한 점수입니다 (지원서 상세에서 다시 산정).</p>
+      )}
 
       {bulk.state && (
         <BulkResultDialog
@@ -431,5 +437,42 @@ export function ApplicantsPage() {
         />
       )}
     </>
+  )
+}
+
+const NO_APPLICANTS_REASON = '접수된 지원서가 없습니다.'
+
+/** 지난 기수 일반 멤버 모집 기간 (src/content/recruiting.json) */
+function lastGeneralRecruit(): { generation: number; start: string; end: string } | null {
+  for (const h of RECRUITING.history) {
+    const step = h.steps.find((x) => x.id === 'general')
+    if (step?.end) return { generation: h.generation, start: step.start, end: step.end }
+  }
+  return null
+}
+
+/** 지원서가 하나도 없을 때: 다음 할 일(지원폼 게시)과 지난 모집 기간 */
+function NoApplicants() {
+  const last = lastGeneralRecruit()
+  return (
+    <EmptyState
+      title="아직 접수된 지원서가 없습니다."
+      description={
+        <>
+          지원폼을 게시하면 지원 기간 동안 홈페이지 지원 안내에서 받은 지원서가 여기에 쌓입니다.
+          {last && (
+            <>
+              {' '}
+              지난 {last.generation}기 일반 멤버 모집 기간은 <span className="num">{formatPeriod(last.start, last.end)}</span>입니다.
+            </>
+          )}
+        </>
+      }
+      action={
+        <Link className="link-go" to={adminPath.recruitForm}>
+          지원폼 작성으로
+        </Link>
+      }
+    />
   )
 }

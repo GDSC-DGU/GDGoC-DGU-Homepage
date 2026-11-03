@@ -21,6 +21,8 @@ export interface AdminProject {
   serviceUrl: string | null
   isPublic: boolean
   createdAt: IsoTime
+  /** 예전 기록을 옮겨 올 때 날짜가 없던 프로젝트 (createdAt 은 정렬용으로만 쓰고 화면에는 '-') */
+  createdAtUnknown?: boolean
   created: AuditStamp
   updated: AuditStamp | null
   deleted: AuditStamp | null

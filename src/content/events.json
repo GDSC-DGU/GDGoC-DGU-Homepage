@@ -50,6 +50,7 @@
     { "id": "4th-rest-mid", "date": "2026-10-20", "title": "중간고사 휴회", "kind": "rest", "place": "community", "generation": 4, "source": "4기 운영 계획" },
     { "id": "4th-sprint-mid", "date": "2026-10-27", "title": "G-Sprint 중간 발표", "kind": "sprint", "place": "projects", "generation": 4, "source": "4기 운영 계획" },
     { "id": "4th-dhdr-1", "date": "2026-11-02", "title": "동홍동락 1차", "venue": "홍익대", "kind": "event", "place": "community", "generation": 4, "source": "4기 운영 계획" },
+    { "id": "4th-sprint-build", "date": "2026-11-03", "endDate": "2026-11-30", "title": "G-Sprint 팀별 개발 기간", "kind": "sprint", "place": "projects", "generation": 4, "source": "4기 운영 계획" },
     { "id": "4th-seminar-fin", "date": "2026-12-01", "title": "금융권 IT 현업자 세미나", "kind": "session", "place": "community", "generation": 4, "source": "4기 운영 계획" },
     { "id": "4th-rest-final", "date": "2026-12-08", "title": "기말고사 휴회", "kind": "rest", "place": "community", "generation": 4, "source": "4기 운영 계획" },
     { "id": "4th-mt", "date": "2026-12-15", "title": "MT", "kind": "event", "place": "community", "generation": 4, "source": "4기 운영 계획" },

@@ -1,3 +1,4 @@
+import { ADMIN_SAMPLE } from '../sample'
 import { GENERATIONS } from '@/content'
 import { PROJECT_SUMMARY_MAX, normalizeProjectInput, validateProjectInput } from '../data/projects/mockRepository'
 import type { AdminProject, ProjectInput } from '../data/projects/types'
@@ -23,7 +24,7 @@ export const emptyProjectDraft = (): ProjectDraft => ({ thumbnail: null, title: 
 
 /** 주소 끝 파일 이름 ('/project-images/agriguard.webp' → 'agriguard.webp'). 예시 그림(data URL)은 '예시 이미지' */
 export function fileNameOf(url: string): string {
-  if (url.startsWith('data:')) return '예시 이미지'
+  if (url.startsWith('data:')) return ADMIN_SAMPLE ? '예시 이미지' : '이미지'
   if (url.startsWith('blob:')) return '올린 이미지'
   const last = url.split(/[?#]/)[0].split('/').filter(Boolean).at(-1)
   return last ? decodeURIComponent(last) : '이미지'

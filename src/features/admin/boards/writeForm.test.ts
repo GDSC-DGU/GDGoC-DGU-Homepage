@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ADMIN_SAMPLE } from '../sample'
 import type { FileRef } from '../data/common/types'
 import { categoryHelp, emptyDraft, isDirty, needsPeriod, toCommunityInput, validateDraft } from './writeForm'
 
@@ -37,6 +38,6 @@ describe('Community 관리자 글 작성 폼 (P-ABD-03)', () => {
     expect(categoryHelp('공지')).toContain('맨 위에 고정')
     expect(categoryHelp('세션')).toContain('기간이 필수')
     expect(categoryHelp('정보 공유')).toContain('기간은 입력하지 않습니다')
-    expect(categoryHelp(null)).toContain('모든 분류')
+    expect(categoryHelp(null)).toContain(ADMIN_SAMPLE ? '모든 분류' : '공지 · 세션 · 행사')
   })
 })

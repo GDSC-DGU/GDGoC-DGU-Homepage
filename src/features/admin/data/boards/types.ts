@@ -1,3 +1,4 @@
+import type { TeamPartId } from '@/features/teams/data/types'
 import type { AuditStamp, FileRef, IsoTime, Page, PageQuery, Ymd } from '../common/types'
 
 /**
@@ -28,6 +29,8 @@ export interface AdminPost {
   content: string
   /** 작성자 표시 이름. 관리자 게시글은 '운영진' */
   authorName: string
+  /** 작성자 기수 (Teams 글: 학번으로 확인된 사용자의 기수). 관리자 게시글은 없음 */
+  authorGeneration?: number | null
   /** 관리자 게시글(공지 · 세션 · 행사 등, F-ABD-010): 목록에서 음영 */
   byAdmin: boolean
   createdAt: IsoTime
@@ -35,8 +38,14 @@ export interface AdminPost {
   /** Teams 모집 기간 · Community 세션 · 행사 기간 */
   startDate: Ymd | null
   endDate: Ymd | null
-  /** Teams 모집 상태 */
+  /** Teams 모집 상태 (종료일 · 작성자 마감으로 정한다: teams/data/rules.ts statusOf) */
   recruitStatus: '모집중' | '마감' | null
+  /** Teams: 작성자가 종료일 전에 직접 마감했는지 */
+  closedByAuthor?: boolean
+  /** Teams: 구하는 파트 (비면 파트 무관) */
+  parts?: TeamPartId[]
+  /** Teams: 모집 인원 (정하지 않았으면 null) */
+  headcount?: number | null
   attachments: FileRef[]
   /** 게시한 관리자 계정 (관리자 게시글의 내부 기록) */
   posted: AuditStamp | null
@@ -49,6 +58,8 @@ export interface AdminComment {
   board: BoardId
   postId: string
   authorName: string
+  /** 작성자 기수 (Teams 댓글) */
+  authorGeneration?: number | null
   content: string
   createdAt: IsoTime
   deleted: AuditStamp | null

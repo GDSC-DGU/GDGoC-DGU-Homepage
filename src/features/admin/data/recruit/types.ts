@@ -143,6 +143,8 @@ export interface InterviewSlot {
   startAt: IsoTime
   /** 면접 담당자 (활성 Core 1명 이상) */
   interviewerIds: string[]
+  /** 면접 장소 (선택). 메일 변수 {{면접장소}} */
+  place?: string
 }
 
 export interface Applicant {

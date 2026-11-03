@@ -1,3 +1,4 @@
+import { ADMIN_SAMPLE } from '../sample'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import s from './admin.module.css'
 
@@ -26,7 +27,7 @@ export class AdminErrorBoundary extends Component<{ children: ReactNode; resetKe
     return (
       <div className={s.error} role="alert">
         <h1 className={s.errorTitle}>화면을 그리지 못했습니다</h1>
-        <p className={s.errorText}>예시 데이터가 꼬였을 수 있습니다. 예시 데이터를 처음으로 되돌리거나 새로고침해 주세요.</p>
+        <p className={s.errorText}>{ADMIN_SAMPLE ? '예시 데이터가 꼬였을 수 있습니다. 예시 데이터를 처음으로 되돌리거나 새로고침해 주세요.' : '잠시 뒤 새로고침해 주세요. 계속되면 데이터를 처음 상태로 되돌려 주세요.'}</p>
         <p className={s.errorText}>
           <code>{this.state.error.message}</code>
         </p>
@@ -39,7 +40,7 @@ export class AdminErrorBoundary extends Component<{ children: ReactNode; resetKe
               this.setState({ error: null })
             }}
           >
-            예시 데이터 처음으로
+            {ADMIN_SAMPLE ? '예시 데이터 처음으로' : '데이터 처음 상태로'}
           </button>
           <button type="button" className="btn-secondary btn-sm" onClick={() => window.location.reload()}>
             새로고침

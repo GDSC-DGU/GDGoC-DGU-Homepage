@@ -3,8 +3,10 @@ import { KIND_LABEL } from '@/config/kinds'
 import { placeColor } from '@/config/places'
 import type { TermId } from '@/content/glossary'
 import type { ScheduleEvent } from '@/domain/types'
-import { ddayLabel, monthDay, weekday } from '@/lib/date'
+import { ticketDday } from '@/features/common/ticketData'
+import { monthDay, weekday } from '@/lib/date'
 import { RoomPlate } from './Signage'
+import { isPeriod } from './thisWeek'
 import { mentionKey } from './terms'
 import { TermText } from './TermText'
 import c from './community.module.css'
@@ -84,7 +86,7 @@ export function Upcoming({ events, today, timeOf, terms }: Props) {
                         ·
                       </span>
                     )}
-                    {e.venue ? <RoomPlate venue={e.venue} prefix="장소" /> : <span className={c.upNoVenue}>장소 미정</span>}
+                    {e.venue ? <RoomPlate venue={e.venue} prefix="장소" /> : isPeriod(e) ? null : <span className={c.upNoVenue}>장소 추후 공지</span>}
                   </>
                 )}
               </span>
@@ -95,7 +97,7 @@ export function Upcoming({ events, today, timeOf, terms }: Props) {
                 </span>
               )}
             </span>
-            {e.id === nextId && <span className={`${c.upEnd} num`}>{ddayLabel(e.date, today)}</span>}
+            {e.id === nextId && <span className={`${c.upEnd} num`}>{ticketDday(e.date, e.endDate, today)}</span>}
           </li>
         )
       })}

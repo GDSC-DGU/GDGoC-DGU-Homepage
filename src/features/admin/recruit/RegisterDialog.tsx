@@ -1,3 +1,4 @@
+import { sampleOnly } from '../sample'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -108,7 +109,7 @@ export function RegisterDialog({ open, onClose, onDone }: { open: boolean; onClo
             <span className={`num ${s.statValue}`}>{result.failed.length}</span>
           </li>
         </ul>
-        <p className={s.muted}>등록한 사용자에게 PIN 설정 링크 메일을 보냈습니다 (예시: 실제로 보내지 않음). PIN 설정 상태는 '대기'입니다.</p>
+        <p className={s.muted}>등록한 사용자에게 PIN 설정 링크 메일을 보냈습니다{sampleOnly(' (예시: 실제로 보내지 않음)')}. PIN 설정 상태는 '대기'입니다.</p>
         {mailFailed.length > 0 && (
           <p className={s.warnLine}>
             <StatusBadge tone="warning">메일 발송 실패 {mailFailed.length}명</StatusBadge> {mailFailed.map((m) => m.name).join(', ')} · 사용자 관리에서 [링크 재발송]으로 다시 보낼 수 있습니다.

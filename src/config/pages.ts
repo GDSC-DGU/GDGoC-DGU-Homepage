@@ -2,7 +2,7 @@ import type { PreviewPlace } from '@/data/repositories'
 
 /**
  * 아직 만들지 않은 페이지의 계획. 배범서 '기획 구체화'(노션)와 Figma 와이어프레임 화면 번호를 따른다.
- * 여기 있는 페이지 중 router.tsx 의 BUILT_ROUTES 에 없는 것은 자동으로 '준비 중' 페이지가 된다 (지금: teams).
+ * 여기 있는 페이지 중 router.tsx 의 BUILT_ROUTES 에 없는 것은 자동으로 '준비 중' 페이지가 된다 (지금: 없음. teams 는 예시 게시판으로 열었다).
  * 관리자 화면(/admin)은 여기 없다: 예시 화면으로 만들었다 (features/admin, docs/ADMIN.md).
  * projects · community · recruits 는 실제 페이지가 있어 lead 는 쓰이지 않고, 기획 메모로만 남긴다.
  * 페이지를 실제로 만들면: 여기서 지우고 → features/ 에 페이지를 만들고 → router.tsx 의 BUILT_ROUTES 에 넣는다.

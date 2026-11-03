@@ -54,6 +54,7 @@ function Row({ item, today }: { item: PreviewItem; today: string }) {
       <span className={`${s.when} ${item.date ? 'num' : ''}`}>{item.date ? shortDay(item.date, today) : item.label}</span>
       <span className={s.what}>
         {item.title}
+        {item.date && item.date > today && <span className={s.soon}>예정</span>}
         {item.sample && <span className="sample-badge">예시</span>}
       </span>
     </li>
@@ -258,11 +259,12 @@ export function PlacePopover({ frameRef, sheet }: Props) {
         {about ? (
           <a
             className="link"
-            href="#about"
+            href="#capability"
             onClick={(e) => {
               e.preventDefault()
               preview.hide()
-              scrollToSection('about')
+              // 홈에는 '소개'(#about) 섹션을 그리지 않는다 → 무엇을 하는 곳인지 보여 주는 '역량' 섹션으로 (전체 점검 2026-11-03)
+              scrollToSection('capability')
             }}
           >
             소개 보기

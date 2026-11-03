@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest'
+import { voices } from '@/content/story'
 import { createSessionStore } from '../auth/session'
 import type { AdminRepoError } from '../common/errors'
 import { setMockOptions } from '../common/mockContext'
@@ -26,15 +27,20 @@ const rejects = (p: Promise<unknown>) =>
     },
     (e: AdminRepoError) => e,
   )
-const review = (extra: Partial<ReviewInput> = {}): ReviewInput => ({ photoFileId: null, generation: 4, name: '예시 멤버 09', track: 'Frontend', content: '예시 후기입니다.', isPublic: true, ...extra })
+const review = (extra: Partial<ReviewInput> = {}): ReviewInput => ({ photoFileId: null, generation: 4, name: '김○○', track: 'Frontend', content: '예시 후기입니다.', isPublic: true, ...extra })
 
 describe('홈페이지 콘텐츠 seed', () => {
   const seed = createContentsSeed({ now: NOW })
-  it('소개 이미지 · 리뷰(공개 · 비공개, 사진 있음 · 없음) · 포스터 · 영역별 마지막 변경', () => {
+  it('리뷰 = 공개 홈 Interview 와 같은 리뷰 (공개 동의가 기록된 voices, 이름 · 파트 · 문장 · 순서)', () => {
+    const shown = voices.filter((v) => v.quote.trim() && v.name.trim() && v.consent?.date && v.consent.by)
+    expect(seed.reviews.map((r) => [r.name, r.track, r.content, r.generation])).toEqual(shown.map((v) => [v.name, v.part, v.quote, v.generation ?? null]))
+    expect(seed.reviews.every((r) => r.isPublic && r.photoUrl === null)).toBe(true)
+  })
+
+  it('소개 이미지 · 리뷰 · 포스터 · 영역별 마지막 변경', () => {
     expect(seed.introImages.length).toBeGreaterThan(1)
     expect(seed.introImages.length).toBeLessThanOrEqual(INTRO_IMAGE_MAX)
-    expect(new Set(seed.reviews.map((r) => r.isPublic))).toEqual(new Set([true, false]))
-    expect(new Set(seed.reviews.map((r) => r.photoUrl === null))).toEqual(new Set([true, false]))
+    expect(seed.reviews.length).toBeGreaterThan(0)
     expect(seed.reviews.every((r) => r.content.length <= 200)).toBe(true)
     expect(seed.poster).not.toBeNull()
     expect(seed.changes.introImages && seed.changes.reviews && seed.changes.poster).toBeTruthy()
@@ -93,11 +99,12 @@ describe('홈 소개 이미지 추가 · 삭제 (F-ACT-002 · 004)', () => {
 })
 
 describe('리뷰 (F-ACT-005 · 007~009)', () => {
-  it('입력 확인: 기수 · 이름 · 트랙/파트 · 후기 필수, 후기 200자', () => {
+  it('입력 확인: 이름 · 트랙/파트 · 후기 필수 (기수는 선택), 후기 200자', () => {
     expect(validateReviewInput(review())).toEqual({})
     expect(validateReviewInput(review({ content: '가'.repeat(200) }))).toEqual({})
     expect(validateReviewInput(review({ content: '가'.repeat(201) }))).toEqual({ content: '후기는 200자 이내로 써 주세요.' })
     expect(Object.keys(validateReviewInput(review({ generation: 0, name: ' ', track: '', content: '' }))).sort()).toEqual(['content', 'generation', 'name', 'track'])
+    expect(validateReviewInput(review({ generation: null }))).toEqual({})
   })
 
   it('추가 (사진 선택 · 공개 기본값) → 수정 (기존 사진 유지 · 공개 끄기) → 삭제, 변경자 기록', async () => {

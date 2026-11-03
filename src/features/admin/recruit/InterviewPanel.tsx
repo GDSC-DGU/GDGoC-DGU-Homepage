@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { adminKeys, errorMessage, isAdminRepoError, useAdminRepos } from '../data'
 import { BUSY_MESSAGE, busyAt, INTERVIEW_MINUTES, isoToKst, kstDateTime, kstToIso, timeSlots } from '../data/recruit/rules'
 import type { ApplicantDetail } from '../data/recruit/types'
-import { Checkbox, DateTimeField, Panel, SelectField, StatusBadge, useToast } from '../ui'
+import { Checkbox, DateTimeField, Panel, SelectField, StatusBadge, TextField, useToast } from '../ui'
 import { IconErrorMark, IconLock } from '../ui/icons'
+import { sampleOnly } from '../sample'
 import { useAction } from './hooks'
 import { Button } from './badges'
 import s from './recruit.module.css'
@@ -24,20 +25,22 @@ export function InterviewPanel({ a }: { a: ApplicantDetail }) {
   const [date, setDate] = useState(current?.ymd ?? '')
   const [time, setTime] = useState(current?.hhmm ?? '')
   const [ids, setIds] = useState<string[]>(a.interview?.interviewerIds ?? [])
+  const [place, setPlace] = useState(a.interview?.place ?? '')
   const [errors, setErrors] = useState<{ date?: string; time?: string; ids?: string; save?: string }>({})
   // 날짜를 고르기 전에도 담당자 이름은 필요해서 오늘로 부른다
   const [today] = useState(() => isoToKst(new Date().toISOString()).ymd)
   const day = date || today
   const board = useQuery({ queryKey: adminKeys.section('recruit', 'interviews', day), queryFn: () => repos.recruit.interviews({ from: day, to: day }) })
-  const save = useAction(() => repos.recruit.saveInterview(a.id, { startAt: kstToIso(date, time), interviewerIds: ids }))
+  const save = useAction(() => repos.recruit.saveInterview(a.id, { startAt: kstToIso(date, time), interviewerIds: ids, place }))
   // 저장된 일정이 바뀌면(결과 변경으로 해제 등) 입력도 맞춘다
-  const savedKey = a.interview ? `${a.interview.startAt}|${a.interview.interviewerIds.join()}` : ''
+  const savedKey = a.interview ? `${a.interview.startAt}|${a.interview.interviewerIds.join()}|${a.interview.place ?? ''}` : ''
   const [seen, setSeen] = useState(savedKey)
   if (seen !== savedKey) {
     setSeen(savedKey)
     setDate(current?.ymd ?? '')
     setTime(current?.hhmm ?? '')
     setIds(a.interview?.interviewerIds ?? [])
+    setPlace(a.interview?.place ?? '')
   }
 
   const editable = a.result === '서류 합격' && !a.locked.document
@@ -50,7 +53,7 @@ export function InterviewPanel({ a }: { a: ApplicantDetail }) {
   const interviewers = board.data?.interviewers ?? []
   const busyFor = (hhmm: string) => (date ? busyAt(interviews, kstToIso(date, hhmm), a.id) : new Set<string>())
   const busyNow = time ? busyFor(time) : new Set<string>()
-  const changed = !a.interview || a.interview.startAt !== (date && time ? kstToIso(date, time) : '') || a.interview.interviewerIds.join() !== ids.join()
+  const changed = !a.interview || a.interview.startAt !== (date && time ? kstToIso(date, time) : '') || a.interview.interviewerIds.join() !== ids.join() || (a.interview.place ?? '') !== place.trim()
   const others = interviews.filter((i) => i.applicantId !== a.id)
   const nameOf = (id: string) => interviewers.find((x) => x.userId === id)?.name ?? '담당자'
 
@@ -69,7 +72,7 @@ export function InterviewPanel({ a }: { a: ApplicantDetail }) {
   }
 
   return (
-    <Panel title="면접 일정" description={`면접 1건은 ${INTERVIEW_MINUTES}분 기준입니다 (확정 필요). 시각은 10분 단위 · 한국 시간입니다.`}>
+    <Panel title="면접 일정" description={`면접 1건은 ${INTERVIEW_MINUTES}분 기준입니다${sampleOnly(' (확정 필요)')}. 시각은 10분 단위 · 한국 시간입니다.`}>
       <p className={s.currentResult}>
         {a.interview ? (
           <>
@@ -77,6 +80,7 @@ export function InterviewPanel({ a }: { a: ApplicantDetail }) {
             <span>
               <span className="num">{kstDateTime(a.interview.startAt)}</span> – <span className="num">{endText(a.interview.startAt)}</span> ·{' '}
               {a.interview.interviewerIds.map((id) => nameOf(id)).join(', ')}
+              {a.interview.place && ` · ${a.interview.place}`}
             </span>
           </>
         ) : (
@@ -168,6 +172,14 @@ export function InterviewPanel({ a }: { a: ApplicantDetail }) {
               </p>
             )}
           </fieldset>
+          <TextField
+            label="면접 장소"
+            value={place}
+            onChange={(e) => setPlace(e.target.value)}
+            placeholder="예: 신공학관 6141"
+            help="메일의 {{면접장소}}에 들어갑니다. 비우면 '장소는 따로 안내드립니다'로 보냅니다."
+            autoComplete="off"
+          />
           {date && board.data && (
             <div className={s.dayList}>
               <p className={s.dayListTitle}>이날 잡힌 다른 면접 {others.length}건</p>

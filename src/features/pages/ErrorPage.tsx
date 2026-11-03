@@ -25,12 +25,15 @@ export function ErrorPage() {
           title={notFound ? '이 주소에는 페이지가 없습니다' : '화면을 불러오지 못했습니다'}
           lead={
             notFound
-              ? '주소가 바뀌었거나 아직 만들지 않은 페이지입니다.'
+              ? '주소가 바뀌었거나 없는 페이지입니다.'
               : '잠시 뒤 새로고침해 주세요. 계속 같은 화면이 나오면 운영진에게 알려 주시면 고치겠습니다.'
           }
           meta={
             <>
-              연락 <span className="num">{CHAPTER.email}</span>
+              연락{' '}
+              <a className="link num" href={`mailto:${CHAPTER.email}`}>
+                {CHAPTER.email}
+              </a>
             </>
           }
         />

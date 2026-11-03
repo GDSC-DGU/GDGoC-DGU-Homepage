@@ -1,3 +1,4 @@
+import { ADMIN_SAMPLE } from '../sample'
 import { useRef, useState, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { validatePasswordChange, type PasswordChangeForm } from '../data/auth/loginPolicy'
@@ -87,7 +88,7 @@ export function PasswordChangeDialog({ open }: { open: boolean }) {
         <TextField label="현재 비밀번호" type="password" autoComplete="off" required value={form.current} onChange={set('current')} error={errors.current} help="로그인할 때 쓴 임시 비밀번호" />
         <TextField label="새 비밀번호" type="password" autoComplete="off" required value={form.next} onChange={set('next')} error={errors.next} help="8자 이상, 영문과 숫자를 함께. 임시 비밀번호와 달라야 합니다." />
         <TextField label="새 비밀번호 확인" type="password" autoComplete="off" required value={form.confirm} onChange={set('confirm')} error={errors.confirm} />
-        <p className={s.pwNote}>예시 화면이라 새 비밀번호는 저장하지 않고 형식만 확인합니다. 다음에도 예시 비밀번호로 로그인합니다.</p>
+        {ADMIN_SAMPLE && <p className={s.pwNote}>예시 화면이라 새 비밀번호는 저장하지 않고 형식만 확인합니다. 다음에도 예시 비밀번호로 로그인합니다.</p>}
       </div>
     </Dialog>
   )

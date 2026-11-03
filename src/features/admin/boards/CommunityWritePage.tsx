@@ -1,24 +1,26 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAdminMe } from '../auth/authContext'
-import { ATTACHMENT_MAX, COMMUNITY_CATEGORIES, type CommunityCategory } from '../data/boards/types'
+import { ATTACHMENT_MAX, type CommunityCategory } from '../data/boards/types'
 import { errorMessage, isAdminRepoError } from '../data/common/errors'
 import { FILE_RULES, fileSizeLabel } from '../data/common/fileRules'
 import { useAdminRepos } from '../data/useAdminData'
+import { ADMIN_SAMPLE, sampleOnly } from '../sample'
 import { adminPath, screenById } from '../screens'
 import { Button, DateTimeField, FileDrop, PageHeader, RadioGroup, TextArea, TextField, focusFirstInvalid, hasErrors, useConfirm, useToast } from '../ui'
 import { IconErrorMark, IconFile } from '../ui/icons'
 import { useAction } from './useAction'
-import { useLeaveGuard } from './useLeaveGuard'
+import { boardCategories } from './display'
+import { LEAVE_CONFIRM, useLeaveGuard } from './useLeaveGuard'
 import { categoryHelp, emptyDraft, isDirty, needsPeriod, toCommunityInput, validateDraft, type CommunityDraft } from './writeForm'
 import s from './boards.module.css'
 
 /**
  * P-ABD-03 Community 게시글 작성 (관리자, F-ABD-010 · 013).
- * - 공지 / 세션 / 행사 / 정보 공유 / 기타 모든 분류, 회원 인증 없이 '운영진' 이름으로 게시
+ * - 공지 / 세션 / 행사 (예시 화면에서는 정보 공유 / 기타도), 회원 인증 없이 '운영진' 이름으로 게시
  * - 세션 · 행사는 기간 필수 (홈 캘린더 · 대시보드 행사 일정), 공지는 목록 위 고정
  * - 첨부: PDF · JPG · PNG, 파일당 10MB, 최대 3개, 이미지도 파일 이름으로만 (업로드는 흉내: 이 브라우저 안에서만)
- * - [취소]는 쓴 내용이 있으면 '작성 중인 내용이 사라집니다.' 확인 후 목록으로
+ * - [취소] · 사이드바 이동 · 뒤로 가기는 쓴 내용이 있으면 '작성 중인 내용이 사라집니다.' 확인 후 (useLeaveGuard)
  * - 게시하면 Community 게시판 관리로 돌아가 새 글을 강조한다
  * 관리자 게시글 수정은 명세 '확정 필요'(F-ABD-010 5)라 만들지 않았다.
  */
@@ -39,7 +41,7 @@ export function CommunityWritePage() {
   const [uploading, setUploading] = useState<string | null>(null)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const dirty = isDirty(draft)
-  useLeaveGuard(dirty)
+  const guard = useLeaveGuard(dirty)
 
   const update = <K extends keyof CommunityDraft>(key: K, value: CommunityDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }))
@@ -66,7 +68,8 @@ export function CommunityWritePage() {
     }
     try {
       const row = await create.run()
-      toast.success(`게시글을 게시했습니다. Community 목록에 '운영진' 이름으로 보입니다.`)
+      toast.success(ADMIN_SAMPLE ? `게시글을 게시했습니다. Community 목록에 '운영진' 이름으로 보입니다.` : `게시글을 게시했습니다. 작성자는 '운영진'으로 보입니다.`)
+      guard.allow()
       navigate(`${adminPath.community}?post=${encodeURIComponent(row.id)}`)
     } catch (err) {
       if (isAdminRepoError(err) && err.fields) {
@@ -77,7 +80,8 @@ export function CommunityWritePage() {
   }
 
   const cancel = async () => {
-    if (dirty && !(await confirm({ title: '작성을 그만둘까요?', body: '작성 중인 내용이 사라집니다.', confirmLabel: '나가기', tone: 'danger' }))) return
+    if (dirty && !(await confirm(LEAVE_CONFIRM))) return
+    guard.allow()
     navigate(adminPath.community)
   }
 
@@ -114,7 +118,7 @@ export function CommunityWritePage() {
 
   return (
     <>
-      <PageHeader back={{ to: adminPath.community, label: 'Community 게시판 관리' }} title={screen.title} description="공지 · 세션 · 행사를 포함한 모든 분류로, 회원 인증 없이 '운영진' 이름으로 게시합니다." />
+      <PageHeader back={{ to: adminPath.community, label: 'Community 게시판 관리' }} title={screen.title} description={ADMIN_SAMPLE ? "공지 · 세션 · 행사를 포함한 모든 분류로, 회원 인증 없이 '운영진' 이름으로 게시합니다." : "공지 · 세션 · 행사 글을 회원 인증 없이 '운영진' 이름으로 게시합니다."} />
       <form ref={formRef} className={s.form} noValidate onSubmit={submit} aria-label="Community 게시글 작성">
         {formError && (
           <p className={s.formError} role="alert">
@@ -127,7 +131,7 @@ export function CommunityWritePage() {
             legend="분류"
             name="category"
             required
-            options={COMMUNITY_CATEGORIES.map((c) => ({ value: c, label: c }))}
+            options={(boardCategories('community') as CommunityCategory[]).map((c) => ({ value: c, label: c }))}
             value={draft.category}
             onChange={(v) => update('category', v)}
             help={categoryHelp(draft.category)}
@@ -166,7 +170,7 @@ export function CommunityWritePage() {
                   busy={!!uploading}
                   onSelect={(f) => void upload(f)}
                   error={uploadError ?? errors.attachments}
-                  help="PDF · JPG · PNG, 파일당 10MB 이하, 최대 3개. 이미지도 파일 이름으로만 보입니다. 예시 화면이라 파일은 이 브라우저 안에만 있습니다."
+                  help={`PDF · JPG · PNG, 파일당 10MB 이하, 최대 3개. 이미지도 파일 이름으로만 보입니다.${sampleOnly(' 예시 화면이라 파일은 이 브라우저 안에만 있습니다.')}`}
                 />
               </>
             )}

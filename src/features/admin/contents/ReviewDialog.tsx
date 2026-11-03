@@ -8,7 +8,7 @@ import { useAction } from '../boards/useAction'
 import { GENERATION_OPTIONS } from '../projects/projectForm'
 import { AdminImage, Button, Checkbox, Dialog, SelectField, TextArea, TextField, focusFirstInvalid, hasErrors } from '../ui'
 import { IconErrorMark } from '../ui/icons'
-import { validateReviewForm, type ReviewDraft } from './reviewForm'
+import { generationOf, validateReviewForm, type ReviewDraft } from './reviewForm'
 import { DefaultAvatar } from './shared'
 import { useFilePicker } from './useFilePicker'
 import s from './contents.module.css'
@@ -28,7 +28,7 @@ export function ReviewDialog({ review, onClose, onSaved }: { review: Review | nu
 
   const [draft, setDraft] = useState<ReviewDraft>(() => ({
     photo: review?.photoUrl ? { url: review.photoUrl, fileId: null } : null,
-    generation: review ? String(review.generation) : '',
+    generation: review?.generation ? String(review.generation) : '',
     name: review?.name ?? '',
     track: review?.track ?? '',
     content: review?.content ?? '',
@@ -66,7 +66,7 @@ export function ReviewDialog({ review, onClose, onSaved }: { review: Review | nu
   const toInput = (d: ReviewDraft): ReviewInput => ({
     photoFileId: d.photo?.fileId ?? null,
     photoUrl: d.photo && !d.photo.fileId ? d.photo.url : null,
-    generation: Number(d.generation) || 0,
+    generation: generationOf(d.generation),
     name: d.name,
     track: d.track,
     content: d.content,
@@ -153,10 +153,10 @@ export function ReviewDialog({ review, onClose, onSaved }: { review: Review | nu
           {picker.input}
         </div>
         <div className={s.row2}>
-          <SelectField label="기수" required placeholder="기수 선택" options={GENERATION_OPTIONS} value={draft.generation} onChange={(e) => update('generation', e.target.value)} error={errors.generation} />
-          <TextField label="이름" required value={draft.name} onChange={(e) => update('name', e.target.value)} error={errors.name} placeholder="예: 예시 멤버 07" autoComplete="off" />
+          <SelectField label="기수" placeholder="기수 없이" options={GENERATION_OPTIONS} value={draft.generation} onChange={(e) => update('generation', e.target.value)} error={errors.generation} help="비워 두면 홈 카드에 파트만 보입니다." />
+          <TextField label="이름" required value={draft.name} onChange={(e) => update('name', e.target.value)} error={errors.name} placeholder="본인이 고른 표기 (실명 · 성만 · 이니셜)" autoComplete="off" />
         </div>
-        <TextField label="트랙 / 파트" required value={draft.track} onChange={(e) => update('track', e.target.value)} error={errors.track} placeholder="예: Frontend · Backend · AI · Design" autoComplete="off" />
+        <TextField label="트랙 / 파트" required value={draft.track} onChange={(e) => update('track', e.target.value)} error={errors.track} placeholder="예: Frontend · Backend · AI/ML · Product Design" autoComplete="off" />
         <TextArea label="후기" required rows={5} limit={REVIEW_CONTENT_MAX} value={draft.content} onChange={(e) => update('content', e.target.value)} error={errors.content} help={`${REVIEW_CONTENT_MAX}자 이내`} />
         <Checkbox label="홈에 공개" description="끄면 홈에서 바로 숨깁니다. 이 목록에는 그대로 남습니다." checked={draft.isPublic} onChange={(e) => update('isPublic', e.target.checked)} />
       </div>
