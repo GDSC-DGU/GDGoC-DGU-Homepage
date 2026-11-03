@@ -66,7 +66,7 @@ export const SHOW_PLAN = import.meta.env.DEV || import.meta.env.VITE_SHOW_PLAN =
 /**
  * 프로토타입 보기: 팀원 찾기 게시판을 운영 중인 것처럼 보여 준다 (4기 Organizer 결정 2026-11: 팀원에게 보여 줄 프로토타입).
  * 켜면 '예시 화면' 안내 · 메뉴의 '준비 중' 표시 · 머리의 공사 중 간판이 빠지고, 지도 미리보기에 최근 글이 나온다.
- * 개발 화면(npm run dev)과 VITE_PROTOTYPE=true 로 만든 빌드(휴대폰 미리보기)에서 켜진다.
- * 공개 배포에서도 켜려면 Vercel 환경 변수에 VITE_PROTOTYPE=true. 백엔드가 붙으면 이 값 대신 실제 데이터가 그 자리를 채운다.
+ * 기본으로 켜져 있다 (Vercel 배포 포함, 4기 Organizer 결정 2026-11-03). 끄려면 빌드 환경 변수 VITE_PROTOTYPE=false
+ * → 게시판 · 관리자에 '예시 화면' 안내가 다시 붙는다. 백엔드가 붙으면 이 값 대신 실제 데이터가 그 자리를 채운다.
  */
-export const PROTOTYPE = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPE === 'true'
+export const PROTOTYPE = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPE !== 'false'
