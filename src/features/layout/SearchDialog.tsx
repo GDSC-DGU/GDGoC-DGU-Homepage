@@ -22,11 +22,17 @@ interface Option {
   to?: string
 }
 
-/** 검색 결과 id → 바로 가는 주소: 'project-<id>' → 아카이브 자세히 보기 창, 'seminar-<id>' → 아카이브 세미나에서 그 제목으로 찾기 */
+/**
+ * 검색 결과 id → 바로 가는 주소: 'project-<id>' → 아카이브 자세히 보기 창,
+ * 'seminar-<id>' → 아카이브 세미나의 그 기수 탭에서 그 제목으로 찾기 (기수는 meta '2025.04.03 · 2기 · 발표자' 에서)
+ */
 function targetOf(doc: SearchHit['doc']): string | undefined {
   const archive = PLACE_BY_ID.projects.path
   if (doc.id.startsWith('project-')) return `${archive}?p=${encodeURIComponent(doc.id.slice('project-'.length))}`
-  if (doc.id.startsWith('seminar-')) return `${archive}?view=seminars&q=${encodeURIComponent(doc.title)}`
+  if (doc.id.startsWith('seminar-')) {
+    const gen = doc.meta?.match(/(?:^| )(\d+)기(?: |$)/)?.[1]
+    return `${archive}?view=seminars${gen ? `&gen=${gen}` : ''}&q=${encodeURIComponent(doc.title)}`
+  }
   return undefined
 }
 

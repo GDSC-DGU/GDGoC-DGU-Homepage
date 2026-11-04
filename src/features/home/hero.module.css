@@ -8,7 +8,8 @@
 }
 
 .top {
-  padding-top: 128px;
+  /* 머리말과 이름 사이 (4기 Organizer 2026-11-05: 128 → 88, 이름이 너무 아래에 있었다) */
+  padding-top: 88px;
   padding-bottom: 72px;
   text-align: center;
 }
@@ -95,7 +96,7 @@
 
 @media (max-width: 1023px) {
   .top {
-    padding-top: 96px;
+    padding-top: 72px;
     padding-bottom: 56px;
   }
   .wordmark {
@@ -118,7 +119,7 @@
 /* ── 폰: 위에서 아래로 ── */
 @media (max-width: 767px) {
   .top {
-    padding-top: 64px;
+    padding-top: 48px;
     padding-bottom: 36px;
   }
   .wordmark {

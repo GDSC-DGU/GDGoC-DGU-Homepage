@@ -68,13 +68,10 @@ export const PLACE_BY_ID: Readonly<Record<PlaceId, Place>> = Object.fromEntries(
 ) as Record<PlaceId, Place>
 
 /**
- * 메뉴 순서: 둘러보기(홈 · 프로젝트 · 커뮤니티) → 지원 안내 → 아직 열지 않은 팀원 찾기.
- * 처음 온 사람이 '무엇을 하는지 → 어떻게 들어가는지' 순서로 읽게 하고, 준비 중인 게시판은 맨 끝에 둔다.
- * (배범서 기획 순서 Home · Projects · Teams · Community · Recruits 에서 바꿈: 2026-10 점검에서
- *  지원 안내 앞의 '팀원 모집' 을 동아리 모집으로 잘못 누르는 일이 있었다)
- * 머리말 · 폰 메뉴에서는 지원 안내를 메뉴 줄 대신 오른쪽 '지원 안내' 버튼(APPLY_PLACE)으로 보인다.
+ * 메뉴 순서: 홈 → 소개 → 아카이브 → 팀원 찾기 → 지원 안내 (4기 Organizer 2026-11-05: 머리말을 소개 · 아카이브 · 팀원 찾기 · 지원 안내 순으로).
+ * 폰 메뉴 · 꼬리말 · 검색도 머리말과 같은 순서. 폰 메뉴에서는 지원 안내를 메뉴 줄 대신 아래 '지원 안내' 버튼(APPLY_PLACE)으로 보인다.
  */
-export const NAV_ORDER: readonly PlaceId[] = ['about', 'projects', 'community', 'recruits', 'teams']
+export const NAV_ORDER: readonly PlaceId[] = ['about', 'community', 'projects', 'teams', 'recruits']
 
 /** 머리말 오른쪽 · 폰 메뉴 아래에 늘 보이는 지원 행동이 가리키는 장소 */
 export const APPLY_PLACE: PlaceId = 'recruits'
@@ -87,10 +84,10 @@ export const SOON_LABEL = '준비 중'
 export const navLabel = (id: PlaceId) => (id === 'about' ? '홈' : PLACE_BY_ID[id].label)
 
 /**
- * 넓은 화면 머리말 메뉴 (4기 Figma 시안 2026-11): 로고가 홈, 오른쪽에 네 메뉴. 지원 안내는 '지원하기' 로 메뉴 줄 끝에.
- * 폰 메뉴 시트 · 꼬리말 · 검색은 NAV_ORDER 를 그대로 쓴다.
+ * 넓은 화면 머리말 메뉴: 로고(= 홈) 오른쪽에 소개 · 아카이브 · 팀원 찾기 · 지원 안내 (4기 Organizer 2026-11-05).
+ * 지원 안내는 모집 중일 때 '지원하기' 로 메뉴 줄 끝에. 폰 메뉴 시트 · 꼬리말 · 검색은 NAV_ORDER 를 그대로 쓴다.
  */
-export const HEADER_NAV: readonly PlaceId[] = ['projects', 'community', 'teams', 'recruits']
+export const HEADER_NAV: readonly PlaceId[] = ['community', 'projects', 'teams', 'recruits']
 /** 모집 중일 때만 '지원하기' (모집 전 · 후에 행동 버튼처럼 보이면 지원 안내 페이지의 '아직 열리지 않았습니다'와 어긋난다: 전체 점검 2026-11-03) */
 export const headerLabel = (id: PlaceId, recruitingOpen = false) => (id === 'recruits' && recruitingOpen ? '지원하기' : navLabel(id))
 

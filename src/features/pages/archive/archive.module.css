@@ -1,6 +1,6 @@
 /*
  * 아카이브: 보기 탭(프로젝트 · 세미나) + 세미나 목록.
- * 보기 탭이 머리 장면 아래 먹선을 맡고, 그 아래 프로젝트 기수 탭 · 세미나 거르기가 이어진다.
+ * 보기 탭이 머리 장면 아래 먹선을 맡고, 그 아래 기수 탭(프로젝트 · 세미나 같은 모양)이 이어진다.
  */
 
 /* ── 보기 탭 ── */
@@ -67,46 +67,23 @@
   font: 500 15px/22px var(--font-kr);
   color: var(--ink-700);
 }
+.fileNote {
+  margin: -16px 0 24px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+/* 기수 탭(프로젝트 보기와 같은 projects/GenTabs) | 찾기 */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 12px 24px;
   margin-bottom: 40px;
 }
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.chip {
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--paper);
-  font: var(--t-ui);
-  color: var(--ink-700);
-  cursor: pointer;
-  transition:
-    background var(--dur-hover) var(--ease),
-    color var(--dur-hover) var(--ease);
-}
-.chip[aria-pressed='true'] {
-  border-color: var(--ink-900);
-  background: var(--ink-900);
-  color: #fff;
-}
-.chip:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-@media (hover: hover) {
-  .chip:hover:not([aria-pressed='true']) {
-    border-color: var(--ink-500);
-    color: var(--ink-900);
-  }
+.toolbar > [role='tablist'] {
+  margin-bottom: 0;
+  padding-top: 0;
 }
 .search {
   position: relative;
@@ -148,15 +125,11 @@
   outline-offset: 1px;
 }
 .found {
-  margin: -24px 0 24px;
+  margin: -16px 0 24px;
   font: 500 14px/20px var(--font-kr);
   color: var(--ink-700);
 }
 
-.groups {
-  display: grid;
-  gap: 72px;
-}
 .groupHead {
   display: flex;
   flex-wrap: wrap;
@@ -182,6 +155,7 @@
 }
 /* 한 줄: 날짜 | 제목 · 발표자 | 자료 */
 .talk {
+  position: relative;
   display: grid;
   grid-template-columns: 148px minmax(0, 1fr) auto;
   align-items: baseline;
@@ -222,6 +196,38 @@
   color: var(--ink-700);
   white-space: nowrap;
 }
+/* 자료가 있으면 제목 링크가 줄 전체를 덮는다 (어디를 눌러도 열린다) */
+.talkLink {
+  color: inherit;
+  text-decoration: none;
+}
+.talkLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.talkLink:focus-visible {
+  outline: none;
+}
+.talkLink:focus-visible::after {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+  border-radius: var(--r-tag);
+}
+@media (hover: hover) {
+  .talk[data-file='ready']:hover {
+    background: var(--subtle);
+  }
+  .talk[data-file='ready']:hover .talkTitle {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+.talkPending {
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-500);
+  white-space: nowrap;
+}
 .talkFile {
   display: inline-flex;
   align-items: center;
@@ -235,27 +241,25 @@
   text-decoration: none;
   white-space: nowrap;
 }
-.talkFile:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-@media (hover: hover) {
-  .talkFile:hover {
-    background: #e6e9ed;
-  }
-}
 .mark {
   background: none;
   color: inherit;
   box-shadow: inset 0 -2px 0 var(--g-yellow);
 }
-.more {
+.empty {
+  display: grid;
+  gap: 16px;
+}
+.elsewhere {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 48px;
-  margin-top: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+/* inline-block: 글자 사이 띄어쓰기가 flex 에서 사라지지 않게 */
+.elsewhereBtn {
+  display: inline-block;
+  min-height: 44px;
+  padding: 10px 16px;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-control);
   background: var(--paper);
@@ -263,19 +267,14 @@
   color: var(--ink-900);
   cursor: pointer;
 }
-.more:focus-visible {
+.elsewhereBtn:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
 @media (hover: hover) {
-  .more:hover {
+  .elsewhereBtn:hover {
     background: var(--subtle);
   }
-}
-.note {
-  margin-top: 40px;
-  font: var(--t-meta);
-  color: var(--ink-500);
 }
 
 @media (max-width: 767px) {
@@ -294,9 +293,6 @@
   .search {
     flex: 1 1 100%;
   }
-  .groups {
-    gap: 56px;
-  }
   .groupTitle {
     font-size: 24px;
     line-height: 32px;
@@ -314,9 +310,12 @@
     flex-direction: column;
     gap: 2px;
   }
-  .talkFile {
+  .talkFile,
+  .talkPending {
     justify-self: start;
-    min-height: 32px;
     margin-top: 6px;
+  }
+  .talkFile {
+    min-height: 32px;
   }
 }

@@ -12,10 +12,10 @@ const CLEAR_AFTER_MS = 2500
 
 /**
  * 좌우 밀기의 기준 순서 = 머리말에 보이는 왼쪽 → 오른쪽 순서
- * (홈 · 프로젝트 · 커뮤니티 · 팀원 찾기 메뉴, 맨 오른쪽 '지원 안내' 버튼).
+ * (홈 로고 · 소개 · 아카이브 · 팀원 찾기 · 지원 안내).
  * 오른쪽 메뉴로 가면 화면이 왼쪽으로 밀리고(forward), 왼쪽 메뉴로 가면 오른쪽으로 밀린다(back).
  */
-export const SLIDE_ORDER: readonly PlaceId[] = ['about', 'projects', 'community', 'teams', 'recruits']
+export const SLIDE_ORDER: readonly PlaceId[] = ['about', 'community', 'projects', 'teams', 'recruits']
 
 const isAdminPath = (path: string) => path === '/admin' || path.startsWith('/admin/')
 

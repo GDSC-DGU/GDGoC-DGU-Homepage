@@ -4,7 +4,6 @@ import { HERO } from '@/content/story'
 import { CampusScene } from '@/features/campus/CampusScene'
 import { NightContext } from '@/features/campus/nightContext'
 import { NightLight } from '@/features/fx/NightLight'
-import { useTimeOfDay } from '@/features/fx/useTimeOfDay'
 import { useSceneFit, type SceneLayout } from '@/features/campus/useSceneFit'
 import { usePlacePreview, usePlacePreviewState } from '@/features/layout/placePreview'
 import { useIsNarrow, useMediaQuery, useReducedMotion } from '@/hooks/useMediaQuery'
@@ -31,6 +30,12 @@ const World3D = lazy(() => import('@/features/world3d/World3D'))
 const GEN_NUMBER = SITE.generation.replace(/\D/g, '')
 
 /**
+ * 밤 모드(한국 시간 19–06시에 먹색 지도)는 끈다: 4기 Organizer 2026-11-05 '검은 색이 안 어울린다'.
+ * 언제나 낮 그림. 다시 켜려면 features/fx/useTimeOfDay 의 useTimeOfDay() === 'night' 로 되돌린다 (밤 그림 · 색은 그대로 남아 있다).
+ */
+const NIGHT_MODE = false
+
+/**
  * 첫 화면 (4기 Figma 시안 2026-11): 가운데 이름 → 정식 이름 → 짧은 소개, 그 아래 캠퍼스 지도를 화면 폭 가득 따로.
  * 이름은 로고(두 꺾쇠)로 시작해 꺾쇠가 양쪽으로 벌어지며 'GDGoC DGU' 가 드러난다 (LogoWordmark).
  * 지도는 이 사이트의 사이트맵이다: 건물 하나가 메뉴 하나이고, 누르면(키보드는 건물에서 Enter · Space) 그 자리에서 미리보기가 열린다 (폰은 아래 시트).
@@ -48,7 +53,7 @@ export function HeroSection() {
   // 지도가 화면 밖이면 반복 애니메이션(깃발, 진행 중 표시)을 멈춘다
   const offscreen = useOffscreen(frameRef)
   // 한국 시간 밤(19–06시)이면 지도도 밤. 불은 실제로 진행 중인 곳에만 켜진다 (DESIGN 6장)
-  const night = useTimeOfDay() === 'night'
+  const night = NIGHT_MODE
   const season = useSeason()
 
   // 3D: SVG 지도를 먼저 그려 두고(첫 그림 · 대체 그림), 브라우저가 한가하고 지도가 화면에 있을 때 3D 를 받아 같은 자리에 겹쳐 바꾼다
