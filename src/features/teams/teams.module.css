@@ -22,6 +22,17 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+/*
+ * 표시 글자는 상자 높이의 가운데에 (리뷰 2026-11-03: 글자가 아래로 처져 보임).
+ * line-height: 1 만으로는 글꼴의 위아래 여백(ascent · descent, 윈도우는 값이 또 다르다) 때문에 글자가 위아래로 처진다
+ * → 글자를 감싼 .tagText 를 text-box 로 글자 위 · 아래만 남기고 다듬은 뒤, 상자(flex)가 가운데에 놓는다.
+ * 지원하지 않는 브라우저는 지금처럼 보인다.
+ */
+.tagText {
+  display: block;
+  line-height: 1;
+  text-box: trim-both cap alphabetic;
+}
 .cat,
 .status,
 .metaTag {
@@ -403,7 +414,7 @@
   border-radius: 50%;
   background: var(--gen);
   font: 700 11px/1 var(--font-num);
-  color: var(--on-gen);
+  color: #fff;
 }
 .avatar {
   display: inline-grid;

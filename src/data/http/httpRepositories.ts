@@ -1,5 +1,5 @@
 import type { Repositories } from '@/data/repositories'
-import { adaptList, toPreviewItem, toProject, toReview, toScheduleEvent, toSearchHit, toStat } from './adapters'
+import { adaptList, toPreviewItem, toProject, toReview, toScheduleEvent, toSearchHit, toSeminar, toStat } from './adapters'
 
 /**
  * Spring Boot API 를 쓰는 구현.
@@ -31,6 +31,7 @@ export function createHttpRepositories(baseUrl = '/api', fetcher: typeof fetch =
   return {
     schedule: { list: async () => adaptList(await getJson('/schedules'), toScheduleEvent) },
     projects: { list: async () => adaptList(await getJson('/projects'), toProject) },
+    seminars: { list: async () => adaptList(await getJson('/seminars'), toSeminar) },
     stats: { list: async () => adaptList(await getJson('/stats'), toStat) },
     previews: {
       latest: async (place, limit) => adaptList(await getJson(`/places/${place}/latest?limit=${limit}`), toPreviewItem).slice(0, limit),

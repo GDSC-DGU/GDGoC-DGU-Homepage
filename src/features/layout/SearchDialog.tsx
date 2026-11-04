@@ -18,6 +18,16 @@ interface Option {
   title: string
   meta: string
   sample?: boolean
+  /** 그 항목이 바로 보이는 주소 (프로젝트 자세히 보기 창 · 세미나 검색). 없으면 장소 페이지 */
+  to?: string
+}
+
+/** 검색 결과 id → 바로 가는 주소: 'project-<id>' → 아카이브 자세히 보기 창, 'seminar-<id>' → 아카이브 세미나에서 그 제목으로 찾기 */
+function targetOf(doc: SearchHit['doc']): string | undefined {
+  const archive = PLACE_BY_ID.projects.path
+  if (doc.id.startsWith('project-')) return `${archive}?p=${encodeURIComponent(doc.id.slice('project-'.length))}`
+  if (doc.id.startsWith('seminar-')) return `${archive}?view=seminars&q=${encodeURIComponent(doc.title)}`
+  return undefined
 }
 
 interface Group {
@@ -42,7 +52,7 @@ const toGroups = (hits: readonly SearchHit[]): Group[] =>
     place: g.place,
     label: PLACE_BY_ID[g.place].label,
     more: g.more,
-    options: g.hits.map(({ doc }) => ({ key: doc.id, place: doc.place, title: doc.title, meta: doc.meta, sample: doc.sample })),
+    options: g.hits.map(({ doc }) => ({ key: doc.id, place: doc.place, title: doc.title, meta: doc.meta, sample: doc.sample, to: targetOf(doc) })),
   }))
 
 interface Props {
@@ -148,7 +158,8 @@ export function SearchDialog({ open, onClose, returnFallbacks }: Props) {
     // 고른 곳(지도 미리보기 · 장소 페이지)이 초점을 가져가므로 검색 버튼으로 돌려주지 않는다
     forgetFocus()
     dialogRef.current?.close()
-    if (pathname === '/') preview.show(opt.place, { reveal: true })
+    if (opt.to) navigate(opt.to)
+    else if (pathname === '/') preview.show(opt.place, { reveal: true })
     else navigate(PLACE_BY_ID[opt.place].path)
   }
 

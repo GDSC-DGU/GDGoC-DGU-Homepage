@@ -28,6 +28,9 @@ export function projectGallery(p: Pick<Project, 'cover' | 'images'>, showUnclear
   return all.filter((img, i) => all.findIndex((x) => x.src === img.src) === i)
 }
 
+/** 그림 원본을 '원본 ↗' 으로 걸어도 되는지: 누구나 열 수 있는 GitHub 주소만 (노션 '전 기수 데이터 모음집'은 챕터 안 문서라 걸지 않는다) */
+export const isOpenSource = (url: string): boolean => /^https:\/\/(github\.com|raw\.githubusercontent\.com)\//.test(url)
+
 /** 화면 캡처 · 소개 이미지처럼 그 자체로 작업을 보여 주는 그림인지 (로고 · 구조도가 아닌 것) */
 export const isWorkImage = (img: ProjectImage | undefined) => img?.kind === 'screen' || img?.kind === 'promo' || img?.kind === 'mobile'
 
@@ -177,7 +180,14 @@ export function toRooms(groups: readonly ProjectGroup[], showUncleared = SHOW_UN
     const generations = [...new Set(g.projects.map((p) => p.generation).filter((n): n is number => typeof n === 'number'))].sort((a, b) => a - b)
     // 화면 · 서비스 → 로고 → 글자 표지 순 (sort 는 안정 정렬이라 같은 순위는 받은 순서 그대로)
     const ranked = [...g.projects].sort((a, b) => exhibitRank(a, showUncleared) - exhibitRank(b, showUncleared))
-    const featured = ranked.length >= 3 ? ranked.find((p) => isWorkImage(projectCover(p, showUncleared))) : undefined
+    // 대표 작품: 작업 그림이 표지인 것 중 앞 순위, 같은 순위면 그림이 더 많은 것 (같으면 이름순). 세 작품 이상인 방에만
+    const candidates = ranked.length >= 3 ? ranked.filter((p) => isWorkImage(projectCover(p, showUncleared))) : []
+    const richness = (p: Project) => projectGallery(p, showUncleared).length
+    const featured = candidates.reduce<Project | undefined>((top, p) => {
+      if (!top) return p
+      const d = exhibitRank(p, showUncleared) - exhibitRank(top, showUncleared)
+      return d < 0 || (d === 0 && richness(p) > richness(top)) ? p : top
+    }, undefined)
     const projects = featured ? [featured, ...ranked.filter((p) => p !== featured)] : ranked
     return { id, title: g.program, yearLabel: lo === hi ? String(lo) : `${lo}–${hi}`, generations, projects, featured }
   })

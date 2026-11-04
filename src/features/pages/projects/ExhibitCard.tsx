@@ -52,7 +52,7 @@ export function LiveLink({ project, tone = 'inline', className = '' }: { project
 
 /**
  * 작품 이름 = 자세히 보기 창(?p=id)을 여는 링크. 누르는 자리는 CSS 로 작품 전체까지 넓힌다.
- * linkTo: 다른 페이지(홈)에서 쓸 때 그 창이 있는 주소('/projects'). 그때는 /projects?p=id 로 옮겨 가서 창이 열린다.
+ * linkTo: 다른 페이지(홈)에서 쓸 때 그 창이 있는 주소('/archive'). 그때는 /archive?p=id 로 옮겨 가서 창이 열린다.
  */
 function OpenLink({ project, className, linkTo }: { project: Project; className: string; linkTo?: string }) {
   const navigate = useNavigate()

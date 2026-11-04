@@ -5,7 +5,7 @@ import type { Project, ProjectImage } from '@/domain/types'
 import { useModalDialog } from '@/features/layout/useModalDialog'
 import { ExternalLink, Mark } from '../PageParts'
 import { Dotted, LiveLink } from './ExhibitCard'
-import { assetUrl, languageSegments, monthSpan, outLinks, projectGallery, repoPath } from './exhibit'
+import { assetUrl, isOpenSource, languageSegments, monthSpan, outLinks, projectGallery, repoPath } from './exhibit'
 import { LanguageBar } from './Plate'
 import { sheetSearch } from './sheetLink'
 import { morphClose } from './sheetMorph'
@@ -16,7 +16,7 @@ const PROJECT_COLOR = placeColor('projects')
 /** 'YYYY-MM-DD' → '2026.10.17' (기준일 표기) */
 const dotted = (ymd: string) => ymd.replaceAll('-', '.')
 
-/** 그림 한 장 + 이름 · 원본 링크 */
+/** 그림 한 장 + 이름 · 원본 링크 (GitHub 원본만) */
 function Shot({ img, project, first }: { img: ProjectImage; project: Project; first: boolean }) {
   return (
     <figure className={c.shot} data-kind={img.kind}>
@@ -25,16 +25,18 @@ function Shot({ img, project, first }: { img: ProjectImage; project: Project; fi
       </div>
       <figcaption className={c.shotCaption}>
         <span>{img.caption ?? img.alt}</span>
-        <ExternalLink href={img.source} context={`${project.name} ${img.caption ?? ''} 원본 그림`} className={`link ${c.source}`}>
-          원본
-        </ExternalLink>
+        {isOpenSource(img.source) && (
+          <ExternalLink href={img.source} context={`${project.name} ${img.caption ?? ''} 원본 그림`} className={`link ${c.source}`}>
+            원본
+          </ExternalLink>
+        )}
       </figcaption>
     </figure>
   )
 }
 
 /**
- * 프로젝트 자세히 보기 창 (/projects?p=<id>).
+ * 프로젝트 자세히 보기 창 (/archive?p=<id>).
  * <dialog> showModal 이라 초점이 창 안에만 돌고 Esc 로 닫히며, 닫으면 연 자리로 초점이 돌아간다 (useModalDialog).
  * 그림(화면 캡처 · 구조도) 크게 + 지금 써 보기(주 버튼, 서비스가 있을 때) + 사실(기수 · 프로그램 · 재료 · 언어 · 대표 저장소 숫자)
  * + 바깥 링크 줄(GitHub 저장소 ↗ · 데모 영상 ↗) + 앞 · 뒤 작품(← · →, 사이트 안).

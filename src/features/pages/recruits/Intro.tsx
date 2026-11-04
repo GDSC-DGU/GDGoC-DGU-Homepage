@@ -15,7 +15,7 @@ const iconOf = (p: Project) => (p.cover?.kind === 'logo' ? projectIcon(p) : null
 
 /**
  * 네 파트 (시안 E): 2 × 2 흰 판. 판마다 파트 이름(28) → 맡는 일 → 화요일 세션에서 비교하는 것 → 지난 프로젝트 실제 아이콘 줄.
- * 아이콘은 공통 IconRow 작은 크기(40px + 이름)이고, 누르면 그 프로젝트 자세히 보기(/projects?p=id).
+ * 아이콘은 공통 IconRow 작은 크기(40px + 이름)이고, 누르면 그 프로젝트 자세히 보기(/archive?p=id).
  * 지난 예가 없는 파트(Product Design)는 아이콘 줄 없이 둔다 (지어내지도, '없다' 고 적지도 않는다).
  * 폰은 한 칸씩.
  */

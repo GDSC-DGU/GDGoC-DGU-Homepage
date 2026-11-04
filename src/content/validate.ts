@@ -1,4 +1,4 @@
-import type { EventKind, Faq, Generation, LanguageShare, PlaceId, Project, ProjectImage, ProjectImageKind } from '@/domain/types'
+import type { EventKind, Faq, Generation, LanguageShare, PlaceId, Project, ProjectImage, ProjectImageKind, Seminar } from '@/domain/types'
 
 /**
  * 콘텐츠 JSON 검사.
@@ -206,5 +206,26 @@ export function checkFaqs(list: unknown): Checked<Faq> {
     for (const key of ['id', 'q', 'a']) requireText(raw, key, problems)
     requireSource(raw, problems)
     return { id: raw.id as string, q: raw.q as string, a: raw.a as string, source: raw.source as string }
+  })
+}
+
+/** seminars.json: 날짜 · 기수 · 제목 · 발표자는 꼭, 자료 형식은 pdf · pptx · null, 주소는 https 또는 null */
+export function checkSeminars(list: unknown): Checked<Seminar> {
+  return checkList('seminars.json', list, (raw, problems) => {
+    for (const key of ['id', 'title', 'speaker']) requireText(raw, key, problems)
+    if (!isValidYmd(raw.date)) problems.push('date 는 YYYY-MM-DD 여야 합니다')
+    if (!isPositiveInt(raw.generation)) problems.push('generation 은 1 이상의 정수여야 합니다')
+    if (!(raw.format === null || raw.format === 'pdf' || raw.format === 'pptx')) problems.push("format 은 'pdf' | 'pptx' | null 중 하나여야 합니다")
+    if (!(raw.fileUrl === null || isHttpsUrl(raw.fileUrl))) problems.push('fileUrl 은 https 주소나 null 이어야 합니다')
+    if (problems.length) return null as never
+    return {
+      id: raw.id as string,
+      date: raw.date as string,
+      generation: raw.generation as number,
+      title: (raw.title as string).trim(),
+      speaker: (raw.speaker as string).trim(),
+      format: raw.format as Seminar['format'],
+      fileUrl: raw.fileUrl as string | null,
+    }
   })
 }

@@ -1,8 +1,8 @@
 import { KIND_LABEL } from '@/config/kinds'
-import { CHAPTER, EVENTS, FAQS, PROJECTS, RECRUITING } from '@/content'
+import { CHAPTER, EVENTS, FAQS, PROJECTS, RECRUITING, SEMINARS } from '@/content'
 import type { PreviewPlace, Repositories } from '@/data/repositories'
 import { REVIEWS, TEAMS_STATUS } from '@/data/mock/fixtures'
-import type { ArchiveDoc, Faq, PreviewItem, Project, ScheduleEvent } from '@/domain/types'
+import type { ArchiveDoc, Faq, PreviewItem, Project, ScheduleEvent, Seminar } from '@/domain/types'
 import { kstToday } from '@/lib/date'
 import { withoutStalePlans } from '@/content/plan'
 import { PROTOTYPE } from '@/config/site'
@@ -22,6 +22,7 @@ export function buildArchive(
   events: readonly ScheduleEvent[] = EVENTS,
   projects: readonly Project[] = PROJECTS,
   faqs: readonly Faq[] = FAQS,
+  seminars: readonly Seminar[] = SEMINARS,
 ): ArchiveDoc[] {
   const eventDocs = events
     .filter((e) => e.kind !== 'rest')
@@ -54,7 +55,17 @@ export function buildArchive(
       keywords: expandKeywords(f.a, '질문 faq 지원 안내'),
     }),
   )
-  return [...eventDocs, ...projectDocs, ...faqDocs]
+  // 세미나 발표: 제목 · 발표자 · 기수로 찾는다 (아카이브 '세미나'로 이어진다)
+  const seminarDocs = seminars.map(
+    (s): ArchiveDoc => ({
+      id: `seminar-${s.id}`,
+      place: 'projects',
+      title: s.title,
+      meta: [s.date.replaceAll('-', '.'), `${s.generation}기`, s.speaker].filter(Boolean).join(' · '),
+      keywords: expandKeywords(s.title, s.speaker, `${s.generation}기`, s.date.slice(0, 4), '세미나 발표 자료 seminar'),
+    }),
+  )
+  return [...eventDocs, ...projectDocs, ...seminarDocs, ...faqDocs]
 }
 
 /** 커뮤니티: 가장 가까운 다음 일정 하나 → 최근 지난 행사. 모자라면 다음 일정을 더 채운다. 휴회는 뺀다 */
@@ -138,6 +149,7 @@ export function createSnapshotRepositories({ today = () => kstToday() }: Snapsho
   return {
     schedule: { list: async () => EVENTS.map((e) => ({ ...e })) },
     projects: { list: async () => PROJECTS.map((p) => ({ ...p, ...(p.stack ? { stack: [...p.stack] } : {}) })) },
+    seminars: { list: async () => SEMINARS.map((s) => ({ ...s })) },
     stats: {
       list: async () => [
         {

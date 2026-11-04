@@ -1,4 +1,4 @@
-import type { ArchiveDoc, EventKind, PlaceId, PreviewItem, Project, Review, ScheduleEvent, SearchHit, Stat } from '@/domain/types'
+import type { ArchiveDoc, EventKind, PlaceId, PreviewItem, Project, Review, ScheduleEvent, SearchHit, Seminar, Stat } from '@/domain/types'
 
 /**
  * 서버 응답 → 화면 데이터 모양(domain/types) 으로 바꾸는 곳 (Adapter).
@@ -81,6 +81,26 @@ export function toProject(raw: unknown): Project | null {
     if (v) p[key] = v
   }
   return p
+}
+
+/** 세미나 한 줄: { id, title, speaker, date, generation, fileUrl } (백엔드 응답 제안 2026-11-04) */
+export function toSeminar(raw: unknown): Seminar | null {
+  if (!isObject(raw)) return null
+  const title = text(raw.title)
+  const date = text(raw.date)?.slice(0, 10)
+  const generation = Number(raw.generation)
+  if (!title || !date || !/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isInteger(generation) || generation < 1) return null
+  const fileUrl = text(raw.fileUrl ?? raw.file_url)
+  const format = text(raw.format)?.toLowerCase()
+  return {
+    id: text(raw.id) ?? `${date}-${title}`,
+    date,
+    generation,
+    title,
+    speaker: text(raw.speaker) ?? '',
+    format: format === 'pdf' || format === 'pptx' ? format : fileUrl?.toLowerCase().endsWith('.pdf') ? 'pdf' : null,
+    fileUrl: fileUrl && /^https:\/\//.test(fileUrl) ? fileUrl : null,
+  }
 }
 
 export function toStat(raw: unknown): Stat | null {

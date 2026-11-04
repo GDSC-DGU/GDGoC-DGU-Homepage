@@ -20,7 +20,7 @@ const CATEGORY_TONE: Record<TeamsCategory, string> = {
 export function CategoryTag({ category }: { category: TeamsCategory }) {
   return (
     <span className={s.cat} data-tone={CATEGORY_TONE[category]}>
-      {category}
+      <span className={s.tagText}>{category}</span>
     </span>
   )
 }
@@ -28,7 +28,7 @@ export function CategoryTag({ category }: { category: TeamsCategory }) {
 export function StatusTag({ status }: { status: RecruitStatus }) {
   return (
     <span className={s.status} data-open={status === '모집중' || undefined}>
-      {status}
+      <span className={s.tagText}>{status}</span>
     </span>
   )
 }
@@ -39,7 +39,7 @@ export function DeadlineTag({ endDate, status, today }: { endDate: string; statu
   if (!label) return null
   return (
     <span className={`${s.deadline} num`} data-soon={closingSoon(endDate, status, today) || undefined}>
-      {label}
+      <span className={s.tagText}>{label}</span>
     </span>
   )
 }
@@ -48,7 +48,8 @@ export function DeadlineTag({ endDate, status, today }: { endDate: string; statu
 export function NewTag() {
   return (
     <span className={s.newTag} lang="en">
-      N<span className="visually-hidden"> 새 글</span>
+      <span className={s.tagText}>N</span>
+      <span className="visually-hidden"> 새 글</span>
     </span>
   )
 }
@@ -71,7 +72,7 @@ export function PartTags({ parts, compact = false }: { parts: readonly TeamPartI
     <span className={s.parts} lang="en">
       {parts.map((p) => (
         <span key={p} className={s.part}>
-          {partShort(p)}
+          <span className={s.tagText}>{partShort(p)}</span>
         </span>
       ))}
     </span>

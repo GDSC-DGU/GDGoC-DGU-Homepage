@@ -19,8 +19,26 @@
   /* 표에서 고른 행 */
   --adm-select: #eceff3;
 
+  /*
+   * 면 나누기 (리뷰 2026-11-03: 사이드바 · 바탕 · 카드가 다 흰색 계열이라 구분이 안 됨)
+   * 먹색 사이드바 | 옅은 회색 바탕 | 흰 카드. 지금 메뉴는 구글 파랑(밝은 쪽, 먹색 위 9:1).
+   */
+  --adm-canvas: #eef0f3;
+  --adm-side: #191b1f;
+  --adm-side-line: rgba(255, 255, 255, 0.1);
+  --adm-side-ink: #e8eaed;
+  --adm-side-muted: #9aa0a6;
+  --adm-side-hover: rgba(255, 255, 255, 0.07);
+  --adm-side-active: rgba(138, 180, 248, 0.16);
+  --adm-side-accent: #8ab4f8;
+  /* 회색 바탕 위 두 번째 버튼은 흰 바탕 + 1px 선 (공개 사이트 .story.field 와 같은 규칙) */
+  --btn2-bg: #ffffff;
+  --btn2-bg-hover: #ffffff;
+  --btn2-line: var(--line-strong);
+  --btn2-line-hover: var(--ink-500);
+
   min-height: 100vh;
-  background: var(--paper);
+  background: var(--adm-canvas);
   color: var(--ink-900);
   font: 400 15px/24px var(--font-kr);
 }

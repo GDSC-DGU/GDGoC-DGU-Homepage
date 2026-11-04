@@ -1,4 +1,4 @@
-import type { PlaceId, PreviewItem, Project, Review, ScheduleEvent, SearchHit, Stat } from '@/domain/types'
+import type { PlaceId, PreviewItem, Project, Review, ScheduleEvent, SearchHit, Seminar, Stat } from '@/domain/types'
 
 /**
  * 화면이 데이터를 가져오는 '창구' (Repository 패턴).
@@ -12,6 +12,11 @@ export interface ScheduleRepository {
 
 export interface ProjectRepository {
   list(): Promise<Project[]>
+}
+
+/** 세미나 발표 기록 (아카이브 '세미나'). 발표 자료 주소(fileUrl)는 백엔드가 R2 에 올린 뒤 채운다 */
+export interface SeminarRepository {
+  list(): Promise<Seminar[]>
 }
 
 export interface StatsRepository {
@@ -38,6 +43,7 @@ export interface SearchService {
 export interface Repositories {
   schedule: ScheduleRepository
   projects: ProjectRepository
+  seminars: SeminarRepository
   stats: StatsRepository
   previews: PreviewRepository
   reviews: ReviewRepository

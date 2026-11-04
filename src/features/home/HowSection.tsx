@@ -56,7 +56,7 @@ function wayText(way: Way, today: string): { label: string; key: string; basis?:
  * 칸 = 위 1px 선 → 작은 이름('매주 화요일') → 큰 숫자('18:00') → 이름 → 한 문장 → 사이트 안 링크 하나.
  * 화면에서는 작은 이름 · 큰 숫자가 이름 위에 보이지만 읽는 순서는 이름 → 작은 이름 → 숫자 → 문장 (제목으로 건너뛸 때 이름이 먼저 들린다).
  * G-Sprint 풀이(<Term>)는 홈에서 여기 한 번. 지도 광장 깃발의 '소개 보기'가 여기로 온다 (#about).
- * 다음 모임은 /community 와 같은 일정에서 고른다 (공개됐거나 확정된 것만). 고를 것이 없으면 표를 그리지 않는다.
+ * 다음 모임은 /about(소개) 과 같은 일정에서 고른다 (공개됐거나 확정된 것만). 고를 것이 없으면 표를 그리지 않는다.
  */
 export function HowSection() {
   const today = useToday()

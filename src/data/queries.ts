@@ -11,6 +11,7 @@ import { useRepositories } from './useRepositories'
 export const queryKeys = {
   schedule: ['schedule'] as const,
   projects: ['projects'] as const,
+  seminars: ['seminars'] as const,
   stats: ['stats'] as const,
   previews: (place: PreviewPlace, limit: number) => ['previews', place, limit] as const,
   reviews: ['reviews'] as const,
@@ -24,6 +25,11 @@ export function useSchedule() {
 export function useProjects() {
   const repos = useRepositories()
   return useQuery({ queryKey: queryKeys.projects, queryFn: () => repos.projects.list() })
+}
+
+export function useSeminars() {
+  const repos = useRepositories()
+  return useQuery({ queryKey: queryKeys.seminars, queryFn: () => repos.seminars.list() })
 }
 
 export function useStats() {

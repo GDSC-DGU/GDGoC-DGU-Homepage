@@ -1,0 +1,943 @@
+{
+  "note": "세미나 발표 기록. 백엔드 팀이 노션 '전 기수 데이터 모음집 > 세미나 자료'에 모은 것을 옮겼다 (2026-11-04). format 은 노션에 올라온 발표 자료 형식(pdf · pptx), 자료가 없거나 확인이 필요하면 null. fileUrl 은 백엔드가 R2 에 올린 공개 주소를 넣는 칸 (올리기 전에는 null → 화면에서 '자료 보기'를 숨긴다).",
+  "updatedAt": "2026-11-04",
+  "source": "노션 전 기수 데이터 모음집 (4기 백엔드 팀 정리)",
+  "seminars": [
+    {
+      "id": "c537f34d4a7e8216a32501d03d23a0b9",
+      "date": "2023-09-21",
+      "generation": 1,
+      "title": "휴, 하마터면 의사 될 뻔…",
+      "speaker": "서희찬",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "0447f34d4a7e831ca20b01aff309b3c5",
+      "date": "2023-10-06",
+      "generation": 1,
+      "title": "Posterior, MAP/MLE 개념 소개",
+      "speaker": "이선호",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "d8e7f34d4a7e8242afc001850d8d43f2",
+      "date": "2023-10-06",
+      "generation": 1,
+      "title": "개발 공부 어떻게 하는건데?",
+      "speaker": "박상준",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "8927f34d4a7e82029a6d016cfcd963b6",
+      "date": "2023-10-06",
+      "generation": 1,
+      "title": "우리가 앱등이인 진짜 이유",
+      "speaker": "이상돈",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "5a37f34d4a7e831192eb81106c054568",
+      "date": "2023-10-13",
+      "generation": 1,
+      "title": "GDSC - 1st Project: Heart Signal 회고",
+      "speaker": "장동겸",
+      "format": "pptx",
+      "fileUrl": null
+    },
+    {
+      "id": "d2b7f34d4a7e83a5805b81404665a41e",
+      "date": "2023-10-13",
+      "generation": 1,
+      "title": "나만의 리뷰 긍 부정 분류기 만들기",
+      "speaker": "이다원",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "ca27f34d4a7e83dc9d3901338afde285",
+      "date": "2023-10-13",
+      "generation": 1,
+      "title": "생각하는 NPC",
+      "speaker": "정은지",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "7817f34d4a7e832492fc81467fc5b64f",
+      "date": "2023-11-03",
+      "generation": 1,
+      "title": "AWS 요금 폭탄 예방하기",
+      "speaker": "임은서",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "7b07f34d4a7e825db92c81d563ffc21c",
+      "date": "2023-11-03",
+      "generation": 1,
+      "title": "How to Live",
+      "speaker": "남경현",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "ed07f34d4a7e82ffae7101667be279d3",
+      "date": "2023-11-03",
+      "generation": 1,
+      "title": "아 그냥 사격 선수할 걸…",
+      "speaker": "손형준",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "bf47f34d4a7e8224a3cd81e75bf71aca",
+      "date": "2023-11-03",
+      "generation": 1,
+      "title": "프로젝트 이렇게 해보는건 어떨까요?",
+      "speaker": "이다은",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "8d57f34d4a7e83ee859801a984ed2c77",
+      "date": "2023-11-10",
+      "generation": 1,
+      "title": "DevRel? 커뮤니티 매니저? 그게 뭔데?",
+      "speaker": "이승현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "ff07f34d4a7e83b89d8381a417f8bb14",
+      "date": "2023-11-10",
+      "generation": 1,
+      "title": "GDSC DGU 사이트 프론트엔드 개발기",
+      "speaker": "정원호",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "71d7f34d4a7e83d5ab93018330d6a5aa",
+      "date": "2023-11-10",
+      "generation": 1,
+      "title": "LLM이 뭐길래?",
+      "speaker": "김윤지",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "fe67f34d4a7e8272af9d01aa629c9ade",
+      "date": "2023-11-10",
+      "generation": 1,
+      "title": "야! 너두 할 수 있어! Deploy",
+      "speaker": "손형준",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "2937f34d4a7e833785ca015060cbac6a",
+      "date": "2023-12-01",
+      "generation": 1,
+      "title": "시큐어 코딩, SQL 인젝션을 중심으로",
+      "speaker": "정구연",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "6927f34d4a7e83ec9cb681e66393dcce",
+      "date": "2023-12-01",
+      "generation": 1,
+      "title": "주전공 화생공 vs 앞으로 먹고살 인공지능",
+      "speaker": "양나은",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "7697f34d4a7e8381a71181edbf60f9bb",
+      "date": "2023-12-01",
+      "generation": 1,
+      "title": "플러터 진짜 괜찮은데!",
+      "speaker": "이도형",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "7717f34d4a7e8206ac670136242c7798",
+      "date": "2024-01-05",
+      "generation": 1,
+      "title": "AI/ML 파트가 주식 투자 하는 법",
+      "speaker": "홍민기",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "6a77f34d4a7e83138d4d819f83c77e48",
+      "date": "2024-01-05",
+      "generation": 1,
+      "title": "나를 알려줘, SSE",
+      "speaker": "강산아",
+      "format": "pptx",
+      "fileUrl": null
+    },
+    {
+      "id": "24a7f34d4a7e83e281348182a5590b5a",
+      "date": "2024-01-05",
+      "generation": 1,
+      "title": "방향키가 없는 n톤 트럭",
+      "speaker": "박정민",
+      "format": "pptx",
+      "fileUrl": null
+    },
+    {
+      "id": "ae87f34d4a7e82cb8fc80101b0789b29",
+      "date": "2024-01-19",
+      "generation": 1,
+      "title": "React",
+      "speaker": "이창준",
+      "format": "pptx",
+      "fileUrl": null
+    },
+    {
+      "id": "7457f34d4a7e838aaade81a4c22d83e3",
+      "date": "2024-01-19",
+      "generation": 1,
+      "title": "http, https 그리고 Nginx",
+      "speaker": "강승준",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "4d77f34d4a7e833d947301365aa53a57",
+      "date": "2024-01-19",
+      "generation": 1,
+      "title": "그래서 딥러닝모델에는 무엇이 있는데…",
+      "speaker": "한종원",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "5ae7f34d4a7e8384bbe00182a93a8b18",
+      "date": "2024-03-14",
+      "generation": 1,
+      "title": "AI and GPU",
+      "speaker": "이재윤",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "1457f34d4a7e82c7a7a5018229527a03",
+      "date": "2024-03-14",
+      "generation": 1,
+      "title": "AI 모델 어떻게 제공해야 할까?",
+      "speaker": "고나연",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "f837f34d4a7e82cdab7a81e80ab1a1a5",
+      "date": "2024-03-14",
+      "generation": 1,
+      "title": "프론트엔드 웹 서비스에서 우아하게 API 호출하기",
+      "speaker": "김민성",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "d217f34d4a7e83d38395815c4120d79a",
+      "date": "2024-03-21",
+      "generation": 1,
+      "title": "CodeJam! AI 이제는 한번 써볼까?",
+      "speaker": "서희찬",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "be07f34d4a7e832bb932018e42f2d83a",
+      "date": "2024-03-21",
+      "generation": 1,
+      "title": "Graph Neural Network",
+      "speaker": "한상훈",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "0377f34d4a7e82afa2ff017994b7fd94",
+      "date": "2024-03-21",
+      "generation": 1,
+      "title": "이제는 공부해야하지 않을까요?",
+      "speaker": "윤창섭",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "1827f34d4a7e833cacda01d13ab2125f",
+      "date": "2024-04-04",
+      "generation": 1,
+      "title": "더 멋지게 사용하는 Git/GitHub",
+      "speaker": "이나경",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "63d7f34d4a7e82159e3881c6e1c4a1df",
+      "date": "2024-04-04",
+      "generation": 1,
+      "title": "모델 경량화란?",
+      "speaker": "김현진",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "31f7f34d4a7e8281bb4f81cba2f3b911",
+      "date": "2024-04-04",
+      "generation": 1,
+      "title": "중요한 것은 꺾이지 않는 마음",
+      "speaker": "유다현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "04b7f34d4a7e8336afef015a291aa8b8",
+      "date": "2024-05-02",
+      "generation": 1,
+      "title": "ALGORITHM",
+      "speaker": "임정우",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "a277f34d4a7e83beac9881b38259b525",
+      "date": "2024-05-02",
+      "generation": 1,
+      "title": "대학원은 왜…?",
+      "speaker": "이윤주",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "dc97f34d4a7e83ddaeb781e9a0750cfd",
+      "date": "2024-05-02",
+      "generation": 1,
+      "title": "데이터분석, 해보지않을래..?",
+      "speaker": "황현정",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "d867f34d4a7e83d4829481e564ecdfe5",
+      "date": "2024-05-02",
+      "generation": 1,
+      "title": "테스트코드, A to E",
+      "speaker": "김재니",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "b187f34d4a7e8358951b816b92a19ea6",
+      "date": "2024-05-16",
+      "generation": 1,
+      "title": "GDSC를 통해 도마뱀에서 공룡으로 진화한 건에 대하여",
+      "speaker": "강승준",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "db97f34d4a7e833bad3e0170ef56474e",
+      "date": "2024-05-16",
+      "generation": 1,
+      "title": "비전공자가 보는 GDSC 이야기",
+      "speaker": "이다연",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "3b67f34d4a7e83a7b8d28112a8d631e1",
+      "date": "2024-05-16",
+      "generation": 1,
+      "title": "아직도 MVVM쓴다고? SwiftUI로 알아보는 MVI 디자인 패턴",
+      "speaker": "이도형",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "0f47f34d4a7e82f88bac013923d0cf29",
+      "date": "2024-05-16",
+      "generation": 1,
+      "title": "웹개발에서 랭체인 찍먹하기",
+      "speaker": "서희찬",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "93f7f34d4a7e8264b2820162dfd6e336",
+      "date": "2024-09-26",
+      "generation": 2,
+      "title": "AppsFlyer로 UserFlow 개선하기",
+      "speaker": "이도형",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "a907f34d4a7e820bb439813cd4f477b1",
+      "date": "2024-10-10",
+      "generation": 2,
+      "title": "Diffusion Model",
+      "speaker": "권다훈",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "cba7f34d4a7e8239ac85012d5121152a",
+      "date": "2024-10-10",
+      "generation": 2,
+      "title": "초등학생도 할 수 있는 배포 너란 녀석…",
+      "speaker": "민장규",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "bbd7f34d4a7e8262b5018146ac8b763d",
+      "date": "2024-10-10",
+      "generation": 2,
+      "title": "퍼블리셔 vs 프론트엔드",
+      "speaker": "홍규진",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "15e7f34d4a7e8309886c015e23ebb5e6",
+      "date": "2024-10-31",
+      "generation": 2,
+      "title": "IAM을 기반으로 알아보는 클라우드 보안",
+      "speaker": "김규리",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "7e77f34d4a7e823698ba812b967f44a7",
+      "date": "2024-10-31",
+      "generation": 2,
+      "title": "쉽게 배우는 도커",
+      "speaker": "박재형",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "4757f34d4a7e82db8132811b4f3503e4",
+      "date": "2024-10-31",
+      "generation": 2,
+      "title": "인공지능 이야기",
+      "speaker": "이동현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "d697f34d4a7e82389e56813ba4660dd8",
+      "date": "2024-11-07",
+      "generation": 2,
+      "title": "사용자 경험까지 생각하는 개발자가 되는건 어떤가요?",
+      "speaker": "김민정",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "0ec7f34d4a7e8274a74d81b8fc426aaf",
+      "date": "2024-11-14",
+      "generation": 2,
+      "title": "LLM으로 만든 캐릭터, Generative Agent",
+      "speaker": "엄태우",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "cd97f34d4a7e83d2bd2b812065318ccc",
+      "date": "2024-11-21",
+      "generation": 2,
+      "title": "ICPC 본선진출자의 코테 부시기",
+      "speaker": "이강욱",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "2a67f34d4a7e83709ff90145103520cd",
+      "date": "2024-11-21",
+      "generation": 2,
+      "title": "Swagger로 Front-end 자동 API 생성하기",
+      "speaker": "홍규진",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "9e17f34d4a7e8271b825812cd4f50925",
+      "date": "2024-11-21",
+      "generation": 2,
+      "title": "Why always “WHY”?",
+      "speaker": "조원준",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "a027f34d4a7e820892de010a5a256a45",
+      "date": "2024-11-21",
+      "generation": 2,
+      "title": "버그덩어리 React Native… 그래도 좋아하시죠?",
+      "speaker": "박주형",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "f077f34d4a7e82a1802981c22fcb1f85",
+      "date": "2025-01-02",
+      "generation": 2,
+      "title": "Wait~ 하지 않는 서비스",
+      "speaker": "오현석",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "f8a7f34d4a7e83adaa4381487d542a55",
+      "date": "2025-01-02",
+      "generation": 2,
+      "title": "컴공에서 디자이너로 살아남기",
+      "speaker": "이정선",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "33b7f34d4a7e82adba8a011ba57e8000",
+      "date": "2025-01-16",
+      "generation": 2,
+      "title": "MLOps 도장깨기",
+      "speaker": "최지안",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "4607f34d4a7e82d1a43201c2da071e74",
+      "date": "2025-01-16",
+      "generation": 2,
+      "title": "Variational Inference",
+      "speaker": "이강욱",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "7b77f34d4a7e82169f4e013b60d60276",
+      "date": "2025-01-16",
+      "generation": 2,
+      "title": "부하 테스트 찍먹하기",
+      "speaker": "이승현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "37d7f34d4a7e827e8724018f17d44f77",
+      "date": "2025-02-13",
+      "generation": 2,
+      "title": "DeepSeek, 넌 뭐길래?",
+      "speaker": "엄태우",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "50a7f34d4a7e821880ac81ee9553a890",
+      "date": "2025-02-13",
+      "generation": 2,
+      "title": "공통 컴포넌트? 너 누군데",
+      "speaker": "김수현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "bdf7f34d4a7e82119e87816c9da8323e",
+      "date": "2025-03-13",
+      "generation": 2,
+      "title": "GENESIS: 노트북에서 구현하는 물리 시뮬레이터",
+      "speaker": "류성호",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "e947f34d4a7e8353908801743649c80a",
+      "date": "2025-03-13",
+      "generation": 2,
+      "title": "GPT : 어디서 왔고, 어떻게 여기까지 왔을까",
+      "speaker": "장소은",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "ee37f34d4a7e83088ae381b2f38cac26",
+      "date": "2025-03-13",
+      "generation": 2,
+      "title": "정통에서 살아남기",
+      "speaker": "박수빈",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "1de7f34d4a7e830a83c501fbf75a880e",
+      "date": "2025-03-27",
+      "generation": 2,
+      "title": "TestCode",
+      "speaker": "안성우",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "0b67f34d4a7e83eb86b601d03f4cea53",
+      "date": "2025-04-03",
+      "generation": 2,
+      "title": "TypeScript, 개발 속도를 높이는 타입의 힘",
+      "speaker": "이지희",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "f707f34d4a7e823abc6781d37e27c385",
+      "date": "2025-04-03",
+      "generation": 2,
+      "title": "모노레포 좋아보이길래 써봤습니다",
+      "speaker": "김수빈",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "aa87f34d4a7e83499d420127eb91b00d",
+      "date": "2025-04-03",
+      "generation": 2,
+      "title": "리액트컴포넌트패턴",
+      "speaker": "김태욱",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "30c7f34d4a7e8271b98a81c4ef498316",
+      "date": "2025-10-10",
+      "generation": 3,
+      "title": "AI Agent, 저도 사용해 봤습니다",
+      "speaker": "박주형",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "eb47f34d4a7e823bbdd901995a5361e7",
+      "date": "2025-10-31",
+      "generation": 3,
+      "title": "앱처럼 느껴지는 웹앱 만들기",
+      "speaker": "이정선",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "b027f34d4a7e8375baeb01e5320cf1e1",
+      "date": "2025-10-31",
+      "generation": 3,
+      "title": "효율적으로 공부하는 방법",
+      "speaker": "권다훈",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "b4d7f34d4a7e83c2919d81706fb70ca5",
+      "date": "2025-11-14",
+      "generation": 3,
+      "title": "LLM이 우리를 기억하는 방식, LLM MEMORY",
+      "speaker": "엄태우",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "4a47f34d4a7e83999a1c01470f1c93d7",
+      "date": "2025-11-14",
+      "generation": 3,
+      "title": "딸깍이면 RDS 마이그레이션",
+      "speaker": "이소은",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "8507f34d4a7e8254aae981f6dc0ea271",
+      "date": "2025-11-21",
+      "generation": 3,
+      "title": "골반이 아니라 FE 손이 안 멈춤 : FE에서 AI 서빙의 모든 것.",
+      "speaker": "백동민",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "fcd7f34d4a7e82cea00b811976c402ca",
+      "date": "2025-11-21",
+      "generation": 3,
+      "title": "보시다시피MCP,Spring으로써버림",
+      "speaker": "정유현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "f427f34d4a7e83aca81f810d1ae53444",
+      "date": "2025-11-21",
+      "generation": 3,
+      "title": "제목은 홈페이지 개발기로 하겠습니다. 근데 마이그레이션을 곁들인",
+      "speaker": "윤진수",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "f3a7f34d4a7e82a69cd101675a56bdaa",
+      "date": "2025-11-21",
+      "generation": 3,
+      "title": "진짜로 굴러가는 사이드 프로젝트 만들기",
+      "speaker": "송윤석",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "ed97f34d4a7e83f4b641019759fe0f64",
+      "date": "2026-01-09",
+      "generation": 3,
+      "title": "Amazon Q Deveolper 경험담 근데 이제 해커톤을 곁들인",
+      "speaker": "정종인",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "cea7f34d4a7e83e488a60173ec9f34a5",
+      "date": "2026-01-16",
+      "generation": 3,
+      "title": "Ai semiconductor",
+      "speaker": "박효빈",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "88e7f34d4a7e82af99dc81e44405a2b9",
+      "date": "2026-01-16",
+      "generation": 3,
+      "title": "LLM으로 만든 캐릭터, Generative Agent",
+      "speaker": "엄태우",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "4637f34d4a7e83e28027810cb3bcde53",
+      "date": "2026-01-23",
+      "generation": 3,
+      "title": "EgoVLA와 EgoBridge로 알아보는 공통점 찾기의 재미",
+      "speaker": "이우제",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "5f77f34d4a7e83ffa360016654282aaf",
+      "date": "2026-01-23",
+      "generation": 3,
+      "title": "자동화의 역설",
+      "speaker": "이재혁",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "e6a7f34d4a7e83fc880a81cb378594a7",
+      "date": "2026-02-06",
+      "generation": 3,
+      "title": "Spring MVC에 WebFlux 도입",
+      "speaker": "추상윤",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "9637f34d4a7e8377a1b7012ed8759f89",
+      "date": "2026-02-06",
+      "generation": 3,
+      "title": "해커톤, 실패에서 성공까지",
+      "speaker": "장은재",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "9bc7f34d4a7e826aacfa016081d40810",
+      "date": "2026-02-13",
+      "generation": 3,
+      "title": "MNIST 학습으로 알아보는 인공지능",
+      "speaker": "성시연",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "d757f34d4a7e82c98fd181e400a1c89a",
+      "date": "2026-02-13",
+      "generation": 3,
+      "title": "tanstack-query optimistic-updates",
+      "speaker": "박원",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "8f17f34d4a7e82aba008816667b67eda",
+      "date": "2026-02-20",
+      "generation": 3,
+      "title": "elevator speech",
+      "speaker": "임준영",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "1bb7f34d4a7e8342837481f8b484b865",
+      "date": "2026-02-20",
+      "generation": 3,
+      "title": "게으른 개발자를 구원한 Figma MCP 사이드 프로젝트 실전 적용기",
+      "speaker": "서은정",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "27f7f34d4a7e838594f7019fa3cffc39",
+      "date": "2026-03-06",
+      "generation": 3,
+      "title": "AI가 잊는 방식, Unlearning",
+      "speaker": "유호준",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "2727f34d4a7e83628ad781da7feab599",
+      "date": "2026-03-06",
+      "generation": 3,
+      "title": "인스타그램은 과연 행복할까?",
+      "speaker": "조수현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "9f17f34d4a7e82f2b7d6813d116d9212",
+      "date": "2026-03-13",
+      "generation": 3,
+      "title": "AI 시대, 인간은 무엇으로 정의되는가",
+      "speaker": "강채연",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "8f87f34d4a7e83c5a00e017861c1babf",
+      "date": "2026-03-13",
+      "generation": 3,
+      "title": "당신은 BOT인가요?? 아니라면 증명해보세요",
+      "speaker": "김동찬",
+      "format": null,
+      "fileUrl": null
+    },
+    {
+      "id": "6be7f34d4a7e83279643015844e229de",
+      "date": "2026-03-20",
+      "generation": 3,
+      "title": "Do Ultrawork!",
+      "speaker": "이영락",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "e737f34d4a7e8201b98c01dbf71d3c11",
+      "date": "2026-03-20",
+      "generation": 3,
+      "title": "사이드 프로젝트보다 내 몸이 먼저 무너지고 있다",
+      "speaker": "윤유겸",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "c2f7f34d4a7e82e289b6014628b1addb",
+      "date": "2026-03-27",
+      "generation": 3,
+      "title": "Edge Computin시대의 Frontend:개발 방식의 변화",
+      "speaker": "류동현",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "4f57f34d4a7e83ca96e1818914856ea1",
+      "date": "2026-03-27",
+      "generation": 3,
+      "title": "인공지능 개발자가 하드웨어를 알아야 하는 이유",
+      "speaker": "오현석",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "9de7f34d4a7e82b79910018f930d9214",
+      "date": "2026-04-03",
+      "generation": 3,
+      "title": "개발자가 돈 버는 법",
+      "speaker": "김민선",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "f857f34d4a7e821a870d813fe46507ae",
+      "date": "2026-04-03",
+      "generation": 3,
+      "title": "내가 필요할 땐 나를 불러줘",
+      "speaker": "윤찬영",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "d827f34d4a7e82f7937f01ecf474f2de",
+      "date": "2026-04-10",
+      "generation": 3,
+      "title": "CLAUDE 너 내 동료가 돼라",
+      "speaker": "공기훈",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "9c27f34d4a7e82398b7b0147fab10bad",
+      "date": "2026-04-10",
+      "generation": 3,
+      "title": "Platform Engineering 개발자를 위한 개발, 인프라 복잡성을 어떻게 해결할 것인가?",
+      "speaker": "한승우",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "3267f34d4a7e83c39199810b02185917",
+      "date": "2026-05-22",
+      "generation": 3,
+      "title": "ADK를 활용한 UI 소통 에이전트 구현 실습",
+      "speaker": "백동민",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "d1b7f34d4a7e839c945f81cd4b1ab741",
+      "date": "2026-05-22",
+      "generation": 3,
+      "title": "Do you wanna build a snowman robot?",
+      "speaker": "이우제",
+      "format": "pdf",
+      "fileUrl": null
+    },
+    {
+      "id": "d807f34d4a7e8347aab601bcb8012c93",
+      "date": "2026-05-22",
+      "generation": 3,
+      "title": "OpenClaw를 메세나폴리스에 풀어",
+      "speaker": "정유현",
+      "format": "pptx",
+      "fileUrl": null
+    },
+    {
+      "id": "1737f34d4a7e8232b3950138571ef001",
+      "date": "2026-05-22",
+      "generation": 3,
+      "title": "취약점을 변기에 넣고서 내려",
+      "speaker": "최희수",
+      "format": "pdf",
+      "fileUrl": null
+    }
+  ]
+}

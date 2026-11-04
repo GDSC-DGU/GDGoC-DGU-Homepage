@@ -605,3 +605,67 @@
     transition: none;
   }
 }
+
+/* ── 소개 맨 위 '우리는': 흰 판 네 장 (옅은 회색 면 위). 지원 안내의 '누가 지원할 수 있나' 판과 같은 모양 ── */
+.who {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gutter);
+}
+.whoCard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 28px 28px 30px;
+  border-radius: var(--r-card);
+  background: var(--paper);
+}
+.whoLabel {
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.whoValue {
+  margin: 14px 0 0;
+  font: 700 28px/38px var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.whoValue :global(.num) {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.whoSub {
+  margin: 8px 0 0;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+@media (max-width: 1199px) {
+  .who {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .whoCard {
+    padding: 24px 22px 26px;
+  }
+  .whoValue {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+@media (max-width: 767px) {
+  .who {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .whoCard {
+    padding: 20px 20px 22px;
+  }
+  .whoValue {
+    margin-top: 8px;
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .whoSub {
+    margin-top: 4px;
+  }
+}
