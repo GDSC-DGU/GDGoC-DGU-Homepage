@@ -29,7 +29,7 @@ const activeColor = (id: string) => ({ '--active': `var(--place-${id}-text)` }) 
 
 /**
  * 모든 페이지 공통 머리말 (4기 Figma 시안 2026-11): 80px 흰 띠(폰 64), 위에 붙어 있다.
- * 왼쪽 'GDGoC Dongguk'(= 홈) · 오른쪽 메뉴 넷(프로젝트 · 커뮤니티 · 팀원 찾기 · 지원하기). 지금 메뉴는 그 장소색(짙게) 글자.
+ * 왼쪽 로고(= 홈, 글자 없이 로고만: 4기 Organizer 2026-11-05) · 오른쪽 메뉴 넷(소개 · 아카이브 · 팀원 찾기 · 지원 안내). 지금 메뉴는 그 장소색(짙게) 글자.
  * 메뉴에 마우스를 올리면 지도에서 같은 건물이 올라온다 (메뉴 = 지도).
  * 검색은 Ctrl/⌘ + K 와 폰 메뉴 시트에서. 폰(900px 이하)은 이름 · 메뉴 버튼 한 줄, 메뉴는 전체 화면 시트로 연다.
  */
@@ -58,13 +58,10 @@ export function SiteHeader() {
     <>
       <header className={s.header} data-site-header="" data-scrolled={scrolled || undefined}>
         <div className={`container ${s.bar}`}>
-          {/* 읽히는 이름 = 보이는 글자 + '홈'. 로고는 꾸밈 (public/brand: 4기 Organizer 가 준 GDG DGU 로고) */}
+          {/* 로고만 보이고, 읽히는 이름은 'GDGoC DGU 홈' (public/brand: 4기 Organizer 가 준 GDG DGU 로고) */}
           <Link className={s.brand} to="/">
             <img className={s.brandLogo} src={`${import.meta.env.BASE_URL}brand/gdg-dgu-logo.png`} alt="" width={LOGO.w} height={LOGO.h} />
-            <span className={s.brandName} lang="en">
-              GDGoC Dongguk
-            </span>
-            <span className="visually-hidden"> 홈</span>
+            <span className="visually-hidden">GDGoC DGU 홈</span>
           </Link>
           <nav className={s.nav} aria-label="주요 메뉴">
             <ul>

@@ -8,8 +8,9 @@ describe('페이지 전환 (메뉴 순서대로 좌우 밀기)', () => {
     expect(transitionKind('/', '')).toBeNull()
   })
   it('머리말에서 오른쪽 메뉴로 가면 forward, 왼쪽으로 가면 back', () => {
-    expect(transitionKind('/', '/archive')).toBe('forward')
-    expect(transitionKind('/archive', '/about')).toBe('forward')
+    expect(transitionKind('/', '/about')).toBe('forward')
+    expect(transitionKind('/about', '/archive')).toBe('forward')
+    expect(transitionKind('/archive', '/about')).toBe('back')
     expect(transitionKind('/about', '/recruits')).toBe('forward')
     expect(transitionKind('/recruits', '/teams')).toBe('back')
     expect(transitionKind('/about/', '/')).toBe('back')
