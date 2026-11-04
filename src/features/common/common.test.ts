@@ -58,7 +58,7 @@ describe('아이콘 타일', () => {
   })
   it('이름 뒤 괄호 설명은 빼고, 누르면 자세히 보기 창으로', () => {
     const t = projectIcon({ id: 'todai', name: '토닥이 (TodAi)', cover })
-    expect(t).toMatchObject({ name: '토닥이', to: { pathname: '/projects', search: '?p=todai' }, width: 400, height: 400 })
+    expect(t).toMatchObject({ name: '토닥이', to: { pathname: '/archive', search: '?p=todai' }, width: 400, height: 400 })
     expect(t?.src.endsWith('project-images/todai.webp')).toBe(true)
   })
 })

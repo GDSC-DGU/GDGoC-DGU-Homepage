@@ -5,13 +5,12 @@
  */
 
 /* ── 기수 탭: 2px 먹선 아래 3기 · 2기 · 1기, 고른 탭에 2px 밑줄 ── */
+/* 기수 탭: 먹선은 위의 아카이브 보기 탭(프로젝트 · 세미나)이 맡는다 */
 .tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 12px;
   margin-bottom: 48px;
-  padding-top: 32px;
-  border-top: 2px solid var(--ink-900);
 }
 .tab {
   position: relative;

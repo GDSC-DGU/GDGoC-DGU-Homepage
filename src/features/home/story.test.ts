@@ -100,7 +100,7 @@ describe('홈 문구 (content/story.ts)', () => {
     }
     expect(SPRINT_LINE.key).toMatch(/^\{teams\}/)
     expect(new Set(WAYS.map((w) => w.link.to)).size).toBe(3)
-    expect(BAND.next.to).toMatch(/^\/community/)
+    expect(BAND.next.to).toMatch(/^\/about/)
   })
 
   it('연합 행사 칸의 큰 숫자는 문장에 적은 챕터 수와 같다', () => {

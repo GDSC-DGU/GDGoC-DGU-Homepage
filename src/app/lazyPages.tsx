@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react'
 import type { PagePlanId } from '@/config/pages'
+import { Navigate, useLocation } from 'react-router-dom'
 import { ADMIN_APP, CAMPUS_PREVIEW, COMMUNITY_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, TEAMS_PAGE, type PageModule } from './pageModules'
 
 /**
@@ -28,7 +29,7 @@ function lazyPage<M, P extends object>(page: PageModule<M>, pick: (m: M) => Comp
   }
 }
 
-const Projects = lazyPage(PROJECTS_PAGE, (m) => m.ProjectsPage)
+const Archive = lazyPage(PROJECTS_PAGE, (m) => m.ArchivePage)
 const Community = lazyPage(COMMUNITY_PAGE, (m) => m.CommunityPage)
 const Recruits = lazyPage(RECRUITS_PAGE, (m) => m.RecruitsPage)
 const TeamsList = lazyPage(TEAMS_PAGE, (m) => m.TeamsListPage)
@@ -40,9 +41,19 @@ const Now = lazyPage(NOW_PREVIEW, (m) => m.NowPreview)
 const Campus = lazyPage(CAMPUS_PREVIEW, (m) => m.CampusPreview)
 const Admin = lazyPage(ADMIN_APP, (m) => m.AdminRoot)
 
-export function ProjectsPage() {
-  return <Projects />
+/**
+ * 옮긴 주소로 그대로 넘긴다 (?p= · ?gen= · #upcoming 같은 뒤쪽은 그대로). 공유된 링크가 끊기지 않게.
+ * 예전 /projects → /archive (2026-11-04), 예전 /community → /about (2026-11-05)
+ */
+export function MovedTo({ pathname }: { pathname: string }) {
+  const { search, hash } = useLocation()
+  return <Navigate to={{ pathname, search, hash }} replace />
 }
+/** 아카이브 (/archive): 프로젝트 · 세미나 */
+export function ArchivePage() {
+  return <Archive />
+}
+/** 소개 (/about): 예전 커뮤니티 페이지 자리 */
 export function CommunityPage() {
   return <Community />
 }

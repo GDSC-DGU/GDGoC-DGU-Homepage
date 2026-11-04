@@ -1,6 +1,6 @@
 {
-  "note": "프로젝트. GitHub GDSC-DGU 조직의 저장소 · README 기준 (2026.10.17 확인). 진행 중인 홈페이지 리뉴얼만 개인 저장소라 주소를 적지 않는다. 기수는 프로그램 시기로 정한다 (docs/CONTENT.md). README에 설명이 없으면 summary를 비우고, 빈 저장소는 넣지 않는다. contributors · commits · firstCommit · lastCommit · languages는 대표 저장소(repo)의 GitHub 숫자다 (statsAsOf 기준). cover · images는 팀 저장소(README · 파일)의 그림을 줄여 public/project-images에 둔 것이고, source가 원본 주소다. 팀이 사이트 게시를 확인하면 teamCleared를 true로 바꾼다.",
-  "updatedAt": "2026-10-17",
+  "note": "프로젝트. GitHub GDSC-DGU 조직의 저장소 · README 기준 (2026.10.17 확인). 진행 중인 홈페이지 리뉴얼만 개인 저장소라 주소를 적지 않는다. 기수는 프로그램 시기로 정한다 (docs/CONTENT.md). README에 설명이 없으면 summary를 비우고, 빈 저장소는 넣지 않는다. contributors · commits · firstCommit · lastCommit · languages는 대표 저장소(repo)의 GitHub 숫자다 (statsAsOf 기준). cover · images는 팀 저장소(README · 파일)의 그림을 줄여 public/project-images에 둔 것이고, source가 원본 주소다. 팀이 사이트 게시를 확인하면 teamCleared를 true로 바꾼다. 2026.11.04: 노션 '전 기수 데이터 모음집'(4기 백엔드 팀 정리)을 보고 Eco-Font · RunSketch · 하투-시그널을 더하고, 1기 4팀과 Circulo의 표지를 그 모음집의 소개 이미지 · 발표 자료 첫 장으로 넣었다(source는 노션 줄 주소). Eco-Font · RunSketch는 저장소 이름이 2026-SDGs-Project-*가 아니지만 3기 SDGs 프로젝트(Solution Challenge 2026)다 (4기 Organizer 확인 2026.11.05). 하투-시그널은 노션에 'project'로만 적혀 있어 program을 '팀 프로젝트'로 쓴다. 2026-SDGs-Project-healthgotchi는 빈 저장소라 넣지 않는다.",
+  "updatedAt": "2026-11-04",
   "projects": [
     {
       "id": "homepage-renewal",
@@ -253,6 +253,53 @@
         "source": "https://raw.githubusercontent.com/GDSC-DGU/2026-SDGs-Project-Clarity/main/clarity-web-demo/frontend/public/logo.svg",
         "teamCleared": false
       }
+    },
+    {
+      "id": "ecofont",
+      "name": "Eco-Font",
+      "summary": "올린 폰트를 잉크를 덜 쓰는 에코폰트로 바꿔 주는 웹 플랫폼입니다. 소수민족 언어까지 모든 언어의 글자를 다루는 것을 목표로 합니다.",
+      "program": "Solution Challenge 2026",
+      "year": 2026,
+      "generation": 3,
+      "stack": ["Next.js", "FastAPI", "FontTools", "Cloud Run"],
+      "repo": "https://github.com/GDSC-DGU/ecofont",
+      "status": "done",
+      "source": "https://github.com/GDSC-DGU/ecofont",
+      "contributors": 4,
+      "commits": 79,
+      "firstCommit": "2026-04-28",
+      "lastCommit": "2026-06-25",
+      "languages": [
+        { "name": "TypeScript", "share": 48.5 },
+        { "name": "Python", "share": 28.6 },
+        { "name": "HTML", "share": 16.0 },
+        { "name": "HCL", "share": 6.1 },
+        { "name": "Dockerfile", "share": 0.7 },
+        { "name": "JavaScript", "share": 0.2 }
+      ],
+      "statsAsOf": "2026-11-04"
+    },
+    {
+      "id": "runsketch",
+      "name": "RunSketch",
+      "summary": "'별 모양으로 3km 뛰고 싶어'처럼 말하면 AI가 도형을 그리고 실제 도로에 맞춰 GPS 아트 러닝 코스를 만들어 주는 서비스입니다.",
+      "program": "Solution Challenge 2026",
+      "year": 2026,
+      "generation": 3,
+      "stack": ["Spring Boot", "PostGIS", "Redis", "Gemini"],
+      "repo": "https://github.com/GDSC-DGU/artrun-be",
+      "status": "done",
+      "source": "https://github.com/GDSC-DGU/artrun-be",
+      "contributors": 2,
+      "commits": 49,
+      "firstCommit": "2026-03-28",
+      "lastCommit": "2026-06-26",
+      "languages": [
+        { "name": "Java", "share": 99.0 },
+        { "name": "Shell", "share": 0.7 },
+        { "name": "Dockerfile", "share": 0.3 }
+      ],
+      "statsAsOf": "2026-11-04"
     },
     {
       "id": "gdgoc-dgu-website",
@@ -585,7 +632,17 @@
         { "name": "Java", "share": 26.2 },
         { "name": "Dockerfile", "share": 0.1 }
       ],
-      "statsAsOf": "2026-10-17"
+      "statsAsOf": "2026-10-17",
+      "cover": {
+        "src": "project-images/circulo.webp",
+        "alt": "Circulo 발표 자료 첫 장. 앱 아이콘과 'Pack it back, earn it back' 문구, 지도 · 홈 · 기록 화면 세 장",
+        "caption": "발표 자료 첫 장",
+        "kind": "promo",
+        "width": 960,
+        "height": 540,
+        "source": "https://app.notion.com/p/0c27f34d4a7e82e48b9b01818ccf5b97",
+        "teamCleared": false
+      }
     },
     {
       "id": "gdsc-dgu-website",
@@ -634,7 +691,17 @@
         { "name": "Python", "share": 1.3 },
         { "name": "Kotlin", "share": 1.0 }
       ],
-      "statsAsOf": "2026-10-17"
+      "statsAsOf": "2026-10-17",
+      "cover": {
+        "src": "project-images/earth-and-i.webp",
+        "alt": "E&I 소개 이미지. 앱 화면 두 장과 함께 기후 변화를 알면서도 탄소 배출을 줄이는 행동으로 잇지 못하는 문제를 풀겠다는 문구",
+        "caption": "소개 이미지",
+        "kind": "promo",
+        "width": 960,
+        "height": 540,
+        "source": "https://app.notion.com/p/fd17f34d4a7e836eb627812b6d89acf2",
+        "teamCleared": false
+      }
     },
     {
       "id": "earlips",
@@ -729,7 +796,17 @@
         { "name": "HTML", "share": 2.4 },
         { "name": "C", "share": 1.8 }
       ],
-      "statsAsOf": "2026-10-17"
+      "statsAsOf": "2026-10-17",
+      "cover": {
+        "src": "project-images/harang.webp",
+        "alt": "하랑 소개 이미지. 앱 화면 두 장과 함께 자립준비청년을 돕는 앱이라는 문구",
+        "caption": "소개 이미지",
+        "kind": "promo",
+        "width": 960,
+        "height": 540,
+        "source": "https://app.notion.com/p/67a7f34d4a7e828ab8f801e18d065240",
+        "teamCleared": false
+      }
     },
     {
       "id": "wave",
@@ -787,7 +864,17 @@
         { "name": "Dart", "share": 99.9 },
         { "name": "Kotlin", "share": 0.1 }
       ],
-      "statsAsOf": "2026-10-17"
+      "statsAsOf": "2026-10-17",
+      "cover": {
+        "src": "project-images/smile.webp",
+        "alt": "sMiLe 소개 이미지. 웅크린 사람의 어깨에 손을 얹은 그림과 함께 우울증 치료라는 문구",
+        "caption": "소개 이미지",
+        "kind": "promo",
+        "width": 960,
+        "height": 540,
+        "source": "https://app.notion.com/p/8397f34d4a7e831885b1810113d8024a",
+        "teamCleared": false
+      }
     },
     {
       "id": "smilelens",
@@ -808,7 +895,17 @@
         { "name": "Jupyter Notebook", "share": 99.8 },
         { "name": "Python", "share": 0.2 }
       ],
-      "statsAsOf": "2026-10-17"
+      "statsAsOf": "2026-10-17",
+      "cover": {
+        "src": "project-images/smilelens.webp",
+        "alt": "SmileLens 소개 이미지. 앱 화면 두 장과 함께 저시력 어르신을 위한 문서 변환 서비스라는 문구",
+        "caption": "소개 이미지",
+        "kind": "promo",
+        "width": 960,
+        "height": 556,
+        "source": "https://app.notion.com/p/5587f34d4a7e825187c2817c324ae831",
+        "teamCleared": false
+      }
     },
     {
       "id": "beeye",
@@ -873,6 +970,26 @@
         "source": "https://raw.githubusercontent.com/GDSC-DGU/2024-SolutionChallenge-IFU/dev/IFU-Hybrid/assets/images/splash.png",
         "teamCleared": false
       }
+    },
+    {
+      "id": "heart-signal",
+      "name": "하투-시그널",
+      "program": "팀 프로젝트",
+      "year": 2023,
+      "generation": 1,
+      "stack": ["Spring Boot", "MySQL", "MongoDB", "WebSocket"],
+      "repo": "https://github.com/GDSC-DGU/heart-signal-server",
+      "status": "done",
+      "source": "https://github.com/GDSC-DGU/heart-signal-server",
+      "contributors": 4,
+      "commits": 227,
+      "firstCommit": "2023-10-04",
+      "lastCommit": "2024-01-26",
+      "languages": [
+        { "name": "Java", "share": 99.7 },
+        { "name": "Dockerfile", "share": 0.3 }
+      ],
+      "statsAsOf": "2026-11-04"
     }
   ]
 }

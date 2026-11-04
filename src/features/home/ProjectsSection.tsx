@@ -26,7 +26,7 @@ function Shot({ img, className, float }: { img: ProjectImage; className: string;
 /**
  * 큰 타일: 팀이 만든 실제 그림을 크게 (16:10, radius 20) + 이름표(이름 · 프로그램 · 기수 → 한 줄).
  * 실제 화면이면 같은 화면의 폰 화면을 오른쪽에 겹친다 (기기 틀 없이 1px 선, 위에 놓인 폰에만 그림자).
- * 링크는 이름 하나이고, 그 링크가 타일 전체를 덮는다 (누르면 /projects?p=id 자세히 보기 창). 그림은 링크 밖이라 alt 를 그대로 읽는다.
+ * 링크는 이름 하나이고, 그 링크가 타일 전체를 덮는다 (누르면 /archive?p=id 자세히 보기 창). 그림은 링크 밖이라 alt 를 그대로 읽는다.
  */
 function BigTile({ p }: { p: Project }) {
   const { wide, phone } = tileShots(projectGallery(p))
@@ -39,7 +39,7 @@ function BigTile({ p }: { p: Project }) {
       <div className={s.label}>
         <div className={s.titleRow}>
           <h3 className={s.name}>
-            <Link className={s.open} to={{ pathname: '/projects', search: sheetSearch(p.id) }}>
+            <Link className={s.open} to={{ pathname: '/archive', search: sheetSearch(p.id) }}>
               {p.name}
             </Link>
           </h3>
@@ -130,14 +130,14 @@ export function ProjectsSection() {
         <div className={s.rest}>
           <WorkList className={s.restList} label={PROJECTS_STORY.restLabel}>
             {rest.map((p) => (
-              <ExhibitCard key={p.id} project={p} withProgram level={3} linkTo="/projects" />
+              <ExhibitCard key={p.id} project={p} withProgram level={3} linkTo="/archive" />
             ))}
           </WorkList>
         </div>
       )}
       {/* 다 본 뒤에 전체로: 섹션 맨 아래 가운데 */}
       <div className={s.all}>
-        <Link className="btn-secondary" to="/projects">
+        <Link className="btn-secondary" to="/archive">
           {fill(PROJECTS_STORY.more, { n: done })}
           <span aria-hidden="true">→</span>
         </Link>

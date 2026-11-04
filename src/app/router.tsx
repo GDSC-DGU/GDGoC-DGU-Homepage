@@ -3,14 +3,18 @@ import { PAGE_PLAN_IDS } from '@/config/pages'
 import { HomePage } from '@/features/home/HomePage'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { ErrorPage } from '@/features/pages/ErrorPage'
-import { AdminApp, CampusPreview, CommunityPage, NotFoundPage, NowPreview, PlannedPage, ProjectsPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
+import { AdminApp, ArchivePage, CampusPreview, CommunityPage, MovedTo, NotFoundPage, NowPreview, PlannedPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
 import { enableViewTransitions } from './viewTransitions'
 
 /** 다 만든 페이지. 준비 중 페이지를 실제로 만들면 여기로 옮긴다 */
 const BUILT_ROUTES: RouteObject[] = [
   { index: true, element: <HomePage /> },
-  { path: 'projects', element: <ProjectsPage /> },
-  { path: 'community', element: <CommunityPage /> },
+  // 아카이브: 프로젝트 · 세미나 (메뉴 '프로젝트' 자리, 4기 Organizer 2026-11-04)
+  { path: 'archive', element: <ArchivePage /> },
+  { path: 'projects', element: <MovedTo pathname="/archive" /> },
+  // 소개: 예전 커뮤니티 (메뉴 '커뮤니티' 자리, 4기 Organizer 2026-11-05)
+  { path: 'about', element: <CommunityPage /> },
+  { path: 'community', element: <MovedTo pathname="/about" /> },
   { path: 'recruits', element: <RecruitsPage /> },
   // 팀원 찾기: 백엔드 전에는 예시 게시판 (features/teams/data/teamsRepo.ts 의 TEAMS_SAMPLE)
   { path: 'teams', element: <TeamsPage /> },

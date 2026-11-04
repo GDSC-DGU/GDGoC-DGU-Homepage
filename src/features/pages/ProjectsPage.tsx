@@ -1,14 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useHashScroll } from './community/useHashScroll'
-import { SPRINT } from '@/config/site'
 import { CHAPTER, isPublicProject } from '@/content'
 import { useProjects } from '@/data/queries'
 import type { Project } from '@/domain/types'
-import { scrollToSection } from '@/features/home/scrollTo'
-import { PlaceHero, type DirectoryRow } from '@/features/placehero/PlaceHero'
 import { useToday } from '@/hooks/useToday'
-import { shortDate } from '@/lib/date'
 import { ExternalLink, StateLine } from './PageParts'
 import { OTHER_PROGRAMS } from './projectGroups'
 import { GridCard, ProjectGrid } from './projects/ExhibitCard'
@@ -20,8 +16,6 @@ import { isSheetState, SHEET_PARAM } from './projects/sheetLink'
 import { SprintBand } from './projects/SprintBand'
 import s from './pages.module.css'
 import p from './projects.module.css'
-import { PLACE_BY_ID } from '@/config/places'
-import { usePageTitle } from '@/hooks/usePageTitle'
 
 const EMPTY: Project[] = []
 
@@ -58,27 +52,24 @@ function RoomSection({ room, first }: { room: Room; first: boolean }) {
 }
 
 /**
- * 프로젝트: 머리(제목 · 한 줄 · 안내판 | 건물) → 탭(3기 · 2기 · 1기 · 기타) → 그 탭의 전시실(카드 격자) → 먹색 4기 G-Sprint 띠.
- * 페이지 끝에 지원 안내(JoinStrip)를 붙이지 않는다: 이 페이지는 프로젝트만 (4기 시안 2026-11).
+ * 아카이브 '프로젝트' 보기 (ArchivePage 안): 탭(3기 · 2기 · 1기 · 기타) → 그 탭의 전시실(카드 격자) → 먹색 4기 G-Sprint 띠.
+ * 머리(제목 · 안내판 | 건물)는 ArchivePage 가 그린다 (프로젝트 · 세미나를 아카이브 하나로 합침: 4기 Organizer 2026-11-04).
  * 고른 탭은 주소 ?gen=2 · ?gen=etc (보내면 같은 탭이 열린다). 작품을 누르면 자세히 보기 창(?p=id).
  * 탭: ?gen → 주소 #방 → 열린 창의 작품 → 가장 최근 기수.
  */
-export function ProjectsPage() {
-  usePageTitle(PLACE_BY_ID.projects.label)
+export function ProjectsView() {
   const today = useToday()
   const [params, setParams] = useSearchParams()
   const location = useLocation()
   const navigate = useNavigate()
   const { data, isPending, isError, refetch } = useProjects()
-  // 홈 '어떻게 하나요'의 G-Sprint 줄 · 안내판에서 /projects#now 로 들어오면 그 섹션으로 내려간다
+  // 홈 '어떻게 하나요'의 G-Sprint 줄 · 안내판에서 /archive#now 로 들어오면 그 섹션으로 내려간다
   useHashScroll(!isPending)
   const projects = data ?? EMPTY
   const done = useMemo(() => projects.filter((pr) => pr.status === 'done'), [projects])
   // 숫자는 공개 기준(GitHub GDSC-DGU 조직 저장소)으로 센다. src/content 의 PUBLIC_PROJECTS 와 같은 기준
   const publicCount = done.filter(isPublicProject).length
   const tabs = useMemo(() => generationTabs(done), [done])
-  const sprint = CHAPTER.sprint
-  const sprintRunning = today <= SPRINT.demoDay
 
   /* ── 자세히 보기 창: 주소의 ?p=<id> 가 곧 열린 상태 ── */
   const openId = params.get(SHEET_PARAM)
@@ -101,22 +92,6 @@ export function ProjectsPage() {
       setParams(nextParams, { replace: true, preventScrollReset: true })
     },
     [params, setParams],
-  )
-  // 안내판에서 방을 고르면: 그 방이 지금 탭에 있으면 바로, 다른 기수면 탭을 바꾸고 그 방이 그려진 뒤 내려간다
-  const scrollTarget = useRef<string | null>(null)
-  useEffect(() => {
-    const id = scrollTarget.current
-    if (!id || !document.getElementById(id)) return
-    scrollTarget.current = null
-    scrollToSection(id)
-  }, [activeKey])
-  const goToRoom = useCallback(
-    (key: string, id: string) => {
-      if (document.getElementById(id)) return scrollToSection(id)
-      scrollTarget.current = id
-      setTab(key)
-    },
-    [setTab],
   )
   const live = useRef({ params, state: location.state as unknown })
   const lastOpen = useRef<string | null>(null)
@@ -148,42 +123,6 @@ export function ProjectsPage() {
     })
   }, [navigate, setParams])
 
-  // 건물 안내판: 지금(4기 G-Sprint) 한 줄 + 전시실마다 한 줄
-  const directory: DirectoryRow[] = [
-    {
-      label: 'G-Sprint',
-      value:
-        sprint.verified && sprintRunning ? (
-          <>
-            <span className="num">{sprint.teams}</span>팀 진행 중
-          </>
-        ) : (
-          <>
-            <span className="num">{shortDate(SPRINT.demoDay, today)}</span> 데모데이
-          </>
-        ),
-      href: '#now',
-      current: true,
-    },
-    ...tabs.flatMap((t) =>
-      t.rooms.map((r) => ({
-        label: r.title,
-        value:
-          r.title === OTHER_PROGRAMS ? (
-            <>
-              <span className="num">{r.projects.length}</span>개
-            </>
-          ) : (
-            <>
-              <span className="num">{r.yearLabel}</span> · <span className="num">{r.projects.length}</span>개
-            </>
-          ),
-        href: `#${r.id}`,
-        onSelect: () => goToRoom(t.key, r.id),
-      })),
-    ),
-  ]
-
   const status = isPending ? (
     <StateLine>프로젝트를 불러오는 중입니다.</StateLine>
   ) : isError ? (
@@ -191,9 +130,7 @@ export function ProjectsPage() {
   ) : null
 
   return (
-    <div className={`container ${s.page}`}>
-      <PlaceHero place="projects" title="프로젝트" lead="GDGoC DGU에서 진행된 프로젝트 둘러보기" directory={directory} plateAt="text" />
-
+    <>
       {/* 기수 탭 → 그 기수의 전시실 (제목은 읽기 프로그램용. 보이는 머리는 탭과 방마다의 해 · 프로그램) */}
       <section id="archive" className={`story paper ${p.archive}`} aria-labelledby="archive-title">
         <h2 id="archive-title" className="visually-hidden">
@@ -233,6 +170,6 @@ export function ProjectsPage() {
       </section>
 
       <SprintBand today={today} />
-    </div>
+    </>
   )
 }

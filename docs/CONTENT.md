@@ -16,7 +16,7 @@
 - **조사는 붙여 씁니다**: `G-Sprint는`, `Camping Seminar를`, `TTS로`, `AI가`, `gdsc.dgu@gmail.com이나`, `@gdg.donggukuniv로`.
 - **화면에 보이는 날짜는 점으로** 씁니다: `2026.08.18`, `2026.09.08–09.10`. `2026-08-18` 모양은 `date` · `start` 같은 날짜 필드에만 씁니다.
 - **한 가지를 한 이름으로**: `Google 기술`(구글 X), `코어 멤버`(Core Member X), `Solution Challenge 2024`, `Solution Challenge 2025`, `Solution Challenge 2026`, `동국대 Dev Conference 2025`, 10.13 은 `킥오프`.
-- 기수 연혁의 숫자는 센 만큼만: `Camping Seminar 공개 기록 8건`(events.json 의 그 기수 · 시리즈 줄 수), `Solution Challenge 2026 프로젝트 4개`(projects.json 의 그 기수 · 프로그램 줄 수).
+- 기수 연혁의 숫자는 센 만큼만: `Camping Seminar 공개 기록 8건`(events.json 의 그 기수 · 시리즈 줄 수), `Solution Challenge 2026 프로젝트 6개`(projects.json 의 그 기수 · 프로그램 줄 수).
 
 ## 2. 파일별 안내
 
@@ -24,6 +24,7 @@
 |---|---|---|
 | `events.json` | 지난 행사 + 다가오는 일정 | 행사가 끝났을 때, 새 일정이 정해졌을 때 (`sync-events` 로 자동) |
 | `projects.json` | 프로젝트 목록 | 데모데이 뒤, GitHub 저장소가 생겼을 때 |
+| `seminars.json` | 세미나 발표 목록 (아카이브 '세미나' 보기) | 세미나가 끝났을 때, 백엔드가 발표 자료(PDF)를 올렸을 때 |
 | `generations.json` | 기수 연혁 (1기 ~ 지금) | 기수가 바뀔 때 |
 | `faq.json` | 자주 묻는 질문 | 모집 전 |
 | `recruiting.json` | 다음 모집 날짜 · 지원서 주소 · 지난 모집 기록 | 모집 공지를 올릴 때 (날짜 세 칸) |
@@ -98,8 +99,8 @@ GitHub 숫자와 그림 (모두 선택. 없으면 화면이 알아서 줄입니�
 
 그림 한 장(`cover` · `images` 의 한 줄)은 `{ src, alt, caption?, kind, width, height, source, teamCleared }` 입니다.
 
-- 파일은 **팀 저장소(GDSC-DGU 조직)에 있는 그림만** 줄여서(가로 960px 이하, webp) `public/project-images/` 에 둡니다. `src` 는 앞에 `/` 없이 `project-images/이름.webp`.
-- `source` 는 원본 그림의 GitHub 주소. 바깥 서버(S3, 스토어 등)에 있는 그림, 사람 얼굴 · 이메일이 보이는 그림은 넣지 않습니다.
+- 파일은 **팀 저장소(GDSC-DGU 조직)나 챕터 노션 '전 기수 데이터 모음집'에 있는 그림만** 줄여서(가로 960px 이하, webp) `public/project-images/` 에 둡니다. `src` 는 앞에 `/` 없이 `project-images/이름.webp`.
+- `source` 는 원본 그림의 GitHub 주소, 노션 모음집에서 가져왔으면 그 줄의 노션 주소(`https://app.notion.com/p/...`). 바깥 서버(S3, 스토어 등)에 있는 그림, 사람 얼굴 · 이메일이 보이는 그림은 넣지 않습니다.
 - `kind`: `screen`(화면) · `mobile`(폰 화면) · `promo`(팀 소개 이미지) · `diagram`(구조도 · ERD) · `logo`.
 - `teamCleared`: 팀이 게시를 확인했는지. 지금은 모두 `false` 지만 화면에는 보입니다 (`src/features/pages/projects/exhibit.ts` 의 `SHOW_UNCLEARED_IMAGES = true`). 확인된 그림만 보이게 하려면 이 값을 `false` 로 바꿉니다.
 
@@ -122,7 +123,8 @@ GitHub 숫자와 그림 (모두 선택. 없으면 화면이 알아서 줄입니�
 | GDSC DGU 웹사이트 (`gdsc-dgu`, README 2024.03) | 2024년 3월 | 1기 |
 | Solution Challenge 2025 (`2025-APAC-SolutionChallenge-*`, 화면에는 APAC 를 쓰지 않는다: 4기 Organizer 2026-11) | 2025년 상반기 | 2기 |
 | 2025 동국대 봄 축제 웹사이트 (`DGU-2025-Festival-*`) | 2025년 봄 | 2기 |
-| Solution Challenge 2026 (`2026-SDGs-Project-*`, 저장소 이름은 SDGs Project) | 2026년 상반기 | 3기 |
+| Solution Challenge 2026 (`2026-SDGs-Project-*`, 저장소 이름은 SDGs Project. `ecofont` · `artrun-be` 도 3기 SDGs 프로젝트: 4기 Organizer 확인 2026-11-05) | 2026년 상반기 | 3기 |
+| 하투-시그널 (`heart-signal-server`, 노션 '팀 프로젝트') | 2023.10–2024.01 | 1기 |
 | G-Sprint (홈페이지 리뉴얼) | 2026년 가을 | 4기 |
 
 `GDGoC-DGU-Website` 는 마지막 수정이 2025.09 라는 것만 확인돼서 기수를 비워 두었습니다.
@@ -244,4 +246,6 @@ npx vitest run src/content         # 받은 뒤 꼭 검사
 - 빈 저장소라 뺀 것: `2026-SDGs-Project-healthgotchi` (2026.10.17 확인).
 - 확인하지 못해 뺀 것: 2기 2024-09-26 OT · 2024-11-21 Open Seminar · 2024-11-28 Bonfire, 3기 2025-11-28 Bonfire · 2026-01-29 건국대 · 동국대 · 숙명여대 Inter-Chapter Session · 2026-02-06~07 GDGoC 연합해커톤 ONE WAVE(동국대 참여 여부) · 2026-05-08 한강 피크닉 · 2026-05-29 SDGs 중간발표 · 2026-06-26 3기 데모데이 · 수료식.
   상세 페이지 주소를 찾으면 그 주소를 `url` · `source` 로 적어 더해 주세요.
-- 프로그램을 확인하지 못해 뺀 저장소: `ecofont`, `artrun-be`, `heart-signal`.
+- 2026-11-04: 노션 '전 기수 데이터 모음집'(4기 백엔드 팀 정리)을 보고 `ecofont`, `artrun-be`, `heart-signal-server` 를 더했습니다 (프로젝트 27개). Eco-Font · RunSketch 는 3기 SDGs 프로젝트라 `Solution Challenge 2026`(4기 Organizer 확인 2026-11-05), 하투-시그널은 노션에 'project' 로만 적혀 있어 '팀 프로젝트'. `ecofont` 의 서비스 주소(ecofont.vercel.app)는 2026-11-04 에 404 라 `url` 을 비웠습니다.
+- 2026-11-04: 1기 E&I · 하랑 · sMiLe · SmileLens 의 소개 이미지, Circulo 발표 자료 첫 장을 노션 모음집에서 표지로 넣었습니다.
+- 세미나: 1–3기 104개 (`seminars.json`, 노션 '전 기수 데이터 모음집'). 발표 자료 주소 `fileUrl` 은 백엔드가 R2 에 올리면 채웁니다. 비어 있으면 '자료 보기'를 걸지 않습니다.

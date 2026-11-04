@@ -1,0 +1,322 @@
+/*
+ * 아카이브: 보기 탭(프로젝트 · 세미나) + 세미나 목록.
+ * 보기 탭이 머리 장면 아래 먹선을 맡고, 그 아래 프로젝트 기수 탭 · 세미나 거르기가 이어진다.
+ */
+
+/* ── 보기 탭 ── */
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  padding-top: 24px;
+  border-top: 2px solid var(--ink-900);
+  scroll-margin-top: 88px;
+}
+.view {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 56px;
+  padding: 6px 2px 10px;
+  border: 0;
+  background: none;
+  font: 700 30px/40px var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-500);
+  cursor: pointer;
+  transition: color var(--dur-hover) var(--ease);
+}
+.view::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: transparent;
+}
+.view[aria-selected='true'] {
+  color: var(--ink-900);
+}
+.view[aria-selected='true']::after {
+  background: var(--ink-900);
+}
+.view:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.viewCount {
+  font: 600 20px/1 var(--font-num);
+  color: var(--ink-500);
+}
+@media (hover: hover) {
+  .view:hover {
+    color: var(--ink-900);
+  }
+}
+
+/* ── 세미나 ── */
+.seminars {
+  --story-top: 36px;
+  --story-bottom: 120px;
+}
+.summary {
+  margin-bottom: 24px;
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 40px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--paper);
+  font: var(--t-ui);
+  color: var(--ink-700);
+  cursor: pointer;
+  transition:
+    background var(--dur-hover) var(--ease),
+    color var(--dur-hover) var(--ease);
+}
+.chip[aria-pressed='true'] {
+  border-color: var(--ink-900);
+  background: var(--ink-900);
+  color: #fff;
+}
+.chip:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .chip:hover:not([aria-pressed='true']) {
+    border-color: var(--ink-500);
+    color: var(--ink-900);
+  }
+}
+.search {
+  position: relative;
+  flex: 0 1 320px;
+  min-width: 0;
+}
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: var(--ink-500);
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.searchInput {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px 0 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background: var(--paper);
+  font: 400 15px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+.searchInput::placeholder {
+  color: var(--ink-500);
+}
+.searchInput:focus {
+  border-color: var(--ink-900);
+  outline: none;
+}
+.searchInput:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+.found {
+  margin: -24px 0 24px;
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+
+.groups {
+  display: grid;
+  gap: 72px;
+}
+.groupHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--ink-900);
+}
+.groupTitle {
+  font: var(--t-h2);
+  letter-spacing: -0.015em;
+  color: var(--ink-900);
+}
+.groupMeta {
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+.talks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* 한 줄: 날짜 | 제목 · 발표자 | 자료 */
+.talk {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 24px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.talk:first-child {
+  border-top: 0;
+}
+/* 같은 날 이어지는 발표는 선을 옅게 (한 세션으로 묶여 보이게) */
+.talk:not([data-first]) {
+  border-top-style: dashed;
+}
+.talkDate {
+  font: 600 15px/24px var(--font-num);
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+.talkWeek {
+  font: 500 14px/24px var(--font-kr);
+  color: var(--ink-500);
+}
+.talkMain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+  min-width: 0;
+}
+.talkTitle {
+  font: 600 17px/26px var(--font-kr);
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+.talkSpeaker {
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.talkFile {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--r-tag);
+  background: var(--field);
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-900);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.talkFile:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .talkFile:hover {
+    background: #e6e9ed;
+  }
+}
+.mark {
+  background: none;
+  color: inherit;
+  box-shadow: inset 0 -2px 0 var(--g-yellow);
+}
+.more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background: var(--paper);
+  font: var(--t-ui);
+  color: var(--ink-900);
+  cursor: pointer;
+}
+.more:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .more:hover {
+    background: var(--subtle);
+  }
+}
+.note {
+  margin-top: 40px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+
+@media (max-width: 767px) {
+  .views {
+    gap: 4px 20px;
+    padding-top: 16px;
+  }
+  .view {
+    min-height: 48px;
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .viewCount {
+    font-size: 17px;
+  }
+  .search {
+    flex: 1 1 100%;
+  }
+  .groups {
+    gap: 56px;
+  }
+  .groupTitle {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  /* 폰: 날짜(그날 첫 발표에만) → 제목 · 발표자 → 자료 보기, 한 칸으로 쌓는다 */
+  .talk {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding: 14px 0;
+  }
+  .talk:not([data-first]) .talkDate {
+    display: none;
+  }
+  .talkMain {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .talkFile {
+    justify-self: start;
+    min-height: 32px;
+    margin-top: 6px;
+  }
+}

@@ -124,9 +124,9 @@ export function NowSection({ today: fixedToday }: Props) {
         <div className={s.homeCal}>
           <CalendarToggle events={events} today={today} />
         </div>
-        {/* 폰은 달력 대신 커뮤니티의 전체 일정으로 */}
+        {/* 폰은 달력 대신 소개 페이지의 전체 일정으로 */}
         <p className={s.homeMore}>
-          <Link className="link" to="/community">
+          <Link className="link" to="/about">
             일정 모두 보기
           </Link>
         </p>

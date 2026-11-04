@@ -25,6 +25,8 @@ const NOT_SHOWN = new Set(['id', 'date', 'endDate', 'start', 'end', 'updatedAt',
 /** public/project-images 에 실제로 있는 그림 파일 ('/public/project-images/x.webp') */
 const PUBLIC_IMAGES = new Set(Object.keys(import.meta.glob('/public/project-images/*')))
 const CHAPTER_RAW = ['https://raw.githubusercontent.com/GDSC-DGU/', 'https://github.com/GDSC-DGU/']
+/** 챕터 노션 '전 기수 데이터 모음집'의 줄 (팀 소개 이미지 · 발표 자료 첫 장. 4기 Organizer 결정 2026-11-04) */
+const CHAPTER_NOTION = 'https://app.notion.com/p/'
 
 interface Shown {
   where: string
@@ -161,12 +163,12 @@ describe('projects.json', () => {
     for (const p of PROJECTS) if (p.generation !== undefined) expect(ns.has(p.generation), p.id).toBe(true)
   })
 
-  it('그림 파일이 public/project-images 에 있고, 원본은 챕터 GitHub 조직 저장소다 (바깥 호스팅 그림은 팀 확인 전까지 넣지 않는다)', () => {
+  it('그림 파일이 public/project-images 에 있고, 원본은 챕터 GitHub 조직 저장소나 챕터 노션 모음집이다 (바깥 호스팅 그림은 팀 확인 전까지 넣지 않는다)', () => {
     for (const p of PROJECTS) {
       for (const img of [...(p.cover ? [p.cover] : []), ...(p.images ?? [])]) {
         expect(PUBLIC_IMAGES.has(`/public/${img.src}`), `${p.id}: ${img.src}`).toBe(true)
         expect(img.src.startsWith('project-images/'), `${p.id}: ${img.src}`).toBe(true)
-        expect(CHAPTER_RAW.some((prefix) => img.source.startsWith(prefix)), `${p.id}: ${img.source}`).toBe(true)
+        expect([...CHAPTER_RAW, CHAPTER_NOTION].some((prefix) => img.source.startsWith(prefix)), `${p.id}: ${img.source}`).toBe(true)
         expect(typeof img.teamCleared, `${p.id}: ${img.src}`).toBe('boolean')
       }
     }
@@ -234,7 +236,7 @@ describe('generations.json', () => {
         const rec = h.match(/^(.+) 공개 기록 (\d+)건$/)
         if (rec) expect(EVENTS.filter((e) => e.generation === g.n && e.series === rec[1]).length, where).toBe(Number(rec[2]))
         if (/Camping Seminar/.test(h)) expect(rec, `${where}: 'Camping Seminar 공개 기록 N건' 으로 씁니다`).not.toBeNull()
-        // 'Solution Challenge 2026 프로젝트 4개' · 'Solution Challenge 2024 프로젝트 9개' = projects.json 에서 그 기수 · 그 프로그램 줄 수
+        // 'Solution Challenge 2026 프로젝트 6개' · 'Solution Challenge 2024 프로젝트 9개' = projects.json 에서 그 기수 · 그 프로그램 줄 수
         const proj = h.match(/^(.+?) (?:프로젝트 )?(\d+)개$/)
         if (proj && PROJECTS.some((p) => p.program === proj[1])) {
           expect(PROJECTS.filter((p) => p.generation === g.n && p.program === proj[1]).length, where).toBe(Number(proj[2]))

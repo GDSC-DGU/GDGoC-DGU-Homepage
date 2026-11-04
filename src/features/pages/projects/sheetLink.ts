@@ -1,5 +1,5 @@
 /**
- * 자세히 보기 창 주소: /projects?p=<id>. 주소를 그대로 보내면 같은 창이 열린다.
+ * 자세히 보기 창 주소: /archive?p=<id>. 주소를 그대로 보내면 같은 창이 열린다.
  * 페이지 안에서 연 창은 history 에 한 칸 쌓으므로(state.sheet), 닫을 때 뒤로 가기로 한 칸 돌아간다.
  */
 export const SHEET_PARAM = 'p'

@@ -11,28 +11,33 @@ export const PLACES: readonly Place[] = [
   {
     id: 'about',
     label: 'GDGoC DGU',
-    sub: '소개',
+    sub: '한눈에 보기',
     path: '/',
     color: '#212121',
     description: '동국대학교 학생이 운영하는 Google Developer Groups on Campus 챕터입니다. 4기는 화요일 세션과 팀 프로젝트 G-Sprint로 움직입니다.',
   },
+  /**
+   * 소개 (/about): 예전 '커뮤니티' 자리 (4기 Organizer 결정 2026-11-05: 커뮤니티를 없애고 소개로 넘긴다).
+   * 안쪽 id 는 'community' 그대로 (지도 건물 · 파랑 · 검색 묶음이 이 id 에 묶여 있다). 예전 /community 주소는 router 가 /about 으로 옮긴다.
+   */
   {
     id: 'community',
-    label: '커뮤니티',
-    sub: '공지 · 세션 · 행사',
-    path: '/community',
+    label: '소개',
+    sub: '활동 · 일정 · 기록',
+    path: '/about',
     color: '#4285f4',
-    description: '공지와 세션 자료, 행사 소식을 한곳에 모읍니다.',
+    description: 'GDGoC DGU가 어떤 곳인지, 이번 주 모임과 다가오는 일정, 1기부터의 활동 기록을 모읍니다.',
     footprint: { x: 0.9, y: 0.9, w: 3.4, d: 3.0, h: 1.5, door: 'R', roof: 'screen', pinGap: 0.75 },
   },
   {
+    // 아카이브: 프로젝트와 세미나를 한곳에 (4기 Organizer 2026-11-04). id 는 지도 · 건물 · 색과 이어져 있어 'projects' 그대로
     id: 'projects',
-    label: '프로젝트',
-    sub: '팀 프로젝트 모음',
-    path: '/projects',
+    label: '아카이브',
+    sub: '프로젝트 · 세미나 기록',
+    path: '/archive',
     color: '#ea4335',
     live: true,
-    description: '4기 G-Sprint 팀 프로젝트와 지난 기수 프로젝트를 모읍니다. 4기 결과는 12.29 데모데이에서 공개합니다.',
+    description: '1기부터 지금까지의 팀 프로젝트와 세미나 발표를 모읍니다. 4기 G-Sprint 결과는 12.29 데모데이에서 공개합니다.',
     footprint: { x: 9.7, y: 0.9, w: 3.4, d: 3.2, h: 1.25, door: 'L', roof: 'saw', pinGap: 1.05 },
   },
   {

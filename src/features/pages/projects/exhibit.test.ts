@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PROJECTS } from '@/content'
 import type { Project, ProjectImage } from '@/domain/types'
 import { groupProjects } from '../projectGroups'
-import { OTHER_LANGUAGES, exhibitRank, outLinks, languageSegments, monogram, monthSpan, neighbors, projectCover, projectGallery, repoPath, stageShots, toRooms } from './exhibit'
+import { exhibitRank, isOpenSource, languageSegments, monogram, monthSpan, neighbors, OTHER_LANGUAGES, outLinks, projectCover, projectGallery, repoPath, stageShots, toRooms } from './exhibit'
 
 const img = (src: string, extra: Partial<ProjectImage> = {}): ProjectImage => ({ src, alt: src, kind: 'screen', width: 960, height: 600, source: 'https://raw.githubusercontent.com/GDSC-DGU/x/main/a.png', teamCleared: false, ...extra })
 const pj = (id: string, program: string, year: number, extra: Partial<Project> = {}): Project => ({ id, name: id, program, year, status: 'done', ...extra })
@@ -161,17 +161,23 @@ describe('대표 작품 무대', () => {
     expect(stageShots(gallery)).toEqual({ wide: gallery[0], tall: gallery[2] })
   })
 
+  it('원본 링크는 GitHub 주소만 건다 (노션 모음집은 걸지 않는다)', () => {
+    expect(isOpenSource('https://raw.githubusercontent.com/GDSC-DGU/x/main/a.png')).toBe(true)
+    expect(isOpenSource('https://github.com/GDSC-DGU/x/blob/main/a.png')).toBe(true)
+    expect(isOpenSource('https://app.notion.com/p/fd17f34d4a7e836eb627812b6d89acf2')).toBe(false)
+  })
+
   it('둘 중 하나라도 없으면 겹치지 않는다', () => {
     expect(stageShots([img('promo.webp', { kind: 'promo' }), img('arch.webp', { kind: 'diagram' })])).toBeNull()
     expect(stageShots([img('d1.webp')])).toBeNull()
     expect(stageShots([])).toBeNull()
   })
 
-  it('실제 데이터: 겹쳐 거는 대표 작품은 약조심, Greenap 은 소개 그림 한 장', () => {
+  it('실제 데이터: 겹쳐 거는 대표 작품은 약조심, Greenap 은 소개 그림 한 장 (그림이 더 많아 Circulo 보다 앞), 2024 는 E&I', () => {
     const done = PROJECTS.filter((p) => p.status === 'done')
     const rooms = toRooms(groupProjects(done))
     const featured = rooms.map((r) => r.featured?.id).filter(Boolean)
-    expect(featured).toEqual(['yakjosim', 'greenap'])
+    expect(featured).toEqual(['yakjosim', 'greenap', 'earth-and-i'])
     const yak = done.find((p) => p.id === 'yakjosim')!
     const green = done.find((p) => p.id === 'greenap')!
     expect(stageShots(projectGallery(yak))?.tall.kind).toBe('mobile')

@@ -23,7 +23,8 @@ function pageModule<M>(importer: () => Promise<M>): PageModule<M> {
   }
 }
 
-export const PROJECTS_PAGE = pageModule(() => import('@/features/pages/ProjectsPage'))
+/** 아카이브 (프로젝트 · 세미나). 이름은 예전 그대로 PROJECTS_PAGE (장소 id 가 'projects') */
+export const PROJECTS_PAGE = pageModule(() => import('@/features/pages/ArchivePage'))
 export const COMMUNITY_PAGE = pageModule(() => import('@/features/pages/CommunityPage'))
 export const RECRUITS_PAGE = pageModule(() => import('@/features/pages/RecruitsPage'))
 export const PLANNED_PAGE = pageModule(() => import('@/features/pages/PlannedPage'))

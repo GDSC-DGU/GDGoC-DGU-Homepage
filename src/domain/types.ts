@@ -114,6 +114,24 @@ export interface Project {
 }
 
 /**
+ * 세미나 발표 하나 (아카이브 '세미나'). 출처: 백엔드 팀이 노션에 모은 '전 기수 데이터 모음집' (content/seminars.json).
+ * 발표 자료 파일은 백엔드가 R2 에 올리고 fileUrl 을 채운다. 비어 있으면 화면에서 '자료 보기'를 숨긴다.
+ */
+export interface Seminar {
+  id: string
+  /** 발표한 날 'YYYY-MM-DD' */
+  date: string
+  generation: number
+  title: string
+  /** 발표자 이름 (공개 확인: 4기 Organizer 2026-11-04) */
+  speaker: string
+  /** 남아 있는 발표 자료 형식. 자료가 없거나 확인이 필요하면 null */
+  format: 'pdf' | 'pptx' | null
+  /** 발표 자료 공개 주소 (R2). 올리기 전에는 null */
+  fileUrl: string | null
+}
+
+/**
  * 프로젝트 그림 종류.
  * screen = 화면 캡처, mobile = 폰 화면 캡처, promo = 팀이 만든 소개 이미지, diagram = 구조도 · ERD, logo = 로고 · 아이콘 · 캐릭터
  */

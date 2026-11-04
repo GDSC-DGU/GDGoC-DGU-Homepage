@@ -278,8 +278,8 @@ describe('기수별 기록 (시안 C 홈 기록에서 옮김)', () => {
     expect(highlightMentions(gens).length).toBe(gens.reduce((n, g) => n + g.highlights.length, 0))
   })
 
-  it('실제 콘텐츠: 그룹 멤버 244명 · 지난 행사 45건 · 공개 프로젝트 23개 (2026.10.18 기준)', () => {
+  it('실제 콘텐츠: 그룹 멤버 244명 · 지난 행사 45건 (2026.10.18 기준) · 공개 프로젝트 26개 (2026.11.04 노션 모음집 반영)', () => {
     const past = pastEvents(EVENTS, '2026-10-18')
-    expect(tallies(CHAPTER.members?.value, past.length, PUBLIC_PROJECTS.length).map((t) => t.value)).toEqual([244, 45, 23])
+    expect(tallies(CHAPTER.members?.value, past.length, PUBLIC_PROJECTS.length).map((t) => t.value)).toEqual([244, 45, 26])
   })
 })

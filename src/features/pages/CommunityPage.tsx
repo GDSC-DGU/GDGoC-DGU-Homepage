@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { PLACE_BY_ID, placeColor } from '@/config/places'
-import { SITE } from '@/config/site'
+import { SITE, SPRINT } from '@/config/site'
 import { CHAPTER, CONTENT_UPDATED_AT, FAQS, GENERATIONS, PUBLIC_PROJECTS } from '@/content'
 import { withoutStalePlans } from '@/content/plan'
 import { useSchedule } from '@/data/queries'
@@ -19,9 +19,9 @@ import { explainedTerms, firstMentions, mentionKey } from './community/terms'
 import { REGULAR_SESSION, isPeriod, regularTime, weekState } from './community/thisWeek'
 import { Upcoming } from './community/Upcoming'
 import { useHashScroll } from './community/useHashScroll'
+import { WHO_TERMS, nameChange, whoCards, whoSpan } from './community/who'
 import { WeekBand } from './community/WeekBand'
 import { YearHeatmap } from './community/YearHeatmap'
-import { dotMonth } from './format'
 import { Section, StateLine } from './PageParts'
 import { pastEvents } from './records'
 import s from './pages.module.css'
@@ -37,10 +37,19 @@ const timeOf = (e: ScheduleEvent) => (sessionFaq ? regularTime(e) : null)
 const GENS = sortGenerations(GENERATIONS)
 const COMMUNITY_COLOR = placeColor('community')
 
+/** 맨 위 '우리는' (who.ts): 2023년 1기부터 지금 4기까지 + 활동 세 가지 + 그룹 멤버 수 */
+const SPAN = whoSpan(GENERATIONS)
+const RENAMED = nameChange(GENERATIONS)
+const WHO = whoCards({ members: CHAPTER.members, sprint: CHAPTER.sprint, demoDay: monthDay(SPRINT.demoDay) })
+
+/** '5팀 27명' → 숫자만 숫자 글꼴로 */
+const withNums = (text: string) => text.split(/(\d+(?:\.\d+)*)/).map((part, i) => (i % 2 ? <span key={i} className="num">{part}</span> : part))
+
 /**
- * 커뮤니티 (시안 E): 건물 앞 머리 → 먹색 '이번 주'(다음 모임 큰 표) → 다가오는 일정(참고, 촘촘한 목록)
+ * 소개 (/about, 예전 커뮤니티. 4기 Organizer 결정 2026-11-05): 건물 앞 머리 → 옅은 회색 '우리는'(몇 기째인지 · 활동 · 멤버 수)
+ * → 먹색 '이번 주'(다음 모임 큰 표) → 다가오는 일정(참고, 촘촘한 목록)
  * → 옅은 회색 '세 기수의 1년'(행사 달력, 주장 '세 기수가 연 공개 행사 45번') → 기수별 기록(참고). 페이지 끝 지원 안내(JoinStrip)는 붙이지 않는다 (4기 시안 2026-11).
- * 면: 흰(머리) → 먹색 → 흰 → 옅은 회색 → 흰 → 회색 꼬리말. 큰 숫자 묶음은 두지 않는다 (숫자는 제목 · 글줄 안에).
+ * 면: 흰(머리) → 옅은 회색 → 먹색 → 흰 → 옅은 회색 → 흰 → 회색 꼬리말. 그룹 멤버 수는 '우리는' 에만 (기록 옆 숫자 줄에서는 뺀다).
  * 날짜가 지났는데 계획으로만 남은 일정은 처음부터 뺀다 (content/plan.ts).
  * 우리끼리 말은 화면에 처음 나오는 자리에서 한 번만 풀어 쓴다: 다가오는 일정 → 기수 요약 · 기록 순서.
  */
@@ -57,13 +66,13 @@ export function CommunityPage() {
   )
   const upcomingCount = ahead.filter((e) => e.kind !== 'rest').length
   const week = useMemo(() => weekState(events, today), [events, today])
-  const lineTerms = useMemo(() => firstMentions(ahead.map((e) => ({ key: mentionKey.line(e), text: e.title }))), [ahead])
-  const explainedAbove = useMemo(() => explainedTerms(lineTerms), [lineTerms])
+  // G-Sprint · 동홍동락은 위 '우리는' 에서 풀었으므로 일정 · 기록에서는 다시 풀지 않는다
+  const lineTerms = useMemo(() => firstMentions(ahead.map((e) => ({ key: mentionKey.line(e), text: e.title })), WHO_TERMS), [ahead])
+  const explainedAbove = useMemo(() => explainedTerms(lineTerms, WHO_TERMS), [lineTerms])
   const year = useMemo(() => yearRows(GENS, events, today), [events, today])
   const held = year.reduce((n, r) => n + r.past, 0)
-  // 기록 섹션의 숫자 글줄: 지난 행사 수는 달력 제목이 말하므로 여기서는 멤버 · 프로젝트만
-  const tally = tallies(CHAPTER.members?.value, 0, PUBLIC_PROJECTS.length)
-  const asOf = CHAPTER.members?.asOf ?? CHAPTER.updatedAt
+  // 기록 섹션의 숫자 글줄: 지난 행사 수는 달력 제목이, 멤버 수는 '우리는' 이 말하므로 여기서는 프로젝트만
+  const tally = tallies(undefined, 0, PUBLIC_PROJECTS.length)
   useHashScroll(ready)
 
   const loading = isPending && <StateLine>일정을 불러오는 중입니다.</StateLine>
@@ -81,14 +90,16 @@ export function CommunityPage() {
   const firstGen = GENS[0]
   const lastGen = GENS[GENS.length - 1]
   const genSpan = GENS.length > 1 ? `${firstGen.n}–${lastGen.n}기` : lastGen ? `${lastGen.n}기` : ''
+  const whoRow: DirectoryRow[] = SPAN.current ? [{ label: '우리는', value: <>지금 <span className="num">{SPAN.current}</span>기</>, href: '#who' }] : []
   const directory: DirectoryRow[] = ready
     ? [
+        ...whoRow,
         { label: '이번 주', value: weekValue, href: '#this-week' },
         { label: '다가오는 일정', value: <><span className="num">{upcomingCount}</span>건</>, href: '#upcoming' },
         ...(held > 0 ? [{ label: '지난 행사', value: <><span className="num">{held}</span>건</>, href: '#year' }] : []),
         ...(genSpan ? [{ label: '기수별 기록', value: <span className="num">{genSpan}</span>, href: '#records' }] : []),
       ]
-    : []
+    : whoRow
 
   // 이 페이지가 기대는 출처: 행사 페이지 · 운영 계획 · 4기 지원서(정기 세션 시간) · 챕터 멤버 수 · 기수 연혁 · GitHub
   const sources = useMemo(
@@ -113,11 +124,52 @@ export function CommunityPage() {
       <PlaceHero
         place="community"
         eyebrow={PLACE_BY_ID.community.sub}
-        title="커뮤니티"
-        lead="화요일 정기 세션과 학기마다 여는 행사, 1기부터 지금까지의 기록을 모았습니다."
+        title={PLACE_BY_ID.community.label}
+        lead="GDGoC DGU가 어떤 곳인지, 화요일 정기 세션과 학기마다 여는 행사, 1기부터 지금까지의 기록을 모았습니다."
         directory={directory}
         screen={next ? { date: next.date, title: next.title } : undefined}
       />
+
+      <StorySection
+        id="who"
+        tone="field"
+        eyebrow="우리는"
+        placeColor={COMMUNITY_COLOR}
+        title={
+          SPAN.since ? (
+            <>
+              <span className="num">{SPAN.since}</span>년 1기부터 지금 <span className="num">{SPAN.current}</span>기까지
+            </>
+          ) : (
+            <>
+              지금 <span className="num">{SPAN.current}</span>기
+            </>
+          )
+        }
+        sub={
+          <>
+            <span className={c.subLine}>동국대학교 학생이 운영하는 Google Developer Groups on Campus 챕터입니다.</span>
+            {RENAMED && (
+              <>
+                {' '}
+                <span className={c.subLine}>
+                  <span className="num">{RENAMED.from - 1}</span>기는 {RENAMED.before}, <span className="num">{RENAMED.from}</span>기부터는 {RENAMED.after} 이름으로 활동합니다.
+                </span>
+              </>
+            )}
+          </>
+        }
+      >
+        <dl className={c.who}>
+          {WHO.map((card) => (
+            <div key={card.id} className={c.whoCard}>
+              <dt className={c.whoLabel}>{card.label}</dt>
+              <dd className={c.whoValue}>{withNums(card.value)}</dd>
+              {card.sub && <dd className={c.whoSub}>{withNums(card.sub)}</dd>}
+            </div>
+          ))}
+        </dl>
+      </StorySection>
 
       {loading || failed || <WeekBand week={week} timeOf={timeOf} regular={Boolean(sessionFaq)} />}
 
@@ -181,11 +233,6 @@ export function CommunityPage() {
                   {t.unit}
                 </span>
               ))}
-              {asOf && (
-                <span className={c.tallyBasis}>
-                  <span className="num">{dotMonth(asOf)}</span> 기준
-                </span>
-              )}
             </p>
           )
         }

@@ -4,7 +4,7 @@ import { assetUrl } from '@/features/pages/projects/exhibit'
 import { sheetSearch } from '@/features/pages/projects/sheetLink'
 
 export interface IconTileProps {
-  /** 누르면 갈 곳 (사이트 안). 프로젝트면 { pathname: '/projects', search: '?p=id' } */
+  /** 누르면 갈 곳 (사이트 안). 프로젝트면 { pathname: '/archive', search: '?p=id' } */
   to: To
   /** 실제 로고 · 앱 아이콘 주소 (public 기준, assetUrl 을 거친 값) */
   src: string
@@ -20,7 +20,7 @@ export interface IconTileProps {
 export function projectIcon(p: Pick<Project, 'id' | 'name' | 'cover'>): IconTileProps | null {
   if (!p.cover) return null
   return {
-    to: { pathname: '/projects', search: sheetSearch(p.id) },
+    to: { pathname: '/archive', search: sheetSearch(p.id) },
     src: assetUrl(p.cover.src),
     name: p.name.replace(/\s*\(.*\)$/, ''),
     width: p.cover.width,

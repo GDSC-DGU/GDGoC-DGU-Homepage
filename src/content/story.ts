@@ -3,7 +3,7 @@
  *
  * 홈은 네 덩어리다: 첫 화면(지도) → 프로젝트(팀으로 만들어 공개한 서비스 {n}개) → 어떻게 하나요(먹색 띠 + 다음 모임 표)
  * → (사람: 동의받은 말이 생길 때까지 숨김) → 페이지 끝 '{gen}기에서 만나요'(common/JoinStrip, 아래 CLOSING 을 쓴다).
- * 모집 절차 · 파트 · 자주 묻는 질문의 답 · 기록은 /recruits · /community 가 말한다. 홈은 거기로 보내기만 한다.
+ * 모집 절차 · 파트 · 자주 묻는 질문의 답 · 기록은 /recruits · /about(소개) 이 말한다. 홈은 거기로 보내기만 한다.
  *
  * 규칙
  *  - 한 사실은 홈에서 한 번만 쓴다 ('같은 문제를 각자 풀고' 는 띠 문장 한 곳, '5팀 27명' 은 G-Sprint 칸 큰 숫자 한 곳).
@@ -87,8 +87,8 @@ export const BAND = {
   title: '어떻게 하나요',
   /** 띠의 주장 제목 (홈에서 이 말은 여기 한 번). 넓은 화면에서는 묶음마다 한 줄 */
   lines: ['같은 문제를 각자 풀고,', '서로의 풀이를 봅니다.'],
-  /** 띠 맨 아래 다음 모임 표 (common/Ticket). 일정은 /community 와 같은 것 (homeNextEvent), D-day 는 날짜로 계산 */
-  next: { kicker: '다음 모임', to: '/community#upcoming' },
+  /** 띠 맨 아래 다음 모임 표 (common/Ticket). 일정은 /about 과 같은 것 (homeNextEvent), D-day 는 날짜로 계산 */
+  next: { kicker: '다음 모임', to: '/about#upcoming' },
   source: [SOURCES.partSessions, SOURCES.applicationForm],
 } as const
 
@@ -134,7 +134,7 @@ export const WAYS: readonly Way[] = [
     key: '{day} 데모데이',
     /** 규모를 확인하지 못한 기수에 쓰는 문장 */
     body: '팀마다 한 학기 동안 아이디어부터 배포까지 서비스 하나를 만듭니다.',
-    link: { label: 'G-Sprint 보기', to: '/projects#now' },
+    link: { label: 'G-Sprint 보기', to: '/archive#now' },
     source: SOURCES.sprintKickoff,
   },
   {
@@ -144,7 +144,7 @@ export const WAYS: readonly Way[] = [
     /** 아래 문장에 적은 챕터 수와 같아야 한다 (story.test.ts) */
     key: '4개 챕터',
     body: '홍익대 · 중앙대 · 건국대 · 숙명여대 챕터와 합동 세미나를 열었습니다.',
-    link: { label: '행사 기록 보기', to: '/community#records' },
+    link: { label: '행사 기록 보기', to: '/about#records' },
     source: [SOURCES.jointHongik, SOURCES.jointChungangKonkuk, SOURCES.interChapter],
   },
 ]
@@ -290,7 +290,7 @@ export const VOICES = {
 /* ── 5. 페이지 끝: {gen}기에서 만나요 ── */
 
 /**
- * 페이지 끝 '{gen}기에서 만나요' (common/JoinStrip 이 홈 · /projects · /community 에서 쓴다).
+ * 페이지 끝 '{gen}기에서 만나요' (common/JoinStrip 이 홈 · /archive · /about 에서 쓴다).
  * 이름 · 모양(title · status · faqIds)을 바꾸지 않는다: JoinStrip 이 이 셋과 homeData 의 closingStatusLine · pickFaqs 를 가져다 쓴다.
  */
 export const CLOSING = {
