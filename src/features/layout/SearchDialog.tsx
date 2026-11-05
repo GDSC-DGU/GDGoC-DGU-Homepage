@@ -3,10 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { NAV_ORDER, PLACE_BY_ID, placeColor } from '@/config/places'
 import { useRepositories } from '@/data/useRepositories'
 import type { PlaceId, SearchHit } from '@/domain/types'
+import { kstToday } from '@/lib/date'
 import { useCampusActions } from '@/state/useCampus'
 import { usePlacePreview } from './placePreview'
 import { useModalDialog } from './useModalDialog'
 import { countByPlace, groupHits } from './searchGroups'
+import { targetOf } from './searchTarget'
 import s from './search.module.css'
 
 /** 입력이 멈추고 이만큼 뒤에 찾는다 (글자마다 서버를 부르지 않게) */
@@ -22,19 +24,6 @@ interface Option {
   to?: string
 }
 
-/**
- * 검색 결과 id → 바로 가는 주소: 'project-<id>' → 아카이브 자세히 보기 창,
- * 'seminar-<id>' → 아카이브 세미나의 그 기수 탭에서 그 제목으로 찾기 (기수는 meta '2025.04.03 · 2기 · 발표자' 에서)
- */
-function targetOf(doc: SearchHit['doc']): string | undefined {
-  const archive = PLACE_BY_ID.projects.path
-  if (doc.id.startsWith('project-')) return `${archive}?p=${encodeURIComponent(doc.id.slice('project-'.length))}`
-  if (doc.id.startsWith('seminar-')) {
-    const gen = doc.meta?.match(/(?:^| )(\d+)기(?: |$)/)?.[1]
-    return `${archive}?view=seminars${gen ? `&gen=${gen}` : ''}&q=${encodeURIComponent(doc.title)}`
-  }
-  return undefined
-}
 
 interface Group {
   place: PlaceId
@@ -58,7 +47,7 @@ const toGroups = (hits: readonly SearchHit[]): Group[] =>
     place: g.place,
     label: PLACE_BY_ID[g.place].label,
     more: g.more,
-    options: g.hits.map(({ doc }) => ({ key: doc.id, place: doc.place, title: doc.title, meta: doc.meta, sample: doc.sample, to: targetOf(doc) })),
+    options: g.hits.map(({ doc }) => ({ key: doc.id, place: doc.place, title: doc.title, meta: doc.meta, sample: doc.sample, to: targetOf(doc, kstToday()) })),
   }))
 
 interface Props {
@@ -209,7 +198,7 @@ export function SearchDialog({ open, onClose, returnFallbacks }: Props) {
           type="text"
           role="combobox"
           value={query}
-          placeholder="세션 · 행사 · 프로젝트 이름"
+          placeholder="세션, 행사, 프로젝트 이름으로 검색"
           aria-label="세션 · 행사 · 프로젝트 검색"
           aria-autocomplete="list"
           aria-controls={listId}
@@ -241,7 +230,7 @@ export function SearchDialog({ open, onClose, returnFallbacks }: Props) {
         aria-label={scrollable ? (q ? '검색 결과 목록' : '바로 가기 목록') : undefined}
       >
         {q && failed && <p className={s.note}>지금은 검색을 할 수 없습니다. 잠시 뒤 다시 시도해 주세요.</p>}
-        {q && !failed && hits !== null && total === 0 && <p className={s.note}>‘{q}’에 맞는 기록이 없습니다. 행사 이름이나 기술 이름으로 찾아보세요.</p>}
+        {q && !failed && hits !== null && total === 0 && <p className={s.note}>‘{q}’에 맞는 기록이 없습니다. 행사 이름이나 기술 이름으로 찾을 수 있습니다.</p>}
         <div id={listId} role="listbox" aria-label={q ? '검색 결과' : '바로 가기'} hidden={!expanded}>
           {groups.map((g, gi) => {
             // id 에 공백이 들어가면 aria-labelledby 가 여러 id 로 갈라진다: 순번만 쓴다

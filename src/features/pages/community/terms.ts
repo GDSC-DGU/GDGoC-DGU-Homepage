@@ -53,7 +53,7 @@ export function firstMentions(items: readonly Mention[], seen: ReadonlySet<TermI
 export const explainedTerms = (at: ReadonlyMap<string, readonly TermId[]>, seen: ReadonlySet<TermId> = new Set()): Set<TermId> =>
   new Set([...seen, ...[...at.values()].flat()])
 
-export type TermPart = { text: string } | { id: TermId; text: string; whole: boolean }
+export type TermPart = { text: string } | { id: TermId; text: string; whole: boolean; suffix?: string }
 
 /**
  * 글자를 용어 자리에서 자른다: 'G-Sprint 중간 발표' → [{id:'g-sprint', whole:true}, {text:' 중간 발표'}].
@@ -67,9 +67,12 @@ export function splitTerms(text: string, ids: readonly TermId[]): TermPart[] {
     const at = rest.indexOf(term)
     if (at < 0) continue
     if (at > 0) parts.push({ text: rest.slice(0, at) })
-    const after = rest.slice(at + term.length)
+    let after = rest.slice(at + term.length)
     const whole = !/^[A-Za-z0-9]/.test(after)
-    parts.push({ id, text: term, whole })
+    // 'Solution Challenge 2026' 처럼 이름 뒤에 붙은 해는 이름의 일부: 풀이는 해 뒤에 (이름이 갈라졌다: 문구 검토 2026-11-05)
+    const year = whole ? /^ \d{4}(?!\d)/.exec(after)?.[0] : undefined
+    if (year) after = after.slice(year.length)
+    parts.push({ id, text: term, whole, ...(year ? { suffix: year } : {}) })
     rest = after
   }
   if (rest) parts.push({ text: rest })

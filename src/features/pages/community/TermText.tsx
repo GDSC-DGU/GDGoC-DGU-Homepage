@@ -15,7 +15,7 @@ export function TermText({ text, terms, tail = true }: { text: string; terms?: r
   const parts = splitTerms(text, terms)
   return (
     <>
-      {parts.map((p, i) => ('id' in p && p.whole ? <Term key={i} id={p.id} /> : <Fragment key={i}>{keepHyphenated(p.text)}</Fragment>))}
+      {parts.map((p, i) => ('id' in p && p.whole ? <Term key={i} id={p.id} suffix={p.suffix} /> : <Fragment key={i}>{keepHyphenated(p.text)}</Fragment>))}
       {tail &&
         tailTerms(text, terms).map((id) => (
           <Fragment key={id}>

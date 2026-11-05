@@ -4,6 +4,7 @@
  */
 export { StoryHead, StorySection, type StoryHeadProps, type StorySectionProps, type StoryTone } from './StorySection'
 export { JoinStrip, type JoinStripProps } from './JoinStrip'
+export { PhotoStrip } from './PhotoStrip'
 export { Ticket, type TicketProps } from './Ticket'
 export { IconRow, IconTile } from './IconTile'
 export { projectIcon, type IconTileProps } from './iconTileData'

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FAQS, PROJECTS, PUBLIC_PROJECTS, isPublicProject } from '@/content'
 import { BAND, CLOSING, FEATURED_PROJECTS, HERO, PROJECTS_STORY, SPRINT_LINE, VOICES, voices, WAYS } from '@/content/story'
-import { isShowableVoice, projectCounts, restProjects } from './homeData'
+import { isShowableVoice, projectCounts, restProjects, voicesShown } from './homeData'
 
 /** 화면에 나오는 홈 문장 */
 const shown: { where: string; text: string }[] = [
@@ -113,7 +113,8 @@ describe('홈 문구 (content/story.ts)', () => {
 
   it('프로젝트 숫자는 문구에 적지 않고 데이터에서 센다', () => {
     expect(PROJECTS_STORY.title).toContain('{n}')
-    expect(PROJECTS_STORY.more).toContain('{n}')
+    // 버튼은 숫자 없이 '프로젝트 전체 보기' (같은 숫자를 제목 · 버튼에 두 번 쓰지 않는다: AI 티 점검 2026-11-05)
+    expect(PROJECTS_STORY.more).not.toMatch(/\d/)
     expect(PROJECTS_STORY.sub.join(' ')).toContain('{sc}')
     for (const t of [PROJECTS_STORY.title, ...PROJECTS_STORY.sub, PROJECTS_STORY.more]) expect(t.replace(/\{\w+\}/g, ''), t).not.toMatch(/\d/)
     // 지금 콘텐츠로 센 값: 완성된 공개 프로젝트가 있고, Solution Challenge 수는 그보다 많지 않다. 커밋 수는 쓰지 않는다
@@ -149,5 +150,13 @@ describe('홈 문구 (content/story.ts)', () => {
 
   it('사람: 비어 있거나, 모두 공개 동의 기록이 있다 (지어낸 후기 금지)', () => {
     for (const v of voices) expect(isShowableVoice(v), v.id).toBe(true)
+  })
+
+  it('멤버 회고: 한국어 제목, 끝맺음을 한 말투로 맞추지 않는다 (원문 그대로), 처음엔 세 사람', () => {
+    expect(VOICES.title).toBe('멤버 회고')
+    const endings = new Set(voices.map((v) => (v.quote.trim().endsWith('습니다.') ? '습니다' : 'other')))
+    expect(endings.size).toBe(2)
+    expect(voicesShown(voices, false, 3)).toHaveLength(3)
+    expect(voicesShown(voices, true, 3)).toHaveLength(voices.length)
   })
 })

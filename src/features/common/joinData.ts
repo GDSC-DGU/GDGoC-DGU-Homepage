@@ -39,6 +39,6 @@ export const TEAMS_WILL_HAVE = [
 export const TEAMS_JOIN = {
   title: '팀원 찾기는 준비하고 있습니다',
   /** {handle}: 인스타그램 계정 */
-  sub: '여는 시기는 정해지지 않았습니다. 열리면 인스타그램 {handle}에 가장 먼저 알립니다.',
+  sub: '여는 시기는 정해지지 않았습니다. 열리면 인스타그램 {handle}에 알립니다.',
   asideTitle: '열리면 생길 것',
 } as const

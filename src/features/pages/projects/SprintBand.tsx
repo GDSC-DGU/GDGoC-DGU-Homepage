@@ -17,22 +17,30 @@ export function SprintBand({ today }: { today: string }) {
   const claim = sprintClaim(CHAPTER.sprint, SPRINT.demoDay, today)
   const steps = sprintSteps(SPRINT.steps, today)
   const gen = claim.generation
-  const verb = claim.past ? '데모데이까지 만들었습니다.' : '데모데이를 향해 만들고 있습니다.'
+  const verb = claim.past ? '서비스를 만들었습니다.' : '서비스를 만듭니다.'
+  // '12.29 데모데이까지' 는 한 덩어리 (날짜와 '데모데이' 가 다른 줄로 갈렸다: 화면 검토 2026-11-05)
+  const until = (
+    <span style={{ whiteSpace: 'nowrap' }}>
+      <span className="num">{claim.demo}</span> 데모데이까지
+    </span>
+  )
 
   const title = claim.counted ? (
     <>
-      <span className="num">{claim.teams}</span>팀 <span className="num">{claim.members}</span>명이 <span className="num">{claim.demo}</span> {verb}
+      <span className="num">{claim.teams}</span>팀 <span className="num">{claim.members}</span>명이 {until} {verb}
     </>
   ) : (
     <>
-      <span className="num">{gen}</span>기 G-Sprint 팀이 <span className="num">{claim.demo}</span> {verb}
+      <span className="num">{gen}</span>기 G-Sprint 팀이 {until} {verb}
     </>
   )
-  const sub = (
+  // 제목이 '서비스를 만듭니다' 로 끝나므로 부제는 같은 말을 되풀이하지 않고 무엇인지만 (문구 검토 2026-11-05)
+  const sub = claim.counted ? (
     <>
-      한 학기 동안 팀을 꾸려 기획부터 배포까지 직접 {claim.past ? '만들었습니다' : '만듭니다'}.
-      {!claim.counted && ' 팀과 주제는 데모데이에서 공개합니다.'}
+      <span className="num">{gen}</span>기 G-Sprint, 한 학기 동안 하는 팀 프로젝트입니다.
     </>
+  ) : (
+    '한 학기 동안 하는 팀 프로젝트입니다. 팀과 주제는 데모데이에서 공개합니다.'
   )
 
   return (
@@ -40,14 +48,7 @@ export function SprintBand({ today }: { today: string }) {
       id="now"
       tone="dark"
       className={k.band}
-      placeColor={null}
       titleSize="section"
-      eyebrow={
-        <>
-          <span className="gen-tag">{gen}기</span>
-          G-Sprint
-        </>
-      }
       title={title}
       sub={sub}
     >
@@ -60,7 +61,8 @@ export function SprintBand({ today }: { today: string }) {
               <span className="num">{st.dateTime ? <time dateTime={st.dateTime}>{st.when}</time> : st.when}</span>
               {st.dday && <span className={`${k.dday} num`}>{st.dday}</span>}
             </span>
-            {STATE_TEXT[st.state] && <span className="visually-hidden"> ({STATE_TEXT[st.state]})</span>}
+            {/* 날짜 없이 달로만 적은 단계(개발 · 11월)가 강조되면 그 단계를 하는 중이다: '다음 단계' 가 아니라 '지금' */}
+            {STATE_TEXT[st.state] && <span className="visually-hidden"> ({st.state === 'next' && !st.dateTime ? '지금' : STATE_TEXT[st.state]})</span>}
           </li>
         ))}
       </ol>

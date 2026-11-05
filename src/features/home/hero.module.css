@@ -8,9 +8,9 @@
 }
 
 .top {
-  /* 머리말과 이름 사이 (4기 Organizer 2026-11-05: 128 → 88, 이름이 너무 아래에 있었다) */
-  padding-top: 88px;
-  padding-bottom: 72px;
+  /* 머리말과 이름 사이 (4기 Organizer 2026-11-05: 128 → 88, 이름이 너무 아래에 있었다 → AI 티 점검: 지도가 첫 화면에 더 보이게 64) */
+  padding-top: 64px;
+  padding-bottom: 48px;
   text-align: center;
 }
 .panel {
@@ -31,7 +31,7 @@
   white-space: nowrap;
 }
 .fullName {
-  margin-top: 28px;
+  margin-top: 20px;
   text-wrap: balance;
   font: 700 28px/38px var(--font-kr);
   letter-spacing: -0.01em;
@@ -82,28 +82,28 @@
   background: linear-gradient(rgba(255, 255, 255, 0), var(--paper));
 }
 
-/* 넓은 화면: 위아래 여백이 넉넉한 만큼 이름도 크게 */
+/* 넓은 화면: 이름은 한 단계만 크게 (AI 티 점검 2026-11-05: 128 → 96. 첫 화면의 주인공은 지도) */
 @media (min-width: 1280px) {
   .wordmark {
-    font-size: 128px;
+    font-size: 96px;
   }
 }
 @media (min-width: 1024px) and (max-width: 1279px) {
   .wordmark {
-    font-size: 108px;
+    font-size: 88px;
   }
 }
 
 @media (max-width: 1023px) {
   .top {
-    padding-top: 72px;
-    padding-bottom: 56px;
+    padding-top: 56px;
+    padding-bottom: 40px;
   }
   .wordmark {
-    font-size: 80px;
+    font-size: 64px;
   }
   .fullName {
-    margin-top: 22px;
+    margin-top: 18px;
     font-size: 22px;
     line-height: 32px;
   }
@@ -119,8 +119,8 @@
 /* ── 폰: 위에서 아래로 ── */
 @media (max-width: 767px) {
   .top {
-    padding-top: 48px;
-    padding-bottom: 36px;
+    padding-top: 40px;
+    padding-bottom: 28px;
   }
   .wordmark {
     font-size: 44px;

@@ -1,13 +1,14 @@
 import { adaptList, toScheduleEvent } from '@/data/http/adapters'
-import type { Faq, Generation, Project, ScheduleEvent, Seminar } from '@/domain/types'
+import type { EventPhoto, Faq, Generation, Project, ScheduleEvent, Seminar } from '@/domain/types'
 import chapterJson from './chapter.json'
 import eventsJson from './events.json'
 import faqJson from './faq.json'
 import generationsJson from './generations.json'
+import photosJson from './photos.json'
 import projectsJson from './projects.json'
 import recruitingJson from './recruiting.json'
 import seminarsJson from './seminars.json'
-import { checkEvents, checkFaqs, checkGenerations, checkProjects, checkSeminars, type ContentIssue } from './validate'
+import { checkEvents, checkFaqs, checkGenerations, checkPhotos, checkProjects, checkSeminars, type ContentIssue } from './validate'
 
 /**
  * 사이트 콘텐츠 (JSON 스냅샷).
@@ -20,6 +21,7 @@ const projects = checkProjects(projectsJson.projects)
 const generations = checkGenerations(generationsJson.generations)
 const faqs = checkFaqs(faqJson.faqs)
 const seminars = checkSeminars(seminarsJson.seminars)
+const photos = checkPhotos(photosJson.photos)
 
 export const EVENTS: ScheduleEvent[] = adaptList(eventsJson.events, toScheduleEvent)
 export const PROJECTS: Project[] = projects.items
@@ -29,6 +31,8 @@ export const FAQS: Faq[] = faqs.items
 export const SEMINARS: Seminar[] = seminars.items
 export const SEMINARS_UPDATED_AT = seminarsJson.updatedAt
 export const CHAPTER = chapterJson
+/** 행사 사진 (공개 동의가 기록된 것만, 최근 순). 비어 있으면 사진 칸을 그리지 않는다 */
+export const PHOTOS: EventPhoto[] = [...photos.items].sort((a, b) => b.date.localeCompare(a.date))
 
 /** 공개 프로젝트를 세는 기준 조직 ('https://github.com/GDSC-DGU' → 'GDSC-DGU') */
 const PUBLIC_ORG = chapterJson.github.replace(/\/+$/, '').split('/').pop() ?? 'GDSC-DGU'
@@ -48,7 +52,7 @@ export const projectsBasis = 'GitHub 공개 저장소 기준'
 export const RECRUITING = recruitingJson
 
 /** JSON 에서 틀린 곳. 비어 있어야 정상이다 */
-export const CONTENT_ISSUES: readonly ContentIssue[] = [...checkEvents(eventsJson.events), ...projects.issues, ...generations.issues, ...faqs.issues, ...seminars.issues]
+export const CONTENT_ISSUES: readonly ContentIssue[] = [...checkEvents(eventsJson.events), ...projects.issues, ...generations.issues, ...faqs.issues, ...seminars.issues, ...photos.issues]
 
 if (import.meta.env?.DEV && CONTENT_ISSUES.length > 0) {
   console.warn('[content] JSON 에 틀린 곳이 있습니다. npm test 로 자세히 보세요.', CONTENT_ISSUES)

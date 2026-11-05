@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useToday } from '@/hooks/useToday'
 import { TeamsError, errorText } from './data/repository'
 import { COMMENT_MAX, EMPTY_CRED, FILE_TYPES, authorLabel, contactAction, credReady, dotDate, periodLabel, sizeLabel, timeAgo } from './data/rules'
-import { TEAMS_SAMPLE, heldCredentials, teamsKeys, useAddComment, useAdjacent, useRemovePost, useTeamComments, useTeamPost, useTeamsList, useTeamsRepo } from './data/teamsRepo'
+import { TEAMS_SAMPLE_DATA, heldCredentials, teamsKeys, useAddComment, useAdjacent, useRemovePost, useTeamComments, useTeamPost, useTeamsList, useTeamsRepo } from './data/teamsRepo'
 import type { Credentials, PostBrief, TeamPost } from './data/types'
 import { Avatar, CategoryTag, ConfirmDialog, CredentialFields, DeadlineTag, PartTags, SampleNotice, StatusTag, VerifyDialog } from './parts'
 import type { FromList } from './TeamsListPage'
@@ -43,7 +43,7 @@ export function TeamsPostPage() {
       <nav className={s.crumb} aria-label="위치">
         <Link to={listPath}>팀원 찾기</Link>
       </nav>
-      {TEAMS_SAMPLE && <SampleNotice compact />}
+      {TEAMS_SAMPLE_DATA && <SampleNotice compact />}
       {post.isPending ? (
         <p className={s.state}>글을 불러오는 중입니다.</p>
       ) : deleted ? (
@@ -362,7 +362,7 @@ function Comments({ postId, count, now, closed }: { postId: string; count: numbe
       {comments.isPending ? (
         <p className={s.muted}>댓글을 불러오는 중입니다.</p>
       ) : list.length === 0 ? (
-        <p className={s.muted}>{closed ? '아직 댓글이 없습니다.' : '아직 댓글이 없습니다. 궁금한 점이나 참여하고 싶은 마음을 남겨 보세요.'}</p>
+        <p className={s.muted}>{closed ? '아직 댓글이 없습니다.' : '아직 댓글이 없습니다. 궁금한 점이나 참여 의사를 댓글로 남겨 주세요.'}</p>
       ) : (
         <ol className={s.commentList}>
           {list.map((c) => (
@@ -391,7 +391,7 @@ function Comments({ postId, count, now, closed }: { postId: string; count: numbe
       >
         <div className={s.commentCred}>
           <CredentialFields idPrefix="comment" value={cred} onChange={setCred} invalid={Boolean(error)} />
-          <p className={s.help}>댓글을 등록할 때마다 학번과 PIN을 함께 넣어 주세요. 댓글에는 이름 · 기수로 표시돼요.</p>
+          <p className={s.help}>댓글을 등록할 때마다 학번과 PIN을 함께 넣어 주세요. 댓글에는 이름과 기수가 표시됩니다.</p>
         </div>
         <label htmlFor="comment-text" className="visually-hidden">
           댓글 내용

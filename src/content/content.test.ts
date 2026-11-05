@@ -11,7 +11,7 @@ import faqJson from './faq.json'
 import generationsJson from './generations.json'
 import projectsJson from './projects.json'
 import recruitingJson from './recruiting.json'
-import { checkFaqs, checkGenerations, checkProjects, isHttpsUrl, isValidYm, isValidYmd } from './validate'
+import { checkFaqs, checkGenerations, checkPhotos, checkProjects, isHttpsUrl, isValidYm, isValidYmd } from './validate'
 
 const unique = (ids: string[]) => ids.filter((id, i) => ids.indexOf(id) !== i)
 const isUrlSource = (s: string) => s.startsWith('http')
@@ -77,6 +77,31 @@ describe('콘텐츠 JSON 전체', () => {
 
   it('갱신 날짜가 YYYY-MM-DD 이다', () => {
     expect(isValidYmd(CONTENT_UPDATED_AT)).toBe(true)
+  })
+})
+
+describe('한글 꼴', () => {
+  it('콘텐츠 JSON 글자는 모두 NFC (풀어 쓴 한글은 검색에서 안 맞는다)', async () => {
+    const files = import.meta.glob('./*.json', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
+    const bad = Object.entries(files).filter(([, text]) => text !== text.normalize('NFC')).map(([name]) => name)
+    expect(bad).toEqual([])
+  })
+})
+
+describe('photos.json', () => {
+  const photo = { id: 'ot', src: 'photos/2026-09-ot.webp', alt: '4기 OT에서 자기소개하는 멤버들', width: 1600, height: 1067, date: '2026-09-15', event: '4기 OT', consent: { date: '2026-09-20', by: '4기 Organizer' } }
+  it('공개 동의 기록이 없는 사진은 화면에 나오지 않는다', () => {
+    expect(checkPhotos([photo]).items).toHaveLength(1)
+    const { consent: _drop, ...noConsent } = photo
+    void _drop
+    const r = checkPhotos([noConsent, { ...photo, id: 'b', consent: { date: '', by: '' } }])
+    expect(r.items).toEqual([])
+    expect(r.issues.map((x) => x.problem)).toEqual(['consent(공개 동의: date · by)가 없습니다', 'consent(공개 동의: date · by)가 없습니다'])
+  })
+  it('파일은 public/photos 나 https 주소, 설명(alt)이 있어야 한다', () => {
+    expect(checkPhotos([{ ...photo, src: 'http://x.test/a.jpg' }]).items).toEqual([])
+    expect(checkPhotos([{ ...photo, alt: ' ' }]).items).toEqual([])
+    expect(checkPhotos([{ ...photo, src: 'https://lh3.googleusercontent.com/a.jpg' }]).items).toHaveLength(1)
   })
 })
 

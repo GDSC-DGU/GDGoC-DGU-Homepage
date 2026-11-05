@@ -33,6 +33,8 @@ describe('용어 찾기', () => {
   it('낱말 중간에 걸린 용어는 자르지 않고 따로 푼다', () => {
     expect(splitTerms('G-Sprint 중간 발표', ['g-sprint'])).toEqual([{ id: 'g-sprint', text: 'G-Sprint', whole: true }, { text: ' 중간 발표' }])
     expect(splitTerms('Winter Gemini Study Jams', ['study-jam'])).toEqual([{ text: 'Winter Gemini ' }, { id: 'study-jam', text: 'Study Jam', whole: false }, { text: 's' }])
+    // 이름 뒤 해는 이름과 한 덩어리: 'Solution Challenge 2026(풀이)'
+    expect(splitTerms('Solution Challenge 2026 프로젝트 6개', ['solution-challenge'])).toEqual([{ id: 'solution-challenge', text: 'Solution Challenge', whole: true, suffix: ' 2026' }, { text: ' 프로젝트 6개' }])
     expect(tailTerms('Winter Gemini Study Jams', ['study-jam'])).toEqual(['study-jam'])
     expect(tailTerms('Camping Seminar', ['camping-seminar'])).toEqual([])
   })

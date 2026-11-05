@@ -26,7 +26,7 @@ export const GLOSSARY: Record<TermId, TermDef> = {
   'g-sprint': {
     term: 'G-Sprint',
     short: '한 학기 팀 프로젝트',
-    long: '4기의 대표 팀 프로젝트입니다. 팀마다 가을 학기 동안 아이디어부터 배포까지 실제 서비스를 만들고 Google 기술을 하나 이상 씁니다.',
+    long: '4기 팀 프로젝트입니다. 팀마다 가을 학기 동안 아이디어부터 배포까지 서비스 하나를 만들고 Google 기술을 하나 이상 씁니다.',
     source: `${EVENT}gdgoc-dgu-g-sprint-kickoff-team-meetings/`,
   },
   'camping-seminar': {
@@ -49,7 +49,7 @@ export const GLOSSARY: Record<TermId, TermDef> = {
   },
   'study-jam': {
     term: 'Study Jam',
-    short: '몇 주짜리 함께 실습',
+    short: '몇 주 동안 하는 실습 스터디',
     long: '한 가지 주제를 몇 주 동안 함께 실습하는 스터디입니다. 3기는 2026년 1월에 Gemini API · Google AI Studio로 3주 동안 열었습니다.',
     source: `${EVENT}gdgoc-dgu-winter-gemini-study-jams-2026-01-16/`,
   },

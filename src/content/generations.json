@@ -29,7 +29,7 @@
       "name": "GDGoC DGU",
       "start": "2025-09",
       "end": "2026-07",
-      "summary": "금요일에 Camping Seminar를 열고, 동국대 동아리 8곳이 함께 연 동국대 Dev Conference 2025를 공동 주최했습니다. 2026년 초에는 Solution Challenge 2026 프로젝트 6개를 만들었습니다.",
+      "summary": "금요일에 Camping Seminar를 열고, 동국대 동아리 8곳과 동국대 Dev Conference 2025를 공동 주최했습니다. 2026년 초에는 Solution Challenge 2026 프로젝트 6개를 만들었습니다.",
       "highlights": ["Camping Seminar 공개 기록 14건", "동국대 Dev Conference 2025 공동 주최", "Solution Challenge 2026 프로젝트 6개", "Winter Gemini Study Jams 3주"],
       "source": [
         "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdgoc-dgu-3rd-ot/",
@@ -43,7 +43,7 @@
       "n": 4,
       "name": "GDGoC DGU",
       "start": "2026-09",
-      "summary": "화요일 정기 세션과 팀 프로젝트 G-Sprint로 활동합니다. G-Sprint에는 5팀 27명이 참여합니다.",
+      "summary": "화요일 정기 세션과 팀 프로젝트 G-Sprint로 활동합니다.",
       "highlights": ["G-Sprint 5팀 27명", "Frontend · Backend · AI/ML · Product Design 파트", "G-Sprint 데모데이 2026.12.29"],
       "current": true,
       "source": [

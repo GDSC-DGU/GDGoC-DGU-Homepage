@@ -351,6 +351,11 @@
 
 /* 폰: 아래에서 올라오는 시트 */
 @media (max-width: 767px) {
+  /* 두 칸 그림의 캡션: '원본 보기 ↗' 가 한쪽만 줄을 넘기면 다음 줄 그림이 어긋난다 → 늘 캡션 아래 줄에 (화면 검토 2026-11-05) */
+  .shotCaption {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .sheet,
   .sheet:has(.bodyBare) {
     width: 100%;

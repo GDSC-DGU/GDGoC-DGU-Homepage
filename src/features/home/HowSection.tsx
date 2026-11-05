@@ -69,7 +69,6 @@ export function HowSection() {
       id="about"
       tone="dark"
       className={s.band}
-      eyebrow={BAND.title}
       title={BAND.lines.map((line, i) => (
         <span key={line} className={s.line}>
           {i > 0 && ' '}

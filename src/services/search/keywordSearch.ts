@@ -6,6 +6,7 @@ const STOP_WORDS = new Set(['작년', '관련', '좀', '거', '것', '보여줘'
 
 export function tokenize(query: string): string[] {
   return query
+    .normalize('NFC')
     .toLowerCase()
     .split(/\s+/)
     .filter((t) => t.length > 0 && !STOP_WORDS.has(t))
@@ -13,8 +14,9 @@ export function tokenize(query: string): string[] {
 
 /** 제목에 들어 있으면 2점, 보조 정보·키워드에만 있으면 1점 */
 export function scoreDoc(doc: ArchiveDoc, tokens: string[]): number {
-  const title = doc.title.toLowerCase()
-  const rest = `${doc.meta} ${doc.keywords}`.toLowerCase()
+  // 한글이 풀어 쓴 꼴(NFD)로 들어와도 맞게 (맥에서 복사한 제목 등: QA 2026-11-05)
+  const title = doc.title.normalize('NFC').toLowerCase()
+  const rest = `${doc.meta} ${doc.keywords}`.normalize('NFC').toLowerCase()
   return tokens.reduce((sum, t) => sum + (title.includes(t) ? 2 : rest.includes(t) ? 1 : 0), 0)
 }
 

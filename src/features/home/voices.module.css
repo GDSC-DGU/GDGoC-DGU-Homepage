@@ -1,315 +1,102 @@
 /*
- * 홈 Interview (4기 피드백 2026-11): 옅은 회색 면.
- * 넓은 화면: 왼쪽 4칸 = 제목 · 큰 번호(01 / 10) · 남은 시간 줄 · 멈춤 · 이전 · 다음 | 오른쪽 7칸 = 한 사람 카드.
- * 좁은 화면: 제목 → 카드 → 번호 · 버튼. 카드는 한 칸에 겹쳐 놓고 지금 사람만 보인다 (옆에서 살짝 밀려 들어온다).
+ * 홈 멤버 회고 (AI 티 점검 2026-11-05): 옅은 회색 면에 글만.
+ * 넓은 화면 세 칸 · 그보다 좁으면 한 칸 (세 사람이 2 + 1 로 갈리지 않게). 한 사람마다 위 괘선 한 줄 → 굵은 한 문장 → 회고 → 이름 · 파트.
+ * 상자 · 그림자 · 색 따옴표 · 이름 동그라미를 두지 않는다 (참고: 국내 IT 회사 채용 페이지의 구성원 이야기).
  */
-.section {
-  --story-top: 112px;
-  --story-bottom: 112px;
-  overflow: hidden;
-  overflow: clip;
-}
-.head {
-  text-align: left;
-}
-.title {
-  font: 700 40px/48px var(--font-num);
-  letter-spacing: -0.02em;
-  color: var(--ink-900);
-}
-.sub {
-  margin-top: 10px;
-  font: 400 17px/27px var(--font-kr);
-  color: var(--ink-700);
-}
-
-.carousel {
+.list {
   display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-  grid-template-areas:
-    'head stage'
-    'meta stage';
-  grid-template-rows: auto 1fr;
-  column-gap: 80px;
-}
-.headArea {
-  grid-area: head;
-  align-self: end;
-}
-.metaArea {
-  grid-area: meta;
-  align-self: start;
-  margin-top: 48px;
-}
-.stage {
-  grid-area: stage;
-  position: relative;
-  display: grid;
-  touch-action: pan-y;
-  user-select: none;
-}
-.card {
-  grid-area: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 360px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 56px 48px;
   margin: 0;
-  padding: 48px 56px 40px;
-  border-radius: var(--r-media);
-  background: var(--paper);
-  box-shadow: 0 1px 2px rgba(25, 27, 31, 0.04), 0 12px 32px rgba(25, 27, 31, 0.07);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity 520ms var(--ease),
-    transform 620ms cubic-bezier(0.2, 0.7, 0, 1),
-    visibility 0s linear 620ms;
+  padding: 0;
+  list-style: none;
 }
-.card[data-side='before'] {
-  transform: translateX(-40px);
-}
-.card[data-side='after'] {
-  transform: translateX(40px);
-}
-.card[data-side='current'] {
-  z-index: 1;
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  transition:
-    opacity 520ms var(--ease) 80ms,
-    transform 620ms cubic-bezier(0.2, 0.7, 0, 1) 80ms,
-    visibility 0s;
+.item {
+  min-width: 0;
+  padding-top: 24px;
+  border-top: 2px solid var(--ink-900);
 }
 .figure {
+  position: relative;
   display: flex;
-  flex: 1;
   flex-direction: column;
+  gap: 24px;
+  height: 100%;
   margin: 0;
 }
 .sampleTag {
   align-self: flex-start;
-  margin-bottom: 12px;
   padding: 2px 8px;
-  border-radius: var(--r-tag);
-  background: var(--field);
-  font: 600 13px/20px var(--font-kr);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  font: var(--t-meta);
   color: var(--ink-700);
-}
-/* 큰 따옴표: 파트 색 */
-.qmark {
-  display: block;
-  height: 40px;
-  font: 700 80px/1 var(--font-num);
-  color: var(--pc);
 }
 .quote {
-  flex: 1;
-  margin: 14px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
 }
-/* 핵심 한 줄: 인터뷰 제목처럼 */
 .headline {
-  font: 700 28px/40px var(--font-kr);
-  letter-spacing: -0.02em;
+  font: var(--t-h3);
+  letter-spacing: -0.015em;
   color: var(--ink-900);
-  text-wrap: balance;
+  text-wrap: pretty;
+  word-break: keep-all;
 }
 .body {
-  margin-top: 16px;
-  font: 400 18px/31px var(--font-kr);
-  letter-spacing: -0.01em;
+  font: 400 16px/27px var(--font-kr);
   color: var(--ink-700);
   text-wrap: pretty;
+  word-break: keep-all;
 }
 .who {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
-}
-/* 이름 동그라미: 파트 색 옅은 판 + 먹색 글자 */
-.avatar {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--pc) 18%, var(--paper));
-  font: 700 15px/1 var(--font-kr);
-  color: var(--ink-900);
-}
-.whoText {
-  display: grid;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-top: auto;
 }
 .name {
-  font: 700 17px/25px var(--font-kr);
+  font: 600 15px/22px var(--font-kr);
   color: var(--ink-900);
 }
 .meta {
-  font: 500 14px/20px var(--font-kr);
-  color: var(--ink-500);
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.more {
+  display: flex;
+  justify-content: center;
+  margin-top: 56px;
 }
 
-/* 큰 번호: 01 / 10 */
-.counter {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-.now {
-  font: 700 64px/1 var(--font-num);
-  letter-spacing: -0.03em;
-  color: var(--ink-900);
-}
-.total {
-  font: 600 20px/1 var(--font-num);
-  color: var(--ink-500);
-}
-/* 다음 사람까지 남은 시간: 번호 아래 2px 줄이 왼쪽에서 차오른다 (저절로 넘어가는 동안만) */
-.progress {
-  position: relative;
-  display: block;
-  width: min(100%, 280px);
-  height: 2px;
-  margin-top: 20px;
-  border-radius: 1px;
-  background: var(--line);
-  overflow: hidden;
-}
-.progress > span {
-  position: absolute;
-  inset: 0;
-  background: var(--ink-900);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-.progress > span[data-running] {
-  animation: fill var(--t) linear both;
-}
-@keyframes fill {
-  to {
-    transform: scaleX(1);
-  }
-}
-
-/* 멈춤 · 이전 · 다음 */
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 24px;
-}
-.ctrl {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-  background: var(--paper);
-  color: var(--ink-900);
-  cursor: pointer;
-  transition: border-color var(--dur-hover) var(--ease);
-}
-.ctrl svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.ctrl:disabled {
-  cursor: default;
-  opacity: 0.4;
-}
-.ctrl:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-@media (hover: hover) {
-  .ctrl:not(:disabled):hover {
-    border-color: var(--ink-500);
-  }
-}
-/* 태블릿 · 폰: 제목 → 카드 → 번호 · 버튼 (가운데) */
 @media (max-width: 1023px) {
-  .carousel {
+  .list {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'head'
-      'stage'
-      'meta';
-    grid-template-rows: auto;
-    row-gap: 32px;
+    gap: 48px;
   }
-  .head {
-    text-align: center;
-  }
-  .metaArea {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 12px 20px;
-    margin-top: 0;
-  }
-  .now {
-    font-size: 40px;
-  }
-  .total {
-    font-size: 16px;
-  }
-  .progress {
-    order: 3;
-    width: 100%;
-    margin-top: 0;
-  }
-  .controls {
-    margin-top: 0;
+  .quote {
+    max-width: 40em;
   }
 }
-
 @media (max-width: 767px) {
-  .section {
-    --story-top: 72px;
-    --story-bottom: 72px;
+  .list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
   }
-  .title {
-    font-size: 30px;
-    line-height: 38px;
+  .item {
+    padding-top: 20px;
   }
-  .card {
-    min-height: 380px;
-    padding: 32px 24px 28px;
-  }
-  .qmark {
-    height: 30px;
-    font-size: 60px;
-  }
-  .headline {
-    font-size: 21px;
-    line-height: 31px;
+  .figure {
+    gap: 20px;
   }
   .body {
-    font-size: 16px;
-    line-height: 27px;
+    font-size: 15px;
+    line-height: 25px;
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .card,
-  .card[data-side='current'] {
-    transition: none;
-  }
-  .progress {
-    display: none;
+  .more {
+    margin-top: 40px;
   }
 }

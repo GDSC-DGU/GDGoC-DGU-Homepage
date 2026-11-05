@@ -18,7 +18,7 @@ import {
   validatePost,
   type FieldErrors,
 } from './data/rules'
-import { TEAMS_SAMPLE, heldCredentials, useCreatePost, useTeamPost, useTeamsRepo, useUpdatePost } from './data/teamsRepo'
+import { TEAMS_SAMPLE_DATA, heldCredentials, useCreatePost, useTeamPost, useTeamsRepo, useUpdatePost } from './data/teamsRepo'
 import { RECRUIT_STATUSES, TEAMS_CATEGORIES, TEAM_PARTS, type Attachment, type Credentials, type PostInput, type RecruitStatus, type TeamPartId, type TeamPost, type TeamsCategory } from './data/types'
 import { ConfirmDialog, CredentialFields, SampleNotice, VerifyDialog } from './parts'
 import type { FromList } from './TeamsListPage'
@@ -43,9 +43,8 @@ export function TeamsWritePage({ mode }: { mode: 'create' | 'edit' }) {
           <span className={s.writeMark} aria-hidden="true" />
           {mode === 'create' ? '게시글 작성' : '게시글 수정'}
         </h1>
-        <p className={s.writeLead}>스터디 · 프로젝트 · 공모전 등 함께할 팀원을 모집하는 글을 작성합니다.</p>
       </header>
-      {TEAMS_SAMPLE && <SampleNotice compact />}
+      {TEAMS_SAMPLE_DATA && <SampleNotice compact />}
       {mode === 'create' ? <PostForm initial={EMPTY_FORM} /> : <EditGate />}
     </div>
   )
@@ -229,7 +228,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
             작성자 확인 <span className={s.required}>필수</span>
           </legend>
           <CredentialFields idPrefix="write" value={cred} onChange={setCred} invalid={Boolean(authError)} />
-          <p className={s.help}>[등록]을 누를 때 학번과 PIN을 함께 확인해요. 인증 상태는 저장되지 않아 글을 쓸 때마다 입력해요. 5번 틀리면 15분 동안 입력할 수 없고, 다시 5번 틀리면 계정이 잠겨 운영진이 풀어 줘야 해요.</p>
+          <p className={s.help}>[등록]을 누를 때 학번과 PIN을 함께 확인합니다. 인증 상태는 저장되지 않아 글을 쓸 때마다 입력합니다. 5번 틀리면 15분 동안 입력할 수 없고, 다시 5번 틀리면 계정이 잠겨 운영진이 풀어야 합니다.</p>
           {authError && (
             <p className={s.error} role="alert">
               {authError}
@@ -267,7 +266,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
             <input type="date" className={s.input} value={form.endDate} min={edit ? form.startDate || undefined : [form.startDate, today].filter(Boolean).sort().at(-1)} aria-invalid={errors.startDate ? true : undefined} onChange={(e) => set('endDate', e.target.value)} />
           </label>
         </div>
-        <p className={s.help}>종료일 다음 날 0시에 자동으로 마감돼요.</p>
+        <p className={s.help}>종료일 다음 날 0시에 자동으로 마감됩니다.</p>
       </Field>
 
       <div className={s.twoCol}>
@@ -303,7 +302,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
 
       <Field label="내용" error={errors.content} counter={`${form.content.length.toLocaleString()} / ${CONTENT_MAX.toLocaleString()}`}>
         {(id, describedBy) => (
-          <textarea id={id} className={`${s.input} ${s.textarea}`} value={form.content} maxLength={CONTENT_MAX} placeholder="어떤 팀원을 찾는지, 언제 · 어떻게 진행하는지 적어 주세요" aria-invalid={errors.content ? true : undefined} aria-describedby={describedBy} onChange={(e) => set('content', e.target.value)} />
+          <textarea id={id} className={`${s.input} ${s.textarea}`} value={form.content} maxLength={CONTENT_MAX} placeholder="어떤 팀원을 찾는지, 언제 어떻게 진행하는지 적어 주세요" aria-invalid={errors.content ? true : undefined} aria-describedby={describedBy} onChange={(e) => set('content', e.target.value)} />
         )}
       </Field>
 
@@ -340,7 +339,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
               </label>
             ))}
           </div>
-          <p className={s.help}>'마감'으로 바꾸면 종료일 전이라도 바로 마감돼요.</p>
+          <p className={s.help}>'마감'으로 바꾸면 종료일 전이라도 바로 마감됩니다.</p>
         </Field>
       )}
 
@@ -355,7 +354,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
           {busy ? '저장하는 중' : edit ? '저장' : '등록'}
         </button>
       </div>
-      {!credReady(cred) && !edit && <p className={`${s.help} ${s.footHelp}`}>학번과 PIN을 모두 넣으면 [등록]이 켜져요.</p>}
+      {!credReady(cred) && !edit && <p className={`${s.help} ${s.footHelp}`}>학번과 PIN을 모두 넣으면 [등록]을 누를 수 있습니다.</p>}
     </form>
     {/* 팝업은 글쓰기 <form> 밖에 둔다 (폼 안의 폼이면 팝업 제출이 글쓰기 폼까지 올라간다) */}
     <ConfirmDialog open={leave.asking} title="작성 중인 내용이 사라집니다." description="지금 나가면 쓴 내용은 저장되지 않습니다." cancelLabel="계속 쓰기" confirmLabel="나가기" onClose={leave.stay} onConfirm={leave.go} />
@@ -439,7 +438,7 @@ function FileDrop({ disabled, busy, full, onFiles }: { disabled: boolean; busy: 
           </>
         )}
       </p>
-      <p className={s.dropSub}>{full ? `첨부파일은 ${FILE_MAX}개까지예요.` : disabled ? '학번과 PIN을 먼저 넣어야 파일을 고를 수 있어요.' : `PDF · JPG · PNG, 파일당 10MB 이하, 최대 ${FILE_MAX}개`}</p>
+      <p className={s.dropSub}>{full ? `첨부파일은 ${FILE_MAX}개까지입니다.` : disabled ? '학번과 PIN을 먼저 넣어야 파일을 고를 수 있습니다.' : `PDF · JPG · PNG, 파일당 10MB 이하, 최대 ${FILE_MAX}개`}</p>
       <input
         ref={inputRef}
         type="file"

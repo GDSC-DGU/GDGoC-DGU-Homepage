@@ -117,6 +117,24 @@ export interface Project {
  * 세미나 발표 하나 (아카이브 '세미나'). 출처: 백엔드 팀이 노션에 모은 '전 기수 데이터 모음집' (content/seminars.json).
  * 발표 자료 파일은 백엔드가 R2 에 올리고 fileUrl 을 채운다. 비어 있으면 화면에서 '자료 보기'를 숨긴다.
  */
+/** 행사 사진 (content/photos.json). 얼굴이 보이는 사람 모두의 웹 공개 동의가 기록된 사진만 */
+export interface EventPhoto {
+  id: string
+  /** 'photos/2026-09-ot.webp' (public/ 기준) 또는 https 주소 */
+  src: string
+  /** 사진에 무엇이 있는지 (읽기 프로그램용, 예: '4기 OT에서 조별로 자기소개하는 멤버들') */
+  alt: string
+  width: number
+  height: number
+  /** 찍은 날 'YYYY-MM-DD' */
+  date: string
+  /** 행사 이름 (사진 아래 한 줄) */
+  event: string
+  generation?: number
+  /** 웹 공개 동의를 받은 날 · 받은 사람 */
+  consent: { date: string; by: string }
+}
+
 export interface Seminar {
   id: string
   /** 발표한 날 'YYYY-MM-DD' */

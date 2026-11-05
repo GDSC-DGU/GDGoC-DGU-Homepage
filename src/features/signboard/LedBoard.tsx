@@ -36,8 +36,9 @@ const LAYOUT: Record<'default' | 'large', LedLayout> = {
   default: { pitch: 4, lineGap: 3, padX: 1, padY: 0, speed: 26, hold: 1400 },
   large: { pitch: 5, lineGap: 4, padX: 1, padY: 0, speed: 24, hold: 1600 },
 }
-/** 점 간격 후보 (CSS px). 큰 점부터 해 보고, 흐르지 않고 다 들어가는 첫 간격을 쓴다. 폰은 3 하나 (넘치면 흐름) */
-const PITCHES = { default: [4, 3], large: [5, 4] } as const
+/** 점 간격 후보 (CSS px). 큰 점부터 해 보고, 흐르지 않고 다 들어가는 첫 간격을 쓴다. 폰은 3 하나 (넘치면 흐름).
+ * 넓은 화면은 가장 작은 간격으로도 넘치면 흐르지 않고 줄을 바꾼다 (DESIGN 6장: 흐르는 건 폰만. 화면 검토 2026-11-05) */
+const PITCHES = { default: [4, 3], large: [5, 4, 3] } as const
 const PHONE_PITCH = 3
 
 /**
@@ -108,8 +109,8 @@ function LedCanvas({ lines, size, mark }: { lines: (narrow: boolean) => LedLine[
         renderer.setScene(lines(narrow), width, true)
         if (!renderer.moving) break
       }
-      // 움직임 줄이기: 흐르는 대신 줄을 바꿔 다 보인다
-      if (reduced && renderer?.moving) renderer.setScene(lines(narrow), width, false)
+      // 움직임 줄이기 · 넓은 화면: 흐르는 대신 줄을 바꿔 다 보인다
+      if ((reduced || width >= 420) && renderer?.moving) renderer.setScene(lines(narrow), width, false)
       sync()
     }
     build()
@@ -163,7 +164,12 @@ export interface LedTicketProps {
 export function LedTicket({ date, endDate, title, kicker, meta, place, to, href, size = 'default', today: todayProp, className = '' }: LedTicketProps) {
   const now = useToday()
   const today = todayProp ?? now
-  const { day, week } = ticketDate(date, today)
+  const start = ticketDate(date, today)
+  // 여러 날 일정은 기간으로 ('11.03–30'). 시작일 하나만 보이면 그날 하루 일정처럼 읽힌다 (화면 검토 2026-11-05)
+  const range = Boolean(endDate && endDate !== date)
+  const endLabel = endDate ? (endDate.slice(0, 7) === date.slice(0, 7) ? String(Number(endDate.slice(8))) : ticketDate(endDate, today).day) : ''
+  const day = range ? `${start.day}–${endLabel}` : start.day
+  const week = range ? '' : start.week
   const dday = ticketDday(date, endDate, today)
   const mark = place ? resolveColor(placeColor(place)) : PALETTE.lit
   const out = Boolean(href)
@@ -173,7 +179,7 @@ export function LedTicket({ date, endDate, title, kicker, meta, place, to, href,
   const lines = useMemo(
     () => (narrow: boolean): LedLine[] => {
       const head = [{ tone: 'mark' as const, size: 8, after: 6 }, { text: kicker, tone: 'soft' as const }]
-      const when = [{ text: day, after: 4 }, { text: week, tone: 'soft' as const }]
+      const when = week ? [{ text: day, after: 4 }, { text: week, tone: 'soft' as const }] : [{ text: day }]
       // 화살표는 넓은 판에서만 (폰은 판 전체가 링크라 자리를 아낀다)
       const arrow = hasLink && !narrow
       const tail = [{ text: dday, tone: 'invert' as const, after: arrow ? 8 : 0 }, ...(arrow ? [{ text: out ? '↗' : '→' }] : [])]

@@ -20,19 +20,18 @@ export interface JoinStripProps {
   /** 섹션 id (기본 'join'). 제목 id 는 `${id}-title` */
   id?: string
   /** 머리 문구를 바꿀 때만. 비우면 변형마다 정해진 문구 */
-  eyebrow?: ReactNode
   title?: ReactNode
   sub?: ReactNode
 }
 
 /**
  * 페이지 끝 '{gen}기에서 만나요' (아트 디렉션 4-7): 옅은 회색 이야기 섹션 → 바로 아래 먹색 꼬리말.
- * 이름표 '지원 안내' → 제목 → 모집 상태 한 문장 → 주 버튼 + 두 번째 버튼('지원 안내 보기') | 오른쪽 자주 묻는 질문 세 개.
+ * 제목 → 모집 상태 한 문장 → 주 버튼 + 두 번째 버튼('지원 안내 보기') | 오른쪽 자주 묻는 질문 세 개.
  * - 주 버튼: 모집 중이고 지원서 주소가 있으면 '지원서 쓰기 ↗', 아니면 '{gen}기 소식 받기 ↗' (홈 마무리와 같은 링크)
  * - 질문은 펼치지 않고 지원 안내의 그 답(/recruits#faq-{id})으로 보낸다. 답은 한 곳(지원 안내)에만 있다.
  * 페이지가 <main> 맨 끝에 직접 넣는다 (/recruits 는 넣지 않는다: 페이지 자체가 같은 내용).
  */
-export function JoinStrip({ variant = 'default', id = 'join', eyebrow, title, sub }: JoinStripProps) {
+export function JoinStrip({ variant = 'default', id = 'join', title, sub }: JoinStripProps) {
   const today = useToday()
   const status = useMemo(() => recruitStatus(today), [today])
   const handle = SITE.links.instagramHandle
@@ -44,8 +43,8 @@ export function JoinStrip({ variant = 'default', id = 'join', eyebrow, title, su
   const faqs = teams ? [] : pickFaqs(FAQS, CLOSING.faqIds, FAQ_SHOWN)
 
   const head = teams
-    ? { eyebrow: PLACE_BY_ID.teams.label, placeColor: 'var(--place-teams)', title: TEAMS_JOIN.title, sub: fill(TEAMS_JOIN.sub, { handle }) }
-    : { eyebrow: PLACE_BY_ID.recruits.label, placeColor: 'var(--place-recruits)', title: fill(CLOSING.title, { gen }), sub: closingStatusLine(status, CLOSING.status, handle) }
+    ? { title: TEAMS_JOIN.title, sub: fill(TEAMS_JOIN.sub, { handle }) }
+    : { title: fill(CLOSING.title, { gen }), sub: closingStatusLine(status, CLOSING.status, handle) }
 
   return (
     <section id={id} className="story field" aria-labelledby={titleId}>
@@ -56,8 +55,6 @@ export function JoinStrip({ variant = 'default', id = 'join', eyebrow, title, su
               titleId={titleId}
               tone="field"
               headClassName={j.head}
-              eyebrow={eyebrow ?? head.eyebrow}
-              placeColor={head.placeColor}
               title={title ?? head.title}
               sub={sub ?? head.sub}
             />

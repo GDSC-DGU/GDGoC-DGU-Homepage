@@ -1,15 +1,13 @@
 import { useMemo } from 'react'
-import { PLACE_BY_ID, placeColor } from '@/config/places'
+import { PLACE_BY_ID } from '@/config/places'
 import { SITE } from '@/config/site'
 import { CHAPTER, EVENTS, FAQS, RECRUITING } from '@/content'
 import { recruitStatus, type RecruitStatus } from '@/content/recruitingStatus'
 import { useSchedule } from '@/data/queries'
 import { StorySection } from '@/features/common'
 import { Term } from '@/features/glossary/Term'
-import { PlaceHero, type DirectoryRow } from '@/features/placehero/PlaceHero'
+import { PlaceHero } from '@/features/placehero/PlaceHero'
 import { useToday } from '@/hooks/useToday'
-import { dotDate, pageSources } from './community/pageSources'
-import { PageSources } from './community/Signage'
 import { useHashScroll } from './community/useHashScroll'
 import { Section, StateLine } from './PageParts'
 import { buildBatches } from './recruits/batches'
@@ -55,7 +53,7 @@ function StatusActions({ st, primary }: { st: RecruitStatus; primary: 'apply' | 
         text={
           st.state === 'open'
             ? `${SITE.shortName} ${st.generation}기 모집 중입니다.`
-            : `${SITE.shortName} ${st.generation}기 모집 소식은 인스타그램 ${handle}에 가장 먼저 올라옵니다.`
+            : `${SITE.shortName} ${st.generation}기 모집 소식은 인스타그램 ${handle}에 올라옵니다.`
         }
       />
     </span>
@@ -85,27 +83,9 @@ export function RecruitsPage() {
   useHashScroll(true)
   const who = eligibilityFacts()
 
-  const directory: DirectoryRow[] = [
-    { label: '지원 자격', value: '전공 · 학년 무관', href: '#who' },
-    { label: '들어오면 이런 한 해', value: <>화요일 <span className="num">18:00</span></>, href: '#year' },
-    { label: '파트', value: <><span className="num">4</span>개</>, href: '#parts' },
-    { label: '자주 묻는 질문', value: <><span className="num">{FAQS.length}</span>개</>, href: '#faq' },
-  ]
-
-  // 이 페이지가 기대는 출처: 지원서 · 모집 게시물 · 행사 페이지 · 운영 계획 · README (페이지 끝 한 줄)
-  const sources = pageSources(
-    [
-      ...FAQS.map((f) => f.source),
-      ...(latest?.steps.map((x) => x.source) ?? []),
-      ...events.filter((e) => e.generation === semesterGen).map((e) => e.source),
-      CHAPTER.github,
-    ],
-    { 'gdg.community.dev': CHAPTER.chapterPage, 'instagram.com': st.channelUrl, 'github.com': CHAPTER.github },
-  )
-
   const yearDesc = (
     <>
-      {semesterGen}기가 실제로 보내는 한 해입니다. 매주 화요일 세션 사이에 <Term id="g-sprint" more /> 단계와 연합 행사가 끼고, 시험 기간에는 쉽니다.
+      매주 화요일 세션 사이사이에 <Term id="g-sprint" more />와 연합 행사가 있습니다.
     </>
   )
 
@@ -114,7 +94,6 @@ export function RecruitsPage() {
       <PlaceHero
         place="recruits"
         state={isOpen ? 'open' : 'closed'}
-        eyebrow={PLACE_BY_ID.recruits.label}
         title={
           view.titleSub ? (
             <>
@@ -142,46 +121,42 @@ export function RecruitsPage() {
           </>
         }
         meta={<StatusActions st={st} primary={view.primary} />}
-        directory={directory}
       />
 
       {who.some((f) => f.id === 'major') && (
         <StorySection
           id="who"
           tone="field"
-          eyebrow="지원 자격"
-          placeColor={placeColor('recruits')}
-          title="전공 · 학년과 상관없이 지원할 수 있습니다"
-          sub={`${semesterGen}기 지원서에 적힌 조건입니다. ${st.generation}기 조건은 모집 공지에서 다시 알립니다.`}
+          title="전공·학년과 상관없이 지원할 수 있습니다"
+          sub={`${semesterGen}기 지원서 기준입니다.`}
         >
           <Eligibility facts={who} />
         </StorySection>
       )}
 
-      <Section id="year" title="들어오면 이런 한 해" desc={yearDesc}>
-        <SemesterPicture events={events} today={today} generation={semesterGen} />
+      {/* 홈 '4기의 1년'(가로 한 줄 요약)과 같은 제목이 되지 않게 '달별 일정' (4기 Organizer 2026-11-05) */}
+      <Section id="year" title={`${semesterGen}기 달별 일정`} desc={yearDesc}>
+        {/* 휴회는 싣지 않는다 (4기 Organizer 2026-11-05: 쉬는 얘기는 브랜드에 쓸모없다) */}
+        <SemesterPicture events={events.filter((e) => e.kind !== 'rest')} today={today} generation={semesterGen} />
       </Section>
 
       {FAQS.some((f) => f.id === 'parts') && (
         <StorySection
           id="parts"
           tone="field"
-          eyebrow="네 파트"
-          placeColor={placeColor('recruits')}
           title="파트마다 같은 문제를 각자 풀고 비교합니다"
-          sub={`${semesterGen}기는 Frontend · Backend · AI/ML · Product Design 네 파트입니다. 파트마다 코어 멤버가 세션을 이끌고, 강의 대신 서로의 풀이와 그 이유를 봅니다.`}
+          sub="파트 세션은 코어 멤버가 이끕니다."
         >
           <Parts />
         </StorySection>
       )}
 
-      <Section id="faq" title="자주 묻는 질문" desc="지원하기 전에 묻는 것과 들어와서 하는 것을 나눴습니다.">
+      <Section id="faq" title="자주 묻는 질문">
         {FAQS.length === 0 ? (
           <StateLine>답을 정리하고 있습니다. 그동안 궁금한 점은 {CHAPTER.email}로 물어봐 주세요.</StateLine>
         ) : (
           <FaqTabs faqs={FAQS} open={OPEN_FAQ} />
         )}
-        <PageSources items={sources} updated={<>모집 기록 <span className="num">{dotDate(RECRUITING.updatedAt)}</span> 갱신</>} />
       </Section>
     </div>
   )

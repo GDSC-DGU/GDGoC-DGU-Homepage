@@ -157,10 +157,8 @@ export function WorkList({ label, children, id, className = '', expanded }: { la
  */
 export function ExhibitCard({ project, withProgram = false, level = 4, linkTo }: { project: Project; withProgram?: boolean; level?: 3 | 4; linkTo?: string }) {
   const Heading = level === 3 ? 'h3' : 'h4'
-  // 그 밖의 프로젝트: '2025 · 챕터 웹사이트 · Next.js · TypeScript' (연도는 한 번만)
-  const meta: ReactNode[] = withProgram
-    ? [<span key="y" className="num">{project.year}</span>, programName(project), ...(project.stack ?? []).slice(0, 2)]
-    : (project.stack ?? []).slice(0, 3)
+  // 그 밖의 프로젝트 · 홈 목록: '2025 · 챕터 웹사이트' (연도는 한 번만). 쓴 기술은 자세히 보기 창에 (한 줄에 다 넣으면 잘렸다)
+  const meta: ReactNode[] = withProgram ? [<span key="y" className="num">{project.year}</span>, programName(project)] : (project.stack ?? []).slice(0, 3)
   return (
     <li className={c.work} data-morph="box">
       <Plate project={project} className={c.icon} />
@@ -181,9 +179,9 @@ export function ExhibitCard({ project, withProgram = false, level = 4, linkTo }:
 }
 
 /** 기수 탭 안 카드 격자 (넓은 화면 3칸 · 태블릿 2칸 · 폰 1칸) */
-export function ProjectGrid({ label, children }: { label: string; children: ReactNode }) {
+export function ProjectGrid({ label, children, wide = false }: { label: string; children: ReactNode; wide?: boolean }) {
   return (
-    <ul className={c.grid} aria-label={label}>
+    <ul className={`${c.grid} ${wide ? c.gridWide : ''}`} aria-label={label}>
       {children}
     </ul>
   )

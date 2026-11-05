@@ -269,9 +269,6 @@ export function YearHeatmap({ rows, events, today }: Props) {
             <span className={c.lgPlan} /> 예정
           </li>
           <li>
-            <span className={c.lgRest} /> 휴회
-          </li>
-          <li>
             <span className={c.lgToday} /> 오늘
           </li>
         </ul>

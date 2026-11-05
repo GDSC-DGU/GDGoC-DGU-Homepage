@@ -43,13 +43,14 @@
     column-gap: var(--gutter);
     align-items: end;
   }
+  /* 제목 '매주 화요일 18:00에 모입니다' 가 64px · 5칸에서 세 줄로 쪼개졌다 → 48px · 6칸 (화면 검토 2026-11-05) */
   .weekHead {
     --story-head-gap: 0;
-    grid-column: 1 / span 5;
+    grid-column: 1 / span 6;
     padding-right: 24px;
   }
   .weekBody {
-    grid-column: 6 / -1;
+    grid-column: 7 / -1;
   }
 }
 .weekLines {
@@ -610,15 +611,15 @@
 .who {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--gutter);
+  gap: 32px 40px;
 }
+/* 흰 카드 n장 대신 위 2px 먹색 줄 칸 (홈 멤버 회고와 같은 모양: 4기 Organizer 2026-11-05) */
 .whoCard {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 28px 28px 30px;
-  border-radius: var(--r-card);
-  background: var(--paper);
+  padding: 20px 0 0;
+  border-top: 2px solid var(--ink-900);
 }
 .whoLabel {
   font: 600 14px/20px var(--font-kr);
@@ -642,10 +643,10 @@
 @media (max-width: 1199px) {
   .who {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 28px 32px;
   }
   .whoCard {
-    padding: 24px 22px 26px;
+    padding-top: 18px;
   }
   .whoValue {
     font-size: 24px;
@@ -655,10 +656,10 @@
 @media (max-width: 767px) {
   .who {
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: 24px;
   }
   .whoCard {
-    padding: 20px 20px 22px;
+    padding-top: 16px;
   }
   .whoValue {
     margin-top: 8px;

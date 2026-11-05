@@ -19,7 +19,7 @@ export interface Part {
 
 export const PARTS: readonly Part[] = [
   { id: 'frontend', name: 'Frontend', role: '사용자가 보고 누르는 화면을 만듭니다.', compare: '서로의 코드', techs: ['React', 'Next.js', 'Angular'] },
-  { id: 'backend', name: 'Backend', role: '서비스의 API · 데이터베이스 · 서버를 만듭니다.', compare: '서로의 설계 이유', techs: ['Spring Boot', 'FastAPI', 'Django', 'Flask', 'Go'] },
+  { id: 'backend', name: 'Backend', role: '서비스의 API, 데이터베이스, 서버를 만듭니다.', compare: '서로의 설계 이유', techs: ['Spring Boot', 'FastAPI', 'Django', 'Flask', 'Go'] },
   { id: 'ai', name: 'AI/ML', role: '모델을 다루고 서비스에 AI 기능을 붙입니다.', compare: '서로의 접근 방법', techs: ['Gemini', 'Vertex AI', 'PyTorch', 'Whisper', 'MobileCLIP'] },
   { id: 'design', name: 'Product Design', role: '사용자 흐름과 화면을 설계합니다.', compare: '서로의 설계', techs: [] },
 ]

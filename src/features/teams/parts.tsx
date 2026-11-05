@@ -28,7 +28,8 @@ export function CategoryTag({ category }: { category: TeamsCategory }) {
 export function StatusTag({ status }: { status: RecruitStatus }) {
   return (
     <span className={s.status} data-open={status === '모집중' || undefined}>
-      <span className={s.tagText}>{status}</span>
+      {/* 저장 값은 '모집중', 보이는 글자는 '모집 중' (거르기 단추와 같게) */}
+      <span className={s.tagText}>{status === '모집중' ? '모집 중' : status}</span>
     </span>
   )
 }
@@ -47,25 +48,20 @@ export function DeadlineTag({ endDate, status, today }: { endDate: string; statu
 /** 새 글 (24시간 안) */
 export function NewTag() {
   return (
-    <span className={s.newTag} lang="en">
-      <span className={s.tagText}>N</span>
-      <span className="visually-hidden"> 새 글</span>
-    </span>
+    <span className={s.newTag}>새 글</span>
   )
 }
 
-/** 이름 동그라미 (이름 뒤 두 글자). 색은 이름마다 정해진 옅은 색 */
-const AVATAR_TINTS = ['#e8f0fe', '#fce8e6', '#fef7e0', '#e6f4ea', '#f3e8fd', '#e4f7fb']
+/** 이름 동그라미 (이름 뒤 두 글자). 옅은 회색 한 가지 · 글자 13px 이상 (이름마다 다른 파스텔색은 뺐다: 화면 검토 2026-11-05) */
 export function Avatar({ author, size = 32 }: { author: Author; size?: number }) {
-  const tint = AVATAR_TINTS[[...author.name].reduce((a, c) => a + c.charCodeAt(0), 0) % AVATAR_TINTS.length]
   return (
-    <span className={s.avatar} style={{ width: size, height: size, background: tint, fontSize: Math.round(size * 0.36) }} aria-hidden="true">
+    <span className={s.avatar} style={{ width: size, height: size, fontSize: 13 }} aria-hidden="true">
       {initials(author.name)}
     </span>
   )
 }
 
-/** 구하는 파트: 'FE · BE'. 고르지 않았으면 '파트 무관' */
+/** 구하는 파트: 'Frontend' 'Backend' 칸. 고르지 않았으면 '파트 무관' */
 export function PartTags({ parts, compact = false }: { parts: readonly TeamPartId[]; compact?: boolean }) {
   if (parts.length === 0) return <span className={s.partsAny}>{compact ? '무관' : '파트 무관'}</span>
   return (
@@ -86,13 +82,13 @@ export function SampleNotice({ compact = false }: { compact?: boolean }) {
       <span className="sample-badge">예시</span>
       <p>
         {compact ? (
-          '예시 화면입니다. 쓴 글은 이 탭에만 남고 새로고침하면 사라집니다.'
+          '아래 글은 실제 모집 글이 아닌 예시입니다. 쓴 글은 이 탭에만 남고 새로고침하면 사라집니다.'
         ) : (
           <>
             게시판을 준비하는 동안 보여 드리는 예시 화면입니다. 아래 글은 실제 모집 글이 아니고, 새로 쓴 글과 댓글은 이 탭에만 남아 새로고침하면 사라집니다.
           </>
         )}{' '}
-        써 보려면 학번 <span className="num">{DEMO_ACCOUNT.studentId}</span> · PIN <span className="num">{DEMO_ACCOUNT.pin}</span>을 넣어 보세요.
+        써 보려면 학번 <span className="num">{DEMO_ACCOUNT.studentId}</span>과 PIN <span className="num">{DEMO_ACCOUNT.pin}</span>을 넣으면 됩니다.
       </p>
     </aside>
   )
@@ -275,7 +271,7 @@ export function VerifyDialog({ open, onClose, verify, onVerified, action }: { op
       <div className={s.verifyFields}>
         <CredentialFields idPrefix="verify" value={cred} onChange={setCred} invalid={Boolean(error)} />
       </div>
-      <p className={s.help}>작성자 본인의 학번과 일치할 때만 진행돼요. 5번 틀리면 15분 동안 입력할 수 없고, 다시 5번 틀리면 계정이 잠겨 운영진이 풀어 줘야 해요.</p>
+      <p className={s.help}>작성자 본인의 학번과 일치할 때만 진행됩니다. 5번 틀리면 15분 동안 입력할 수 없고, 다시 5번 틀리면 계정이 잠겨 운영진이 풀어야 합니다.</p>
       {error && (
         <p className={s.error} role="alert">
           {error}

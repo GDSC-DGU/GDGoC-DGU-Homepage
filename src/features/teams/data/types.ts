@@ -11,12 +11,15 @@ export type TeamsCategory = (typeof TEAMS_CATEGORIES)[number]
 export const RECRUIT_STATUSES = ['모집중', '마감'] as const
 export type RecruitStatus = (typeof RECRUIT_STATUSES)[number]
 
-/** 구하는 파트 (4기 네 파트, 홈 '역량' 카드와 같은 짧은 이름) */
+/**
+ * 구하는 파트 (4기 네 파트). 화면에 쓰는 이름(short)도 사이트 다른 곳과 같은 전체 이름
+ * ('PD · FE · BE' 줄임말은 프로듀서 등으로 읽혀서 뺐다: 4기 Organizer 2026-11-05)
+ */
 export const TEAM_PARTS = [
-  { id: 'design', short: 'PD', name: 'Product Design' },
+  { id: 'design', short: 'Product Design', name: 'Product Design' },
   { id: 'ai', short: 'AI/ML', name: 'AI/ML' },
-  { id: 'frontend', short: 'FE', name: 'Frontend' },
-  { id: 'backend', short: 'BE', name: 'Backend' },
+  { id: 'frontend', short: 'Frontend', name: 'Frontend' },
+  { id: 'backend', short: 'Backend', name: 'Backend' },
 ] as const
 export type TeamPartId = (typeof TEAM_PARTS)[number]['id']
 

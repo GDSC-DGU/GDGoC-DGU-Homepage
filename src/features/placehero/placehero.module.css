@@ -29,6 +29,10 @@
   font: var(--t-ui);
   color: var(--ink-700);
 }
+/* 머리 이름표 앞 색 네모도 그리지 않는다 (섹션 이름표와 같게) */
+.eyebrow :global(.mark) {
+  display: none;
+}
 .title {
   font: var(--t-display);
   letter-spacing: var(--ls-display);

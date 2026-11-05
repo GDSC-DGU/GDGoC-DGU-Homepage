@@ -12,6 +12,11 @@ import type { Credentials, ListQuery, PostInput, PostUpdate } from './types'
  * 백엔드가 생기면: http 구현을 만들어 아래 TEAMS_REPO 를 바꾸고, TEAMS_SAMPLE 을 false 로.
  */
 export const TEAMS_SAMPLE = !PROTOTYPE
+/**
+ * 글이 예시 저장소에서 오는지 (백엔드 전에는 늘 그렇다). 프로토타입 보기(PROTOTYPE)에서도 '예시 글' 안내 한 줄은 붙인다:
+ * 지어낸 글이 실제 멤버 글처럼 보이지 않게 (docs/CONTENT.md '지어낸 예시 글' 원칙, AI 티 점검 2026-11-05)
+ */
+export const TEAMS_SAMPLE_DATA = true // 백엔드(http 구현)로 바꾸면 false
 
 const TEAMS_REPO: TeamsRepository = createSampleTeamsRepository()
 

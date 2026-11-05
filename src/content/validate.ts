@@ -1,4 +1,4 @@
-import type { EventKind, Faq, Generation, LanguageShare, PlaceId, Project, ProjectImage, ProjectImageKind, Seminar } from '@/domain/types'
+import type { EventKind, EventPhoto, Faq, Generation, LanguageShare, PlaceId, Project, ProjectImage, ProjectImageKind, Seminar } from '@/domain/types'
 
 /**
  * 콘텐츠 JSON 검사.
@@ -222,10 +222,40 @@ export function checkSeminars(list: unknown): Checked<Seminar> {
       id: raw.id as string,
       date: raw.date as string,
       generation: raw.generation as number,
-      title: (raw.title as string).trim(),
-      speaker: (raw.speaker as string).trim(),
+      title: (raw.title as string).normalize('NFC').trim(),
+      speaker: (raw.speaker as string).normalize('NFC').trim(),
       format: raw.format as Seminar['format'],
       fileUrl: raw.fileUrl as string | null,
+    }
+  })
+}
+
+/**
+ * photos.json: 사진 한 장마다 파일 · 설명(alt) · 크기 · 찍은 날 · 행사 이름 · 공개 동의(받은 날 · 받은 사람)가 꼭 있어야 한다.
+ * 동의 기록이 없는 사진은 화면에 내보내지 않는다 (얼굴이 나온 사진을 묻지 않고 올리지 않는다).
+ */
+export function checkPhotos(list: unknown): Checked<EventPhoto> {
+  return checkList('photos.json', list, (raw, problems) => {
+    for (const key of ['id', 'alt', 'event']) requireText(raw, key, problems)
+    const src = raw.src
+    if (!(isText(src) && (/^photos\/[\w.-]+\.(webp|jpe?g|png)$/.test(src) || isHttpsUrl(src)))) problems.push("src 는 'photos/파일.webp' 나 https 주소여야 합니다")
+    if (!isPositiveInt(raw.width) || !isPositiveInt(raw.height)) problems.push('width · height 는 1 이상의 정수여야 합니다')
+    if (!isValidYmd(raw.date)) problems.push('date 는 YYYY-MM-DD 여야 합니다')
+    optional(raw, 'generation', isPositiveInt, '1 이상의 정수', problems)
+    const consent = raw.consent
+    if (!isObject(consent) || !isValidYmd(consent.date) || !isText(consent.by)) problems.push('consent(공개 동의: date · by)가 없습니다')
+    if (problems.length) return null as never
+    const c = consent as Raw
+    return {
+      id: raw.id as string,
+      src: src as string,
+      alt: (raw.alt as string).trim(),
+      width: raw.width as number,
+      height: raw.height as number,
+      date: raw.date as string,
+      event: (raw.event as string).trim(),
+      ...(raw.generation !== undefined ? { generation: raw.generation as number } : {}),
+      consent: { date: c.date as string, by: c.by as string },
     }
   })
 }

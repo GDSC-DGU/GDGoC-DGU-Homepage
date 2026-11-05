@@ -5,7 +5,7 @@ import { NAV_ORDER, PLACE_BY_ID, navLabel, placeColor } from '@/config/places'
 import { SHOW_PLAN } from '@/config/site'
 import { CONTENT_UPDATED_AT } from '@/content'
 import type { PlaceId } from '@/domain/types'
-import { JoinStrip, TEAMS_WILL_HAVE } from '@/features/common'
+import { JoinStrip } from '@/features/common'
 import { PlaceHero } from '@/features/placehero/PlaceHero'
 import { useToday } from '@/hooks/useToday'
 import { DetourLink } from './community/Signage'
@@ -16,11 +16,11 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 
 /** 지금 열려 있는 페이지와 그 페이지에서 볼 수 있는 것 */
 const OPEN_PAGES: Partial<Record<PlaceId, string>> = {
-  about: '캠퍼스 지도로 보는 GDGoC DGU 소개',
-  projects: 'G-Sprint 진행 상황과 지난 프로젝트',
+  about: '캠퍼스 지도와 대표 프로젝트',
+  projects: '지난 프로젝트와 세미나 발표',
   community: '다가오는 일정과 기수별 행사 기록',
-  teams: '프로젝트 · 스터디 팀원 모집 글',
-  recruits: '모집 소식 · 지난 모집 기록 · 연락처',
+  teams: '프로젝트, 스터디 팀원 모집 글',
+  recruits: '지원 자격, 지난 모집 기록, 자주 묻는 질문',
 }
 
 /** 지금 볼 수 있는 페이지로 가는 줄 목록 (찾을 수 없음 페이지). 사이트 안 이동이라 화살표는 없다 */
@@ -111,16 +111,9 @@ export function PlannedPage({ id }: { id: PagePlanId }) {
       <PlaceHero
         place={place}
         state="construction"
-        eyebrow={PLACE_BY_ID[place].sub}
         title={PLACE_BY_ID[place].label}
         lead={LEADS[id] ?? plan.lead}
         meta={meta}
-        directory={[
-          { label: '지금 상태', value: '준비 중', href: '#join' },
-          { label: '여는 시기', value: '미정', href: '#join' },
-          ...(id === 'teams' ? [{ label: '열리면 생길 것', value: <><span className="num">{TEAMS_WILL_HAVE.length}</span>가지</>, href: '#join' }] : []),
-          { label: '동아리 지원', value: PLACE_BY_ID.recruits.label, href: PLACE_BY_ID.recruits.path },
-        ]}
       />
 
       {/* 개발 화면에서만: 팀 기획 메모 (JoinStrip 뒤에 두면 꼬리말 위에 흰 여백이 생겨 앞에 둔다) */}
@@ -141,7 +134,7 @@ export function NotFoundPage() {
         wide
         eyebrow={<span className="num">404</span>}
         title="이 주소에는 페이지가 없습니다"
-        lead="주소가 바뀌었거나 없는 페이지입니다. 아래에서 찾던 곳을 골라 주세요."
+        lead="주소가 바뀌었거나 없는 페이지입니다."
         meta={
           <>
             요청한 주소 <code className={s.path}>{pathname}</code>

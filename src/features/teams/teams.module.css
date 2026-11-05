@@ -47,29 +47,47 @@
   white-space: nowrap;
   background: var(--paper);
 }
+/* 분류: 8px 장소색 네모 + 먹색 글자 (장소색은 표식에만, 글자 · 테두리에는 쓰지 않는다: DESIGN 4 · 7장, 화면 검토 2026-11-05) */
+.cat[data-tone] {
+  gap: 6px;
+  padding: 0;
+  border-color: transparent;
+  background: none;
+  color: var(--ink-700);
+}
+.cat[data-tone]::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: var(--tone, var(--ink-500));
+}
 .cat[data-tone='project'] {
-  border-color: #f2b8b5;
-  color: var(--place-projects-text);
+  --tone: var(--place-projects);
 }
 .cat[data-tone='study'] {
-  border-color: #aecbfa;
-  color: var(--place-community-text);
+  --tone: var(--place-community);
 }
 .cat[data-tone='club'] {
-  border-color: #a8dab5;
-  color: var(--place-recruits-text);
+  --tone: var(--place-recruits);
 }
 .cat[data-tone='contest'] {
-  border-color: #fdd663;
-  color: var(--place-teams-text);
+  --tone: var(--place-teams);
 }
 .status {
   border-color: transparent;
   background: var(--field);
   color: var(--ink-500);
 }
+/* 모집 중만 상자 하나 (먹색 테두리). 마감은 회색 글자만 */
+.status {
+  padding: 0;
+  background: none;
+}
 .status[data-open] {
-  background: var(--g-yellow);
+  padding: 0 8px;
+  border-color: var(--ink-900);
+  background: var(--paper);
   color: var(--ink-900);
 }
 .metaTag {
@@ -77,21 +95,20 @@
   padding: 0 7px;
   font: var(--t-meta);
 }
+/* 구하는 파트: 상자 없이 'Frontend, Backend' 글자 한 줄 (4기 Organizer 2026-11-05) */
 .parts {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 4px;
 }
 .part {
   display: inline-flex;
   align-items: center;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: var(--r-tag);
-  background: var(--subtle);
-  box-shadow: inset 0 0 0 1px var(--line);
-  font: 600 12.5px/1 var(--font-num);
+  font: 600 13px/20px var(--font-num);
   color: var(--ink-700);
+}
+.part + .part::before {
+  content: ',';
+  margin-right: 0.3em;
 }
 .partsAny {
   font: var(--t-meta);
@@ -346,7 +363,7 @@
   min-height: 36px;
   padding: 0 12px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--r-control);
   background: var(--paper);
   font: 600 14px/20px var(--font-kr);
   color: var(--ink-700);
@@ -391,40 +408,35 @@
   height: 18px;
 }
 
-/* 마감 · 새 글 표시 */
+/* 마감 · 새 글 표시: 상자 없이 글자만. 마감 임박은 먹색 굵게 (빨간 알약은 뺐다: 4기 Organizer 2026-11-05) */
 .deadline {
   display: inline-flex;
   align-items: center;
-  height: 24px;
-  padding: 0 7px;
-  border-radius: var(--r-tag);
-  background: var(--field);
-  font: 600 13px/1 var(--font-num);
-  color: var(--ink-700);
+  font: 500 13px/20px var(--font-num);
+  color: var(--ink-500);
 }
 .deadline[data-soon] {
-  background: #fce8e6;
-  color: #c5221f;
+  font-weight: 700;
+  color: var(--ink-900);
 }
+/* 새 글: 글자 '새 글' 하나 (주황은 '지금 기수' 에만 쓴다: DESIGN 4장) */
 .newTag {
-  display: inline-grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--gen);
-  font: 700 11px/1 var(--font-num);
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  font: 600 13px/20px var(--font-kr);
+  color: var(--ink-900);
+  white-space: nowrap;
 }
 .avatar {
   display: inline-grid;
   flex: none;
   place-items: center;
   border-radius: 50%;
+  background: var(--field);
   font-family: var(--font-kr);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1;
-  color: var(--ink-900);
+  color: var(--ink-700);
   letter-spacing: -0.02em;
 }
 
@@ -606,7 +618,7 @@
   flex: none;
   width: 16px;
   font: 700 15px/1 var(--font-num);
-  color: var(--place-teams-text);
+  color: var(--ink-500);
   text-align: center;
 }
 .sideText {
@@ -1286,7 +1298,7 @@ fieldset.field > .label {
   min-height: 40px;
   padding: 0 16px;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: var(--r-control);
   background: var(--paper);
   font: 600 14px/20px var(--font-kr);
   color: var(--ink-700);

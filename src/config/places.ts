@@ -23,21 +23,21 @@ export const PLACES: readonly Place[] = [
   {
     id: 'community',
     label: '소개',
-    sub: '활동 · 일정 · 기록',
+    sub: '동아리 소개',
     path: '/about',
     color: '#4285f4',
-    description: 'GDGoC DGU가 어떤 곳인지, 이번 주 모임과 다가오는 일정, 1기부터의 활동 기록을 모읍니다.',
+    description: '매주 화요일 18:00에 모입니다. 다가오는 일정과 2기부터 연 행사 기록을 볼 수 있습니다.',
     footprint: { x: 0.9, y: 0.9, w: 3.4, d: 3.0, h: 1.5, door: 'R', roof: 'screen', pinGap: 0.75 },
   },
   {
     // 아카이브: 프로젝트와 세미나를 한곳에 (4기 Organizer 2026-11-04). id 는 지도 · 건물 · 색과 이어져 있어 'projects' 그대로
     id: 'projects',
     label: '아카이브',
-    sub: '프로젝트 · 세미나 기록',
+    sub: '프로젝트와 세미나',
     path: '/archive',
     color: '#ea4335',
     live: true,
-    description: '1기부터 지금까지의 팀 프로젝트와 세미나 발표를 모읍니다. 4기 G-Sprint 결과는 12.29 데모데이에서 공개합니다.',
+    description: '1기부터 만든 프로젝트와 세미나 발표가 있습니다. 4기 G-Sprint 결과는 12.29 데모데이에 공개합니다.',
     footprint: { x: 9.7, y: 0.9, w: 3.4, d: 3.2, h: 1.25, door: 'L', roof: 'saw', pinGap: 1.05 },
   },
   {
@@ -48,8 +48,8 @@ export const PLACES: readonly Place[] = [
     path: '/teams',
     color: '#fbbc04',
     description: PROTOTYPE
-      ? '멤버끼리 스터디 · 프로젝트 · 공모전 팀원을 찾는 게시판입니다. 동아리 지원은 지원 안내에서 합니다.'
-      : '멤버끼리 스터디 · 프로젝트 · 공모전 팀원을 찾는 게시판입니다. 아직 준비 중이고, 동아리 지원은 지원 안내에서 합니다.',
+      ? '멤버끼리 스터디, 프로젝트, 공모전 팀원을 찾는 게시판입니다. 동아리 지원은 지원 안내에서 합니다.'
+      : '멤버끼리 스터디, 프로젝트, 공모전 팀원을 찾는 게시판입니다. 아직 준비 중이고, 동아리 지원은 지원 안내에서 합니다.',
     footprint: { x: 0.9, y: 9.7, w: 3.4, d: 3.4, h: 0.95, door: 'R', roof: 'arch', pinGap: 0.7 },
   },
   {
@@ -58,7 +58,7 @@ export const PLACES: readonly Place[] = [
     sub: '5기 모집',
     path: '/recruits',
     color: '#34a853',
-    description: '모집 일정과 지원 방법, 지난 모집 과정을 안내합니다.',
+    description: '지원 자격과 자주 묻는 질문, 지난 4기 모집 기록을 볼 수 있습니다.',
     footprint: { x: 9.8, y: 9.8, w: 2.7, d: 2.7, h: 1.05, door: 'L', roof: 'gable', pinGap: 0.7 },
   },
 ]

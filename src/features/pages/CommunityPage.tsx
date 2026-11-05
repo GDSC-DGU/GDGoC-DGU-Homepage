@@ -1,22 +1,20 @@
 import { useMemo } from 'react'
-import { PLACE_BY_ID, placeColor } from '@/config/places'
+import { PLACE_BY_ID } from '@/config/places'
 import { SITE, SPRINT } from '@/config/site'
-import { CHAPTER, CONTENT_UPDATED_AT, FAQS, GENERATIONS, PUBLIC_PROJECTS } from '@/content'
+import { CHAPTER, FAQS, GENERATIONS, PUBLIC_PROJECTS } from '@/content'
 import { withoutStalePlans } from '@/content/plan'
 import { useSchedule } from '@/data/queries'
 import type { ScheduleEvent } from '@/domain/types'
-import { StorySection } from '@/features/common'
-import { PlaceHero, type DirectoryRow } from '@/features/placehero/PlaceHero'
+import { PhotoStrip, StorySection } from '@/features/common'
+import { PlaceHero } from '@/features/placehero/PlaceHero'
 import { useToday } from '@/hooks/useToday'
-import { monthDay, weekday } from '@/lib/date'
+import { monthDay } from '@/lib/date'
 import { Archive } from './community/Archive'
-import { countWord, yearRows } from './community/heatmap'
+import { yearRows } from './community/heatmap'
 import { sortGenerations, tallies } from './community/history'
 import { OverviewToggle } from './community/OverviewToggle'
-import { dotDate, pageSources } from './community/pageSources'
-import { PageSources } from './community/Signage'
 import { explainedTerms, firstMentions, mentionKey } from './community/terms'
-import { REGULAR_SESSION, isPeriod, regularTime, weekState } from './community/thisWeek'
+import { REGULAR_SESSION, regularTime, weekState } from './community/thisWeek'
 import { Upcoming } from './community/Upcoming'
 import { useHashScroll } from './community/useHashScroll'
 import { WHO_TERMS, nameChange, whoCards, whoSpan } from './community/who'
@@ -35,7 +33,6 @@ const sessionFaq = FAQS.find((f) => f.id === REGULAR_SESSION.faqId)
 const timeOf = (e: ScheduleEvent) => (sessionFaq ? regularTime(e) : null)
 
 const GENS = sortGenerations(GENERATIONS)
-const COMMUNITY_COLOR = placeColor('community')
 
 /** 맨 위 '우리는' (who.ts): 2023년 1기부터 지금 4기까지 + 활동 세 가지 + 그룹 멤버 수 */
 const SPAN = whoSpan(GENERATIONS)
@@ -57,15 +54,17 @@ export function CommunityPage() {
   usePageTitle(PLACE_BY_ID.community.label)
   const today = useToday()
   const { data, isPending, isError, refetch } = useSchedule()
-  const events = useMemo(() => withoutStalePlans(data ?? EMPTY, today), [data, today])
+  const all = useMemo(() => withoutStalePlans(data ?? EMPTY, today), [data, today])
+  // 휴회(시험 기간 등)는 화면에 싣지 않는다 (4기 Organizer 2026-11-05: 쉬는 얘기는 브랜드에 쓸모없다).
+  // '이번 주' 계산(weekState)만 휴회를 알아야 다음 모임을 고른다
+  const events = useMemo(() => all.filter((e) => e.kind !== 'rest'), [all])
   const ready = !isPending && !isError
   const past = useMemo(() => pastEvents(events, today), [events, today])
   const ahead = useMemo(
     () => events.filter((e) => (e.endDate ?? e.date) >= today).sort((a, b) => a.date.localeCompare(b.date) || a.title.localeCompare(b.title, 'ko')),
     [events, today],
   )
-  const upcomingCount = ahead.filter((e) => e.kind !== 'rest').length
-  const week = useMemo(() => weekState(events, today), [events, today])
+  const week = useMemo(() => weekState(all, today), [all, today])
   // G-Sprint · 동홍동락은 위 '우리는' 에서 풀었으므로 일정 · 기록에서는 다시 풀지 않는다
   const lineTerms = useMemo(() => firstMentions(ahead.map((e) => ({ key: mentionKey.line(e), text: e.title })), WHO_TERMS), [ahead])
   const explainedAbove = useMemo(() => explainedTerms(lineTerms, WHO_TERMS), [lineTerms])
@@ -78,63 +77,21 @@ export function CommunityPage() {
   const loading = isPending && <StateLine>일정을 불러오는 중입니다.</StateLine>
   const failed = isError && <StateLine onRetry={() => void refetch()}>일정을 불러오지 못했습니다.</StateLine>
 
-  const { status, meet, next } = week
-  const weekValue =
-    status === 'rest'
-      ? `${monthDay(meet)} ${weekday(meet)} · 휴회`
-      : status === 'meet'
-        ? `${monthDay(meet)} ${weekday(meet)} · ${isPeriod(week.meeting[0]) ? '팀별 개발' : '모임'}`
-        : status === 'quiet'
-          ? `${monthDay(meet)} ${weekday(meet)} · 일정 미공개`
-          : '잡힌 일정 없음'
-  const firstGen = GENS[0]
-  const lastGen = GENS[GENS.length - 1]
-  const genSpan = GENS.length > 1 ? `${firstGen.n}–${lastGen.n}기` : lastGen ? `${lastGen.n}기` : ''
-  const whoRow: DirectoryRow[] = SPAN.current ? [{ label: '우리는', value: <>지금 <span className="num">{SPAN.current}</span>기</>, href: '#who' }] : []
-  const directory: DirectoryRow[] = ready
-    ? [
-        ...whoRow,
-        { label: '이번 주', value: weekValue, href: '#this-week' },
-        { label: '다가오는 일정', value: <><span className="num">{upcomingCount}</span>건</>, href: '#upcoming' },
-        ...(held > 0 ? [{ label: '지난 행사', value: <><span className="num">{held}</span>건</>, href: '#year' }] : []),
-        ...(genSpan ? [{ label: '기수별 기록', value: <span className="num">{genSpan}</span>, href: '#records' }] : []),
-      ]
-    : whoRow
+  const { next } = week
 
-  // 이 페이지가 기대는 출처: 행사 페이지 · 운영 계획 · 4기 지원서(정기 세션 시간) · 챕터 멤버 수 · 기수 연혁 · GitHub
-  const sources = useMemo(
-    () =>
-      pageSources(
-        [
-          ...past.map((e) => e.source),
-          ...ahead.map((e) => e.source),
-          sessionFaq?.source,
-          CHAPTER.members?.source,
-          ...GENS.flatMap((g) => g.source),
-          CHAPTER.github,
-        ],
-        { 'gdg.community.dev': CHAPTER.chapterPage, 'github.com': CHAPTER.github },
-      ),
-    [past, ahead],
-  )
-  const planSource = [...new Set(ahead.filter((e) => !e.url && e.source && !/^https?:/.test(e.source)).map((e) => e.source))].join(' · ')
 
   return (
     <div className={`container ${s.page}`}>
       <PlaceHero
         place="community"
-        eyebrow={PLACE_BY_ID.community.sub}
         title={PLACE_BY_ID.community.label}
-        lead="GDGoC DGU가 어떤 곳인지, 화요일 정기 세션과 학기마다 여는 행사, 1기부터 지금까지의 기록을 모았습니다."
-        directory={directory}
+        lead="동국대학교 학생들이 운영하는 Google 개발자 동아리입니다. 매주 화요일에 모이고, 학기마다 행사를 엽니다."
         screen={next ? { date: next.date, title: next.title } : undefined}
       />
 
       <StorySection
         id="who"
         tone="field"
-        eyebrow="우리는"
-        placeColor={COMMUNITY_COLOR}
         title={
           SPAN.since ? (
             <>
@@ -147,17 +104,11 @@ export function CommunityPage() {
           )
         }
         sub={
-          <>
-            <span className={c.subLine}>동국대학교 학생이 운영하는 Google Developer Groups on Campus 챕터입니다.</span>
-            {RENAMED && (
-              <>
-                {' '}
-                <span className={c.subLine}>
-                  <span className="num">{RENAMED.from - 1}</span>기는 {RENAMED.before}, <span className="num">{RENAMED.from}</span>기부터는 {RENAMED.after} 이름으로 활동합니다.
-                </span>
-              </>
-            )}
-          </>
+          RENAMED && (
+            <>
+              <span className="num">{RENAMED.from - 1}</span>기는 {RENAMED.before}라는 이름이었고, <span className="num">{RENAMED.from}</span>기부터 {RENAMED.after}로 바뀌었습니다.
+            </>
+          )
         }
       >
         <dl className={c.who}>
@@ -173,11 +124,7 @@ export function CommunityPage() {
 
       {loading || failed || <WeekBand week={week} timeOf={timeOf} regular={Boolean(sessionFaq)} />}
 
-      <Section
-        id="upcoming"
-        title="다가오는 일정"
-        desc={planSource ? `${planSource}에 있는 일정은 바뀔 수 있고, 바뀌면 인스타그램에 먼저 알립니다.` : '바뀌면 인스타그램에 먼저 알립니다.'}
-      >
+      <Section id="upcoming" title="다가오는 일정">
         {loading ||
           failed ||
           (ahead.length === 0 ? (
@@ -194,17 +141,14 @@ export function CommunityPage() {
         <StorySection
           id="year"
           tone="field"
-          eyebrow="1년 달력"
-          placeColor={COMMUNITY_COLOR}
-          title={
-            <>
-              {countWord(year.length)} 기수가 연 공개 행사 <span className="num">{held}</span>번
-            </>
-          }
+          titleSize="h2"
+          title="행사 달력"
           sub={
             <>
-              <span className={c.subLine}>gdg.community.dev에 공개된 행사만 셌습니다.</span>{' '}
-              <span className={c.subLine}>한 줄이 한 기수의 9월–8월, 칸 하나가 하루입니다.</span>
+              <span className={c.subLine}>
+                <span className="num">{year[0].gen.n}</span>기부터 연 행사 <span className="num">{held}</span>개입니다.
+              </span>{' '}
+              <span className={c.subLine}>한 줄이 9월부터 다음 해 8월까지, 칸 하나가 하루입니다.</span>
             </>
           }
         >
@@ -212,10 +156,12 @@ export function CommunityPage() {
         </StorySection>
       )}
 
+      <PhotoStrip id="about-photos" limit={8} />
+
       <Section
         id="records"
         title="기수별 기록"
-        desc="공개된 기록만 모았습니다. 끝난 행사는 원래 행사 페이지로 이어집니다."
+        desc="끝난 행사를 누르면 gdg.community.dev 행사 페이지가 열립니다."
         aside={
           tally.length > 0 && (
             <p className={c.tallyLine}>
@@ -238,7 +184,6 @@ export function CommunityPage() {
         }
       >
         {loading || failed || <Archive gens={GENS} past={past} today={today} explained={explainedAbove} />}
-        <PageSources items={sources} updated={<>일정 <span className="num">{dotDate(CONTENT_UPDATED_AT)}</span> 갱신</>} />
       </Section>
     </div>
   )

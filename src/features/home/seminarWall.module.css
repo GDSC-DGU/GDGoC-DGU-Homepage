@@ -1,0 +1,69 @@
+/*
+ * 홈 멤버 세미나: 기수 한 줄 = [기수 | 발표 세 개]. 줄 사이는 1px 괘선.
+ * 제목이 주인공 (멤버가 붙인 제목 그대로). 발표자 · 날짜는 작게. 상자 · 아이콘 · 색을 쓰지 않는다.
+ */
+.wall {
+  border-bottom: 1px solid var(--line);
+}
+.row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 24px 32px;
+  padding-block: 36px;
+  border-top: 1px solid var(--line);
+}
+.gen {
+  font: 600 28px/36px var(--font-num);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.talks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 40px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.talk {
+  min-width: 0;
+}
+.title {
+  font: var(--t-h3);
+  letter-spacing: -0.015em;
+  color: var(--ink-900);
+  text-decoration: none;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.title:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+.meta {
+  margin-top: 8px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+
+@media (max-width: 1023px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+@media (max-width: 767px) {
+  .row {
+    padding-block: 28px;
+  }
+  .gen {
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .talks {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+}

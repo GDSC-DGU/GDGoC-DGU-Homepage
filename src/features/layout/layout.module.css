@@ -73,15 +73,18 @@
   white-space: nowrap;
   transition: color var(--dur-hover) var(--ease);
 }
-/* 지금 메뉴: 그 장소색(짙게) 글자 (4기 시안). 메뉴 링크에 --active 로 장소를 넘긴다 */
+/* 지금 메뉴: 먹색 글자 + 2px 먹색 밑줄 (AI 티 점검 2026-11-05: 메뉴마다 다른 장소색 글자 → 한 가지 표시) */
 .navActive {
-  color: var(--active, var(--ink-900));
+  color: var(--ink-900);
 }
-/* 마지막 메뉴는 본문 오른쪽 끝선에 글자를 맞춘다 */
-.nav li:last-child .navLink {
-  margin-right: -12px;
+/* 메뉴 오른쪽에 돋보기 단추가 붙는다: 단추의 아이콘이 본문 오른쪽 끝선에 오게 (아이콘 버튼 안쪽 여백만큼) */
+@media (min-width: 901px) {
+  .nav + .tools {
+    margin-left: 4px;
+    margin-right: -12px;
+  }
 }
-/* 마우스를 올린 메뉴: 옅은 회색 밑줄이 가운데에서 펴진다 (지금 메뉴는 글자색이 말하므로 밑줄 없음) */
+/* 마우스를 올린 메뉴: 옅은 회색 밑줄이 가운데에서 펴진다. 지금 메뉴는 같은 자리에 먹색 밑줄이 늘 있다 */
 .navLink::after {
   position: absolute;
   left: 12px;
@@ -97,7 +100,9 @@
     transform var(--dur-open) var(--ease);
 }
 .navActive::after {
-  display: none;
+  background: var(--ink-900);
+  opacity: 1;
+  transform: none;
 }
 @media (hover: hover) {
   .navLink:hover::after {
@@ -143,6 +148,9 @@
 }
 .menuBtn {
   display: none;
+}
+.searchBtn {
+  display: grid;
 }
 
 /*
@@ -232,6 +240,9 @@
   }
   .menuBtn {
     display: grid;
+  }
+  .searchBtn {
+    display: none;
   }
   /* 메뉴 줄이 없으니 워드마크 오른쪽 여백은 도구 묶음과의 최소 간격만 */
   .brand {
@@ -444,7 +455,8 @@
   border-top: 1px solid var(--line);
   background: var(--field);
 }
-:global(main):has(> :global(.story):last-child, > :last-child > :global(.story):last-child) + .footer {
+/* 본문이 이야기 섹션(면)으로 끝나면 꼬리말을 바로 붙인다. 아카이브는 섹션이 탭 칸 안 한 단계 더 깊다 (main > .container > 탭 칸 > 띠) */
+:global(main):has(> :global(.story):last-child, > :last-child > :global(.story):last-child, > :last-child > :last-child > :global(.story):last-child) + .footer {
   margin-top: 0;
 }
 .footerGrid {
@@ -462,7 +474,7 @@
 .footerBrand {
   font: 800 22px/28px var(--font-num);
   letter-spacing: 0.01em;
-  color: var(--ink-500);
+  color: var(--ink-900);
 }
 .footerAddress {
   margin-top: 6px;

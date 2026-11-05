@@ -151,7 +151,7 @@ const ROWS: Row[] = [
   },
   {
     category: '스터디',
-    title: 'Spring Boot 입문 스터디 — 주 1회 온라인',
+    title: 'Spring Boot 입문 스터디 (주 1회 온라인)',
     author: 5,
     hoursAgo: 52,
     days: 5,
