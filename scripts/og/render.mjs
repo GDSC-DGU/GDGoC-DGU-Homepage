@@ -23,6 +23,7 @@ const { chromium } = require('playwright')
 const SITE = process.argv[2] ?? 'http://localhost:4173/'
 const HTML = fileURLToPath(new URL('./og.html', import.meta.url))
 const OUT = fileURLToPath(new URL('../../public/og.png', import.meta.url))
+const LOGO = fileURLToPath(new URL('../../public/brand/gdg-dgu-logo.png', import.meta.url))
 const MAX_BYTES = 300 * 1024
 
 const proxy = process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypass: 'localhost,127.0.0.1' } : undefined
@@ -33,12 +34,17 @@ try {
   await site.goto(SITE, { waitUntil: 'networkidle' })
   await site.evaluate(() => document.fonts.ready)
   await site.waitForTimeout(800)
+  // 날짜가 지나면 틀려지는 손글씨(G-Sprint 'n팀 만드는 중 · 데모데이')는 공유 카드에서 뺀다. 매주 화요일 메모는 둔다
+  await site.addStyleTag({ content: "[data-pen='sprint']{display:none!important}" })
   const frame = site.locator('#hero-title').locator('xpath=ancestor::section[1]').locator('svg').first().locator('xpath=..')
   const campus = await frame.screenshot({ animations: 'disabled' })
 
   // 2) 카드
   const card = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 })
-  const html = (await readFile(HTML, 'utf8')).replace('src="campus.png"', `src="data:image/png;base64,${campus.toString('base64')}"`)
+  const logo = await readFile(LOGO)
+  const html = (await readFile(HTML, 'utf8'))
+    .replace('src="campus.png"', `src="data:image/png;base64,${campus.toString('base64')}"`)
+    .replace('src="logo.png"', `src="data:image/png;base64,${logo.toString('base64')}"`)
   await card.setContent(html, { waitUntil: 'networkidle' })
   await card.evaluate(() => document.fonts.ready)
   let png = await card.screenshot({ type: 'png' })

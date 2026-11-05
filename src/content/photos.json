@@ -1,0 +1,5 @@
+{
+  "note": "행사 사진. 얼굴이 보이는 사람 모두에게 웹 공개 동의를 받은 사진만 넣는다 (consent 가 없으면 화면에 나오지 않는다). 사진 파일은 public/photos/ 에 1600px 폭 webp 로. 고치는 법: docs/CONTENT.md '행사 사진'",
+  "updatedAt": "2026-11-05",
+  "photos": []
+}

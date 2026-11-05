@@ -35,7 +35,8 @@ export function buildArchive(
         keywords: expandKeywords(e.title, e.originalTitle, e.series, KIND_LABEL[e.kind], e.venue, e.generation ? `${e.generation}기` : '', e.date.slice(0, 4)),
       }),
     )
-  const projectDocs = projects.map(
+  // 자세히 보기 창이 열리는 완성 프로젝트만 (진행 중인 줄은 아카이브에 보이지 않는다: QA 2026-11-05)
+  const projectDocs = projects.filter((p) => p.status === 'done').map(
     (p): ArchiveDoc => ({
       id: `project-${p.id}`,
       place: 'projects',
@@ -136,7 +137,8 @@ function teamsPreview(today: string, limit: number): PreviewItem[] {
   return createSampleSeed(today, Date.now())
     .posts.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .slice(0, limit)
-    .map((p) => ({ id: p.id, title: p.title, date: kstToday(new Date(p.createdAt)), tag: p.category }))
+    // 게시판과 같은 예시 글이라 줄마다 '예시' 표시를 단다 (지도 미리보기에서 실제 모집 글로 읽히지 않게: 문구 검토 2026-11-05)
+    .map((p) => ({ id: p.id, title: p.title, date: kstToday(new Date(p.createdAt)), tag: p.category, sample: true }))
 }
 
 export function createSnapshotRepositories({ today = () => kstToday() }: SnapshotOptions = {}): Repositories {

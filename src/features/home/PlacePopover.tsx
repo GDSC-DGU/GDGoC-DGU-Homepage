@@ -13,7 +13,7 @@ import { iso } from '@/lib/iso'
 import { useCampus } from '@/state/useCampus'
 import { shortDay } from './homeData'
 import { dockInset, placePopover, type PopoverPlacement, type Rect } from './popoverPosition'
-import { revealElement, scrollToSection } from './scrollTo'
+import { revealElement } from './scrollTo'
 import s from './popover.module.css'
 
 const LATEST = 3
@@ -257,18 +257,10 @@ export function PlacePopover({ frameRef, sheet }: Props) {
       </ul>
       <div className={s.foot}>
         {about ? (
-          <a
-            className="link"
-            href="#capability"
-            onClick={(e) => {
-              e.preventDefault()
-              preview.hide()
-              // 홈에는 '소개'(#about) 섹션을 그리지 않는다 → 무엇을 하는 곳인지 보여 주는 '역량' 섹션으로 (전체 점검 2026-11-03)
-              scrollToSection('capability')
-            }}
-          >
-            소개 보기
-          </a>
+          // 동아리 소개는 /about 이 맡는다 (홈 '역량' 섹션은 2026-11-05 에 '멤버 세미나'로 바뀌었다)
+          <Link className="link" to="/about" onClick={() => preview.hide()}>
+            소개 페이지로
+          </Link>
         ) : (
           <Link className="link" to={place.path}>
             {place.label} 페이지로

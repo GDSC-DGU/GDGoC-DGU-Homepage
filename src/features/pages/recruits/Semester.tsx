@@ -2,13 +2,12 @@ import { useMemo, type CSSProperties } from 'react'
 import { placeColor } from '@/config/places'
 import { GENERATIONS } from '@/content'
 import type { TermId } from '@/content/glossary'
-import { isPlanOnly, withoutStalePlans } from '@/content/plan'
+import { withoutStalePlans } from '@/content/plan'
 import type { ScheduleEvent } from '@/domain/types'
 import { weekday } from '@/lib/date'
 import { firstMentions } from '../community/terms'
 import { TermText } from '../community/TermText'
 import { MONTH_CAPTION, firstHalfYear, monthsOf, springOf } from './batches'
-import { Note } from './Notes'
 import k from './recruit.module.css'
 
 /** 이 목록에서 처음 나올 때 풀어 쓸 용어. G-Sprint 는 섹션 머리 한 줄에서 이미 푼다 */
@@ -43,7 +42,6 @@ export function SemesterPicture({ events, today, generation }: { events: readonl
     [months, spring],
   )
   // 계획 일정의 출처 이름 ('4기 운영 계획')
-  const plans = [...new Set(months.flatMap((m) => m.events.filter((e) => isPlanOnly(e)).map((e) => e.source ?? '')))].filter(Boolean)
   if (!period) return null
   return (
     <>
@@ -63,9 +61,9 @@ export function SemesterPicture({ events, today, generation }: { events: readonl
                 return (
                   <li key={e.id} className={k.mEvent} data-rest={rest || undefined} data-past={past || undefined} data-sprint={sprint || undefined}>
                     <span className={`${k.mDate} num`}>
-                      {/* '2일 월': 날짜 뒤에 '일' 을 붙여 요일 '월' 이 달(2월)로 읽히지 않게 */}
-                      {+e.date.slice(8, 10)}
-                      {e.endDate && e.endDate !== e.date && `–${+e.endDate.slice(8, 10)}`}일 {weekday(e.date)}
+                      {/* '2일 월': 날짜 뒤에 '일' 을 붙여 요일 '월' 이 달(2월)로 읽히지 않게.
+                          여러 날이면 요일 없이 '3–30일' (요일 하나를 붙이면 기간 전체가 그 요일로 읽혔다: 문구 검토 2026-11-05) */}
+                      {e.endDate && e.endDate !== e.date ? `${+e.date.slice(8, 10)}–${+e.endDate.slice(8, 10)}일` : `${+e.date.slice(8, 10)}일 ${weekday(e.date)}`}
                     </span>
                     <span className={k.mTitle}>
                       {sprint && <span className={k.mMark} style={{ '--c': placeColor(e.place) } as CSSProperties} aria-hidden="true" />}
@@ -86,7 +84,7 @@ export function SemesterPicture({ events, today, generation }: { events: readonl
             </h3>
             <div>
               <p className={k.springLead}>
-                {generation}기 봄 일정은 공개되면 더합니다. 지난 {spring.generation}기는 이렇게 보냈습니다.
+                {generation}기 봄 일정은 아직 정하지 않았습니다. 지난 {spring.generation}기 봄 학기 일정입니다.
               </p>
               <ul aria-label={`지난 ${spring.generation}기 봄 학기`}>
                 {spring.items.map((it) => (
@@ -108,9 +106,6 @@ export function SemesterPicture({ events, today, generation }: { events: readonl
         )}
       </ol>
 
-      <Note>
-        지난 일정은 gdg.community.dev 공개 행사입니다.{plans.length > 0 && ` 앞으로의 일정은 ${plans.join(' · ')}이라 바뀔 수 있습니다.`}
-      </Note>
     </>
   )
 }

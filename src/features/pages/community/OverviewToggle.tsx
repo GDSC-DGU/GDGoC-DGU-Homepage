@@ -14,7 +14,7 @@ export function OverviewToggle({ events, today }: { events: readonly ScheduleEve
   return (
     <div className={c.overviewToggle}>
       <button type="button" className={c.toggle} aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
-        {open ? '학기 한눈에 · 달력 접기' : '학기 한눈에 · 달력'}
+        {open ? '달력 접기' : '달력으로 보기'}
         <svg className={c.toggleIcon} width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
           <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>

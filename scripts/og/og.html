@@ -1,8 +1,9 @@
 <!doctype html>
 <!--
   공유 카드(og:image) 원본: 1200×630. scripts/og/render.mjs 가 이 파일에 실제 홈 지도 캡처를 끼워 public/og.png 로 찍는다.
-  문구는 홈 첫 화면 h1(src/content/story.ts HERO.title) 그대로. 숫자 · 모집 상태 · 기수처럼 바뀌는 말은 넣지 않는다
-  (그림은 한번 퍼지면 고칠 수 없다). '서비스를 냅니다' 는 해마다 되풀이되는 일이라 데모데이 뒤에도 맞다.
+  문구는 홈 첫 화면 소개 한 줄(src/content/story.ts HERO.pitch, 4기 Organizer 문구 2026-11-05) 그대로.
+  숫자 · 모집 상태 · 기수처럼 바뀌는 말은 넣지 않는다 (그림은 한번 퍼지면 고칠 수 없다).
+  로고는 public/brand/gdg-dgu-logo.png (render.mjs 가 끼운다). 구글 4색 점은 쓰지 않는다 (DESIGN 4장).
 -->
 <html lang="ko">
   <head>
@@ -40,9 +41,9 @@
       /* 실제 홈 지도 캡처. 오른쪽 · 아래로 흘려 보내고, 글자 쪽(왼쪽 · 위) 가장자리는 종이색으로 녹인다 */
       .campus {
         position: absolute;
-        left: var(--campus-x, 296px);
-        top: var(--campus-y, 218px);
-        width: var(--campus-w, 1140px);
+        left: var(--campus-x, 380px);
+        top: var(--campus-y, 262px);
+        width: var(--campus-w, 980px);
         height: auto;
         -webkit-mask-image: linear-gradient(to right, transparent 0, #000 24%), linear-gradient(to bottom, transparent 0, #000 7%);
         -webkit-mask-composite: source-in;
@@ -61,22 +62,13 @@
         font: 700 30px/1 var(--font-num);
         letter-spacing: -0.01em;
       }
-      .dots {
-        display: inline-flex;
-        gap: 6px;
+      .logo {
+        height: 40px;
+        width: auto;
       }
-      .dots i {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-      }
-      .dots i:nth-child(1) { background: var(--g-blue); }
-      .dots i:nth-child(2) { background: var(--g-red); }
-      .dots i:nth-child(3) { background: var(--g-yellow); }
-      .dots i:nth-child(4) { background: var(--g-green); }
       h1 {
         margin: 40px 0 0;
-        font: 800 64px/78px var(--font-kr);
+        font: 700 60px/74px var(--font-kr);
         letter-spacing: -0.03em;
       }
       h1 span {
@@ -110,18 +102,17 @@
     <img class="campus" id="campus" src="campus.png" alt="" />
     <div class="text">
       <div class="brand">
+        <img class="logo" src="logo.png" alt="" />
         <span lang="en">GDGoC DGU</span>
-        <span class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
       </div>
       <h1>
-        <span>9월에 처음 만난 사람들이</span>
-        <span>12월엔 한 팀으로</span>
-        <span>서비스를 냅니다.</span>
+        <span>학생과 현업자 사이를 잇는</span>
+        <span>동국대학교 개발자 커뮤니티</span>
       </h1>
     </div>
     <p class="sub">
       <b>동국대학교 Google Developer Groups on Campus</b>
-      전공 · 학년 상관없이 함께합니다
+      전공과 학년에 상관없이 지원할 수 있습니다
     </p>
   </body>
 </html>

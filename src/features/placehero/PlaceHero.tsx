@@ -1,6 +1,6 @@
 import { useId, useRef, type CSSProperties, type MouseEvent, type ReactNode, type RefObject } from 'react'
 import { Link } from 'react-router-dom'
-import { PLACE_BY_ID, placeColor } from '@/config/places'
+import { placeColor } from '@/config/places'
 import { SITE } from '@/config/site'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useToday } from '@/hooks/useToday'
@@ -53,10 +53,8 @@ export interface PlaceHeroProps {
 /** 이 폭 미만이면 위아래로 쌓는다 (pages.module.css 의 섹션과 같은 기준) */
 export const HERO_STACK_QUERY = '(max-width: 1023px)'
 
-const directoryName = (place: HeroPlace) => {
-  const label = PLACE_BY_ID[place].label
-  return label.endsWith('안내') ? label : `${label} 안내`
-}
+/** 안내판 머리: 모든 페이지에서 '바로 가기' ('소개 안내' 같은 겹말을 만들지 않는다. AI 티 점검 2026-11-05) */
+const DIRECTORY_NAME = '바로 가기'
 
 /** 같은 페이지 섹션으로: hash 주소(#/…) 미리보기에서도 라우터가 가로채지 않게 직접 옮긴다 */
 function onSectionClick(e: MouseEvent<HTMLAnchorElement>, href: string) {
@@ -184,7 +182,7 @@ export function PlaceHero({ place, eyebrow, title, lead, meta, directory, state,
         {lead && <p className={s.lead}>{lead}</p>}
         {meta && <p className={s.meta}>{meta}</p>}
         {/* 글자 아래 안내판 (넓은 화면만. 1024 미만은 아래 묶음이 바로 이어진다) */}
-        {hasPlate && !onRoof && !narrow && <Plate id={titleId} title={directoryTitle ?? directoryName(place)} rows={rows} className={`${s.plate} ${s.textPlate}`} />}
+        {hasPlate && !onRoof && !narrow && <Plate id={titleId} title={directoryTitle ?? DIRECTORY_NAME} rows={rows} className={`${s.plate} ${s.textPlate}`} />}
       </div>
 
       <div className={s.place}>
@@ -198,7 +196,7 @@ export function PlaceHero({ place, eyebrow, title, lead, meta, directory, state,
           <div className={s.pin} style={pinStyle} data-ready={frame ? '' : undefined}>
             <span className={s.foot} aria-hidden="true" />
             <span className={s.leader} aria-hidden="true" />
-            <Plate id={titleId} title={directoryTitle ?? directoryName(place)} rows={rows} plateRef={plateRef} className={s.plate} />
+            <Plate id={titleId} title={directoryTitle ?? DIRECTORY_NAME} rows={rows} plateRef={plateRef} className={s.plate} />
           </div>
         )}
       </div>

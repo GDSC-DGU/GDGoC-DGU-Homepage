@@ -27,8 +27,8 @@ export interface SeminarTab {
   count: number
 }
 
-/** 'React Native' → 'reactnative' (띄어쓰기 · 대소문자 무시) */
-const norm = (s: string) => s.toLowerCase().replace(/\s+/g, '')
+/** 'React Native' → 'reactnative' (띄어쓰기 · 대소문자 무시, 한글은 NFC 로 맞춘다) */
+const norm = (s: string) => s.normalize('NFC').toLowerCase().replace(/\s+/g, '')
 
 export function matchesSeminar(s: Pick<Seminar, 'title' | 'speaker'>, q: string): boolean {
   const key = norm(q)
@@ -62,14 +62,25 @@ export function matchesByGeneration(list: readonly Seminar[], q: string): { gen:
     .filter((x) => x.count > 0)
 }
 
+/** 홈 '멤버 세미나': 기수마다 가장 최근 발표 n개 (최근 기수 먼저, 같은 날이면 제목 순) */
+export function latestByGeneration(list: readonly Seminar[], n = 3): { gen: number; items: Seminar[] }[] {
+  return seminarGenerations(list).map((gen) => ({ gen, items: list.filter((s) => s.generation === gen).sort(byRecent).slice(0, n) }))
+}
+
+/** 아카이브 세미나 보기에서 그 발표를 찾아 둔 주소: '/archive?view=seminars&gen=3&q=제목#archive-views' */
+export function seminarHref(talk: Pick<Seminar, 'generation' | 'title'>): string {
+  const p = new URLSearchParams({ view: 'seminars', gen: String(talk.generation), q: talk.title })
+  return `/archive?${p.toString()}#archive-views`
+}
+
 /** 발표한 사람 수 (같은 사람이 여러 번 해도 한 명) */
 export const speakerCount = (list: readonly Seminar[]) => new Set(list.map((s) => s.speaker).filter(Boolean)).size
 
-/** '2025.10 – 2026.05' (같은 달이면 하나만) */
+/** '2025.10–2026.05' (같은 달이면 하나만) */
 export function periodLabel(from: string, to: string): string {
   const a = from.slice(0, 7).replace('-', '.')
   const b = to.slice(0, 7).replace('-', '.')
-  return a === b ? a : `${a} – ${b}`
+  return a === b ? a : `${a}–${b}`
 }
 
 /** 주소의 ?gen=2 → 2. 목록에 없는 기수 · 이상한 값 · 없으면 가장 최근 기수 */

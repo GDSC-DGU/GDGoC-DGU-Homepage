@@ -45,16 +45,17 @@ export function nameChange(gens: readonly Generation[]): { before: string; after
   return i > 0 ? { before: sorted[i - 1].name, after: sorted[i].name, from: sorted[i].n } : null
 }
 
-/** 흰 판 네 장: 정기 세션 · G-Sprint · 연합 행사 · 그룹 멤버 (자료가 없는 판은 뺀다) */
+/** 칸 네 개 (위 2px 먹색 줄): 정기 세션 · G-Sprint · 연합 행사 · 챕터 페이지 가입자 (자료가 없는 칸은 뺀다) */
 export function whoCards({ members, sprint, demoDay }: WhoInput): WhoCard[] {
   const cards: WhoCard[] = [
-    // 홈 지도 팝업 '화요일 · 네 파트별 실습' + 지원 안내 '시험 기간에는 쉽니다' (faq when-sessions)
-    { id: 'sessions', label: '정기 세션', value: '매주 화요일', sub: '네 파트별 실습 · 시험 기간에는 쉽니다' },
+    // 홈 지도 팝업 '화요일 · 파트별 실습' (faq when-sessions)
+    { id: 'sessions', label: '정기 세션', value: '매주 화요일', sub: '파트별 실습' },
   ]
   const sprintSub = [GLOSSARY['g-sprint'].short, demoDay ? `${demoDay} ${GLOSSARY['demo-day'].term}` : null].filter(Boolean).join(' · ')
   if (sprint?.verified) cards.push({ id: 'sprint', label: GLOSSARY['g-sprint'].term, value: `${sprint.teams}팀 ${sprint.members}명`, sub: sprintSub })
   else cards.push({ id: 'sprint', label: GLOSSARY['g-sprint'].term, value: GLOSSARY['g-sprint'].short })
-  cards.push({ id: 'joint', label: '연합 행사', value: `${GLOSSARY['dong-hong'].term} · 동지톤`, sub: `${GLOSSARY['dong-hong'].term}: ${GLOSSARY['dong-hong'].short}` })
-  if (members) cards.push({ id: 'members', label: '그룹 멤버', value: `${members.value}명`, sub: `gdg.community.dev 챕터 그룹 · ${members.asOf.slice(0, 7).replace('-', '.')} 기준` })
+  cards.push({ id: 'joint', label: '연합 행사', value: `${GLOSSARY['dong-hong'].term} · 동지톤`, sub: `${GLOSSARY['dong-hong'].term}은 홍익대와 하는 교류전` })
+  // gdg.community.dev 챕터 페이지에 가입한 사람 수 (활동 멤버 수가 아니다)
+  if (members) cards.push({ id: 'members', label: '챕터 페이지 가입자', value: `${members.value}명`, sub: `gdg.community.dev, ${members.asOf.slice(0, 7).replace('-', '.')} 기준` })
   return cards
 }

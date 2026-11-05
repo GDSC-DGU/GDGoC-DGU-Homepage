@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import s from './story.module.css'
 
 export type StoryTone = 'paper' | 'field' | 'dark'
@@ -6,42 +6,33 @@ export type StoryTone = 'paper' | 'field' | 'dark'
 export interface StoryHeadProps {
   /** h2 의 id. 섹션의 aria-labelledby 가 이것을 가리킨다 */
   titleId: string
-  /** 장소 이름표 ('프로젝트' · '지원 안내' …). 없으면 이름표 줄을 그리지 않는다 */
-  eyebrow?: ReactNode
-  /**
-   * 이름표 네모 색 (장소색: 'var(--place-projects)' 또는 placeColor(id)).
-   * 비우면 면의 글자색(흰 면 먹색 · 먹색 면 흰색), null 이면 네모 없이 글자만.
-   */
-  placeColor?: string | null
   /** 주장 제목: 실제 숫자나 사실을 담은 한 문장. 질문형 금지. 숫자는 <span className="num"> */
   title: ReactNode
   /** 제목 아래 한두 줄 (기준 · 풀이) */
   sub?: ReactNode
   /** 제목 줄 오른쪽 끝 행동 하나 (.link-go 또는 .btn-secondary). 폰에서는 아래로 내려간다 */
   action?: ReactNode
-  /** 제목 크기. 기본: 먹색 면은 display(64), 나머지는 section(48) */
-  titleSize?: 'section' | 'display'
+  /**
+   * 제목 크기. 기본: 먹색 면은 display(64), 나머지는 section(48).
+   * h2(28): 페이지의 주인공이 아닌 섹션 (큰 제목은 페이지마다 두세 개만: 화면 검토 2026-11-05)
+   */
+  titleSize?: 'section' | 'display' | 'h2'
   tone?: StoryTone
   /** 머리(header)에 덧붙일 class (머리 → 내용 간격을 바꿀 때) */
   headClassName?: string
 }
 
 /**
- * 이야기 섹션 머리: 이름표(10px 장소색 네모 + 이름) → 주장 제목 → 한 줄 | 오른쪽 행동 하나.
+ * 이야기 섹션 머리: 제목 → 한 줄 | 오른쪽 행동 하나.
+ * 제목 위 작은 이름표(eyebrow)는 두지 않는다 (AI 티 점검 2026-11-05: 섹션마다 '프로젝트' · '연혁' 같은 이름표가 붙으면 틀로 찍은 화면처럼 읽힌다).
  * 보통은 StorySection 이 그린다. 섹션 틀을 직접 짜야 할 때만 따로 쓴다 (그때도 section 에 aria-labelledby={titleId}).
  */
-export function StoryHead({ titleId, eyebrow, placeColor, title, sub, action, titleSize, tone = 'paper', headClassName = '' }: StoryHeadProps) {
+export function StoryHead({ titleId, title, sub, action, titleSize, tone = 'paper', headClassName = '' }: StoryHeadProps) {
   const size = titleSize ?? (tone === 'dark' ? 'display' : 'section')
   return (
-    <header className={`${s.head} ${headClassName}`}>
+    <header className={`${s.head} ${size === 'h2' ? s.headSmall : ''} ${headClassName}`}>
       <div className={s.headText}>
-        {eyebrow && (
-          <p className={s.eyebrow}>
-            {placeColor !== null && <span className="mark" style={placeColor ? ({ '--c': placeColor } as CSSProperties) : undefined} aria-hidden="true" />}
-            {eyebrow}
-          </p>
-        )}
-        <h2 id={titleId} className={`${s.headline} ${size === 'display' ? s.display : ''}`}>
+        <h2 id={titleId} className={`${s.headline} ${size === 'display' ? s.display : size === 'h2' ? s.small : ''}`}>
           {title}
         </h2>
         {sub && <p className={s.sub}>{sub}</p>}

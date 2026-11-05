@@ -12,6 +12,8 @@ export interface TermProps {
    * 버튼이 들어가므로 링크 · 버튼 안에서는 쓰지 않는다 (기본 모양은 어디서나 써도 된다).
    */
   more?: boolean
+  /** 용어와 풀이 사이에 붙일 이름의 나머지 ('Solution Challenge' + ' 2026' → 'Solution Challenge 2026(풀이)') */
+  suffix?: string
 }
 
 /**
@@ -21,17 +23,18 @@ export interface TermProps {
  * - more: 용어가 버튼이 되고, 누르면 괄호 안 짧은 풀이가 한두 문장 풀이로 바뀐다 (aria-expanded)
  * 조사는 뒤에 붙여 쓴다: <Term id="g-sprint" />는 → 'G-Sprint(한 학기 팀 프로젝트)는'
  */
-export function Term({ id, bare = false, more = false }: TermProps) {
+export function Term({ id, bare = false, more = false, suffix = '' }: TermProps) {
   const def = GLOSSARY[id]
   const longId = useId()
   const [open, setOpen] = useState(false)
   // 'G-Sprint' 가 하이픈에서 줄이 바뀌지 않게
   const term = keepHyphenated(def.term)
-  if (bare) return <>{term}</>
+  if (bare) return <>{term}{suffix}</>
   if (!more) {
     return (
       <span className={s.term}>
         {term}
+        {suffix}
         <span className={s.short}>({def.short})</span>
       </span>
     )
@@ -52,6 +55,7 @@ export function Term({ id, bare = false, more = false }: TermProps) {
         }}
       >
         {term}
+        {suffix}
         <span className="visually-hidden"> 풀이</span>
       </button>
       <span className={s.short}>

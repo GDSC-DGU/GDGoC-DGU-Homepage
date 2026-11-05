@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SEMINARS } from '@/content'
 import type { Seminar } from '@/domain/types'
-import { matchesByGeneration, matchesSeminar, parseSeminarGen, periodLabel, seminarFileState, seminarGenerations, seminarGroup, seminarTabs, speakerCount } from './seminars'
+import { latestByGeneration, matchesByGeneration, matchesSeminar, parseSeminarGen, periodLabel, seminarFileState, seminarGenerations, seminarGroup, seminarHref, seminarTabs, speakerCount } from './seminars'
 
 const s = (id: string, date: string, generation: number, title: string, speaker = '발표자', extra: Partial<Seminar> = {}): Seminar => ({ id, date, generation, title, speaker, format: 'pdf', fileUrl: null, ...extra })
 const LIST = [s('a', '2024-01-05', 1, '나를 알려줘, SSE', '강산아'), s('b', '2025-04-03', 2, 'TypeScript, 개발 속도를 높이는 타입의 힘', '이지희'), s('c', '2025-04-03', 2, '리액트컴포넌트패턴', '김태욱'), s('d', '2026-04-10', 3, 'CLAUDE 너 내 동료가 돼라', '공기훈')]
@@ -44,8 +44,22 @@ describe('아카이브 세미나', () => {
     expect(seminarFileState({ format: null, fileUrl: null })).toBe('none')
   })
 
+  it('홈 멤버 세미나: 기수마다 최근 발표 n개, 누르면 아카이브에서 그 발표를 찾은 화면', () => {
+    expect(latestByGeneration(LIST, 1).map((g) => [g.gen, g.items.map((x) => x.id)])).toEqual([
+      [3, ['d']],
+      [2, ['c']],
+      [1, ['a']],
+    ])
+    expect(latestByGeneration(SEMINARS).every((g) => g.items.length === 3)).toBe(true)
+    const href = seminarHref(LIST[1])
+    expect(href.startsWith('/archive?')).toBe(true)
+    const p = new URLSearchParams(href.slice('/archive?'.length).split('#')[0])
+    expect([p.get('view'), p.get('gen'), p.get('q')]).toEqual(['seminars', '2', LIST[1].title])
+    expect(href.endsWith('#archive-views')).toBe(true)
+  })
+
   it('기간 표기 · 발표자 수', () => {
-    expect(periodLabel('2025-10-10', '2026-05-22')).toBe('2025.10 – 2026.05')
+    expect(periodLabel('2025-10-10', '2026-05-22')).toBe('2025.10–2026.05')
     expect(periodLabel('2025-04-03', '2025-04-03')).toBe('2025.04')
     expect(seminarGenerations(LIST)).toEqual([3, 2, 1])
     expect(speakerCount([...LIST, s('e', '2026-01-01', 3, '또', '공기훈')])).toBe(4)

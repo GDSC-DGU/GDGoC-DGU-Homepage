@@ -7,8 +7,8 @@ import type { Project } from '@/domain/types'
 import { useToday } from '@/hooks/useToday'
 import { ExternalLink, StateLine } from './PageParts'
 import { OTHER_PROGRAMS } from './projectGroups'
-import { GridCard, ProjectGrid } from './projects/ExhibitCard'
-import { neighbors, type Room } from './projects/exhibit'
+import { ExhibitCard, GridCard, ProjectGrid, WorkList } from './projects/ExhibitCard'
+import { isWorkImage, neighbors, projectGallery, type Room } from './projects/exhibit'
 import { GEN_PARAM, genTabId, generationTabs, parseTab, tabOfProject, tabOfRoom } from './projects/generations'
 import { GenTabs } from './projects/GenTabs'
 import { ProjectSheet } from './projects/ProjectSheet'
@@ -21,13 +21,20 @@ const EMPTY: Project[] = []
 
 const PANEL_ID = 'gen-panel'
 
+/** 큰 카드에 걸 작품: 실제 그림(화면 · 소개 이미지 · 폰 화면)이 있는 것. 로고 · 구조도만 있거나 그림이 없으면 줄 목록 */
+const hasWorkImage = (pr: Project) => projectGallery(pr).some(isWorkImage)
+
 /**
- * 전시실 하나: 머리 한 줄(큰 해 · 프로그램 | 오른쪽 끝 기수 · 개수) → 카드 격자 (그림 · 이름 · 한 줄 설명).
+ * 전시실 하나: 머리 한 줄(큰 해 · 프로그램 | 오른쪽 끝 기수 · 개수) → 실제 그림이 있는 작품은 큰 카드 두 칸 → 나머지는 아이콘 줄 목록.
+ * (같은 크기 카드에 화면 · 로고 · 글자 표지가 섞여 있었다: 4기 Organizer 2026-11-05)
  * 탭의 첫 방은 탭 위 먹선이 머리 선을 대신한다. first: 탭의 첫 방 (첫 줄 그림을 먼저 불러온다)
  */
 function RoomSection({ room, first }: { room: Room; first: boolean }) {
   const other = room.title === OTHER_PROGRAMS
   const gens = room.generations.map((n) => `${n}기`).join(' · ')
+  const label = other ? room.title : `${room.yearLabel} ${room.title}`
+  const big = room.projects.filter(hasWorkImage)
+  const rest = room.projects.filter((pr) => !hasWorkImage(pr))
   return (
     <section id={room.id} className={p.room} aria-labelledby={`${room.id}-title`}>
       <header className={p.roomHead}>
@@ -42,11 +49,20 @@ function RoomSection({ room, first }: { room: Room; first: boolean }) {
           <span className="num">{room.projects.length}</span>개
         </p>
       </header>
-      <ProjectGrid label={other ? room.title : `${room.yearLabel} ${room.title}`}>
-        {room.projects.map((pr, i) => (
-          <GridCard key={pr.id} project={pr} withProgram={other} eager={first && i < 3} />
-        ))}
-      </ProjectGrid>
+      {big.length > 0 && (
+        <ProjectGrid wide label={label}>
+          {big.map((pr, i) => (
+            <GridCard key={pr.id} project={pr} withProgram={other} eager={first && i < 2} />
+          ))}
+        </ProjectGrid>
+      )}
+      {rest.length > 0 && (
+        <WorkList label={big.length > 0 ? `${label} 나머지 작품` : label}>
+          {rest.map((pr) => (
+            <ExhibitCard key={pr.id} project={pr} withProgram={other} />
+          ))}
+        </WorkList>
+      )}
     </section>
   )
 }
@@ -95,9 +111,11 @@ export function ProjectsView() {
   )
   const live = useRef({ params, state: location.state as unknown })
   const lastOpen = useRef<string | null>(null)
+  const tabsRef = useRef(tabs)
   useEffect(() => {
     live.current = { params, state: location.state }
-  }, [params, location.state])
+    tabsRef.current = tabs
+  }, [params, location.state, tabs])
   useEffect(() => {
     if (open) lastOpen.current = open.id
   }, [open])
@@ -110,17 +128,26 @@ export function ProjectsView() {
       else {
         const rest = new URLSearchParams(cur)
         rest.delete(SHEET_PARAM)
+        // 다른 페이지 · 주소에서 바로 연 창이면 주소에 기수가 없다: 그 작품이 든 탭에 남는다 (QA 2026-11-05: 닫으면 3기 탭으로 튀었다)
+        if (!rest.get(GEN_PARAM) && lastOpen.current) {
+          const key = tabOfProject(tabsRef.current, lastOpen.current)
+          if (key) rest.set(GEN_PARAM, key)
+        }
         setParams(rest, { replace: true, preventScrollReset: true })
       }
     }
-    // 연 자리를 모르면(주소로 바로 연 창) 그 작품으로 초점을 옮긴다
-    requestAnimationFrame(() => {
+    // 연 자리를 모르면(주소로 바로 연 창) 그 작품으로 초점을 옮긴다. 탭이 바뀌어 카드가 늦게 그려질 수 있어 몇 번 다시 본다
+    let tries = 0
+    const focusCard = () => {
       const active = document.activeElement
       // 초점이 이미 페이지의 어딘가로 돌아갔으면 그대로 둔다 (닫히는 창 안이나 body 면 옮긴다)
       if (active && active !== document.body && active.id !== 'main' && !active.closest('dialog')) return
       const id = lastOpen.current
-      if (id) document.querySelector<HTMLElement>(`[data-sheet-card="${CSS.escape(id)}"]`)?.focus()
-    })
+      const card = id ? document.querySelector<HTMLElement>(`[data-sheet-card="${CSS.escape(id)}"]`) : null
+      if (card) card.focus()
+      else if (++tries < 10) requestAnimationFrame(focusCard)
+    }
+    requestAnimationFrame(focusCard)
   }, [navigate, setParams])
 
   const status = isPending ? (

@@ -22,7 +22,7 @@ export function eligibilityFacts(): Fact[] {
   const facts: Fact[] = []
   if (who) {
     facts.push({ id: 'campus', label: '학적', value: '동국대 서울캠퍼스', sub: '재학생 · 휴학생 · 수료생' })
-    facts.push({ id: 'major', label: '전공 · 학년', value: '상관없음', sub: '비전공자 · 1학년도 지원할 수 있습니다.' })
+    facts.push({ id: 'major', label: '전공·학년', value: '상관없음', sub: '비전공자, 1학년도 지원할 수 있습니다.' })
   }
   if (when) {
     facts.push({
@@ -33,7 +33,6 @@ export function eligibilityFacts(): Fact[] {
           매주 화요일 <span className="num">18:00</span>
         </>
       ),
-      sub: '중간 · 기말고사 기간에는 쉽니다.',
     })
   }
   return facts

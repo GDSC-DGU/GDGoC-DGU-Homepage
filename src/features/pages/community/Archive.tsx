@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { CHAPTER } from '@/content'
 import type { TermId } from '@/content/glossary'
 import type { Generation, ScheduleEvent } from '@/domain/types'
@@ -107,7 +107,11 @@ export function Archive({
         </div>
         {events.length === 0 ? (
           <p className={c.genEmpty}>
-            gdg.community.dev에 공개된 {info.n}기 행사 기록은 없습니다. 이 기수가 남긴 프로젝트는 프로젝트 페이지에 있습니다.
+            gdg.community.dev에 공개된 {info.n}기 행사 기록은 없습니다. 이 기수가 남긴 프로젝트와 세미나는{' '}
+            <Link className="link" to={`/archive?gen=${info.n}`}>
+              아카이브
+            </Link>
+            에 있습니다.
           </p>
         ) : (
           <ul className={s.rows} aria-label={`${info.n}기 행사 기록 ${events.length}건`}>

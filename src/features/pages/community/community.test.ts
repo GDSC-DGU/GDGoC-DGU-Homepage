@@ -102,6 +102,11 @@ describe('regularTime (정기 세션 시간)', () => {
     expect(regularTime(ev('b', '2026-12-01'))).toBe('18:00')
   })
 
+  it('운영 계획에만 있는 일정(특강 · 데모데이)에는 붙이지 않는다', () => {
+    expect(regularTime(ev('plan', '2026-12-01', { source: '4기 운영 계획' }))).toBeNull()
+    expect(regularTime(ev('demo', '2026-12-29', { kind: 'sprint', source: '4기 운영 계획' }))).toBeNull()
+  })
+
   it('행사 · 다른 요일 · 다른 기수 · 여러 날 행사에는 붙이지 않는다', () => {
     expect(regularTime(ev('mt', '2026-12-15', { kind: 'event' }))).toBeNull()
     expect(regularTime(ev('mon', '2026-11-02'))).toBeNull()

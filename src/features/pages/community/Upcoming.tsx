@@ -86,7 +86,7 @@ export function Upcoming({ events, today, timeOf, terms }: Props) {
                         ·
                       </span>
                     )}
-                    {e.venue ? <RoomPlate venue={e.venue} prefix="장소" /> : isPeriod(e) ? null : <span className={c.upNoVenue}>장소 추후 공지</span>}
+                    {e.venue ? <RoomPlate venue={e.venue} prefix="장소" /> : isPeriod(e) ? null : <span className={c.upNoVenue}>장소 미정</span>}
                   </>
                 )}
               </span>

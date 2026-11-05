@@ -53,10 +53,12 @@ describe('미리보기 (지도 패널의 최신 3개)', () => {
     const teams = await repos.previews.latest('teams', 3)
     expect(teams.length).toBeGreaterThan(0)
     for (const t of teams) {
-      expect(t.sample, t.id).toBeUndefined()
-      // 프로토타입 보기(개발 · 테스트)는 게시판의 최근 글, 공개 배포는 날짜 없는 상태 줄
-      if (PROTOTYPE) expect(t.date, t.id).toBeTruthy()
-      else {
+      // 프로토타입 보기(개발 · 테스트)는 게시판의 최근 예시 글('예시' 표시), 공개 배포는 날짜 없는 상태 줄
+      if (PROTOTYPE) {
+        expect(t.date, t.id).toBeTruthy()
+        expect(t.sample, t.id).toBe(true)
+      } else {
+        expect(t.sample, t.id).toBeUndefined()
         expect(t.date, t.id).toBeUndefined()
         expect(t.label, t.id).toBeTruthy()
       }
@@ -80,7 +82,7 @@ describe('검색 아카이브', () => {
     const ids = docs.map((d) => d.id)
     expect(new Set(ids).size).toBe(ids.length)
     expect(docs.some((d) => d.id.startsWith('event-'))).toBe(true)
-    expect(docs.filter((d) => d.id.startsWith('project-'))).toHaveLength(PROJECTS.length)
+    expect(docs.filter((d) => d.id.startsWith('project-'))).toHaveLength(PROJECTS.filter((p) => p.status === 'done').length)
     expect(docs.filter((d) => d.id.startsWith('faq-'))).toHaveLength(FAQS.length)
     expect(docs.some((d) => d.id === 'event-4th-rest-mid')).toBe(false)
   })

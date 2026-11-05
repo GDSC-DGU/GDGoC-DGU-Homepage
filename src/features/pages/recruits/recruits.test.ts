@@ -159,7 +159,7 @@ describe('모집 상태 문구', () => {
   it('unscheduled: 지난 모집 시기 + 인스타그램', () => {
     const v = statusView(base, '2026-10-18', H)
     expect(v.title).toBe('5기 모집은 아직 열리지 않았습니다')
-    expect(v.lines).toEqual(['지난 4기는 2026.08–09에 모집했습니다.', `열리면 인스타그램 ${H}에 가장 먼저 알립니다.`])
+    expect(v.lines).toEqual(['지난 4기는 2026.08–09에 모집했습니다.', `열리면 인스타그램 ${H}에 알립니다.`])
     expect(v.primary).toBe('channel')
     expect(v.dday).toBeUndefined()
   })

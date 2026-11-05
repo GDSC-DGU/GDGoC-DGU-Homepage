@@ -5,7 +5,7 @@ import type { Project, ProjectImage } from '@/domain/types'
 import { useModalDialog } from '@/features/layout/useModalDialog'
 import { ExternalLink, Mark } from '../PageParts'
 import { Dotted, LiveLink } from './ExhibitCard'
-import { assetUrl, isOpenSource, languageSegments, monthSpan, outLinks, projectGallery, repoPath } from './exhibit'
+import { assetUrl, isOpenSource, languageSegments, monthSpan, outLinks, projectGallery } from './exhibit'
 import { LanguageBar } from './Plate'
 import { sheetSearch } from './sheetLink'
 import { morphClose } from './sheetMorph'
@@ -27,7 +27,7 @@ function Shot({ img, project, first }: { img: ProjectImage; project: Project; fi
         <span>{img.caption ?? img.alt}</span>
         {isOpenSource(img.source) && (
           <ExternalLink href={img.source} context={`${project.name} ${img.caption ?? ''} 원본 그림`} className={`link ${c.source}`}>
-            원본
+            원본 보기
           </ExternalLink>
         )}
       </figcaption>
@@ -160,7 +160,7 @@ export function ProjectSheet({
                   </div>
                   {p.stack && p.stack.length > 0 && (
                     <div>
-                      <dt>재료</dt>
+                      <dt>사용 기술</dt>
                       <dd>
                         <Dotted parts={p.stack} />
                       </dd>
@@ -168,7 +168,7 @@ export function ProjectSheet({
                   )}
                   {span && (
                     <div>
-                      <dt>커밋 기간</dt>
+                      <dt>개발 기간</dt>
                       <dd className="num">{span}</dd>
                     </div>
                   )}
@@ -192,8 +192,7 @@ export function ProjectSheet({
                 </dl>
                 {p.repo && p.statsAsOf && (span || segs.length > 0) && (
                   <p className={c.basis}>
-                    {/* 저장소 이름만 (조직 이름 'GDSC-DGU' 는 지금 쓰지 않는 이름이라 보이지 않는다) */}
-                    커밋 기간 · 언어는 대표 저장소 {repoPath(p.repo).split('/').pop()} 기준 · GitHub <span className="num">{dotted(p.statsAsOf)}</span>
+                    개발 기간과 언어는 GitHub 기준 (<span className="num">{dotted(p.statsAsOf)}</span>)
                   </p>
                 )}
                 {links.length > 0 && (

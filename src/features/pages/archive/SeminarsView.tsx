@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useSeminars } from '@/data/queries'
 import type { Seminar } from '@/domain/types'
@@ -35,7 +35,7 @@ function Highlight({ text, q }: { text: string; q: string }): ReactNode {
 
 /**
  * 발표 한 줄: 날짜(같은 날이 이어지면 첫 줄에만) | 제목 · 발표자 | 자료.
- * 자료가 올라와 있으면 줄 전체가 링크(새 창으로 PDF 열기 · PPT 받기). 아직이면 '준비 중', 자료가 없던 발표는 비워 둔다.
+ * 자료가 올라와 있으면 줄 전체가 링크(새 창으로 PDF 열기, PPT 받기). 아직이면 비워 둔다 (맨 위 안내 한 줄이 말한다).
  */
 function TalkRow({ talk, showDate, q }: { talk: Seminar; showDate: boolean; q: string }) {
   const state = seminarFileState(talk)
@@ -75,7 +75,6 @@ function TalkRow({ talk, showDate, q }: { talk: Seminar; showDate: boolean; q: s
           {kind === 'PPT' ? 'PPT 받기 ↓' : 'PDF 열기 ↗'}
         </span>
       )}
-      {state === 'pending' && <span className={a.talkPending}>{kind} 준비 중</span>}
     </li>
   )
 }
@@ -123,10 +122,24 @@ export function SeminarsView() {
   const gens = useMemo(() => seminarGenerations(list), [list])
   const tabs = useMemo(() => seminarTabs(list), [list])
   const gen = parseSeminarGen(params.get(SEMINAR_GEN_PARAM), gens)
-  const q = params.get(SEMINAR_Q_PARAM) ?? ''
+  const urlQ = params.get(SEMINAR_Q_PARAM) ?? ''
+  // 찾기 칸은 입력한 글자를 바로 보여 주고, 주소(?q=)에는 뒤따라 적는다.
+  // 주소에서 바로 값을 읽으면 주소가 늦게 바뀌어 한글 조합이 깨지고 커서가 끝으로 튄다 (QA 2026-11-05).
+  // 내가 적은 값이 주소로 돌아온 것은 건너뛰고, 다른 곳에서 바뀐 주소(검색 창 · 링크)만 칸에 반영한다.
+  const [q, setQ] = useState(urlQ)
+  const written = useRef<string[]>([])
+  useEffect(() => {
+    const i = written.current.indexOf(urlQ)
+    if (i >= 0) {
+      written.current = written.current.slice(i + 1)
+      return
+    }
+    setQ(urlQ)
+  }, [urlQ])
   const group = useMemo(() => (gen === undefined ? null : seminarGroup(list, gen, q)), [list, gen, q])
   const elsewhere = useMemo(() => (q.trim() ? matchesByGeneration(list, q).filter((x) => x.gen !== gen) : []), [list, q, gen])
   const pending = list.filter((s) => seminarFileState(s) === 'pending').length
+  const ready = list.filter((s) => seminarFileState(s) === 'ready').length
 
   const update = (patch: Record<string, string | undefined>) => {
     const next = new URLSearchParams(params)
@@ -151,7 +164,8 @@ export function SeminarsView() {
         <span className="num">{gens.length > 1 ? `${gens[gens.length - 1]}–${gens[0]}` : gens[0]}</span>기 세미나 발표 <span className="num">{list.length}</span>개 · 발표자{' '}
         <span className="num">{speakerCount(list)}</span>명
       </p>
-      {pending > 0 && <p className={a.fileNote}>발표 자료(PDF)는 지금 올리는 중입니다. 올라온 발표는 줄을 누르면 새 창에서 열립니다.</p>}
+      {/* 자료가 하나라도 올라온 뒤에만 (아직 올리지 않았는데 '올리고 있다' 고 하지 않는다: 4기 Organizer 2026-11-05) */}
+      {ready > 0 && pending > 0 && <p className={a.fileNote}>자료가 올라온 발표는 눌러서 볼 수 있습니다.</p>}
 
       <div className={a.toolbar}>
         <GenTabs tabs={tabs} active={String(gen)} onChange={(key) => update({ [SEMINAR_GEN_PARAM]: key })} panelId={PANEL_ID} noun="세미나" tabId={seminarTabId} />
@@ -169,7 +183,19 @@ export function SeminarsView() {
             <circle cx="11" cy="11" r="6.5" />
             <path d="M16 16l4.5 4.5" />
           </svg>
-          <input id="seminar-q" className={a.searchInput} type="search" placeholder="제목 · 발표자" value={q} onChange={(e) => update({ [SEMINAR_Q_PARAM]: e.target.value || undefined })} />
+          <input
+            id="seminar-q"
+            className={a.searchInput}
+            type="search"
+            placeholder="제목이나 발표자"
+            value={q}
+            onChange={(e) => {
+              const v = e.target.value
+              setQ(v)
+              written.current.push(v)
+              update({ [SEMINAR_Q_PARAM]: v || undefined })
+            }}
+          />
         </form>
       </div>
 
@@ -187,7 +213,16 @@ export function SeminarsView() {
             {elsewhere.length > 0 && (
               <p className={a.elsewhere}>
                 {elsewhere.map((x) => (
-                  <button key={x.gen} type="button" className={a.elsewhereBtn} onClick={() => update({ [SEMINAR_GEN_PARAM]: String(x.gen) })}>
+                  <button
+                    key={x.gen}
+                    type="button"
+                    className={a.elsewhereBtn}
+                    onClick={() => {
+                      update({ [SEMINAR_GEN_PARAM]: String(x.gen) })
+                      // 누른 단추는 사라진다: 초점을 찾기 칸으로 (몸통으로 떨어지지 않게)
+                      document.getElementById('seminar-q')?.focus()
+                    }}
+                  >
                     <span className="num">{x.gen}</span>기에서 <span className="num">{x.count}</span>개 보기
                   </button>
                 ))}

@@ -109,8 +109,6 @@ export function ProjectsSection() {
     <StorySection
       id="projects"
       className={s.section}
-      eyebrow={PROJECTS_STORY.eyebrow}
-      placeColor="var(--place-projects)"
       title={withNum(PROJECTS_STORY.title, done)}
       sub={PROJECTS_STORY.sub.map((line, i) => (
         <span key={line} className={s.subLine}>

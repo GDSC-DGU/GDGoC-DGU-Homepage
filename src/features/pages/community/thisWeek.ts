@@ -1,3 +1,4 @@
+import { isPlanOnly } from '@/content/plan'
 import type { ScheduleEvent } from '@/domain/types'
 import { dayValue } from '@/lib/date'
 import { addDays } from '@/lib/rail'
@@ -35,9 +36,13 @@ export function meetingCycle(today: string, weekday: number = REGULAR_SESSION.we
   return { from: today, meet: addDays(today, (weekday - dow(today) + 7) % 7) }
 }
 
-/** 정기 세션 시간이 붙는 일정인지: 그 기수 · 모임 요일 · 세션이나 G-Sprint 단계 */
+/**
+ * 정기 세션 시간이 붙는 일정인지: 그 기수 · 모임 요일 · 세션이나 G-Sprint 단계.
+ * 운영 계획에만 있는 일정(공개 행사 페이지 없음)에는 붙이지 않는다: 특강 · 데모데이는 정기 세션 시간과 다를 수 있다 (4기 Organizer 2026-11-05)
+ */
 export function regularTime(e: ScheduleEvent, rule: { generation: number; weekday: number; time: string } = REGULAR_SESSION): string | null {
   if (e.generation !== rule.generation) return null
+  if (isPlanOnly(e)) return null
   if (e.kind !== 'session' && e.kind !== 'sprint') return null
   if (e.endDate && e.endDate !== e.date) return null
   return dow(e.date) === rule.weekday ? rule.time : null

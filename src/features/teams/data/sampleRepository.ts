@@ -247,7 +247,7 @@ export function createSampleTeamsRepository({ now = () => Date.now(), delay = 25
       respond(() => {
         const p = find(id)
         const studentId = checkCred(cred)
-        if (p.authorId !== studentId) throw new TeamsError('NOT_AUTHOR', '작성자만 수정 · 삭제할 수 있어요.')
+        if (p.authorId !== studentId) throw new TeamsError('NOT_AUTHOR', '작성자만 수정하거나 삭제할 수 있습니다.')
       }),
 
     update: (id, input, cred) =>
@@ -259,7 +259,7 @@ export function createSampleTeamsRepository({ now = () => Date.now(), delay = 25
           if (err) throw new TeamsError('INVALID', err, { fields: { status: err } })
         }
         const studentId = checkCred(cred)
-        if (p.authorId !== studentId) throw new TeamsError('NOT_AUTHOR', '작성자만 수정 · 삭제할 수 있어요.')
+        if (p.authorId !== studentId) throw new TeamsError('NOT_AUTHOR', '작성자만 수정하거나 삭제할 수 있습니다.')
         Object.assign(p, clean(input), {
           attachments: takeFiles(input.attachmentIds.slice(0, FILE_MAX), p.attachments),
           closedByAuthor: input.status === '마감',
@@ -272,7 +272,7 @@ export function createSampleTeamsRepository({ now = () => Date.now(), delay = 25
       respond(() => {
         const p = find(id)
         const studentId = checkCred(cred)
-        if (p.authorId !== studentId) throw new TeamsError('NOT_AUTHOR', '작성자만 수정 · 삭제할 수 있어요.')
+        if (p.authorId !== studentId) throw new TeamsError('NOT_AUTHOR', '작성자만 수정하거나 삭제할 수 있습니다.')
         p.deleted = true
       }),
 

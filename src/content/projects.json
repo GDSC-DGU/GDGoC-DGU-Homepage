@@ -48,7 +48,7 @@
     {
       "id": "yakjosim",
       "name": "약조심",
-      "summary": "약 · 음식 · 영양제를 같이 먹어도 되는지 '금기 · 주의'로 알려 주는 웹 서비스입니다.",
+      "summary": "약, 음식, 영양제를 같이 먹어도 되는지 '금기'와 '주의'로 알려 주는 웹 서비스입니다.",
       "program": "Solution Challenge 2026",
       "year": 2026,
       "generation": 3,
@@ -174,7 +174,7 @@
     {
       "id": "todai",
       "name": "토닥이 (TodAi)",
-      "summary": "홀로 사는 어르신과의 대화를 분석해 외로움 · 건강 위험을 짚고, 사회복지사가 먼저 챙길 사람을 고르게 돕는 AI 말벗입니다.",
+      "summary": "홀로 사는 어르신과 나눈 대화에서 외로움과 건강 위험을 짚어, 사회복지사가 먼저 챙길 사람을 알려 주는 AI 말벗입니다.",
       "program": "Solution Challenge 2026",
       "year": 2026,
       "generation": 3,

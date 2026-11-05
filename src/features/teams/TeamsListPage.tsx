@@ -5,10 +5,9 @@ import { CONTENT_UPDATED_AT } from '@/content'
 import { DetourLink } from '@/features/pages/community/Signage'
 import { dateLabel } from '@/features/pages/format'
 import { PlaceHero } from '@/features/placehero/PlaceHero'
-import type { DirectoryRow } from '@/features/placehero/PlaceHero'
 import { useToday } from '@/hooks/useToday'
 import { authorLabel, isNew, listSearch, parseListParams, periodLabel, timeAgo } from './data/rules'
-import { TEAMS_SAMPLE, useTeamsList, useTeamsSummary } from './data/teamsRepo'
+import { TEAMS_SAMPLE, TEAMS_SAMPLE_DATA, useTeamsList, useTeamsSummary } from './data/teamsRepo'
 import { SORTS, TEAMS_CATEGORIES, TEAM_PARTS, type ListQuery, type PostBrief, type TeamPost } from './data/types'
 import { Avatar, CategoryTag, DeadlineTag, NewTag, Pagination, PartTags, SampleNotice, SearchIcon, StatusTag } from './parts'
 import s from './teams.module.css'
@@ -22,7 +21,7 @@ export interface FromList {
 
 const LEAD = (
   <>
-    GDGoC DGU 멤버끼리 스터디 · 프로젝트 · 공모전을 같이할 팀원을 찾는 게시판입니다. 동아리 멤버를 뽑는 곳은 아닙니다.
+    멤버끼리 스터디, 프로젝트, 공모전 팀원을 구하는 게시판입니다. 동아리 멤버를 뽑는 곳은 아닙니다.
     <DetourLink to={PLACE_BY_ID.recruits.path} place="recruits">
       동아리 지원은 지원 안내에서
     </DetourLink>
@@ -62,20 +61,6 @@ export function TeamsListPage() {
   }
 
   const sum = summary.data
-  const count = (n: number | undefined) => (n === undefined ? '…' : <><span className="num">{n}</span>건</>)
-  const directory: DirectoryRow[] = TEAMS_SAMPLE
-    ? [
-        { label: '지금 상태', value: '예시 화면', href: '#board' },
-        { label: '여는 시기', value: '미정', href: '#board' },
-        { label: '모집 중인 글', value: count(sum?.open), href: '#board', onSelect: () => (update({ status: '모집중' }), toBoard()) },
-        { label: '동아리 지원', value: PLACE_BY_ID.recruits.label, href: PLACE_BY_ID.recruits.path },
-      ]
-    : [
-        { label: '모집 중', value: count(sum?.open), href: '#board', onSelect: () => (update({ status: '모집중' }), toBoard()) },
-        { label: '오늘 새 글', value: count(sum?.newToday), href: '#board', onSelect: () => (update({}), toBoard()) },
-        { label: '마감 임박', value: count(sum?.closingSoon.length), href: '#board', onSelect: () => (update({ sort: 'deadline', status: '모집중' }), toBoard()) },
-        { label: '동아리 지원', value: PLACE_BY_ID.recruits.label, href: PLACE_BY_ID.recruits.path },
-      ]
   const meta = TEAMS_SAMPLE ? (
     <>
       <span className={s.metaTag}>준비 중</span> <span className="num">{dateLabel(CONTENT_UPDATED_AT, null, today)}</span> 기준
@@ -95,13 +80,13 @@ export function TeamsListPage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PlaceHero place="teams" state={TEAMS_SAMPLE ? 'construction' : 'open'} eyebrow={PLACE_BY_ID.teams.sub} title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} directory={directory} />
+      <PlaceHero place="teams" state={TEAMS_SAMPLE ? 'construction' : 'open'} title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} />
 
       <section id="board" ref={boardRef} className={`story paper ${s.board}`} aria-labelledby="board-title">
         <h2 id="board-title" className="visually-hidden">
           팀원 모집 글
         </h2>
-        {TEAMS_SAMPLE && <SampleNotice />}
+        {TEAMS_SAMPLE ? <SampleNotice /> : TEAMS_SAMPLE_DATA && <SampleNotice compact />}
         {flash && (
           <p className={s.flash} role="status">
             {flash}
@@ -223,7 +208,7 @@ export function TeamsListPage() {
             <SideBox title="이번 주 많이 본 글" items={sum?.popular} empty="아직 글이 없습니다." from={location.search} ranked render={(p) => <span className={`${s.sideCount} num`}>{p.views}</span>} />
             <div className={s.sideNote}>
               <p className={s.sideNoteTitle}>처음 글을 쓴다면</p>
-              <p>글 · 댓글은 학번과 PIN 4자리로 씁니다. PIN을 잊었다면 운영진에게 다시 받을 수 있어요.</p>
+              <p>글과 댓글은 학번과 PIN 4자리로 씁니다. PIN을 잊었다면 운영진에게 다시 받으면 됩니다.</p>
             </div>
           </aside>
         </div>

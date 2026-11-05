@@ -66,7 +66,7 @@
    * 글자 크기/줄 높이 (DESIGN 3장 표). 폭에 따라 아래 미디어 쿼리에서 바뀐다.
    * 80(--t-hero) → 64(display) → 48(section) → 28(h2) 로 단계를 둔다. 40(--t-h1)은 예전 화면용으로만 남긴다.
    */
-  --t-display: 800 64px/76px var(--font-kr); /* 하위 페이지 h1 · 먹색 띠 주장 */
+  --t-display: 700 64px/76px var(--font-kr); /* 하위 페이지 h1 · 먹색 띠 주장 (800 → 700: 참고 회사들은 제목 700) */
   --t-section: 700 48px/60px var(--font-kr); /* 이야기 섹션 주장 제목 */
   --t-h1: 700 40px/52px var(--font-kr); /* (예전) 참고 화면 제목. 새 화면은 --t-section */
   --t-h2: 700 28px/38px var(--font-kr); /* 참고 섹션 제목 · 묶음 제목 */
@@ -78,8 +78,8 @@
   --t-meta: 500 13px/20px var(--font-kr); /* 하한: 13px 미만 한글 금지 */
   --t-num: 600 88px/88px var(--font-num); /* 큰 숫자 (한 화면에 한 묶음) */
   --t-num-m: 600 40px/44px var(--font-num); /* 일정 표 날짜 · 전시실 연도 */
-  --ls-display: -0.03em;
-  --ls-section: -0.028em;
+  --ls-display: -0.02em;
+  --ls-section: -0.02em;
   --ls-h1: -0.02em;
   --ls-h2: -0.015em;
   --ls-h3: -0.01em;
@@ -140,7 +140,7 @@
 
 @media (max-width: 1279px) {
   :root {
-    --t-display: 800 56px/68px var(--font-kr);
+    --t-display: 700 56px/68px var(--font-kr);
     --t-section: 700 44px/56px var(--font-kr);
     --gap-section: 120px;
   }
@@ -157,7 +157,7 @@
 
 @media (max-width: 767px) {
   :root {
-    --t-display: 800 36px/46px var(--font-kr);
+    --t-display: 700 36px/46px var(--font-kr);
     --t-section: 700 30px/40px var(--font-kr);
     --t-h1: 700 26px/36px var(--font-kr);
     --t-h2: 700 22px/32px var(--font-kr);

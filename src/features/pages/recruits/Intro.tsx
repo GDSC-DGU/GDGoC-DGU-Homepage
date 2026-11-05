@@ -2,7 +2,6 @@ import { FAQS, PUBLIC_PROJECTS } from '@/content'
 import type { Project } from '@/domain/types'
 import { IconRow, projectIcon } from '@/features/common'
 import type { Fact } from './eligibility'
-import { Note } from './Notes'
 import { PARTS, partExamples } from './parts'
 import k from './recruit.module.css'
 
@@ -21,7 +20,6 @@ const iconOf = (p: Project) => (p.cover?.kind === 'logo' ? projectIcon(p) : null
  */
 export function Parts() {
   if (!faq('parts')) return null
-  const anyExamples = PARTS.some((p) => EXAMPLES[p.id])
   return (
     <>
       <ul className={k.parts} aria-label="파트">
@@ -34,30 +32,26 @@ export function Parts() {
                 {part.name}
               </h3>
               <p className={k.partRole}>{part.role}</p>
-              <dl className={k.partFacts}>
-                <div>
-                  <dt>화요일 세션에서 비교하는 것</dt>
-                  <dd className={k.partCompare}>{part.compare}</dd>
-                </div>
-                {icons.some(Boolean) && (
+              {/* 지난 기록이 없는 파트(4기에 생긴 Product Design)는 빈 괘선이 남지 않게 칸째 뺀다 */}
+              {icons.some(Boolean) && (
+                <dl className={k.partFacts}>
                   <div>
                     <dt>지난 프로젝트</dt>
                     <dd className={k.partIcons}>
                       <IconRow label={`${part.name} 파트가 맡는 기술을 쓴 지난 프로젝트`} items={icons} size="small" />
                     </dd>
                   </div>
-                )}
-              </dl>
+                </dl>
+              )}
             </li>
           )
         })}
       </ul>
-      {anyExamples && <Note>지난 프로젝트는 GitHub 저장소 README에 적힌 기술로 골랐습니다.</Note>}
     </>
   )
 }
 
-/** 흰 판 세 장: 작은 이름 → 값(28/38) → 풀이. 옅은 회색 면 위에 놓는다 */
+/** 칸 세 개 (위 2px 먹색 줄): 작은 이름 → 값(28/38) → 풀이. 옅은 회색 면 위에 놓는다 */
 export function Eligibility({ facts }: { facts: readonly Fact[] }) {
   return (
     <dl className={k.who}>

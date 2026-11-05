@@ -28,7 +28,7 @@ export const SITE = {
 
 /** 소개 장소(광장 깃발)의 미리보기 세 줄. 확인된 사실만 (4기 운영 계획 · 일정) */
 export const ABOUT_FACTS = [
-  { id: 'sessions', label: '정기 세션', title: '화요일 · 네 파트별 실습' },
+  { id: 'sessions', label: '정기 세션', title: '화요일 · 파트별 실습' },
   { id: 'sprint', label: 'G-Sprint', title: '5팀 27명 · 12.29 데모데이' },
   { id: 'joint', label: '연합 행사', title: '동홍동락 · 동지톤' },
 ] as const
@@ -36,8 +36,8 @@ export const ABOUT_FACTS = [
 /** 지난 모집에서 확인된 사실 (인스타그램 4기 모집 게시물 · Linktree 4기 지원서 기준). 5기 일정이 아니다 */
 export const RECRUIT_FACTS = [
   { id: 'when', label: '지난 모집', body: '4기는 8월에 코어 멤버, 9월 초에 마케팅 코어 · 일반 멤버를 모집했습니다.' },
-  { id: 'session', label: '정기 세션', body: '4기는 매주 화요일 저녁 6시에 모입니다. 시험 기간에는 쉽니다.' },
-  { id: 'next', label: '5기 모집', body: '일정이 정해지면 이 페이지와 인스타그램에 가장 먼저 공지합니다.' },
+  { id: 'session', label: '정기 세션', body: '4기는 매주 화요일 저녁 6시에 모입니다.' },
+  { id: 'next', label: '5기 모집', body: '일정이 정해지면 이 페이지와 인스타그램에 공지합니다.' },
 ] as const
 
 /**

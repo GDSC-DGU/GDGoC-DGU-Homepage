@@ -126,6 +126,9 @@ export function pickFaqs<T extends { id: string; source?: string }>(faqs: readon
   return [...picked, ...sourced.filter((f) => !picked.includes(f))].slice(0, n)
 }
 
+/** 멤버 회고에서 지금 보일 사람: 접혀 있으면 앞의 first 명, 펼치면 전부 */
+export const voicesShown = <T,>(all: readonly T[], open: boolean, first: number): readonly T[] => (open ? all : all.slice(0, first))
+
 /** 홈에 실을 수 있는 '사람' 한 줄: 공개 동의 기록이 있고 말이 비어 있지 않은 것만 */
 export const isShowableVoice = (v: { quote: string; name: string; consent?: { date: string; by: string } | null }) =>
   Boolean(v.quote.trim() && v.name.trim() && v.consent?.date && v.consent.by)

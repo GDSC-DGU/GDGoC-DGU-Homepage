@@ -223,11 +223,6 @@
     text-underline-offset: 3px;
   }
 }
-.talkPending {
-  font: 500 14px/20px var(--font-kr);
-  color: var(--ink-500);
-  white-space: nowrap;
-}
 .talkFile {
   display: inline-flex;
   align-items: center;
@@ -310,12 +305,9 @@
     flex-direction: column;
     gap: 2px;
   }
-  .talkFile,
-  .talkPending {
-    justify-self: start;
-    margin-top: 6px;
-  }
   .talkFile {
+    justify-self: start;
     min-height: 32px;
+    margin-top: 6px;
   }
 }

@@ -200,14 +200,17 @@
   color: var(--ink-900);
   overflow-wrap: anywhere;
 }
-/* 한 줄 설명: 한 줄에서 자른다 (전문은 자세히 보기 창) */
+/* 한 줄 설명: 두 줄까지 (전문은 자세히 보기 창). 한 줄에서 자르면 거의 모든 설명이 '…'로 끝났다 (화면 검토 2026-11-05) */
 .summary {
+  display: -webkit-box;
   margin-top: 2px;
   overflow: hidden;
   font: 400 15px/24px var(--font-kr);
   color: var(--ink-700);
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  word-break: keep-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 .meta {
   margin-top: 2px;
@@ -293,6 +296,13 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 40px var(--gutter);
 }
+/* 실제 그림이 있는 작품만 크게 두 칸 (아카이브 전시실: 4기 Organizer 2026-11-05). 나머지는 아래 줄 목록 */
+.gridWide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gridWide + .list {
+  margin-top: 48px;
+}
 /* 카드: 그림(16:9) → 이름 → 한 줄 설명. 1px 괘선 틀, 그림자 없음 */
 .card {
   position: relative;
@@ -317,6 +327,16 @@
 }
 .stage.thumb::after {
   display: none;
+}
+/* 격자 카드의 글자 표지: 이름은 바로 아래 카드 제목이 말하므로 표지에는 머리글자만 (이름이 두 번 나왔다: 화면 검토 2026-11-05) */
+.thumb [data-part='name'] {
+  display: none;
+}
+.thumb [data-part='mono'] {
+  display: block;
+  font: 600 clamp(40px, 16cqi, 88px) / 1 var(--font-num);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 .cardBody {
   flex: 1;

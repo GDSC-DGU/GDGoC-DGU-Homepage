@@ -94,8 +94,8 @@ export function monthsOf(events: readonly ScheduleEvent[], period: Period): Mont
 export const MONTH_CAPTION: Readonly<Record<number, string>> = {
   9: '첫 만남',
   10: '팀 꾸리기',
-  11: '함께 만들기',
-  12: '시연 · 마무리',
+  11: '팀별 개발',
+  12: '데모데이',
   1: '겨울 활동',
   2: '겨울 활동',
 }

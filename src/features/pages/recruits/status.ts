@@ -33,7 +33,7 @@ const mdw = (ymd: string, today: string) => `${md(ymd, today)}(${weekday(ymd)})`
 
 export function statusView(st: RecruitStatus, today: string, handle: string): StatusView {
   const gen = st.generation
-  const notice = `열리면 인스타그램 ${handle}에 가장 먼저 알립니다.`
+  const notice = `열리면 인스타그램 ${handle}에 알립니다.`
   switch (st.state) {
     case 'soon': {
       const opens = st.opensAt!

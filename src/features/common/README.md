@@ -9,14 +9,12 @@ import { IconRow, JoinStrip, StorySection, Ticket, projectIcon } from '@/feature
 
 ## StorySection: 이야기 섹션
 
-이름표(10px 장소색 네모 + 이름) → 주장 제목 → 한 줄 | 오른쪽 행동 하나 → 내용(12칸 전체).
+주장 제목 → 한 줄 | 오른쪽 행동 하나 → 내용(12칸 전체). 제목 위 이름표(eyebrow)는 없습니다 (AI 티 점검 2026-11-05).
 
 ```tsx
 <StorySection
   id="projects"                         // 섹션 id. h2 id 는 'projects-title' (aria-labelledby 자동)
   tone="paper"                          // 'paper'(기본) | 'field'(옅은 회색) | 'dark'(먹색)
-  eyebrow="프로젝트"                     // 이름표. 없으면 이름표 줄 없음
-  placeColor="var(--place-projects)"    // 이름표 네모. 비우면 면의 글자색, null 이면 네모 없음
   title={<>팀으로 만들어 공개한 서비스 <span className="num">{done}</span>개</>}  // 질문형 금지, 숫자는 계산
   sub="20개는 Google Solution Challenge에서 만들었습니다."
   action={<Link className="link-go" to="/projects">프로젝트 모두 보기</Link>}
