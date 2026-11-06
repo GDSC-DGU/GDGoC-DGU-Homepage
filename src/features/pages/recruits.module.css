@@ -52,3 +52,12 @@
     flex: 1 1 100%;
   }
 }
+
+/* dcamp 구성: 검정 띠 바로 뒤의 회색 섹션은 위 여백 없이 붙인다 */
+.flush:global(.story.field) {
+  margin-top: 0;
+}
+/* 프로그램 머리의 제목 뒷부분 (다음 줄, 같은 크기 회색) */
+.titleSub {
+  color: var(--ink-700);
+}

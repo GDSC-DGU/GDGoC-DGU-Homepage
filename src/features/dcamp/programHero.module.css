@@ -1,0 +1,121 @@
+/* 프로그램 머리 (dcamp batch). 흰 면 · 지금 위치 → 이름표 → 제목 36 → 설명 → 단추 → 카드 세 장 */
+.hero {
+  padding-block: 24px 120px;
+}
+.eyebrow {
+  margin-top: 72px;
+  font: 700 28px/1.1 var(--font-num);
+  letter-spacing: -0.03em;
+  color: #e8590c; /* 큰 글자 3.6:1 (dcamp 주황 #FF5E27 은 흰 바탕 3:1 에 조금 못 미친다) */
+}
+.eyebrow :global(.dark) {
+  color: var(--ink-900);
+}
+.title {
+  margin-top: 16px;
+  font: 500 36px/1.4 var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  word-break: keep-all;
+  text-wrap: balance;
+}
+.lead {
+  display: grid;
+  gap: 2px;
+  max-width: 40em;
+  margin-top: 28px;
+  font: 400 17px/1.6 var(--font-kr);
+  color: var(--ink-700);
+  word-break: keep-all;
+}
+.actions {
+  margin-top: 40px;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 64px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.card {
+  position: relative;
+  min-height: 280px;
+  padding: 32px 32px 112px;
+  border-radius: var(--r-card);
+  background: var(--field);
+}
+.cardTitle {
+  font: 600 20px/1.3 var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.cardValue {
+  margin-top: 16px;
+  font: 400 16px/1.6 var(--font-kr);
+  color: var(--ink-700);
+  word-break: keep-all;
+}
+.notes {
+  display: grid;
+  gap: 4px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  font: 400 14px/1.5 var(--font-kr);
+  color: var(--ink-700);
+}
+.notes li::before {
+  content: '• ';
+}
+.icon {
+  position: absolute;
+  right: 32px;
+  bottom: 28px;
+  width: 64px;
+  height: 64px;
+  fill: none;
+  stroke: var(--ink-900);
+  stroke-width: 1.6;
+}
+@media (max-width: 1023px) {
+  .cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .card {
+    min-height: 0;
+    padding-bottom: 32px;
+    padding-right: 112px;
+  }
+  .icon {
+    top: 28px;
+    bottom: auto;
+    width: 52px;
+    height: 52px;
+  }
+}
+@media (max-width: 767px) {
+  .hero {
+    padding-bottom: 72px;
+  }
+  .eyebrow {
+    margin-top: 40px;
+    font-size: 22px;
+  }
+  .title {
+    font-size: 26px;
+  }
+  .lead {
+    font-size: 16px;
+  }
+  .card {
+    padding: 24px 88px 24px 24px;
+  }
+  .icon {
+    right: 20px;
+    top: 22px;
+    width: 44px;
+    height: 44px;
+  }
+}

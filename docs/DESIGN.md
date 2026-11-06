@@ -12,6 +12,13 @@
 > - 하위 페이지 머리: 지금 위치(홈 › 소개) → 주황 영문 이름표 · 제목 40 · 한 줄 | 오른쪽 사진(최대 460px). 사진을 본문 폭 가득 쓰지 않는다.
 > - 섹션 제목은 36 · 600 으로 낮춘다. 머리 오른쪽 '전체 보기'는 1px 테두리 알약.
 > - 카드 hover: 0.6초 `--ease-soft` 로 6px 떠오름 + 옅은 그림자 (툭 올라가지 않게). 그림 hover 는 0.5초 1.03배.
+> - **구성도 dcamp 를 따른다** (같은 날 2차). 부품은 `src/features/dcamp/`:
+>   - 소개 = dcamp 'Who we are': `DarkHero`(검정 · 주황 빛 · 격자, 큰 제목, 주황 큰 숫자 | 설명) → `Evolution`(Our Evolution) → `MissionBand`(사진 한 면 + Mission) → `WorkCards`(How We Work) → `QuoteBanner` → 일정 · 기록.
+>   - 지원하기 = dcamp 'dcamp batch': `ProgramHero`(이름표 · 제목 · 단추 · 정보 카드 셋) → `DarkProgram`(빛줄기 검정 띠 · 숫자 카드 · 주요 활동) → `QuoteRow`(회고) → 파트 · 달별 일정 → `Process` → Q 카드 FAQ → `StickyCta`(아래 고정 띠).
+>   - 아카이브 · 팀원 찾기 = dcamp 'Story' · 'Startup' 목록 머리: `PageHero`(지금 위치 · 제목 40 · 한 줄 · 검정 띠 카드).
+>   - 홈: 첫 화면 · 지도 · 프로젝트는 그대로, 그 아래 dcamp 홈 조각 — 다가오는 일정 엇갈린 카드(`UpcomingCards`) · `ImpactSection` 숫자 카드 2 × 2 · `NewsBand` 소식 띠.
+>   - 머리말은 `data-band="dark"` 섹션 위에 있으면 검정 띠로 바뀐다 (SiteHeader `useOnDark`).
+>   - 주황 글자는 흰 바탕 대비 때문에 `--gen-text`(#C2410C), 큰 글자만 #E8590C. 검정 위 주황은 dcamp 그대로 #FF5E27.
 
 ## 1. 한 줄 방향
 

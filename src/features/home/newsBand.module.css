@@ -1,0 +1,66 @@
+.band {
+  padding-block: 72px;
+  background: var(--field);
+}
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+.title {
+  font: 600 26px/1.45 var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  word-break: keep-all;
+}
+.name {
+  color: #ad3709; /* 따뜻한 회색 위 4.9:1 */
+}
+.bubble {
+  position: relative;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: var(--gen-text);
+  font: 500 14px/1.4 var(--font-kr);
+  color: #fff;
+}
+.bubble::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: -6px;
+  border: 6px solid transparent;
+  border-top: 0;
+  border-bottom-color: var(--gen-text);
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 1px solid var(--ink-900);
+  border-radius: var(--r-pill);
+  font: 600 16px/1 var(--font-kr);
+  color: var(--ink-900);
+  text-decoration: none;
+  transition: background 300ms var(--ease), color 300ms var(--ease);
+}
+@media (hover: hover) {
+  .cta:hover {
+    background: var(--ink-900);
+    color: #fff;
+  }
+}
+@media (max-width: 767px) {
+  .band {
+    padding-block: 56px;
+  }
+  .title {
+    font-size: 20px;
+  }
+}

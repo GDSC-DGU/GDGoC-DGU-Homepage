@@ -1,6 +1,9 @@
 import { useRef, type KeyboardEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
+import { SPRINT } from '@/config/site'
+import { CHAPTER } from '@/content'
+import { GLOSSARY } from '@/content/glossary'
 import { useProjects, useSeminars } from '@/data/queries'
 import { PageHero } from '@/features/pagehero/PageHero'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -18,6 +21,12 @@ const VIEWS: readonly { key: View; label: string }[] = [
   { key: 'seminars', label: '세미나' },
 ]
 const PANEL_ID = 'archive-panel'
+
+/** 머리 아래 검정 띠 카드: 지금 기수 G-Sprint (확인된 숫자만) → 아래 G-Sprint 띠로 */
+const SPRINT_OK = CHAPTER.sprint?.verified ? CHAPTER.sprint : null
+const BANNER = SPRINT_OK
+  ? { kicker: `4기 ${GLOSSARY['g-sprint'].term} · ${GLOSSARY['g-sprint'].short}`, title: `${SPRINT_OK.teams}팀 ${SPRINT_OK.members}명이 ${SPRINT.demoDay.slice(5).replace('-', '.')} 데모데이를 향해 만들고 있습니다`, to: '/archive#now' }
+  : undefined
 const viewTabId = (v: View) => `archive-view-${v}`
 
 /**
@@ -58,7 +67,7 @@ export function ArchivePage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PageHero place="projects" title={PLACE_BY_ID.projects.label} lead="1기부터 지금까지 만든 프로젝트와 세미나 발표입니다." photoId="2023-10-06-camping-seminar-2" />
+      <PageHero place="projects" title={PLACE_BY_ID.projects.label} lead="1기부터 지금까지 만든 프로젝트와 세미나 발표입니다." banner={BANNER} />
 
       <div id="archive-views" className={a.views} role="tablist" aria-label="아카이브 보기">
         {VIEWS.map((v, i) => {
