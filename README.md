@@ -6,6 +6,7 @@ Google Developer Groups on Campus Dongguk University 홈페이지를 React로 �
 - 메뉴: 배범서 기획(노션 '기획 구체화')의 Home · Projects · Teams · Community · Recruits 를 한글로 표기 (홈 · 프로젝트 · 커뮤니티 · 팀원 찾기, 오른쪽 끝 '지원 안내' 버튼). 주소는 영어 그대로 (/projects …)
 - 첫 화면: 3D 캠퍼스 지도가 배경(넓은 화면)이고, 오른쪽에 이름 GDGoC DGU · 짧은 소개 · 버튼 · 5기 모집 상태 (폰은 글자 → 지도). 건물 하나가 메뉴 하나입니다 (지도 = 메뉴 = 사이트맵)
 - 디자인: [docs/DESIGN.md](docs/DESIGN.md) '캠퍼스 안내판' · 시안 E '지도는 표지, 나머지는 전시장'. 흰 종이 + 먹색 글자, 장소색은 '어디'에만, 주황은 '지금 기수'에만
+- 말 · 작업 순서: [docs/GLOSSARY.md](docs/GLOSSARY.md) · [docs/WORKFLOW.md](docs/WORKFLOW.md)
 - 내용: 지어낸 숫자 · 후기 · 사진 없이 **실제 기록**만 씁니다 (gdg.community.dev 행사, GitHub GDSC-DGU 프로젝트, 4기 일정). [docs/CONTENT.md](docs/CONTENT.md)
 - 문구: 되도록 한글. 이름(GDGoC DGU, G-Sprint, 행사 정식 명칭)과 기술 이름만 영어
 
@@ -69,9 +70,12 @@ src/
       recruits/  지원 자격 · 들어오면 이런 한 해 · 네 파트 · 자주 묻는 질문 · 공유
 public/project-images/   프로젝트 표지 · 화면 (팀 저장소 그림을 줄인 것)
 scripts/sync-events.mjs   행사 목록 갱신
+scripts/route-html.mjs    빌드 뒤 주소별 HTML (제목 · 설명 · 공유 카드, src/content/seo.json)
 docs/DESIGN.md            디자인 원칙 (먼저 읽기)
 docs/CONTENT.md           내용을 고치는 법 · 출처 규칙
 docs/ARCHITECTURE.md      왜 이렇게 나눴는지
+docs/GLOSSARY.md          이 저장소에서 쓰는 말 (화면 이름 ↔ 코드 이름, 움직임 9가지)
+docs/WORKFLOW.md          큰 변경의 순서 (스펙 → 일감 → 만들기 → 리뷰 두 번 → 회고), 디자인 스킬 검사
 ```
 
 ## 자주 하는 일

@@ -66,12 +66,12 @@ export function fill(template: string, vars: Record<string, string | number>): s
 
 const recent = (a: Project, b: Project) => b.year - a.year || (b.generation ?? 0) - (a.generation ?? 0) || a.name.localeCompare(b.name, 'ko')
 
-/** 프로젝트 이름표 한 줄: 'Solution Challenge 2026 · 3기' (프로그램 이름에 해가 이미 있으면 해를 한 번만) */
+/** 프로젝트 이름표 한 줄: 'Solution Challenge 2026, 3기' (프로그램 이름에 해가 이미 있으면 해를 한 번만) */
 export function projectMeta(p: Pick<Project, 'program' | 'year' | 'generation'>): string {
   const parts = [p.program]
   if (!p.program.includes(String(p.year))) parts.push(String(p.year))
   if (p.generation) parts.push(`${p.generation}기`)
-  return parts.join(' · ')
+  return parts.join(', ')
 }
 
 /**

@@ -10,9 +10,6 @@
 .item {
   min-width: 0;
 }
-.figure {
-  margin: 0;
-}
 .img {
   display: block;
   width: 100%;
@@ -22,11 +19,6 @@
   object-fit: cover;
   border-radius: var(--r-media);
   background: var(--field);
-}
-.caption {
-  margin-top: 10px;
-  font: var(--t-meta);
-  color: var(--ink-700);
 }
 
 @media (max-width: 767px) {

@@ -137,7 +137,7 @@ export function ProjectsSection() {
       <div className={s.all}>
         <Link className="btn-secondary" to="/archive">
           {fill(PROJECTS_STORY.more, { n: done })}
-          <span aria-hidden="true">→</span>
+          
         </Link>
       </div>
     </StorySection>

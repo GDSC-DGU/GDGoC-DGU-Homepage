@@ -6,7 +6,7 @@ import { closingStatusLine, fill, isAfter, isShowableVoice, pickFaqs, pickProjec
 
 const pj = (id: string, extra: Partial<Project> = {}): Project => ({ id, name: id, program: 'Solution Challenge 2026', year: 2026, generation: 3, status: 'done', repo: `https://github.com/GDSC-DGU/${id}`, ...extra })
 
-const st = (extra: Partial<RecruitStatus>): RecruitStatus => ({ state: 'unscheduled', generation: 5, channelUrl: 'https://www.instagram.com/gdg.donggukuniv/', lastWindow: '2026.08–09', lastGeneration: 4, ...extra })
+const st = (extra: Partial<RecruitStatus>): RecruitStatus => ({ state: 'unscheduled', generation: 5, channelUrl: 'https://www.instagram.com/gdg.donggukuniv/', lastWindow: '2026.08~09', lastGeneration: 4, ...extra })
 
 describe('첫 화면 시제 · 문구', () => {
   it('데모데이 당일까지는 아직, 다음 날부터 지난 일', () => {
@@ -22,7 +22,7 @@ describe('첫 화면 시제 · 문구', () => {
 
 describe('모집 상태 (recruitStatus 결과로)', () => {
   it('미정: 지금 상태 · 지난 시기 · 먼저 알릴 채널', () => {
-    expect(statusWords(st({}))).toEqual({ state: '아직 열리지 않음', more: ['지난 4기는 2026.08–09에 모집', '열리면 인스타그램에 먼저'] })
+    expect(statusWords(st({}))).toEqual({ state: '아직 열리지 않음', more: ['지난 4기는 2026.08~09에 모집', '열리면 인스타그램에 먼저'] })
     expect(statusWords(st({ lastWindow: undefined })).more).toEqual(['열리면 인스타그램에 먼저'])
   })
 

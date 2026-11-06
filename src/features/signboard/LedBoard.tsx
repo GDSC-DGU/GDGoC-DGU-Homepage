@@ -165,10 +165,10 @@ export function LedTicket({ date, endDate, title, kicker, meta, place, to, href,
   const now = useToday()
   const today = todayProp ?? now
   const start = ticketDate(date, today)
-  // 여러 날 일정은 기간으로 ('11.03–30'). 시작일 하나만 보이면 그날 하루 일정처럼 읽힌다 (화면 검토 2026-11-05)
+  // 여러 날 일정은 기간으로 ('11.03~30'). 시작일 하나만 보이면 그날 하루 일정처럼 읽힌다 (화면 검토 2026-11-05)
   const range = Boolean(endDate && endDate !== date)
   const endLabel = endDate ? (endDate.slice(0, 7) === date.slice(0, 7) ? String(Number(endDate.slice(8))) : ticketDate(endDate, today).day) : ''
-  const day = range ? `${start.day}–${endLabel}` : start.day
+  const day = range ? `${start.day}~${endLabel}` : start.day
   const week = range ? '' : start.week
   const dday = ticketDday(date, endDate, today)
   const mark = place ? resolveColor(placeColor(place)) : PALETTE.lit

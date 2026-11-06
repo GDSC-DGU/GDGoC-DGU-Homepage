@@ -219,10 +219,10 @@
 .tab[aria-selected='true'] {
   border-color: var(--gen-text);
   background: var(--gen-text);
-  color: #fff;
+  color: var(--white);
 }
 .tab[aria-selected='true'] .tabCount {
-  color: #fff;
+  color: var(--white);
 }
 .tab:focus-visible {
   outline-offset: 2px;
@@ -261,9 +261,9 @@
   width: 22px;
   height: 22px;
   border-radius: 6px;
-  background: #ff5e27;
+  background: var(--brand);
   font: 700 12px/1 var(--font-num);
-  color: #fff;
+  color: var(--white);
 }
 .q {
   flex: 1;

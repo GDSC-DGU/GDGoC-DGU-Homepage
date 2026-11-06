@@ -3,7 +3,7 @@ import type { PlaceId } from '@/domain/types'
 
 /**
  * 지도 미리보기 맨 위 행사 사진 세 장 (4기 Organizer 2026-11-06: 글만 있는 미리보기가 비어 보인다 → 드라이브 활동 사진).
- * 첫 장이 크게. content/photos.json 의 id 만 쓴다 (없는 id 는 건너뛴다). 지금은 모두 1기(2023–24) 사진이다.
+ * 첫 장이 크게. content/photos.json 의 id 만 쓴다 (없는 id 는 건너뛴다). 지금은 모두 1기(2023~24) 사진이다.
  */
 const PICK: Readonly<Record<PlaceId, readonly string[]>> = {
   community: ['2023-09-15-welcome-group', '2023-11-24-part-seminar', '2023-12-22-closing-room'],

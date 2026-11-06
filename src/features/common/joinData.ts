@@ -6,7 +6,7 @@ import type { RecruitStatus } from '@/content/recruitingStatus'
  */
 
 export interface JoinPrimary {
-  /** apply: 모집 중이고 지원서 주소가 있을 때 '지원서 쓰기 ↗' · notify: 그 밖 '{gen}기 소식 받기 ↗' (인스타그램) */
+  /** apply: 모집 중이고 지원서 주소가 있을 때 '지원서 쓰기' · notify: 그 밖 '{gen}기 소식 받기' (인스타그램) */
   kind: 'apply' | 'notify'
   label: string
   href: string
@@ -28,8 +28,8 @@ export const TEAMS_WILL_HAVE = [
   {
     id: 'post',
     name: '팀원 찾는 글',
-    desc: '스터디 · 프로젝트 · 공모전마다 제목 · 기간 · 내용을 적어 올립니다. 글은 멤버 인증을 거쳐 씁니다.',
-    from: '글 작성: 제목 · 기간 · 내용 (작성할 때 회원 인증)',
+    desc: '스터디, 프로젝트, 공모전마다 제목, 기간, 내용을 적어 올립니다. 글은 멤버 인증을 거쳐 씁니다.',
+    from: '글 작성: 제목, 기간, 내용 (작성할 때 회원 인증)',
   },
   { id: 'comment', name: '댓글', desc: '올라온 글을 읽고 댓글로 이야기합니다.', from: '글 조회 + 댓글' },
   { id: 'search', name: '검색', desc: '올라온 글을 검색해 찾습니다.', from: '검색' },

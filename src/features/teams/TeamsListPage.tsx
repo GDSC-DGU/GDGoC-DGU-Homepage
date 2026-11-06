@@ -67,7 +67,7 @@ export function TeamsListPage() {
     </>
   ) : (
     <>
-      전체 글 <span className="num">{sum?.total ?? '…'}</span>개 · 지금 모집 중 <span className="num">{sum?.open ?? '…'}</span>개
+      전체 글 <span className="num">{sum?.total ?? '…'}</span>개, 지금 모집 중 <span className="num">{sum?.open ?? '…'}</span>개
     </>
   )
 
@@ -80,7 +80,7 @@ export function TeamsListPage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PageHero place="teams" title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} banner={{ kicker: 'Team up', title: '스터디 · 프로젝트 · 공모전 팀원을 여기서 구해 보세요', to: '/teams/write' }} />
+      <PageHero place="teams" title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} banner={{ title: '스터디, 프로젝트, 공모전 팀원을 여기서 구해 보세요', to: '/teams/write' }} />
 
       <section id="board" ref={boardRef} className={`story paper ${s.board}`} aria-labelledby="board-title">
         <h2 id="board-title" className="visually-hidden">
@@ -126,7 +126,7 @@ export function TeamsListPage() {
                 {query.q && (
                   <>
                     {' '}
-                    · ‘{query.q}’ 검색{' '}
+                    ‘{query.q}’ 검색{' '}
                     <button type="button" className={s.clearQ} onClick={() => update({ q: undefined })}>
                       지우기
                     </button>
@@ -145,7 +145,7 @@ export function TeamsListPage() {
                   </select>
                 </label>
                 <form role="search" className={s.search} onSubmit={onSearch}>
-                  <input key={query.q ?? ''} className={s.searchInput} type="search" name="q" defaultValue={query.q ?? ''} placeholder="제목 · 내용 · 작성자 검색" aria-label="제목 · 내용 · 작성자 검색" />
+                  <input key={query.q ?? ''} className={s.searchInput} type="search" name="q" defaultValue={query.q ?? ''} placeholder="제목, 내용, 작성자 검색" aria-label="제목, 내용, 작성자 검색" />
                   <button type="submit" className={s.searchBtn} aria-label="검색">
                     <SearchIcon />
                   </button>
@@ -171,7 +171,7 @@ export function TeamsListPage() {
                 <div className={s.state}>
                   <p>조건에 맞는 글이 없습니다.</p>
                   <button type="button" className="link" onClick={() => setParams(new URLSearchParams(), { preventScrollReset: true })}>
-                    거르기 · 검색어 지우기
+                    거르기와 검색어 지우기
                   </button>
                 </div>
               ) : (

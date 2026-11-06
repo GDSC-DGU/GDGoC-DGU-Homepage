@@ -5,11 +5,11 @@ import { programName } from '../projectGroups'
 import { assetUrl, isLive, projectCover, projectGallery, stageShots } from './exhibit'
 import { Plate } from './Plate'
 import { SHEET_STATE, sheetSearch } from './sheetLink'
-import { morphOpen } from './sheetMorph'
+import { flipOpen, morphOpen } from './sheetMorph'
 import c from './exhibit.module.css'
 
-/** '3기 · 2026' 처럼 · 로 잇되, '·' 는 앞 낱말에 붙여 줄이 점으로 시작하지 않게 */
-export function Dotted({ parts }: { parts: ReactNode[] }) {
+/** '3기, 2026' 처럼 쉼표로 잇되, 쉼표는 앞 낱말에 붙여 줄이 쉼표로 시작하지 않게 (가운뎃점 줄 금지, hallmark 63) */
+export function CommaList({ parts }: { parts: ReactNode[] }) {
   return (
     <>
       {parts.map((part, i) => (
@@ -17,7 +17,7 @@ export function Dotted({ parts }: { parts: ReactNode[] }) {
           {i > 0 && ' '}
           <span className={c.part}>
             {part}
-            {i < parts.length - 1 && ' ·'}
+            {i < parts.length - 1 && ','}
           </span>
         </Fragment>
       ))}
@@ -25,19 +25,19 @@ export function Dotted({ parts }: { parts: ReactNode[] }) {
   )
 }
 
-/** 바깥 링크 글자: 글자 + ↗ (읽기 프로그램에는 '(무엇, 새 창)') */
+/** 바깥 링크 글자: 글자만 (읽기 프로그램에는 '(무엇, 새 창)') */
 function OutText({ children, context }: { children: ReactNode; context?: string }) {
   return (
     <>
       {children}
-      <span aria-hidden="true">↗</span>
+      
       <span className="visually-hidden">{context ? ` (${context}, 새 창)` : ' (새 창)'}</span>
     </>
   )
 }
 
 /**
- * 지금 열리는 서비스로 가는 링크 '지금 써 보기 ↗'. url 이 있는 프로젝트(실제로 열리는 웹 · 스토어 주소)에만.
+ * 지금 열리는 서비스로 가는 링크 '지금 써 보기'. url 이 있는 프로젝트(실제로 열리는 웹 · 스토어 주소)에만.
  * tone: 'button' = 두 번째 버튼 (대표 작품 · 자세히 보기 창), 'inline' = 작은 글자 링크 (줄 목록).
  */
 export function LiveLink({ project, tone = 'inline', className = '' }: { project: Project; tone?: 'inline' | 'button' | 'primary'; className?: string }) {
@@ -75,7 +75,9 @@ function OpenLink({ project, className, linkTo }: { project: Project; className:
         // 새 창 · 새 탭으로 여는 누름은 그대로 둔다
         if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
         const card = e.currentTarget.closest<HTMLElement>('[data-morph]')
-        const opened = morphOpen(card, () => navigate({ search: sheetSearch(project.id) }, { state: SHEET_STATE, preventScrollReset: true, flushSync: true }))
+        const open = () => navigate({ search: sheetSearch(project.id) }, { state: SHEET_STATE, preventScrollReset: true, flushSync: true })
+        // View Transitions 가 있으면 확대 · 공유 요소 전환, 없으면 확대 전환만 (sheetMorph.ts)
+        const opened = morphOpen(card, open) || flipOpen(card, open)
         if (opened) e.preventDefault()
       }}
     >
@@ -112,7 +114,7 @@ function Stage({ project, eager, className = '' }: { project: Project; eager: bo
 
 /**
  * 전시실 맨 앞에 크게 거는 작품 (실제 화면이 있는 것): 무대 7칸 | 이름 · 한 줄 · 쓴 기술 · 지금 써 보기 5칸.
- * 이름 링크가 작품 전체를 덮어 무대를 눌러도 자세히 보기 창이 열린다. '자세히 보기 →' 는 그 링크의 보이는 신호(읽지 않음).
+ * 이름 링크가 작품 전체를 덮어 무대를 눌러도 자세히 보기 창이 열린다. '자세히 보기' 는 그 링크의 보이는 신호(읽지 않음).
  * GitHub · 데모 영상은 자세히 보기 창에만 둔다.
  */
 export function FeaturedWork({ project, eager = false, level = 4 }: { project: Project; eager?: boolean; level?: 3 | 4 }) {
@@ -127,7 +129,7 @@ export function FeaturedWork({ project, eager = false, level = 4 }: { project: P
         {project.summary && <p className={c.featureSummary}>{project.summary}</p>}
         {stack.length > 0 && (
           <p className={c.featureStack}>
-            <Dotted parts={stack} />
+            <CommaList parts={stack} />
           </p>
         )}
         <div className={c.featureActions}>
@@ -169,7 +171,7 @@ export function ExhibitCard({ project, withProgram = false, level = 4, linkTo }:
         {project.summary && <p className={c.summary}>{project.summary}</p>}
         {meta.length > 0 && (
           <p className={c.meta}>
-            <Dotted parts={meta} />
+            <CommaList parts={meta} />
           </p>
         )}
         <LiveLink project={project} className={c.raise} />
@@ -204,7 +206,7 @@ export function GridCard({ project, withProgram = false, eager = false, level = 
         </Heading>
         {withProgram && (
           <p className={c.cardMeta}>
-            <Dotted parts={[<span key="y" className="num">{project.year}</span>, programName(project)]} />
+            <CommaList parts={[<span key="y" className="num">{project.year}</span>, programName(project)]} />
           </p>
         )}
         {project.summary && <p className={c.cardSummary}>{project.summary}</p>}

@@ -76,7 +76,7 @@ describe('아카이브 세미나', () => {
   })
 
   it('기간 표기 · 발표자 수', () => {
-    expect(periodLabel('2025-10-10', '2026-05-22')).toBe('2025.10–2026.05')
+    expect(periodLabel('2025-10-10', '2026-05-22')).toBe('2025.10~2026.05')
     expect(periodLabel('2025-04-03', '2025-04-03')).toBe('2025.04')
     expect(seminarGenerations(LIST)).toEqual([3, 2, 1])
     expect(speakerCount([...LIST, s('e', '2026-01-01', 3, '또', '공기훈')])).toBe(4)
@@ -115,7 +115,7 @@ describe('아카이브 세미나', () => {
     expect(homeSeminarCards(LIST.filter((x) => x.generation === 2))).toHaveLength(2)
   })
 
-  it('실제 자료: 1–3기 104개, 제목 · 발표자가 비지 않고 주소는 아직 비어 있다', () => {
+  it('실제 자료: 1~3기 104개, 제목 · 발표자가 비지 않고 주소는 아직 비어 있다', () => {
     expect(SEMINARS).toHaveLength(104)
     expect(seminarGenerations(SEMINARS)).toEqual([3, 2, 1])
     expect(SEMINARS.every((x) => x.title.trim() && x.speaker.trim())).toBe(true)

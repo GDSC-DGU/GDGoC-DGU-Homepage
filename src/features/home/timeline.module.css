@@ -3,6 +3,7 @@
  * 가운데 주황(기수색 --gen) 4px 세로줄 + 16px 점. 줄마다 [왼쪽 | 점 | 오른쪽], 단계는 줄 쪽으로 붙여 쓴다.
  * 지나간 단계 점은 채우고, 남은 단계 점은 흰 바탕에 주황 테두리. 오늘 걸린 단계 위에 주황 '지금' 이름표.
  * 폰(≤767): 줄을 왼쪽으로, 단계와 그림을 모두 오른쪽 한 칸에 (단계 → 그림).
+ * 바운스: '지금' 줄이 화면에 들어오면(data-hop) 이름표 · 구름이 한 번 통통 튄다. 마우스를 올리면 다시 한 번 (TimelineSection).
  */
 .section {
   --story-head-gap: 40px;
@@ -52,7 +53,7 @@
   height: 22px;
   box-shadow:
     0 0 0 4px var(--paper),
-    0 0 0 8px rgba(255, 99, 9, 0.2);
+    0 0 0 8px var(--gen-a20);
 }
 .left {
   display: flex;
@@ -163,5 +164,33 @@
   .left .art,
   .right .art {
     margin: 8px 0 0;
+  }
+}
+
+/* ── 바운스: '지금' 이름표 · 그 줄의 구름 (data-hop 1 ↔ 2 를 바꿀 때마다 한 번) ── */
+@media (prefers-reduced-motion: no-preference) {
+  .row[data-now][data-hop='1'] .now,
+  .row[data-now][data-hop='1'] .art {
+    animation: hop calc(var(--dur-long) * 1.5) var(--ease-bounce) both;
+  }
+  .row[data-now][data-hop='2'] .now,
+  .row[data-now][data-hop='2'] .art {
+    animation: hop-again calc(var(--dur-long) * 1.5) var(--ease-bounce) both;
+  }
+}
+@keyframes hop {
+  from {
+    transform: translateY(-14px);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes hop-again {
+  from {
+    transform: translateY(-14px);
+  }
+  to {
+    transform: none;
   }
 }

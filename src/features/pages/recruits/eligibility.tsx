@@ -21,8 +21,8 @@ export function eligibilityFacts(): Fact[] {
   const when = faq('when-sessions')
   const facts: Fact[] = []
   if (who) {
-    facts.push({ id: 'campus', label: '학적', value: '동국대 서울캠퍼스', sub: '재학생 · 휴학생 · 수료생' })
-    facts.push({ id: 'major', label: '전공·학년', value: '상관없음', sub: '비전공자, 1학년도 지원할 수 있습니다.' })
+    facts.push({ id: 'campus', label: '학적', value: '동국대 서울캠퍼스', sub: '재학생, 휴학생, 수료생' })
+    facts.push({ id: 'major', label: '전공과 학년', value: '상관없음', sub: '비전공자, 1학년도 지원할 수 있습니다.' })
   }
   if (when) {
     facts.push({

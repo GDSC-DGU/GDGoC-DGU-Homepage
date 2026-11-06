@@ -175,7 +175,7 @@ export interface ProjectImage {
 /** GitHub 언어 비율 한 줄 */
 export interface LanguageShare {
   name: string
-  /** 바이트 기준 % (0–100) */
+  /** 바이트 기준 % (0~100) */
   share: number
 }
 

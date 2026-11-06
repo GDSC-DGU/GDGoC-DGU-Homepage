@@ -23,19 +23,18 @@ function LineIcon({ kind }: { kind: InfoCard['icon'] }) {
 }
 
 /**
- * 프로그램 머리 (dcamp 'dcamp batch' 페이지 맨 위): 지금 위치 → 주황 영문 이름표 → 제목(36, 두 줄) → 설명 → 알약 단추
+ * 프로그램 머리 (dcamp 'dcamp batch' 페이지 맨 위): 지금 위치 → 제목(36, 두 줄) → 설명 → 알약 단추.
+ * 제목 위 영문 이름표는 두지 않는다 (hallmark 54 · impeccable, 4기 Organizer 2026-11-06: 스킬 규칙 우선)
  * → 따뜻한 회색 정보 카드 세 장 (제목 · 값 · • 메모, 오른쪽 아래 선 그림).
  */
 export function ProgramHero({
   trail,
-  eyebrow,
   title,
   lead,
   actions,
   cards,
 }: {
   trail: readonly string[]
-  eyebrow: ReactNode
   title: ReactNode
   lead?: ReactNode
   actions?: ReactNode
@@ -45,9 +44,6 @@ export function ProgramHero({
     <header className={s.hero}>
       <div className="container">
         <Crumbs trail={trail} />
-        <p className={s.eyebrow} lang="en">
-          {eyebrow}
-        </p>
         <h1 className={s.title}>{title}</h1>
         {lead && <div className={s.lead}>{lead}</div>}
         {actions && <div className={s.actions}>{actions}</div>}

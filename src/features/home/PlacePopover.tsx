@@ -122,6 +122,10 @@ export function PlacePopover({ frameRef, sheet }: Props) {
   const returnTo = useRef<Element | null>(null)
   const revealed = useRef(0)
   const [pos, setPos] = useState<PopoverPlacement | null>(null)
+  // 한 번 연 뒤에는 닫혀도 내용을 남긴다: 닫히는 150ms 동안 사진 · 목록이 먼저 사라져 창이 줄어 보이지 않게
+  const [filled, setFilled] = useState(open)
+  if (open && !filled) setFilled(true) // 그리는 동안 고친다 (effect 를 한 번 더 돌지 않게)
+  const showBody = open || filled
   const place = PLACE_BY_ID[selected]
 
   // 홈을 떠나면 닫는다 (다시 와도 닫힌 채로)
@@ -270,10 +274,10 @@ export function PlacePopover({ frameRef, sheet }: Props) {
           <span className="visually-hidden">미리보기 닫기</span>
         </button>
       </div>
-      {open && <Photos id={selected} />}
+      {showBody && <Photos id={selected} />}
       <p className={s.desc}>{place.description}</p>
       <ul className={s.list} aria-label={about ? '한눈에' : '최근 기록'}>
-        {open && <Latest id={selected} today={today} />}
+        {showBody && <Latest id={selected} today={today} />}
       </ul>
       <div className={s.foot}>
         {about ? (

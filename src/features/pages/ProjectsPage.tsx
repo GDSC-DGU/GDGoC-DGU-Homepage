@@ -4,6 +4,7 @@ import { useHashScroll } from './community/useHashScroll'
 import { CHAPTER, isPublicProject } from '@/content'
 import { useProjects } from '@/data/queries'
 import type { Project } from '@/domain/types'
+import { useChanged } from '@/hooks/useChanged'
 import { useToday } from '@/hooks/useToday'
 import { ExternalLink, StateLine } from './PageParts'
 import { OTHER_PROGRAMS } from './projectGroups'
@@ -31,7 +32,7 @@ const hasWorkImage = (pr: Project) => projectGallery(pr).some(isWorkImage)
  */
 function RoomSection({ room, first }: { room: Room; first: boolean }) {
   const other = room.title === OTHER_PROGRAMS
-  const gens = room.generations.map((n) => `${n}기`).join(' · ')
+  const gens = room.generations.map((n) => `${n}기`).join(', ')
   const label = other ? room.title : `${room.yearLabel} ${room.title}`
   const big = room.projects.filter(hasWorkImage)
   const rest = room.projects.filter((pr) => !hasWorkImage(pr))
@@ -45,8 +46,8 @@ function RoomSection({ room, first }: { room: Room; first: boolean }) {
           <span className={p.roomProgram}>{room.title}</span>
         </h3>
         <p className={p.roomMeta}>
-          {!other && gens && <>{gens} · </>}
-          <span className="num">{room.projects.length}</span>개
+          {!other && gens && <>{gens} </>}
+          프로젝트 <span className="num">{room.projects.length}</span>개
         </p>
       </header>
       {big.length > 0 && (
@@ -95,6 +96,7 @@ export function ProjectsView() {
   const hashRoom = location.hash ? decodeURIComponent(location.hash.slice(1)) : ''
   const activeKey = parseTab(params.get(GEN_PARAM), tabs) ?? (hashRoom ? tabOfRoom(tabs, hashRoom) : undefined) ?? (open ? tabOfProject(tabs, open.id) : undefined) ?? tabs[0]?.key
   const activeTab = tabs.find((t) => t.key === activeKey)
+  const tabMoved = useChanged(activeTab?.key) // 기수 탭을 바꿨을 때만 페이드
   // 창의 앞 · 뒤 작품은 그 작품이 든 탭 안에서만
   const openTab = open ? tabs.find((t) => t.key === tabOfProject(tabs, open.id)) : undefined
   const sheetRooms = openTab?.rooms ?? []
@@ -176,7 +178,7 @@ export function ProjectsView() {
             activeTab && (
               <>
                 <GenTabs tabs={tabs} active={activeTab.key} onChange={setTab} panelId={PANEL_ID} />
-                <div id={PANEL_ID} role="tabpanel" aria-labelledby={genTabId(activeTab.key)} className={p.rooms}>
+                <div key={activeTab.key} id={PANEL_ID} role="tabpanel" aria-labelledby={genTabId(activeTab.key)} className={tabMoved ? `fade-in ${p.rooms}` : p.rooms}>
                   {activeTab.rooms.map((r, i) => (
                     <RoomSection key={r.id} room={r} first={i === 0} />
                   ))}

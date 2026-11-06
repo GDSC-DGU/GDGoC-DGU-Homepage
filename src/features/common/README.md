@@ -41,7 +41,7 @@ import { IconRow, JoinStrip, StorySection, Ticket, projectIcon } from '@/feature
 // /recruits 에는 넣지 않습니다
 ```
 
-- 주 버튼: 모집 중이고 지원서 주소가 있으면 '지원서 쓰기 ↗', 아니면 '{gen}기 소식 받기 ↗' (홈 첫 화면 두 번째 버튼과 같은 링크). 두 번째 버튼 '지원 안내 보기' → /recruits.
+- 주 버튼: 모집 중이고 지원서 주소가 있으면 '지원서 쓰기', 아니면 '{gen}기 소식 받기' (홈 첫 화면 두 번째 버튼과 같은 링크). 두 번째 버튼 '지원 안내 보기' → /recruits.
   꼬리말에는 이 행동을 다시 두지 않습니다 (꼬리말 '연락'에는 '인스타그램 @…' 처럼 채널 이름만).
 - 모집 상태 문장 · 자주 묻는 질문은 홈과 같은 것: `content/story.ts` 의 `CLOSING`, `features/home/homeData.ts` 의 `closingStatusLine` · `pickFaqs` 를 import 합니다. **홈 담당은 이 셋의 이름 · 모양을 유지해 주세요.**
 - 문구를 바꿀 때만 `eyebrow` · `title` · `sub` 를 넘깁니다. id 는 기본 `join`.
@@ -59,8 +59,8 @@ import { IconRow, JoinStrip, StorySection, Ticket, projectIcon } from '@/feature
 ```
 
 - 날짜는 '10.27' + 요일(해가 다르면 '2027.01.30'), D-day 는 `ticketDday`(lib/date `ddayLabel`)로 계산합니다. 손으로 적지 마세요.
-- `to`(사이트 안, 끝에 →) 또는 `href`(사이트 밖, 새 창, ↗). 둘 다 없으면 링크 없는 판.
-- 폰(≤767)은 세 줄(작은 글자 / 날짜 · D-day / 제목), → 는 숨김. 표는 늘 흰 판(`.on-light`)이라 먹색 면 안에서도 글자가 먹색입니다.
+- `to`(사이트 안) 또는 `href`(사이트 밖, 새 창). 둘 다 없으면 링크 없는 판. 표 전체가 링크라 화살표는 없습니다 (hallmark 63).
+- 폰(≤767)은 세 줄(작은 글자 / 날짜 · D-day / 제목). 표는 늘 흰 판(`.on-light`)이라 먹색 면 안에서도 글자가 먹색입니다.
 - 큰 판(`size="large"`)은 날짜 · 제목 · D-day 뿐이라 12칸 전체에 두면 가운데가 비어 보입니다. 7–8칸 폭이 알맞습니다 (커뮤니티 '이번 주'는 넓은 화면에서 머리 5칸 | 표 7칸).
 - 다음 모임 찾기는 `homeNextEvent`(홈) 등 페이지 쪽에서 합니다. 휴회(rest)는 표에 올리지 않습니다.
 
@@ -95,11 +95,11 @@ const icons = ['agriguard', 'todai', 'clarity'].map((id) => byId.get(id)).map((p
 | `.btn-secondary` | 두 번째 버튼 (옅은 면). field 위 흰 바탕 + 선, 먹색 위 #2B2E34 |
 | `.btn-sm` | 작은 크기 (40 · r10, 누르는 자리 44) |
 | `.btn-row` | 버튼 줄. 폰에서 버튼이 한 줄 가득 |
-| `.link-go` | 사이트 안 이동 → (밑줄 없음, hover 밑줄, 높이 44) |
+| `.link-go` | 사이트 안 이동. 동사 하나 + 1px 밑줄, hover 에 밑줄이 진해진다 (화살표 없음, 높이 44) |
 | `.link` | 밑줄 링크. 문장 · 표 · 각주 안에서만 |
 | `.on-dark` / `.on-light` | 먹색 면 단계로 / 밝은 면 단계로 되돌리기 (글자 · 선 · 버튼 · 포커스) |
 | `.story` + `.paper` · `.field` · `.dark` | 이야기 섹션 면 (StorySection 이 붙임) |
 
-바깥 링크는 글자 뒤에 `<span aria-hidden="true">↗</span><span className="visually-hidden"> (새 창)</span>` (밑줄은 글자에만, 버튼 안에서는 gap 8).
+바깥 링크는 글자 뒤에 `<span className="visually-hidden"> (새 창)</span>` 만 붙입니다. 글자 뒤 ↗ · → 는 쓰지 않습니다 (hallmark 63 · 30a). 글자 대신 그림이 필요하면 `common/Glyphs.tsx`.
 hover 규칙은 `@media (hover: hover)` 안에 쓰고, 움직임은 `prefers-reduced-motion: reduce` 에서 끕니다.
 데이터에서 온 글자에 'G-Sprint' 같은 하이픈 낱말이 있으면 `lib/text.ts` 의 `keepHyphenated` 를 거쳐 그립니다 (하이픈에서 줄이 꺾이지 않게).

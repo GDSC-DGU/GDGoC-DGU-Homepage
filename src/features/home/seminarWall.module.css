@@ -1,9 +1,9 @@
 /*
  * 홈 멤버 세미나 (4기 Organizer 2026-11-06: 발표 카드).
  * 네 칸 두 줄: 첫 장(가장 최근 발표)은 두 칸 · 먹색, 나머지는 흰 카드. 카드 뒤 오른쪽 아래에 기수 숫자를 옅게 크게.
- * 위: 기수 이름표 · 날짜 → 그날 세션 이름 → 제목(주인공) → 아래: 발표자 동그라미 · 이름 · 화살표.
+ * 제목(주인공) → 기수 · 날짜 · 그날 세션 이름 한 줄 → 아래: 발표자 동그라미 · 이름. 제목 위 이름표는 두지 않는다 (hallmark 54).
  * dcamp 카드처럼 흰 면 위 따뜻한 회색 카드 (모서리 8 · 테두리 없음). 마우스를 올리면 0.6초에 걸쳐 스윽 떠오르고 화살표가 나아간다.
- * 태블릿 두 칸, 폰은 옆으로 넘긴다.
+ * 태블릿 두 칸, 폰은 옆으로 넘긴다. 마우스를 올리면 카드가 2px 떠오른다 (--lift).
  */
 .grid {
   display: grid;
@@ -34,7 +34,7 @@
   color: var(--ink-900);
   text-decoration: none;
   isolation: isolate;
-  box-shadow: 0 0 0 rgba(17, 17, 17, 0);
+  box-shadow: 0 0 0 var(--ink-a0);
   transition:
     transform var(--dur-lift) var(--ease-soft),
     box-shadow var(--dur-lift) var(--ease-soft);
@@ -42,8 +42,8 @@
 .item[data-feature] .card {
   padding: 32px;
   border-color: transparent;
-  background: var(--band-bg, #191b1f);
-  color: #fff;
+  background: var(--band-bg, var(--ink-900));
+  color: var(--white);
 }
 .card:focus-visible {
   outline: 2px solid var(--focus);
@@ -53,9 +53,6 @@
   .card:hover {
     transform: translateY(var(--lift));
     box-shadow: var(--shadow-lift);
-  }
-  .card:hover .go {
-    transform: translateX(4px);
   }
 }
 
@@ -67,20 +64,21 @@
   z-index: -1;
   font: 700 168px/1 var(--font-num);
   letter-spacing: -0.06em;
-  color: rgba(17, 17, 17, 0.05);
+  color: var(--ink-a5);
   pointer-events: none;
 }
 .item[data-feature] .bigGen {
   right: 8px;
   bottom: -56px;
   font-size: 280px;
-  color: rgba(255, 255, 255, 0.07);
+  color: var(--white-a7);
 }
 
 .top {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 6px 10px;
 }
 .gen {
   padding: 2px 10px;
@@ -98,14 +96,14 @@
   color: var(--ink-500);
 }
 .item[data-feature] .date {
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--white-a72);
 }
 .day {
   font: 600 14px/20px var(--font-kr);
   color: var(--ink-700);
 }
 .item[data-feature] .day {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--white-a80);
 }
 .title {
   font: 700 20px/30px var(--font-kr);
@@ -138,28 +136,23 @@
   letter-spacing: -0.02em;
 }
 .avatar[data-tone='blue'] {
-  background: #e8f0fe;
-  color: #174ea6;
+  background: var(--tone-blue-bg);
+  color: var(--tone-blue-ink);
 }
 .avatar[data-tone='red'] {
-  background: #fce8e6;
-  color: #a50e0e;
+  background: var(--tone-red-bg);
+  color: var(--tone-red-ink);
 }
 .avatar[data-tone='yellow'] {
-  background: #fef7e0;
-  color: #7a4100;
+  background: var(--tone-yellow-bg);
+  color: var(--tone-yellow-ink);
 }
 .avatar[data-tone='green'] {
-  background: #e6f4ea;
-  color: #0d652d;
+  background: var(--tone-green-bg);
+  color: var(--tone-green-ink);
 }
 .speaker {
   font: 600 15px/22px var(--font-kr);
-}
-.go {
-  margin-left: auto;
-  font: 600 18px/1 var(--font-kr);
-  transition: transform var(--dur-lift) var(--ease-soft);
 }
 
 @media (max-width: 1023px) {
@@ -208,13 +201,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .card,
-  .go {
-    transition: none;
-  }
   .card:hover {
-    transform: none;
-  }
-  .card:hover .go {
     transform: none;
   }
 }

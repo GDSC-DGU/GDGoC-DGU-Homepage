@@ -8,7 +8,7 @@ export interface ProcessStep {
   note?: ReactNode
 }
 
-/** 과정 (dcamp 'Process'): 따뜻한 회색 면, 주황 번호 동그라미 01–04 를 가는 선으로 잇고 아래에 단계 이름 · 날짜 */
+/** 과정 (dcamp 'Process'): 따뜻한 회색 면, 주황 번호 동그라미 01~04 를 가는 선으로 잇고 아래에 단계 이름 · 날짜 */
 export function Process({ title, steps, note }: { title: string; steps: readonly ProcessStep[]; note?: ReactNode }) {
   return (
     <section className={s.process} aria-labelledby="process-title">

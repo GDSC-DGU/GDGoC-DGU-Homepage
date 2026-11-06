@@ -10,7 +10,7 @@
   color: var(--ink-900);
 }
 .crumbs[data-tone='dark'] ol {
-  color: #fff;
+  color: var(--white);
 }
 .crumbs li {
   display: flex;

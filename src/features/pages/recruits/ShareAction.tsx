@@ -43,14 +43,14 @@ export function ShareAction({ title, text, label = '친구에게 알려 주기',
       </button>
       <span className={k.shareStatus} role="status" data-kind={result?.kind}>
         {result?.kind === 'copied' && (
-          <>
-            <span aria-hidden="true">✓ </span>링크를 복사했습니다. 친구에게 붙여 넣어 보내 주세요.
-          </>
+          <span key="copied" className="fade-in">
+            링크를 복사했습니다. 친구에게 붙여 넣어 보내 주세요.
+          </span>
         )}
         {result?.kind === 'failed' && (
-          <>
+          <span key="failed" className="fade-in">
             복사하지 못했습니다. 이 주소를 보내 주세요: <span className={k.shareUrl}>{result.url}</span>
-          </>
+          </span>
         )}
       </span>
     </span>

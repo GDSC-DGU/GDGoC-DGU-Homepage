@@ -67,9 +67,9 @@ describe('종류 거르기', () => {
 
 describe('generationRange', () => {
   it('기수 기간 표기', () => {
-    expect(generationRange({ start: '2025-09', end: '2026-06' })).toBe('2025.09–2026.06')
-    expect(generationRange({ start: '2026-09', current: true })).toBe('2026.09–지금')
-    expect(generationRange({ start: '2023-09' })).toBe('2023.09–')
+    expect(generationRange({ start: '2025-09', end: '2026-06' })).toBe('2025.09~2026.06')
+    expect(generationRange({ start: '2026-09', current: true })).toBe('2026.09~지금')
+    expect(generationRange({ start: '2023-09' })).toBe('2023.09~')
     expect(generationRange({ end: '2024-06' })).toBeNull()
     expect(generationRange({})).toBeNull()
   })

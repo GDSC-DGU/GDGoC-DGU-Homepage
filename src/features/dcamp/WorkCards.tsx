@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import { useStaggerReveal } from '@/hooks/useStaggerReveal'
 import s from './work.module.css'
 
 export interface WorkCard {
@@ -54,13 +56,15 @@ function Icon({ kind }: { kind: WorkCard['icon'] }) {
  * 카드마다 왼쪽 위 작은 선 그림(주황 점 하나) → 제목(20) → 설명(15).
  */
 export function WorkCards({ title, cards }: { title: string; cards: readonly WorkCard[] }) {
+  const listRef = useRef<HTMLUListElement>(null)
+  useStaggerReveal(listRef) // 소개 페이지의 순차 등장은 여기 한 곳
   return (
     <section className={s.work} aria-labelledby="work-title">
       <div className="container">
         <h2 id="work-title" className={s.title} lang="en">
           {title}
         </h2>
-        <ul className={s.cards} tabIndex={0} aria-label={title}>
+        <ul ref={listRef} className={s.cards} tabIndex={0} aria-label={title}>
           {cards.map((c) => (
             <li key={c.id} className={s.card}>
               <Icon kind={c.icon} />

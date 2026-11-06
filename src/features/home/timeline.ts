@@ -26,8 +26,8 @@ export interface TimelineStep {
 }
 
 const dot = (ymd: string) => ymd.replaceAll('-', '.')
-/** '2026.09.03–09.10' (같은 해면 뒤 날짜에서 해를 뺀다. 기간 표기는 사이트 전체 '–' 하나: docs/CONTENT.md 1-1) */
-const span = (a: string, b: string) => (a.slice(0, 4) === b.slice(0, 4) ? `${dot(a)}–${dot(b).slice(5)}` : `${dot(a)}–${dot(b)}`)
+/** '2026.09.03~09.10' (같은 해면 뒤 날짜에서 해를 뺀다. 기간 표기는 사이트 전체 '~' 하나: docs/CONTENT.md 1-1) */
+const span = (a: string, b: string) => (a.slice(0, 4) === b.slice(0, 4) ? `${dot(a)}~${dot(b).slice(5)}` : `${dot(a)}~${dot(b)}`)
 
 /** 지금 기수의 활동이 끝나는 달 (generations.json 은 끝난 기수에만 end 를 적는다) */
 const PLANNED_END: Readonly<Record<number, string>> = { 4: '2027.07' }

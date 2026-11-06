@@ -1,5 +1,6 @@
 import { VOICES, voices, type Voice } from '@/content/story'
 import { StorySection } from '@/features/common'
+import { QuoteMark } from '@/features/common/Glyphs'
 import { isShowableVoice, voiceColumns, VOICE_LIMIT } from './homeData'
 import s from './voices.module.css'
 
@@ -22,9 +23,7 @@ function VoiceCard({ v, index, sample }: { v: Voice; index: number; sample: bool
   return (
     <li role="listitem" className={s.item} style={{ order: index }} data-dark={dark || undefined}>
       <figure className={s.card}>
-        <span className={s.mark} aria-hidden="true">
-          “
-        </span>
+        <QuoteMark className={s.mark} />
         {sample && <span className={s.sampleTag}>예시</span>}
         <blockquote className={s.quote}>
           {v.headline && <p className={s.headline}>{v.headline}</p>}

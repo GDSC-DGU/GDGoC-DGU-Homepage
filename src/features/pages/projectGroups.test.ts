@@ -72,13 +72,13 @@ describe('groupProjects', () => {
 
 describe('한 줄 정보', () => {
   it('기수 · 프로그램 연도 · 기술', () => {
-    expect(projectMeta({ program: 'Solution Challenge 2025', year: 2025, generation: 3, stack: ['Flutter', 'Firebase'] })).toBe('3기 · Solution Challenge 2025 · Flutter · Firebase')
+    expect(projectMeta({ program: 'Solution Challenge 2025', year: 2025, generation: 3, stack: ['Flutter', 'Firebase'] })).toBe('3기, Solution Challenge 2025, Flutter, Firebase')
     expect(projectMeta({ program: 'G-Sprint', year: 2026 })).toBe('G-Sprint 2026')
-    expect(projectMeta({ program: 'Solution Challenge 2025 (APAC)', year: 2025, generation: 2 })).toBe('2기 · Solution Challenge 2025 (APAC)')
+    expect(projectMeta({ program: 'Solution Challenge 2025 (APAC)', year: 2025, generation: 2 })).toBe('2기, Solution Challenge 2025 (APAC)')
   })
 
   it('묶음 제목이 프로그램을 말하면 기수 · 기술만 (연도는 한 번만)', () => {
-    expect(projectMeta({ program: 'Solution Challenge 2025', year: 2025, generation: 2, stack: ['Kotlin', ''] }, false)).toBe('2기 · Kotlin')
+    expect(projectMeta({ program: 'Solution Challenge 2025', year: 2025, generation: 2, stack: ['Kotlin', ''] }, false)).toBe('2기, Kotlin')
     expect(projectMeta({ program: 'SDGs Project', year: 2026 }, false)).toBe('')
   })
 })

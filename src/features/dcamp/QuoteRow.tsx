@@ -1,4 +1,5 @@
 import type { Voice } from '@/content/story'
+import { QuoteMark } from '@/features/common/Glyphs'
 import s from './quoteRow.module.css'
 
 /**
@@ -17,9 +18,7 @@ export function QuoteRow({ title, voices }: { title: string; voices: readonly Vo
           {voices.map((v) => (
             <li key={v.id} className={s.item}>
               <figure className={s.fig}>
-                <span className={s.mark} aria-hidden="true">
-                  “
-                </span>
+                <QuoteMark className={s.mark} />
                 <blockquote className={s.quote}>
                   {v.headline && <p className={s.headline}>{v.headline}</p>}
                   <p>{v.quote}</p>

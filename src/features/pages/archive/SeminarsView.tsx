@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { EVENTS, PHOTOS } from '@/content'
 import { useSeminars } from '@/data/queries'
 import type { Seminar } from '@/domain/types'
+import { useChanged } from '@/hooks/useChanged'
 import { weekday } from '@/lib/date'
 import { StateLine } from '../PageParts'
 import { GenTabs } from '../projects/GenTabs'
@@ -79,7 +80,7 @@ function TalkCard({ talk, q }: { talk: Seminar; q: string }) {
         </span>
         {state === 'ready' && (
           <span className={a.talkFile} aria-hidden="true">
-            {kind === 'PPT' ? 'PPT 받기 ↓' : 'PDF 열기 ↗'}
+            {kind === 'PPT' ? 'PPT 받기' : 'PDF 열기'}
           </span>
         )}
       </span>
@@ -126,7 +127,7 @@ function GenGroup({ group, q }: { group: SeminarGroup; q: string }) {
           <span className="num">{group.generation}</span>기 세미나
         </h3>
         <p className={a.groupMeta}>
-          <span className="num">{periodLabel(group.from, group.to)}</span> ·{' '}
+          <span className="num">{periodLabel(group.from, group.to)}</span>,{' '}
           {items.length === group.total ? (
             <>
               발표 <span className="num">{group.total}</span>개
@@ -149,7 +150,7 @@ function GenGroup({ group, q }: { group: SeminarGroup; q: string }) {
 
 /**
  * 아카이브 '세미나' 보기: 기수 탭(프로젝트 보기와 같은 모양, 3기 · 2기 · 1기) · 찾기 → 고른 기수의 발표 전부를 날짜별 카드로.
- * 맨 위 '1–3기 세미나 발표 104개 · 발표자 85명' 요약 줄은 뺐다 (4기 Organizer 2026-11-06: 프로젝트처럼 바로 기수 탭).
+ * 맨 위 '1~3기 세미나 발표 104개 · 발표자 85명' 요약 줄은 뺐다 (4기 Organizer 2026-11-06: 프로젝트처럼 바로 기수 탭).
  * 발표 자료(PDF)는 백엔드가 R2 에 올린 주소(fileUrl)가 있을 때만 줄을 눌러 연다. 없으면 '준비 중'.
  */
 export function SeminarsView() {
@@ -159,6 +160,7 @@ export function SeminarsView() {
   const gens = useMemo(() => seminarGenerations(list), [list])
   const tabs = useMemo(() => seminarTabs(list), [list])
   const gen = parseSeminarGen(params.get(SEMINAR_GEN_PARAM), gens)
+  const genMoved = useChanged(gen) // 기수 탭을 바꿨을 때만 페이드
   const urlQ = params.get(SEMINAR_Q_PARAM) ?? ''
   // 찾기 칸은 입력한 글자를 바로 보여 주고, 주소(?q=)에는 뒤따라 적는다.
   // 주소에서 바로 값을 읽으면 주소가 늦게 바뀌어 한글 조합이 깨지고 커서가 끝으로 튄다 (QA 2026-11-05).
@@ -232,7 +234,7 @@ export function SeminarsView() {
         </form>
       </div>
 
-      <div id={PANEL_ID} role="tabpanel" aria-labelledby={seminarTabId(String(gen))}>
+      <div key={gen} id={PANEL_ID} role="tabpanel" aria-labelledby={seminarTabId(String(gen))} className={genMoved ? 'fade-in' : undefined}>
         {q.trim() && found > 0 && (
           <p className={a.found} role="status">
             <span className="num">{gen}</span>기에서 ‘{q.trim()}’ <span className="num">{found}</span>개

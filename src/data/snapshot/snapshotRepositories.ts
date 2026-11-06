@@ -14,7 +14,7 @@ const dotDate = (ymd: string) => ymd.replaceAll('-', '.')
 
 function eventDateLabel(e: Pick<ScheduleEvent, 'date' | 'endDate'>): string {
   if (!e.endDate || e.endDate === e.date) return dotDate(e.date)
-  return `${dotDate(e.date)}–${e.endDate.slice(0, 4) === e.date.slice(0, 4) ? dotDate(e.endDate.slice(5)) : dotDate(e.endDate)}`
+  return `${dotDate(e.date)}~${e.endDate.slice(0, 4) === e.date.slice(0, 4) ? dotDate(e.endDate.slice(5)) : dotDate(e.endDate)}`
 }
 
 /** 검색 대상: 행사 · 프로젝트 · 자주 묻는 질문. id 는 'event-' · 'project-' · 'faq-' 로 나눠 겹치지 않게 한다 */
@@ -31,7 +31,7 @@ export function buildArchive(
         id: `event-${e.id}`,
         place: e.place,
         title: e.title,
-        meta: [eventDateLabel(e), e.generation ? `${e.generation}기` : '', e.venue ?? ''].filter(Boolean).join(' · '),
+        meta: [eventDateLabel(e), e.generation ? `${e.generation}기` : '', e.venue ?? ''].filter(Boolean).join(', '),
         keywords: expandKeywords(e.title, e.originalTitle, e.series, KIND_LABEL[e.kind], e.venue, e.generation ? `${e.generation}기` : '', e.date.slice(0, 4)),
       }),
     )
@@ -43,7 +43,7 @@ export function buildArchive(
       title: p.name,
       meta: [p.program, p.program.includes(String(p.year)) ? '' : String(p.year), p.generation ? `${p.generation}기` : '', p.status === 'in-progress' ? '진행 중' : '']
         .filter(Boolean)
-        .join(' · '),
+        .join(', '),
       keywords: expandKeywords(p.name, p.summary, p.program, ...(p.stack ?? []), String(p.year), p.generation ? `${p.generation}기` : '', '프로젝트 project'),
     }),
   )
@@ -62,7 +62,7 @@ export function buildArchive(
       id: `seminar-${s.id}`,
       place: 'projects',
       title: s.title,
-      meta: [s.date.replaceAll('-', '.'), `${s.generation}기`, s.speaker].filter(Boolean).join(' · '),
+      meta: [s.date.replaceAll('-', '.'), `${s.generation}기`, s.speaker].filter(Boolean).join(', '),
       keywords: expandKeywords(s.title, s.speaker, `${s.generation}기`, s.date.slice(0, 4), '세미나 발표 자료 seminar'),
     }),
   )

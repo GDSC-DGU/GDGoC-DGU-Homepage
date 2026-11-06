@@ -46,10 +46,10 @@ export function ApplyLink({ where, onHover, onClick }: { where: Where; onHover?:
   const name = open ? '지원서 쓰기' : place.label
   // 시트의 오른쪽 설명: 모집 중이면 마감일, 열릴 날이 정해졌으면 그날, 아니면 페이지가 다루는 것
   const sub = open
-    ? [due, `${generation}기`].filter(Boolean).join(' · ')
+    ? [`${generation}기`, due].filter(Boolean).join(' ')
     : st.state === 'soon' && st.opensAt
       ? `${monthDay(st.opensAt)}부터 ${generation}기 지원`
-      : '모집 일정 · 지원 방법'
+      : '모집 일정과 지원 방법'
 
   const body = (
     <>
@@ -72,7 +72,7 @@ export function ApplyLink({ where, onHover, onClick }: { where: Where; onHover?:
     return (
       <a className={cls} href={st.applyUrl} target="_blank" rel="noreferrer" onClick={onClick} {...hover}>
         {body}
-        <span aria-hidden="true">↗</span>
+        
         <span className="visually-hidden"> ({generation}기 지원서, 새 창)</span>
       </a>
     )

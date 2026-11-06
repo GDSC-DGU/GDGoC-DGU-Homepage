@@ -11,7 +11,7 @@ html[data-story] #projects {
   z-index: 1;
   background: var(--paper);
   border-radius: 28px 28px 0 0;
-  box-shadow: 0 -14px 40px -16px rgba(25, 27, 31, 0.18);
+  box-shadow: 0 -14px 40px -16px var(--ink-a18);
 }
 @media (max-width: 767px) {
   html[data-story] #projects {

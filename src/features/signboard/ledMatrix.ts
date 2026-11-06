@@ -74,7 +74,7 @@ function ctx2d(): CanvasRenderingContext2D {
 }
 
 const FONT = `12px "${FONT_FAMILY}"`
-/** 기준선: 몸통이 1–11 행, 내림이 12–13 행에 오도록 (12px 에서 몸통 꼭대기 = 기준선 − 11) */
+/** 기준선: 몸통이 1~11 행, 내림이 12~13 행에 오도록 (12px 에서 몸통 꼭대기 = 기준선 − 11) */
 const BASELINE_Y = CAP_TOP + CAP_H
 
 function textWidth(text: string): number {

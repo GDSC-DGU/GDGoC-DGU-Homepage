@@ -1,7 +1,7 @@
 /*
  * 일정 표 (Ticket): 흰 판 한 장, radius 20.
- * 기본: 한 줄 [다음 모임] [10.27 화] [제목] [D-9] [→] — 빠진 칸은 자리를 남기지 않는다 (flex).
- * 폰(≤767): 세 줄 (작은 글자 / 날짜 · D-day / 제목), → 는 숨긴다 (표 전체가 링크).
+ * 기본: 한 줄 [다음 모임] [10.27 화] [제목] [D-9]. 빠진 칸은 자리를 남기지 않는다 (flex). 표 전체가 링크라 화살표는 없다 (hallmark 63).
+ * 폰(≤767): 세 줄 (작은 글자 / 날짜 · D-day / 제목).
  * 큰 판(.large): 커뮤니티 '이번 주'. 날짜 --t-num, 제목 28/38, 아래 한 줄(meta).
  */
 .ticket {
@@ -26,7 +26,7 @@
 }
 /* 먹색 면 위: 판 바깥에 그려지는 포커스 링은 먹색 위 값 (#8AB4F8, 8.2:1) */
 .ticket[data-surface='dark']:focus-visible {
-  outline-color: #8ab4f8;
+  outline-color: var(--focus-dark);
 }
 
 .kicker {
@@ -73,12 +73,6 @@
   font: 600 20px/1 var(--font-num);
   white-space: nowrap;
 }
-.go {
-  grid-area: go;
-  flex: none;
-  font: 600 22px/1 var(--font-num);
-  transition: transform var(--dur-hover) var(--ease);
-}
 
 /* 눌렀을 때 · 마우스를 올렸을 때 (마우스가 있는 화면에서만) */
 .linked:active {
@@ -88,12 +82,6 @@
   .linked:hover .title {
     text-decoration-line: underline;
   }
-  .linked:hover .go {
-    transform: translateX(3px);
-  }
-  .linked:hover .out {
-    transform: translate(1px, -1px);
-  }
 }
 
 /* ── 큰 판 (커뮤니티 '이번 주') ── */
@@ -102,8 +90,8 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas:
     'kicker kicker dday'
-    'when title go'
-    'when meta go';
+    'when title .'
+    'when meta .';
   align-items: center;
   gap: 4px 40px;
   padding: 36px 44px 40px;
@@ -131,9 +119,6 @@
 .large .dday {
   font-size: 22px;
 }
-.large .go {
-  font-size: 28px;
-}
 
 @media (max-width: 1023px) {
   .large {
@@ -142,7 +127,7 @@
   }
 }
 
-/* ── 폰: 세 줄 (→ 는 숨김, 표 전체가 링크) ── */
+/* ── 폰: 세 줄 (표 전체가 링크) ── */
 @media (max-width: 767px) {
   .ticket {
     display: grid;
@@ -186,18 +171,10 @@
   .large .dday {
     font-size: 18px;
   }
-  .go {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ticket,
-  .go {
+  .ticket {
     transition: none;
-  }
-  .linked:hover .go,
-  .linked:hover .out {
-    transform: none;
   }
 }

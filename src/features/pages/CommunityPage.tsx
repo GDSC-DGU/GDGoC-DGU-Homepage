@@ -79,13 +79,13 @@ const HERO_TEXT = [
 const SEMINAR_GENS = [...new Set(SEMINARS.map((x) => x.generation))].sort((a, b) => a - b)
 const SC_PROJECTS = PUBLIC_PROJECTS.filter((p) => /^Solution Challenge\b/.test(p.program)).length
 const WORK: WorkCard[] = [
-  { id: 'sessions', icon: 'calendar', title: '정기 세션', body: '매주 화요일 18:00에 Frontend · Backend · AI/ML · Product Design 파트별로 모입니다. 강의보다 같은 문제를 각자 풀어 보고 비교하는 실습을 합니다.' },
+  { id: 'sessions', icon: 'calendar', title: '정기 세션', body: '매주 화요일 18:00에 Frontend, Backend, AI/ML, Product Design 파트별로 모입니다. 강의보다 같은 문제를 각자 풀어 보고 비교하는 실습을 합니다.' },
   { id: 'sprint', icon: 'sprint', title: GLOSSARY['g-sprint'].term, body: '팀마다 가을 학기 동안 아이디어부터 배포까지 서비스 하나를 만들고 Google 기술을 하나 이상 씁니다. 학기 끝 데모데이에서 직접 시연합니다.' },
   {
     id: 'seminars',
     icon: 'mic',
     title: '멤버 세미나',
-    body: `멤버가 주제를 정해 직접 발표합니다. ${SEMINAR_GENS.length > 1 ? `${SEMINAR_GENS[0]}–${SEMINAR_GENS[SEMINAR_GENS.length - 1]}` : SEMINAR_GENS[0]}기 발표 ${SEMINARS.length}개가 아카이브에 남아 있습니다.`,
+    body: `멤버가 주제를 정해 직접 발표합니다. ${SEMINAR_GENS.length > 1 ? `${SEMINAR_GENS[0]}~${SEMINAR_GENS[SEMINAR_GENS.length - 1]}` : SEMINAR_GENS[0]}기 발표 ${SEMINARS.length}개가 아카이브에 남아 있습니다.`,
   },
   {
     id: 'solution-challenge',
@@ -93,7 +93,7 @@ const WORK: WorkCard[] = [
     title: GLOSSARY['solution-challenge'].term,
     body: `${GLOSSARY['solution-challenge'].long}${SC_PROJECTS ? ` 지금까지 ${SC_PROJECTS}개 프로젝트를 냈습니다.` : ''}`,
   },
-  { id: 'joint', icon: 'people', title: '연합 행사', body: `${GLOSSARY['dong-hong'].long.replace(/입니다\.$/, '')}인 ${GLOSSARY['dong-hong'].term}, 동지톤 같은 행사를 다른 챕터 · 동아리와 함께 엽니다.` },
+  { id: 'joint', icon: 'people', title: '연합 행사', body: `${GLOSSARY['dong-hong'].long.replace(/입니다\.$/, '')}인 ${GLOSSARY['dong-hong'].term}, 동지톤 같은 행사를 다른 챕터, 동아리와 함께 엽니다.` },
 ]
 
 /**
@@ -189,9 +189,7 @@ export function CommunityPage() {
                 <span key={t.id} className={c.tallyItem}>
                   {i > 0 && (
                     <>
-                      <span className={c.tallySep} aria-hidden="true">
-                        ·
-                      </span>
+                      <span className={c.tallySep} aria-hidden="true" />
                       <span className="visually-hidden">, </span>
                     </>
                   )}

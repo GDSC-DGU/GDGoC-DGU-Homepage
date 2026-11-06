@@ -51,7 +51,7 @@ interface Props {
 const colorOf = (e: ScheduleEvent) => (e.kind === 'rest' ? 'var(--ink-500)' : placeColor(e.place))
 
 /**
- * 학기 레일: 9월–2월을 가로 한 줄로 펼치고, 일정 · 휴회 · G-Sprint 기간 · 오늘을 올린다.
+ * 학기 레일: 9월~2월을 가로 한 줄로 펼치고, 일정 · 휴회 · G-Sprint 기간 · 오늘을 올린다.
  * 키보드: 레일은 Tab 한 번에 들어가고, 좌우 화살표 · Home · End 로 일정 사이를 옮긴다.
  * 같은 내용은 화면 읽기 프로그램용 목록으로도 둔다.
  */
@@ -348,7 +348,7 @@ export function SemesterRail({ period, events, today, sprint, linkedId = null }:
           <span className={s.tipMeta}>
             <i className={s.tipSq} style={{ '--c': colorOf(shown) } as CSSProperties} data-rest={shown.kind === 'rest' || undefined} />
             {KIND_LABEL[shown.kind]}
-            {shown.venue && <> · {shown.venue}</>}
+            {shown.venue && <>, {shown.venue}</>}
           </span>
         </div>
       )}

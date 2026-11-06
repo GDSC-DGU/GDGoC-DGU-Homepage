@@ -1,6 +1,7 @@
 import { useId, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useLocation } from 'react-router-dom'
 import type { Faq } from '@/domain/types'
+import { useChanged } from '@/hooks/useChanged'
 import { FAQ_GROUP_LABEL, faqGroupOf, faqIdFromHash, groupFaqs, type FaqGroupId } from './faqGroups'
 import k from './recruit.module.css'
 
@@ -42,6 +43,7 @@ export function FaqTabs({ faqs, open = [] }: { faqs: readonly Faq[]; open?: read
   const [tab, setTab] = useState<FaqGroupId>(() => (target ? faqGroupOf(target) : (tabs[0] ?? 'apply')))
   // 다른 질문을 가리키는 주소로 바뀌면 그 탭으로 (렌더 중에 맞추는 React 권장 방식)
   const [seen, setSeen] = useState(target)
+  const moved = useChanged(tab) // 탭을 바꿨을 때만 패널이 페이드로 나타난다
   if (seen !== target) {
     setSeen(target)
     if (target) setTab(faqGroupOf(target))
@@ -97,7 +99,7 @@ export function FaqTabs({ faqs, open = [] }: { faqs: readonly Faq[]; open?: read
         })}
       </div>
       {tabs.map((g) => (
-        <div key={g} role="tabpanel" id={`${base}-panel-${g}`} aria-labelledby={`${base}-tab-${g}`} hidden={g !== tab} className={k.panel}>
+        <div key={g} role="tabpanel" id={`${base}-panel-${g}`} aria-labelledby={`${base}-tab-${g}`} hidden={g !== tab} className={moved ? 'fade-in' : undefined}>
           <QaList faqs={groups[g]} open={openSet} target={target} />
         </div>
       ))}

@@ -2,6 +2,13 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { annotate } from 'rough-notation'
 import type { RoughAnnotationType, RoughPadding } from 'rough-notation/lib/model'
 
+/*
+ * rough-notation 은 처음 그릴 때 <style> 한 장을 문서에 끼워 넣어 선 긋는 keyframes 를 만든다.
+ * 보안 헤더(CSP style-src 에 'unsafe-inline' 없음)가 그 <style> 을 막으므로, 같은 keyframes 를 styles/global.css 에 두고
+ * 라이브러리가 '이미 넣었다'고 보게 표시만 해 둔다 (rough-notation 0.5 의 window.__rno_kf_s).
+ */
+if (typeof window !== 'undefined') (window as Window & { __rno_kf_s?: unknown }).__rno_kf_s = true
+
 interface Props {
   children: ReactNode
   type?: RoughAnnotationType

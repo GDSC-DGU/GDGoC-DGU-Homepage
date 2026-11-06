@@ -28,12 +28,12 @@
   display: grid;
   align-content: center;
   gap: 8px;
-  min-height: 112px;
+  min-height: 88px;
   margin-top: 40px;
   padding: 24px 80px 24px 32px;
   border-radius: var(--r-card);
-  background: #000;
-  color: #fff;
+  background: var(--black);
+  color: var(--white);
   text-decoration: none;
 }
 .banner::before {
@@ -42,10 +42,10 @@
   inset: 0;
   z-index: -1;
   background:
-    repeating-linear-gradient(100deg, transparent 0 14px, rgba(160, 190, 255, 0.1) 14px 15px, transparent 15px 30px),
-    radial-gradient(40% 140% at 72% 40%, rgba(80, 120, 255, 0.45), transparent 70%),
-    radial-gradient(30% 120% at 92% 70%, rgba(190, 240, 160, 0.35), transparent 70%),
-    radial-gradient(30% 140% at 56% 100%, rgba(255, 94, 39, 0.45), transparent 70%);
+    repeating-linear-gradient(100deg, transparent 0 14px, var(--glow-a0beff-a10) 14px 15px, transparent 15px 30px),
+    radial-gradient(40% 140% at 72% 40%, var(--glow-5078ff-a45), transparent 70%),
+    radial-gradient(30% 120% at 92% 70%, var(--glow-bef0a0-a35), transparent 70%),
+    radial-gradient(30% 140% at 56% 100%, var(--brand-a45), transparent 70%);
   transition: transform 700ms var(--ease-soft);
 }
 @media (hover: hover) {
@@ -60,10 +60,6 @@
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-.bannerKicker {
-  font: 500 14px/1.3 var(--font-kr);
-  color: #d5d2cf;
-}
 .bannerTitle {
   font: 600 20px/1.4 var(--font-kr);
   letter-spacing: -0.02em;
@@ -73,9 +69,10 @@
   position: absolute;
   right: 32px;
   top: 50%;
+  width: 24px;
+  height: 24px;
   margin-top: -12px;
-  font: 500 22px/24px var(--font-num);
-  transition: transform 400ms var(--ease-soft);
+  transition: transform var(--dur-short) var(--ease-out);
 }
 @media (max-width: 767px) {
   .hero {
@@ -93,5 +90,16 @@
   }
   .bannerGo {
     right: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner::before,
+  .bannerGo {
+    transition: none;
+  }
+  .banner:hover::before,
+  .banner:hover .bannerGo {
+    transform: none;
   }
 }

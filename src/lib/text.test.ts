@@ -13,6 +13,6 @@ describe('keepHyphenated', () => {
   })
 
   it('한글 · 숫자 기간 · 띄어 쓴 하이픈은 건드리지 않는다', () => {
-    for (const s of ['2026.08–09', '중간 - 기말', '3-4월', '휴회']) expect(keepHyphenated(s)).toBe(s)
+    for (const s of ['2026.08~09', '중간 - 기말', '3-4월', '휴회']) expect(keepHyphenated(s)).toBe(s)
   })
 })

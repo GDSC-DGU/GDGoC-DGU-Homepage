@@ -75,11 +75,11 @@
 }
 .map::before {
   top: 0;
-  background: linear-gradient(var(--paper), rgba(255, 255, 255, 0));
+  background: linear-gradient(var(--paper), var(--white-a0));
 }
 .map::after {
   bottom: 0;
-  background: linear-gradient(rgba(255, 255, 255, 0), var(--paper));
+  background: linear-gradient(var(--white-a0), var(--paper));
 }
 
 /* 넓은 화면: 이름은 한 단계만 크게 (AI 티 점검 2026-11-05: 128 → 96. 첫 화면의 주인공은 지도) */
@@ -145,13 +145,13 @@
 
 /* ── 밤: 첫 블록 바탕 · 지도 위아래 흐림을 밤 바탕색으로. 글자는 .on-dark ── */
 .hero[data-tod='night'] {
-  background: #15191f;
+  background: var(--hero-shade);
 }
 .hero[data-tod='night'] .map::before {
-  background: linear-gradient(#15191f, rgba(21, 25, 31, 0));
+  background: linear-gradient(var(--hero-shade), var(--glow-15191f-a0));
 }
 .hero[data-tod='night'] .map::after {
-  background: linear-gradient(rgba(21, 25, 31, 0), #15191f);
+  background: linear-gradient(var(--glow-15191f-a0), var(--hero-shade));
 }
 
 /* 아주 좁은 폰(360 미만): 꺾쇠 둘 + 이름이 한 줄에 들어가게 */

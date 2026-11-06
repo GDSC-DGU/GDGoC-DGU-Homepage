@@ -91,7 +91,7 @@ describe('검색 아카이브', () => {
     const originals = new Set(EVENTS.map((e) => e.originalTitle).filter(Boolean))
     expect(docs.filter((d) => originals.has(d.title)).map((d) => d.title)).toEqual([])
     expect(docs.find((d) => d.id === 'event-3rd-dev-conference')?.title).toBe('동국대 Dev Conference 2025')
-    expect(docs.find((d) => d.id === 'event-4th-sprint-kickoff')?.title).toBe('G-Sprint 킥오프 · 팀 회의')
+    expect(docs.find((d) => d.id === 'event-4th-sprint-kickoff')?.title).toBe('G-Sprint 킥오프와 팀 회의')
     expect(docs.filter((d) => d.sample)).toEqual([])
   })
 

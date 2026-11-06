@@ -99,8 +99,8 @@ export function Archive({
               <span lang="en">{info.name}</span>
               {range && (
                 <>
-                  {' · '}
-                  <span className="num">{range}</span>
+                  {' '}
+                  <span className={`num ${c.genRange}`}>{range}</span>
                 </>
               )}
             </span>
@@ -114,13 +114,8 @@ export function Archive({
         {photos.length > 0 && (
           <ul className={c.genPhotos} aria-label={`${info.n}기 행사 사진`}>
             {photos.map((p) => (
-              <li key={p.id}>
-                <figure className={c.genPhoto}>
-                  <img src={p.src.startsWith('https://') ? p.src : assetUrl(p.src)} alt={p.alt} width={p.width} height={p.height} loading="lazy" decoding="async" />
-                  <figcaption>
-                    {p.event} · <time className="num" dateTime={p.date}>{p.date.replaceAll('-', '.')}</time>
-                  </figcaption>
-                </figure>
+              <li key={p.id} className={c.genPhoto}>
+                <img src={p.src.startsWith('https://') ? p.src : assetUrl(p.src)} alt={p.alt} width={p.width} height={p.height} loading="lazy" decoding="async" />
               </li>
             ))}
           </ul>

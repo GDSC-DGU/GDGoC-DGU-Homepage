@@ -79,8 +79,8 @@ describe('홈 다음 일정 (공개됐거나 확정된 것만)', () => {
 
 describe('프로젝트', () => {
   it('프로그램 이름에 해가 있으면 해를 두 번 쓰지 않는다', () => {
-    expect(projectMeta({ program: 'Solution Challenge 2024', year: 2024, generation: 2 })).toBe('Solution Challenge 2024 · 2기')
-    expect(projectMeta({ program: 'G-Sprint', year: 2026 } as Pick<Project, 'program' | 'year' | 'generation'>)).toBe('G-Sprint · 2026')
+    expect(projectMeta({ program: 'Solution Challenge 2024', year: 2024, generation: 2 })).toBe('Solution Challenge 2024, 2기')
+    expect(projectMeta({ program: 'G-Sprint', year: 2026 } as Pick<Project, 'program' | 'year' | 'generation'>)).toBe('G-Sprint, 2026')
   })
 })
 

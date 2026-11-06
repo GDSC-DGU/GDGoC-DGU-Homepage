@@ -45,7 +45,7 @@ export function DetourLink({ to, place, children }: { to: string; place: PlaceId
 }
 
 /**
- * 페이지 끝 출처 한 줄: '출처 gdg.community.dev ↗ · 4기 운영 계획 · … · 10.17 갱신'.
+ * 페이지 끝 출처 한 줄: '출처 gdg.community.dev · 4기 운영 계획 · … · 10.17 갱신'.
  * 줄마다 붙이던 출처 꼬리표 · 각주 대신 페이지에 한 번만 (pageSources.ts 가 목록을 접는다).
  */
 export function PageSources({ items, updated }: { items: readonly SourceItem[]; updated?: ReactNode }) {
@@ -55,13 +55,12 @@ export function PageSources({ items, updated }: { items: readonly SourceItem[]; 
       <span className={g.pageSourcesLabel}>출처</span>
       {items.map((it, i) => (
         <Fragment key={it.key}>
-          {i > 0 && <span aria-hidden="true"> · </span>}
-          {i > 0 && <span className="visually-hidden">, </span>}
+          {i > 0 && ', '}
           {it.href ? (
             <a className={g.sourceLink} href={it.href} target="_blank" rel="noreferrer">
               {it.label}
               <span className="visually-hidden"> (새 창)</span>
-              <span aria-hidden="true"> ↗</span>
+              
             </a>
           ) : (
             <span>{it.label}</span>
@@ -70,8 +69,7 @@ export function PageSources({ items, updated }: { items: readonly SourceItem[]; 
       ))}
       {updated && (
         <>
-          <span aria-hidden="true"> · </span>
-          <span className="visually-hidden">, </span>
+          {', '}
           {updated}
         </>
       )}

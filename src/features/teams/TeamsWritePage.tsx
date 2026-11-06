@@ -220,7 +220,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
       {/* 작성자 확인 */}
       {edit ? (
         <p className={s.authorDone}>
-          작성자 확인됨 · <strong>{authorLabel(edit.post.author)}</strong>
+          작성자 확인됨: <strong>{authorLabel(edit.post.author)}</strong>
         </p>
       ) : (
         <fieldset className={s.authorBox}>
@@ -270,7 +270,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
       </Field>
 
       <div className={s.twoCol}>
-        <Field label="구하는 파트" hint="선택 · 여러 개" error={errors.parts} group>
+        <Field label="구하는 파트" hint="선택, 여러 개 고를 수 있습니다" error={errors.parts} group>
           <div className={s.chips} lang="en">
             {TEAM_PARTS.map((p) => (
               <label key={p.id} className={s.chip}>
@@ -294,7 +294,7 @@ function PostForm({ initial, edit }: { initial: FormState; edit?: { post: TeamPo
         </Field>
       </div>
 
-      <Field label="연락 방법 링크" hint="선택 · 오픈채팅 · 디스코드 등" error={errors.contactUrl}>
+      <Field label="연락 방법 링크" hint="선택 (오픈채팅, 디스코드 등)" error={errors.contactUrl}>
         {(id, describedBy) => (
           <input id={id} type="url" inputMode="url" className={s.input} value={form.contactUrl} placeholder="https://" aria-invalid={errors.contactUrl ? true : undefined} aria-describedby={describedBy} onChange={(e) => set('contactUrl', e.target.value)} />
         )}
@@ -438,7 +438,7 @@ function FileDrop({ disabled, busy, full, onFiles }: { disabled: boolean; busy: 
           </>
         )}
       </p>
-      <p className={s.dropSub}>{full ? `첨부파일은 ${FILE_MAX}개까지입니다.` : disabled ? '학번과 PIN을 먼저 넣어야 파일을 고를 수 있습니다.' : `PDF · JPG · PNG, 파일당 10MB 이하, 최대 ${FILE_MAX}개`}</p>
+      <p className={s.dropSub}>{full ? `첨부파일은 ${FILE_MAX}개까지입니다.` : disabled ? '학번과 PIN을 먼저 넣어야 파일을 고를 수 있습니다.' : `PDF, JPG, PNG 파일당 10MB 이하, 최대 ${FILE_MAX}개`}</p>
       <input
         ref={inputRef}
         type="file"
