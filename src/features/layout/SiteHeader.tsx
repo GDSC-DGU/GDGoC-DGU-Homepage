@@ -20,6 +20,45 @@ function useScrolled(): boolean {
   return scrolled
 }
 
+/**
+ * 머리말 아래에 검정 섹션(data-band='dark')이 깔려 있으면 머리말도 검정 띠로 (dcamp: 검정 머리 위 검정 머리말).
+ * 스크롤 · 크기 변경 · 본문이 바뀔 때 다시 잰다 (한 프레임에 한 번).
+ */
+function useOnDark(key: string): boolean {
+  const [dark, setDark] = useState(false)
+  useEffect(() => {
+    let raf = 0
+    const check = () => {
+      raf = 0
+      const y = 48 // 머리말 띠 가운데 (위 여백 16 + 띠 64 의 절반)
+      let on = false
+      for (const el of document.querySelectorAll('[data-band="dark"]')) {
+        const r = el.getBoundingClientRect()
+        if (r.top <= y && r.bottom >= y) {
+          on = true
+          break
+        }
+      }
+      setDark(on)
+    }
+    const queue = () => {
+      if (!raf) raf = requestAnimationFrame(check)
+    }
+    queue()
+    window.addEventListener('scroll', queue, { passive: true })
+    window.addEventListener('resize', queue)
+    const mo = new MutationObserver(queue)
+    mo.observe(document.getElementById('main') ?? document.body, { childList: true, subtree: true })
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('scroll', queue)
+      window.removeEventListener('resize', queue)
+      mo.disconnect()
+    }
+  }, [key])
+  return dark
+}
+
 /** GDG DGU 로고 그림 크기 (public/brand/gdg-dgu-logo.png 원본 비율 그대로, 화면에서는 높이 26px) */
 const LOGO = { w: 280, h: 137 } as const
 
@@ -45,6 +84,7 @@ export function SiteHeader() {
     hereRef.current = here
   }, [here])
   const recruitingOpen = recruitStatus(useToday()).state === 'open'
+  const onDark = useOnDark(here)
   const menuBtnRef = useRef<HTMLButtonElement>(null)
   const searchBtnRef = useRef<HTMLButtonElement>(null)
 
@@ -63,8 +103,8 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className={s.header} data-site-header="" data-scrolled={scrolled || undefined}>
-        <div className={`container ${s.bar}`}>
+      <header className={s.header} data-site-header="" data-scrolled={scrolled || undefined} data-on-dark={onDark || undefined}>
+        <div className={`container ${s.bar} ${onDark ? 'on-dark' : ''}`}>
           {/* 로고만 보이고, 읽히는 이름은 'GDGoC DGU 홈' (public/brand: 4기 Organizer 가 준 GDG DGU 로고) */}
           <Link className={s.brand} to="/">
             <img className={s.brandLogo} src={`${import.meta.env.BASE_URL}brand/gdg-dgu-logo.png`} alt="" width={LOGO.w} height={LOGO.h} />

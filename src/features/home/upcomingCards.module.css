@@ -1,0 +1,146 @@
+/* 홈 다가오는 일정 (dcamp 홈 프로그램 카드): 따뜻한 회색 면 · 두 칸 [영문 세 줄 | 엇갈린 흰 정사각 카드 2 × 2] */
+.section {
+  padding-block: 120px 180px;
+  background: var(--field);
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 680px);
+  gap: 48px;
+  align-items: start;
+}
+.head {
+  position: sticky;
+  top: 120px;
+}
+.title {
+  font: 500 32px/1.25 var(--font-num);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.sub {
+  margin-top: 16px;
+  font: 500 16px/1.5 var(--font-kr);
+  color: var(--ink-700);
+}
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  margin-top: 28px;
+  padding: 0 16px;
+  border: 1px solid var(--ink-900);
+  border-radius: var(--r-pill);
+  font: 500 14px/1 var(--font-kr);
+  color: var(--ink-900);
+  text-decoration: none;
+  transition: background 300ms var(--ease), color 300ms var(--ease);
+}
+@media (hover: hover) {
+  .more:hover {
+    background: var(--ink-900);
+    color: #fff;
+  }
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* 왼쪽 줄 카드만 60px 내려 엇갈리게 (dcamp) */
+.item:nth-child(odd) {
+  transform: translateY(60px);
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1 / 1;
+  padding: 32px;
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--ink-900);
+  text-decoration: none;
+  transition:
+    transform var(--dur-lift) var(--ease-soft),
+    box-shadow var(--dur-lift) var(--ease-soft);
+}
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(var(--lift));
+    box-shadow: var(--shadow-lift);
+  }
+}
+.card:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.kind {
+  font: 600 16px/1.2 var(--font-kr);
+  color: var(--gen-text);
+}
+.name {
+  margin-top: 24px;
+  font: 600 20px/1.35 var(--font-kr);
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+.when {
+  margin-top: auto;
+  font: 400 14px/1.6 var(--font-num);
+  color: var(--ink-500);
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .head {
+    position: static;
+  }
+  .section {
+    padding-bottom: 160px;
+  }
+}
+@media (max-width: 767px) {
+  .section {
+    padding-block: 80px;
+  }
+  .title {
+    font-size: 24px;
+  }
+  .cards {
+    display: flex;
+    gap: 16px;
+    margin-inline: calc(-1 * var(--side)) calc(-1 * var(--side-r));
+    padding: 4px var(--side-r) 8px var(--side);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .cards::-webkit-scrollbar {
+    display: none;
+  }
+  .item {
+    flex: none;
+    width: 70vw;
+    scroll-snap-align: start;
+  }
+  .item:nth-child(odd) {
+    transform: none;
+  }
+  .card {
+    padding: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:hover {
+    transform: none;
+  }
+}

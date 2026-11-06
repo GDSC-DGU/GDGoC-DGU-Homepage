@@ -27,6 +27,28 @@
 .header[data-scrolled] .bar {
   box-shadow: 0 6px 24px -10px rgba(17, 17, 17, 0.18);
 }
+/* 검정 섹션 위: 검정 띠 · 흰 글자 (on-dark 가 글자 단계를 바꾼다) */
+.header[data-on-dark] .bar {
+  background: #000;
+  box-shadow: none;
+}
+.header[data-on-dark] .searchBox {
+  background: #262525;
+  color: #a8a3a1;
+}
+.header[data-on-dark] .searchBox:hover {
+  border-color: #4a4645;
+}
+.header[data-on-dark] .applyCta {
+  background: #fff;
+  color: #000;
+}
+.header[data-on-dark] .applyCtaActive {
+  box-shadow: 0 0 0 2px #000, 0 0 0 4px #fff;
+}
+.header[data-on-dark] .navActive::after {
+  background: #fff;
+}
 
 .bar {
   display: flex;
@@ -35,7 +57,9 @@
   height: 64px;
   border-radius: var(--r-card);
   background: var(--field);
-  transition: box-shadow var(--dur-open) var(--ease);
+  transition:
+    box-shadow var(--dur-open) var(--ease),
+    background 300ms var(--ease);
 }
 /* 본문 틀(.container) 의 좌우 여백 안에서 띠만 32px 넓게: 안쪽 여백으로 로고 · 메뉴는 본문 끝선 그대로.
    .container 의 width: 100% 는 풀어 둔다 (바깥 여백과 더해지면 화면보다 넓어진다) */

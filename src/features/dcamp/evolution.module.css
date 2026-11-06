@@ -1,0 +1,135 @@
+/* 연혁 (dcamp 'Our Evolution'): 검정 면 · 위아래 120 · 두 칸 [제목 | 줄] */
+.evo {
+  padding-block: 120px;
+  background: #000;
+  color: #fff;
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 620px);
+  gap: 32px 80px;
+}
+.title {
+  font: 500 32px/1.2 var(--font-num);
+  letter-spacing: -0.02em;
+}
+.rows {
+  display: grid;
+  gap: 40px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 120px 16px minmax(0, 1fr);
+  gap: 0 32px;
+  align-items: start;
+}
+/* 점과 점 사이 세로줄 (마지막 줄 아래로는 잇지 않는다) */
+.row:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(120px + 32px + 7px);
+  top: 26px;
+  bottom: -40px;
+  width: 1px;
+  background: #4a4645;
+}
+.when {
+  display: grid;
+  gap: 2px;
+}
+.label {
+  font: 700 24px/1.2 var(--font-kr);
+  letter-spacing: -0.02em;
+}
+.period {
+  font: 500 13px/1.4 var(--font-num);
+  color: #948f8d;
+}
+.dot {
+  position: relative;
+  z-index: 1;
+  width: 16px;
+  height: 16px;
+  margin-top: 6px;
+  border: 3px solid #ff5e27;
+  border-radius: 50%;
+  background: #000;
+}
+.row[data-current] .dot {
+  background: #ff5e27;
+  box-shadow: 0 0 0 6px rgba(255, 94, 39, 0.22);
+}
+.lines {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 0 0;
+  list-style: none;
+  font: 500 15px/1.5 var(--font-kr);
+  color: #fff;
+  word-break: keep-all;
+}
+.lines li:not(:first-child) {
+  color: #d5d2cf;
+  font-weight: 400;
+}
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: 40px 0 0 calc(120px + 32px - 36px);
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: #262525;
+  font: 600 14px/1 var(--font-kr);
+  color: #fff;
+  cursor: pointer;
+}
+.more svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  transition: transform 300ms var(--ease-soft);
+}
+.more svg[data-open] {
+  transform: rotate(180deg);
+}
+.more:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 767px) {
+  .evo {
+    padding-block: 80px;
+  }
+  .title {
+    font-size: 24px;
+  }
+  .row {
+    grid-template-columns: 72px 16px minmax(0, 1fr);
+    gap: 0 16px;
+  }
+  .row:not(:last-child)::after {
+    left: calc(72px + 16px + 7px);
+  }
+  .label {
+    font-size: 20px;
+  }
+  .more {
+    margin-left: 0;
+  }
+}

@@ -80,7 +80,7 @@ export function TeamsListPage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PageHero place="teams" title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} photoId="2023-12-22-closing-room" />
+      <PageHero place="teams" title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} banner={{ kicker: 'Team up', title: '스터디 · 프로젝트 · 공모전 팀원을 여기서 구해 보세요', to: '/teams/write' }} />
 
       <section id="board" ref={boardRef} className={`story paper ${s.board}`} aria-labelledby="board-title">
         <h2 id="board-title" className="visually-hidden">
