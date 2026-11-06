@@ -25,7 +25,7 @@ const OPEN = { opensAt: '2027-08-20', deadline: '2027-09-05', applyUrl: 'https:/
 describe('recruitStatus: 날짜로 정하는 모집 상태', () => {
   it('unscheduled: 날짜가 없으면 일정 미정 + 지난 모집 시기', () => {
     const s = recruitStatus('2026-10-18', data())
-    expect(s).toMatchObject({ state: 'unscheduled', generation: 5, channelUrl: CHANNEL, lastGeneration: 4, lastWindow: '2026.08–09' })
+    expect(s).toMatchObject({ state: 'unscheduled', generation: 5, channelUrl: CHANNEL, lastGeneration: 4, lastWindow: '2026.08~09' })
     expect(s.opensAt).toBeUndefined()
     expect(s.daysLeft).toBeUndefined()
   })
@@ -96,19 +96,19 @@ describe('recruitingProblems: 운영진이 적은 칸 검사', () => {
 
 describe('lastWindowOf: 지난 모집 시기', () => {
   it('가장 큰 기수의 OT 를 뺀 단계로 (배열 순서와 상관없이)', () => {
-    expect(lastWindowOf([...HISTORY].reverse())).toEqual({ generation: 4, label: '2026.08–09' })
+    expect(lastWindowOf([...HISTORY].reverse())).toEqual({ generation: 4, label: '2026.08~09' })
   })
 
   it('같은 달 · 해를 넘는 기간 · 기록 없음', () => {
     expect(lastWindowOf([{ generation: 1, steps: [{ id: 'a', start: '2026-03-02', end: '2026-03-09' }] }]).label).toBe('2026.03')
-    expect(lastWindowOf([{ generation: 1, steps: [{ id: 'a', start: '2026-12-20', end: '2027-01-09' }] }]).label).toBe('2026.12–2027.01')
+    expect(lastWindowOf([{ generation: 1, steps: [{ id: 'a', start: '2026-12-20', end: '2027-01-09' }] }]).label).toBe('2026.12~2027.01')
     expect(lastWindowOf([])).toEqual({})
     expect(lastWindowOf([{ generation: 2, steps: [{ id: 'ot', start: '2026-09-15' }] }])).toEqual({ generation: 2 })
   })
 
-  it('실제 콘텐츠: 지난 모집은 4기 2026.08–09', () => {
+  it('실제 콘텐츠: 지난 모집은 4기 2026.08~09', () => {
     const s = recruitStatus('2026-10-18')
     expect(s.lastGeneration).toBe(4)
-    expect(s.lastWindow).toBe('2026.08–09')
+    expect(s.lastWindow).toBe('2026.08~09')
   })
 })

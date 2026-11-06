@@ -15,9 +15,9 @@ export interface TicketProps {
   kicker?: ReactNode
   /** 제목 아래 한 줄 ('18:00 · 장소 미정'). size='large' 에서만 보인다 */
   meta?: ReactNode
-  /** 사이트 안 이동 (표 전체가 링크, 끝에 →) */
+  /** 사이트 안 이동 (표 전체가 링크) */
   to?: To
-  /** 사이트 밖 이동 (새 창, 끝에 ↗). to 와 함께 쓰지 않는다 */
+  /** 사이트 밖 이동 (새 창). to 와 함께 쓰지 않는다 */
   href?: string
   /** large: 커뮤니티 '이번 주' 큰 판 (날짜 --t-num) */
   size?: 'default' | 'large'
@@ -30,7 +30,7 @@ export interface TicketProps {
 
 /**
  * 일정 표 (DESIGN 7장 · 아트 디렉션 4-6): 다음 모임 한 장.
- * [다음 모임] [10.27 화] [G-Sprint 중간 발표] [D-9] [→]
+ * [다음 모임] [10.27 화] [G-Sprint 중간 발표] [D-9]
  * 홈 띠 맨 아래(먹색 면 위)와 커뮤니티 '이번 주'(size='large')가 같은 부품을 쓴다. D-day 는 날짜로 계산한다 (손으로 적지 않는다).
  * 표는 늘 흰 판이다 (.on-light: 먹색 면 안에서도 글자 단계를 밝은 면 값으로 되돌린다).
  */
@@ -58,9 +58,6 @@ export function Ticket({ date, endDate, title, kicker, meta, to, href, size = 'd
     return (
       <Link className={cls} to={to} data-surface={surface}>
         {body}
-        <span className={s.go} aria-hidden="true">
-          →
-        </span>
       </Link>
     )
   }
@@ -68,9 +65,6 @@ export function Ticket({ date, endDate, title, kicker, meta, to, href, size = 'd
     return (
       <a className={cls} href={href} target="_blank" rel="noreferrer" data-surface={surface}>
         {body}
-        <span className={`${s.go} ${s.out}`} aria-hidden="true">
-          ↗
-        </span>
         <span className="visually-hidden"> (새 창)</span>
       </a>
     )

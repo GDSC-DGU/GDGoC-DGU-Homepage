@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 export type TimeOfDay = 'day' | 'night'
 
-/** 한국 시간 몇 시인지 (0–23) */
+/** 한국 시간 몇 시인지 (0~23) */
 function kstHour(d = new Date()): number {
   return Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hourCycle: 'h23', timeZone: 'Asia/Seoul' }).format(d))
 }

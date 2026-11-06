@@ -5,7 +5,7 @@ export interface EvolutionRow {
   n: number
   /** 큰 글자: '4기' */
   label: string
-  /** 작은 글자: '2026.09–' · '2023.09–2024.07' */
+  /** 작은 글자: '2026.09~' · '2023.09~2024.07' */
   period: string
   /** 그 기수 이름이 바뀌었으면 '이름 GDSC DGU → GDGoC DGU' 같은 줄이 앞에 붙는다 */
   lines: string[]
@@ -28,7 +28,7 @@ export function evolutionRows(gens: readonly Generation[], max = 3): EvolutionRo
       return {
         n: g.n,
         label: `${g.n}기`,
-        period: g.start ? `${ym(g.start)}–${g.end ? ym(g.end) : ''}` : '',
+        period: g.start ? `${ym(g.start)}~${g.end ? ym(g.end) : ''}` : '',
         lines: [...first, ...renamed, ...(g.highlights ?? [])].slice(0, max + 1),
         current: Boolean(g.current),
       }

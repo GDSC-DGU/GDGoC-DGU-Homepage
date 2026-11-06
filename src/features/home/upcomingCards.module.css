@@ -40,7 +40,7 @@
 @media (hover: hover) {
   .more:hover {
     background: var(--ink-900);
-    color: #fff;
+    color: var(--white);
   }
 }
 .cards {
@@ -78,15 +78,15 @@
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-.kind {
-  font: 600 16px/1.2 var(--font-kr);
-  color: var(--gen-text);
-}
 .name {
-  margin-top: 24px;
   font: 600 20px/1.35 var(--font-kr);
   letter-spacing: -0.02em;
   word-break: keep-all;
+}
+.kind {
+  margin-top: 10px;
+  font: 600 15px/1.3 var(--font-kr);
+  color: var(--gen-text);
 }
 .when {
   margin-top: auto;

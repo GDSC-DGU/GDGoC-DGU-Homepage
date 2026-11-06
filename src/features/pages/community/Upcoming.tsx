@@ -20,7 +20,7 @@ interface Props {
   terms?: ReadonlyMap<string, readonly TermId[]>
 }
 
-/** 날짜 칸: '10.27' + '화'. 여러 날이면 '01.30–31 토–일'. 올해가 아니면 앞에 연도 */
+/** 날짜 칸: '10.27' + '화'. 여러 날이면 '01.30~31 토~일'. 올해가 아니면 앞에 연도 */
 function Day({ e, today }: { e: ScheduleEvent; today: string }) {
   const multi = e.endDate && e.endDate !== e.date ? e.endDate : null
   const sameMonth = multi && multi.slice(0, 7) === e.date.slice(0, 7)
@@ -29,11 +29,11 @@ function Day({ e, today }: { e: ScheduleEvent; today: string }) {
       {e.date.slice(0, 4) !== today.slice(0, 4) && <span className={`${c.upYear} num`}>{e.date.slice(0, 4)}</span>}
       <time className={`${c.upDay} num`} dateTime={e.date}>
         {monthDay(e.date)}
-        {multi && <>–{sameMonth ? multi.slice(8, 10) : monthDay(multi)}</>}
+        {multi && <>~{sameMonth ? multi.slice(8, 10) : monthDay(multi)}</>}
       </time>
       <span className={c.upWeekday}>
         {weekday(e.date)}
-        {multi && `–${weekday(multi)}`}
+        {multi && `~${weekday(multi)}`}
       </span>
     </span>
   )
@@ -43,7 +43,7 @@ function Day({ e, today }: { e: ScheduleEvent; today: string }) {
  * 다가오는 일정 (참고 섹션): 한 줄 = 일정 하나. 날짜 | 이름 | 시간 · 장소 | 종류 | D-day.
  * 넓은 화면은 한 줄에 다 놓아 촘촘하게, 태블릿은 시간 · 장소를 이름 아래로, 폰은 날짜 · D-day / 이름 / 시간 · 장소 · 종류.
  * 장소는 상자 없이 맨 글자, 종류만 장소색 네모 하나. D-day 는 다음 일정 한 줄에만 (큰 표가 위 '이번 주' 에 있다).
- * 휴회도 숨기지 않고 옅고 얇은 줄로. 원래 행사 페이지가 있는 일정만 이름이 링크(↗).
+ * 휴회도 숨기지 않고 옅고 얇은 줄로. 원래 행사 페이지가 있는 일정만 이름이 링크.
  */
 export function Upcoming({ events, today, timeOf, terms }: Props) {
   const nextId = events.find((e) => e.kind !== 'rest')?.id
@@ -61,9 +61,6 @@ export function Upcoming({ events, today, timeOf, terms }: Props) {
                 <a className={c.titleLink} href={e.url} target="_blank" rel="noreferrer">
                   <TermText text={e.title} terms={t} />
                   <span className="visually-hidden"> (새 창)</span>
-                  <span className={c.titleArrow} aria-hidden="true">
-                    ↗
-                  </span>
                 </a>
               ) : (
                 <TermText text={e.title} terms={t} />
@@ -82,9 +79,7 @@ export function Upcoming({ events, today, timeOf, terms }: Props) {
                       </span>
                     )}
                     {time && (
-                      <span className={c.upDot} aria-hidden="true">
-                        ·
-                      </span>
+                      <span className={c.upDot} aria-hidden="true" />
                     )}
                     {e.venue ? <RoomPlate venue={e.venue} prefix="장소" /> : isPeriod(e) ? null : <span className={c.upNoVenue}>장소 미정</span>}
                   </>

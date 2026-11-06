@@ -6,7 +6,7 @@ export const KIND_LABEL: Record<EventKind, string> = {
   event: '행사',
   sprint: 'G-Sprint',
   project: '프로젝트',
-  recruit: '모집 · OT',
+  recruit: '모집, OT',
   notice: '공지',
   rest: '휴회',
 }

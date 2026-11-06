@@ -76,11 +76,11 @@ export function seminarHref(talk: Pick<Seminar, 'generation' | 'title'>): string
 /** 발표한 사람 수 (같은 사람이 여러 번 해도 한 명) */
 export const speakerCount = (list: readonly Seminar[]) => new Set(list.map((s) => s.speaker).filter(Boolean)).size
 
-/** '2025.10–2026.05' (같은 달이면 하나만) */
+/** '2025.10~2026.05' (같은 달이면 하나만) */
 export function periodLabel(from: string, to: string): string {
   const a = from.slice(0, 7).replace('-', '.')
   const b = to.slice(0, 7).replace('-', '.')
-  return a === b ? a : `${a}–${b}`
+  return a === b ? a : `${a}~${b}`
 }
 
 /** 주소의 ?gen=2 → 2. 목록에 없는 기수 · 이상한 값 · 없으면 가장 최근 기수 */

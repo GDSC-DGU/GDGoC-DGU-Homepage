@@ -24,7 +24,7 @@ export const addDays = (ymd: string, n: number) => toYmd(dayValue(ymd) + n * DAY
 export const lastOfMonth = (ymd: string) => toYmd(Date.UTC(+ymd.slice(0, 4), +ymd.slice(5, 7), 0))
 
 /**
- * 한국 대학의 반년 단위: 3–8월(1학기 · 여름방학), 9–2월(2학기 · 겨울방학).
+ * 한국 대학의 반년 단위: 3~8월(1학기 · 여름방학), 9~2월(2학기 · 겨울방학).
  * 기수는 학기 단위로 움직이므로 레일도 이 단위로 자른다.
  */
 export function halfYearOf(ymd: string): Period {
@@ -202,13 +202,13 @@ export function placeStepLabels(items: readonly LabelBox[], { gap = 8, inset = 4
 export const dayLabel = (ymd: string, today: string) => `${shortDate(ymd, today)} ${weekday(ymd)}`
 
 /**
- * 일정 날짜 표기. 하루면 dayLabel, 여러 날이면 '2027.01.30–31 토–일' / '10.31–11.02 토–월'
+ * 일정 날짜 표기. 하루면 dayLabel, 여러 날이면 '2027.01.30~31 토~일' / '10.31~11.02 토~월'
  */
 export function spanLabel(e: Pick<ScheduleEvent, 'date' | 'endDate'>, today: string): string {
   const end = e.endDate
   if (!end || end === e.date) return dayLabel(e.date, today)
   const tail = end.slice(0, 7) === e.date.slice(0, 7) ? end.slice(8, 10) : shortDate(end, e.date)
-  return `${shortDate(e.date, today)}–${tail} ${weekday(e.date)}–${weekday(end)}`
+  return `${shortDate(e.date, today)}~${tail} ${weekday(e.date)}~${weekday(end)}`
 }
 
 /** 화면 읽기용 날짜: '10월 27일 화요일', 해가 다르면 '2027년 1월 30일 토요일' */

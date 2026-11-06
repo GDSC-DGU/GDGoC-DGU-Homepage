@@ -19,23 +19,23 @@ describe('dateLabel', () => {
   })
 
   it('올해 기간은 양 끝에 요일', () => {
-    expect(dateLabel('2026-08-18', '2026-08-31', TODAY)).toBe('08.18 화–08.31 월')
-    expect(dateLabel('2026-10-31', '2026-11-02', TODAY)).toBe('10.31 토–11.02 월')
+    expect(dateLabel('2026-08-18', '2026-08-31', TODAY)).toBe('08.18 화~08.31 월')
+    expect(dateLabel('2026-10-31', '2026-11-02', TODAY)).toBe('10.31 토~11.02 월')
   })
 
   it('올해가 아닌 기간은 앞에만 연도', () => {
-    expect(dateLabel('2027-01-30', '2027-01-31', TODAY)).toBe('2027.01.30 토–01.31 일')
-    expect(dateLabel('2025-07-01', '2025-07-26', TODAY)).toBe('2025.07.01 화–07.26 토')
+    expect(dateLabel('2027-01-30', '2027-01-31', TODAY)).toBe('2027.01.30 토~01.31 일')
+    expect(dateLabel('2025-07-01', '2025-07-26', TODAY)).toBe('2025.07.01 화~07.26 토')
   })
 
   it('해를 넘는 기간은 양쪽 모두 연도, 요일 없이', () => {
-    expect(dateLabel('2026-12-31', '2027-01-01', TODAY)).toBe('2026.12.31–2027.01.01')
-    expect(dateLabel('2025-12-30', '2026-01-02', TODAY)).toBe('2025.12.30–2026.01.02')
+    expect(dateLabel('2026-12-31', '2027-01-01', TODAY)).toBe('2026.12.31~2027.01.01')
+    expect(dateLabel('2025-12-30', '2026-01-02', TODAY)).toBe('2025.12.30~2026.01.02')
   })
 
   it('기준이 되는 오늘의 해가 바뀌면 표기도 바뀐다', () => {
     expect(dateLabel('2026-10-13', undefined, '2027-01-02')).toBe('2026.10.13 화')
-    expect(dateLabel('2027-01-30', '2027-01-31', '2027-01-02')).toBe('01.30 토–01.31 일')
+    expect(dateLabel('2027-01-30', '2027-01-31', '2027-01-02')).toBe('01.30 토~01.31 일')
   })
 })
 
@@ -67,7 +67,7 @@ describe('출처', () => {
     expect(basisLabel([])).toBeNull()
     expect(basisLabel([undefined, ''])).toBeNull()
     expect(basisLabel(['https://gdg.community.dev/a/', 'https://gdg.community.dev/b/'])).toBe('gdg.community.dev')
-    expect(basisLabel(['https://gdg.community.dev/a/', '4기 운영 계획'])).toBe('gdg.community.dev · 4기 운영 계획')
-    expect(basisLabel(['https://github.com/x', 'https://gdg.community.dev/', '4기 운영 계획'])).toBe('github.com · gdg.community.dev 외')
+    expect(basisLabel(['https://gdg.community.dev/a/', '4기 운영 계획'])).toBe('gdg.community.dev, 4기 운영 계획')
+    expect(basisLabel(['https://github.com/x', 'https://gdg.community.dev/', '4기 운영 계획'])).toBe('github.com, gdg.community.dev 외')
   })
 })

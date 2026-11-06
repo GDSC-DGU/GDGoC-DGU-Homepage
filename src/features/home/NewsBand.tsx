@@ -13,7 +13,7 @@ export function NewsBand() {
       <div className={`container ${s.inner}`}>
         <div>
           <h2 id="news-band-title" className={s.title}>
-            놓치면 아쉬운 {gen}기 모집 · 행사 소식,
+            놓치면 아쉬운 {gen}기 모집과 행사 소식,
             <br />
             <span className={s.name}>{SITE.shortName}</span>가 알려 드립니다
           </h2>
@@ -21,7 +21,7 @@ export function NewsBand() {
         </div>
         <a className={s.cta} href={RECRUITING.current.channel} target="_blank" rel="noreferrer">
           {gen}기 소식 받기<span className="visually-hidden"> (인스타그램, 새 창)</span>
-          <span aria-hidden="true">↗</span>
+          
         </a>
       </div>
     </section>

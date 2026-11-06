@@ -70,13 +70,14 @@
   max-width: 100%;
   padding-bottom: 6px;
 }
-/* 머리 오른쪽 '… 전체 보기 →': dcamp 의 'View More →' 처럼 1px 테두리 알약 (마우스를 올리면 검정으로 채워진다) */
+/* 머리 오른쪽 '… 전체 보기': dcamp 의 'View More' 처럼 1px 테두리 알약 (마우스를 올리면 검정으로 채워진다). 테두리가 있으니 밑줄은 없다 */
 .action :global(.link-go) {
   min-height: 40px;
   padding: 0 18px;
   border: 1px solid currentColor;
   border-radius: var(--r-pill);
   font: 500 15px/20px var(--font-kr);
+  text-decoration: none;
   transition:
     background 300ms var(--ease),
     color 300ms var(--ease);
@@ -85,7 +86,6 @@
   .action :global(.link-go:hover) {
     background: var(--ink-900);
     color: var(--paper);
-    text-decoration-line: none;
   }
 }
 

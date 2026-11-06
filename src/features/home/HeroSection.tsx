@@ -30,7 +30,7 @@ const World3D = lazy(() => import('@/features/world3d/World3D'))
 const GEN_NUMBER = SITE.generation.replace(/\D/g, '')
 
 /**
- * 밤 모드(한국 시간 19–06시에 먹색 지도)는 끈다: 4기 Organizer 2026-11-05 '검은 색이 안 어울린다'.
+ * 밤 모드(한국 시간 19~06시에 먹색 지도)는 끈다: 4기 Organizer 2026-11-05 '검은 색이 안 어울린다'.
  * 언제나 낮 그림. 다시 켜려면 features/fx/useTimeOfDay 의 useTimeOfDay() === 'night' 로 되돌린다 (밤 그림 · 색은 그대로 남아 있다).
  */
 const NIGHT_MODE = false
@@ -52,7 +52,7 @@ export function HeroSection() {
   const frameRef = useRef<HTMLDivElement>(null)
   // 지도가 화면 밖이면 반복 애니메이션(깃발, 진행 중 표시)을 멈춘다
   const offscreen = useOffscreen(frameRef)
-  // 한국 시간 밤(19–06시)이면 지도도 밤. 불은 실제로 진행 중인 곳에만 켜진다 (DESIGN 6장)
+  // 한국 시간 밤(19~06시)이면 지도도 밤. 불은 실제로 진행 중인 곳에만 켜진다 (DESIGN 6장)
   const night = NIGHT_MODE
   const season = useSeason()
 

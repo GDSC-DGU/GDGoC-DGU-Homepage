@@ -123,7 +123,7 @@ export const WAYS: readonly Way[] = [
     label: '매주 화요일',
     name: '화요일 세션',
     key: '18:00',
-    body: 'Frontend · Backend · AI/ML · Product Design 네\u00a0파트로 나뉘어 모입니다.',
+    body: 'Frontend, Backend, AI/ML, Product Design 네\u00a0파트로 나뉘어 모입니다.',
     link: { label: '네 파트 보기', to: '/recruits#parts' },
     source: [SOURCES.partSessions, SOURCES.applicationForm],
   },
@@ -144,7 +144,7 @@ export const WAYS: readonly Way[] = [
     name: '연합 행사',
     /** 아래 문장에 적은 챕터 수와 같아야 한다 (story.test.ts) */
     key: '4개 챕터',
-    body: '홍익대 · 중앙대 · 건국대 · 숙명여대 챕터와 합동 세미나를 열었습니다.',
+    body: '홍익대, 중앙대, 건국대, 숙명여대 챕터와 합동 세미나를 열었습니다.',
     link: { label: '행사 기록 보기', to: '/about#records' },
     source: [SOURCES.jointHongik, SOURCES.jointChungangKonkuk, SOURCES.interChapter],
   },

@@ -38,7 +38,7 @@ export interface PlaceHeroProps {
   title: ReactNode
   lead?: ReactNode
   meta?: ReactNode
-  /** 건물 안내판: 이 페이지 안의 주요 묶음 3–6줄 */
+  /** 건물 안내판: 이 페이지 안의 주요 묶음 3~6줄 */
   directory?: DirectoryRow[]
   /** 건물 상태. 생략하면 장소별 기본값(G-Sprint · 모집 기간에서 계산) */
   state?: 'open' | 'closed' | 'construction'

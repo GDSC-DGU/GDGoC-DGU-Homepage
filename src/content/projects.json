@@ -101,7 +101,7 @@
         },
         {
           "src": "project-images/yakjosim-d-analyze.webp",
-          "alt": "약조심 조합 분석 화면 (데스크톱). 복용 중인 약 · 음식 · 영양제를 고른다",
+          "alt": "약조심 조합 분석 화면 (데스크톱). 복용 중인 약, 음식, 영양제를 고른다",
           "caption": "조합 분석 (데스크톱)",
           "kind": "screen",
           "width": 960,
@@ -209,8 +209,8 @@
       "images": [
         {
           "src": "project-images/todai-architecture.webp",
-          "alt": "토닥이 시스템 구조와 데이터 흐름도 (Next.js · Go · Spring · Python)",
-          "caption": "시스템 구조 · 데이터 흐름",
+          "alt": "토닥이 시스템 구조와 데이터 흐름도 (Next.js, Go, Spring, Python)",
+          "caption": "시스템 구조와 데이터 흐름",
           "kind": "diagram",
           "width": 960,
           "height": 558,
@@ -395,7 +395,7 @@
         },
         {
           "src": "project-images/greenap-server.webp",
-          "alt": "Greenap 서버 계층 구조도 (UI · Application · Domain · Infrastructure)",
+          "alt": "Greenap 서버 계층 구조도 (UI, Application, Domain, Infrastructure)",
           "caption": "서버 구조",
           "kind": "diagram",
           "width": 657,
@@ -635,7 +635,7 @@
       "statsAsOf": "2026-10-17",
       "cover": {
         "src": "project-images/circulo.webp",
-        "alt": "Circulo 발표 자료 첫 장. 앱 아이콘과 'Pack it back, earn it back' 문구, 지도 · 홈 · 기록 화면 세 장",
+        "alt": "Circulo 발표 자료 첫 장. 앱 아이콘과 'Pack it back, earn it back' 문구, 지도, 홈, 기록 화면 세 장",
         "caption": "발표 자료 첫 장",
         "kind": "promo",
         "width": 960,

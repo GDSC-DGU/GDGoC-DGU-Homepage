@@ -4,11 +4,11 @@ import { placeColor } from '@/config/places'
 import type { Project, ProjectImage } from '@/domain/types'
 import { useModalDialog } from '@/features/layout/useModalDialog'
 import { ExternalLink, Mark } from '../PageParts'
-import { Dotted, LiveLink } from './ExhibitCard'
+import { CommaList, LiveLink } from './ExhibitCard'
 import { assetUrl, isOpenSource, languageSegments, monthSpan, outLinks, projectGallery } from './exhibit'
 import { LanguageBar } from './Plate'
 import { sheetSearch } from './sheetLink'
-import { morphClose } from './sheetMorph'
+import { morphClose, runFlip } from './sheetMorph'
 import c from './sheet.module.css'
 
 const PROJECT_COLOR = placeColor('projects')
@@ -16,21 +16,21 @@ const PROJECT_COLOR = placeColor('projects')
 /** 'YYYY-MM-DD' → '2026.10.17' (기준일 표기) */
 const dotted = (ymd: string) => ymd.replaceAll('-', '.')
 
-/** 그림 한 장 + 이름 · 원본 링크 (GitHub 원본만) */
+/** 그림 한 장 + 원본 링크 (GitHub 원본만) */
 function Shot({ img, project, first }: { img: ProjectImage; project: Project; first: boolean }) {
   return (
     <figure className={c.shot} data-kind={img.kind}>
       <div className={c.frame} data-morph-target={first ? 'media' : undefined}>
         <img src={assetUrl(img.src)} alt={img.alt} width={img.width} height={img.height} loading={first ? 'eager' : 'lazy'} decoding="async" />
       </div>
-      <figcaption className={c.shotCaption}>
-        <span>{img.caption ?? img.alt}</span>
-        {isOpenSource(img.source) && (
+      {/* 그림 밑 설명은 두지 않고(taste-skill, 설명은 alt 에), GitHub 원본 출처 링크만 한 줄 */}
+      {isOpenSource(img.source) && (
+        <figcaption className={c.shotCaption}>
           <ExternalLink href={img.source} context={`${project.name} ${img.caption ?? ''} 원본 그림`} className={`link ${c.source}`}>
             원본 보기
           </ExternalLink>
-        )}
-      </figcaption>
+        </figcaption>
+      )}
     </figure>
   )
 }
@@ -39,7 +39,7 @@ function Shot({ img, project, first }: { img: ProjectImage; project: Project; fi
  * 프로젝트 자세히 보기 창 (/archive?p=<id>).
  * <dialog> showModal 이라 초점이 창 안에만 돌고 Esc 로 닫히며, 닫으면 연 자리로 초점이 돌아간다 (useModalDialog).
  * 그림(화면 캡처 · 구조도) 크게 + 지금 써 보기(주 버튼, 서비스가 있을 때) + 사실(기수 · 프로그램 · 재료 · 언어 · 대표 저장소 숫자)
- * + 바깥 링크 줄(GitHub 저장소 ↗ · 데모 영상 ↗) + 앞 · 뒤 작품(← · →, 사이트 안).
+ * + 바깥 링크 줄(GitHub 저장소 · 데모 영상) + 이전 · 다음 작품(사이트 안).
  * 폰: 아래에서 올라오는 시트. 첫 그림 → 사실 → 나머지 그림 순서.
  */
 export function ProjectSheet({
@@ -71,6 +71,8 @@ export function ProjectSheet({
     if (!id) return
     scrollRef.current?.scrollTo({ top: 0 })
     if (ref.current?.open) headingRef.current?.focus({ preventScroll: true })
+    // View Transitions 가 없는 브라우저에서 작품을 눌러 열었으면, 그 자리에서 커진다 (sheetMorph flipOpen)
+    if (ref.current) runFlip(ref.current)
   }, [id, ref])
 
   /** 닫기: 연 작품이 화면에 보이면 그 자리로 돌아가며 닫힌다 (sheetMorph). 아니면 그냥 닫는다 */
@@ -162,7 +164,7 @@ export function ProjectSheet({
                     <div>
                       <dt>사용 기술</dt>
                       <dd>
-                        <Dotted parts={p.stack} />
+                        <CommaList parts={p.stack} />
                       </dd>
                     </div>
                   )}
@@ -177,7 +179,7 @@ export function ProjectSheet({
                     <div>
                       <dt>팀원</dt>
                       <dd>
-                        <Dotted parts={p.members} />
+                        <CommaList parts={p.members} />
                       </dd>
                     </div>
                   )}
@@ -201,9 +203,6 @@ export function ProjectSheet({
                       <li key={l.href}>
                         <a className={c.outLink} href={l.href} target="_blank" rel="noreferrer">
                           {l.label}
-                          <span className={c.outArrow} aria-hidden="true">
-                            ↗
-                          </span>
                           <span className="visually-hidden">
                             {' '}
                             ({p.name}, 새 창)
@@ -230,7 +229,7 @@ export function ProjectSheet({
                 {prev ? (
                   <Link className={c.walkLink} to={{ search: sheetSearch(prev.id) }} state={walkState} replace preventScrollReset>
                     <span className={c.walkDir}>
-                      <span aria-hidden="true">← </span>이전
+                      이전
                     </span>
                     <span className={c.walkName}>{prev.name}</span>
                   </Link>
@@ -240,7 +239,7 @@ export function ProjectSheet({
                 {next && (
                   <Link className={`${c.walkLink} ${c.walkNext}`} to={{ search: sheetSearch(next.id) }} state={walkState} replace preventScrollReset>
                     <span className={c.walkDir}>
-                      다음<span aria-hidden="true"> →</span>
+                      다음
                     </span>
                     <span className={c.walkName}>{next.name}</span>
                   </Link>

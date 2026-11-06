@@ -51,10 +51,10 @@ export function whoCards({ members, sprint, demoDay }: WhoInput): WhoCard[] {
     // 홈 지도 팝업 '화요일 · 파트별 실습' (faq when-sessions)
     { id: 'sessions', label: '정기 세션', value: '매주 화요일', sub: '파트별 실습' },
   ]
-  const sprintSub = [GLOSSARY['g-sprint'].short, demoDay ? `${demoDay} ${GLOSSARY['demo-day'].term}` : null].filter(Boolean).join(' · ')
+  const sprintSub = [GLOSSARY['g-sprint'].short, demoDay ? `${demoDay} ${GLOSSARY['demo-day'].term}` : null].filter(Boolean).join(', ')
   if (sprint?.verified) cards.push({ id: 'sprint', label: GLOSSARY['g-sprint'].term, value: `${sprint.teams}팀 ${sprint.members}명`, sub: sprintSub })
   else cards.push({ id: 'sprint', label: GLOSSARY['g-sprint'].term, value: GLOSSARY['g-sprint'].short })
-  cards.push({ id: 'joint', label: '연합 행사', value: `${GLOSSARY['dong-hong'].term} · 동지톤`, sub: `${GLOSSARY['dong-hong'].term}은 홍익대와 하는 교류전` })
+  cards.push({ id: 'joint', label: '연합 행사', value: `${GLOSSARY['dong-hong'].term}, 동지톤`, sub: `${GLOSSARY['dong-hong'].term}은 홍익대와 하는 교류전` })
   // gdg.community.dev 챕터 페이지에 가입한 사람 수 (활동 멤버 수가 아니다)
   if (members) cards.push({ id: 'members', label: '챕터 페이지 가입자', value: `${members.value}명`, sub: `gdg.community.dev, ${members.asOf.slice(0, 7).replace('-', '.')} 기준` })
   return cards

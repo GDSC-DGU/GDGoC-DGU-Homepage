@@ -3,7 +3,7 @@
   bottom: 0;
   z-index: 30;
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--white-a96);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   box-shadow: 0 -1px 0 var(--line);

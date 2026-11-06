@@ -199,7 +199,7 @@ export function SearchDialog({ open, onClose, returnFallbacks }: Props) {
           role="combobox"
           value={query}
           placeholder="세션, 행사, 프로젝트 이름으로 검색"
-          aria-label="세션 · 행사 · 프로젝트 검색"
+          aria-label="세션, 행사, 프로젝트 검색"
           aria-autocomplete="list"
           aria-controls={listId}
           aria-expanded={expanded}
@@ -231,7 +231,7 @@ export function SearchDialog({ open, onClose, returnFallbacks }: Props) {
       >
         {q && failed && <p className={s.note}>지금은 검색을 할 수 없습니다. 잠시 뒤 다시 시도해 주세요.</p>}
         {q && !failed && hits !== null && total === 0 && <p className={s.note}>‘{q}’에 맞는 기록이 없습니다. 행사 이름이나 기술 이름으로 찾을 수 있습니다.</p>}
-        <div id={listId} role="listbox" aria-label={q ? '검색 결과' : '바로 가기'} hidden={!expanded}>
+        <div key={q ? 'results' : 'shortcuts'} id={listId} role="listbox" aria-label={q ? '검색 결과' : '바로 가기'} hidden={!expanded} className="fade-in">
           {groups.map((g, gi) => {
             // id 에 공백이 들어가면 aria-labelledby 가 여러 id 로 갈라진다: 순번만 쓴다
             const gid = `${uid}-g-${gi}`

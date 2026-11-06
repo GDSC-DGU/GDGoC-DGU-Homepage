@@ -226,20 +226,20 @@
   letter-spacing: -0.02em;
 }
 .avatar[data-tone='blue'] {
-  background: #e8f0fe;
-  color: #174ea6;
+  background: var(--tone-blue-bg);
+  color: var(--tone-blue-ink);
 }
 .avatar[data-tone='red'] {
-  background: #fce8e6;
-  color: #a50e0e;
+  background: var(--tone-red-bg);
+  color: var(--tone-red-ink);
 }
 .avatar[data-tone='yellow'] {
-  background: #fef7e0;
-  color: #7a4100;
+  background: var(--tone-yellow-bg);
+  color: var(--tone-yellow-ink);
 }
 .avatar[data-tone='green'] {
-  background: #e6f4ea;
-  color: #0d652d;
+  background: var(--tone-green-bg);
+  color: var(--tone-green-ink);
 }
 .talkMain {
   display: flex;

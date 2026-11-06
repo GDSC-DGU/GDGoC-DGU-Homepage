@@ -2,17 +2,8 @@
 .hero {
   padding-block: 24px 120px;
 }
-.eyebrow {
-  margin-top: 72px;
-  font: 700 28px/1.1 var(--font-num);
-  letter-spacing: -0.03em;
-  color: #e8590c; /* 큰 글자 3.6:1 (dcamp 주황 #FF5E27 은 흰 바탕 3:1 에 조금 못 미친다) */
-}
-.eyebrow :global(.dark) {
-  color: var(--ink-900);
-}
 .title {
-  margin-top: 16px;
+  margin-top: 72px;
   font: 500 36px/1.4 var(--font-kr);
   letter-spacing: -0.02em;
   color: var(--ink-900);
@@ -99,11 +90,8 @@
   .hero {
     padding-bottom: 72px;
   }
-  .eyebrow {
-    margin-top: 40px;
-    font-size: 22px;
-  }
   .title {
+    margin-top: 40px;
     font-size: 26px;
   }
   .lead {

@@ -32,7 +32,7 @@ export const GLOSSARY: Record<TermId, TermDef> = {
   'camping-seminar': {
     term: 'Camping Seminar',
     short: '멤버 발표 세미나',
-    long: '2 · 3기의 정기 세미나입니다. 멤버가 AI/ML · Web & App · Server/Cloud 주제로 발표하고 파트별로 나눠 이야기했습니다.',
+    long: '2기와 3기의 정기 세미나입니다. 멤버가 AI/ML, Web & App, Server/Cloud 주제로 발표하고 파트별로 나눠 이야기했습니다.',
     source: `${EVENT}gdg-on-campus-dgu-10th-camping-seminar/`,
   },
   'demo-day': {
@@ -50,12 +50,12 @@ export const GLOSSARY: Record<TermId, TermDef> = {
   'study-jam': {
     term: 'Study Jam',
     short: '몇 주 동안 하는 실습 스터디',
-    long: '한 가지 주제를 몇 주 동안 함께 실습하는 스터디입니다. 3기는 2026년 1월에 Gemini API · Google AI Studio로 3주 동안 열었습니다.',
+    long: '한 가지 주제를 몇 주 동안 함께 실습하는 스터디입니다. 3기는 2026년 1월에 Gemini API와 Google AI Studio로 3주 동안 열었습니다.',
     source: `${EVENT}gdgoc-dgu-winter-gemini-study-jams-2026-01-16/`,
   },
   'dong-hong': {
     term: '동홍동락',
-    short: '동국대 · 홍익대 교류전',
+    short: '동국대와 홍익대 교류전',
     long: '동국대와 홍익대 챕터의 교류전입니다.',
     source: '4기 운영 계획',
   },

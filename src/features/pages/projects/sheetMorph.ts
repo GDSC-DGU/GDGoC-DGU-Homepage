@@ -1,7 +1,7 @@
 /**
  * 작품 → 자세히 보기 창 '이어지는 열림' (View Transitions 같은 문서 전환, 의존성 없음).
  * '무엇이 어디서 열렸는지'를 보여 준다: 누른 작품의 그림(대표 작품 무대) 또는 작품 상자(줄 목록)가 창의 그 자리로 옮겨 가며 커진다.
- * 닫을 때는 거꾸로 제자리로 돌아간다. 페이지 이동의 좌우 밀기(app/viewTransitions.ts)와 같은 API · 같은 속도 단계(320ms 열림 · 닫힘은 더 빠르게).
+ * 닫을 때는 거꾸로 제자리로 돌아간다. 페이지 이동의 좌우 밀기(app/viewTransitions.ts)와 같은 API. 420ms 열림 · 280ms 닫힘 (tokens.css --dur-long · --dur-long-exit).
  *
  * 켜지는 조건: 브라우저가 startViewTransition 을 지원 · '동작 줄이기'가 아님 · 넓은 화면(768↑, 폰은 아래에서 올라오는 시트 그대로).
  * 조건이 안 맞으면 false 를 돌려주고, 부른 쪽이 원래대로 연다 · 닫는다.
@@ -101,4 +101,64 @@ export function morphClose(dialog: HTMLDialogElement, projectId: string, close: 
     () => name(parts, false),
   )
   return true
+}
+
+/** View Transitions 가 없는 넓은 화면: 확대 전환만 따로 그릴 수 있는지 (Web Animations) */
+export function canFlip(): boolean {
+  if (typeof document === 'undefined' || typeof document.startViewTransition === 'function') return false
+  if (typeof Element === 'undefined' || typeof Element.prototype.animate !== 'function') return false
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
+  return window.matchMedia('(min-width: 768px)').matches
+}
+
+/** 처음 상자(from)를 끝 상자(to)에 겹치게 하는 변형: 왼쪽 위를 맞추고 너비 비율로 고르게 줄인다 */
+export function flipFrom(from: { left: number; top: number; width: number }, to: { left: number; top: number; width: number }): string {
+  const scale = to.width > 0 ? from.width / to.width : 1
+  return `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${scale})`
+}
+
+/** CSS 시간 값을 ms 로: '420ms' · '.42s' (빌드가 줄여 쓴 모양) 모두. 읽지 못하면 fallback */
+export function cssMs(value: string, fallback: number): number {
+  const v = value.trim()
+  const n = parseFloat(v)
+  if (!Number.isFinite(n)) return fallback
+  return v.endsWith('ms') ? n : v.endsWith('s') ? n * 1000 : fallback
+}
+
+/** 누른 작품 자리 (flipOpen 이 적어 두고, 창이 열린 뒤 runFlip 이 쓴다) */
+let pending: { rect: DOMRect; at: number } | null = null
+
+/**
+ * View Transitions 를 못 쓰는 브라우저의 확대 전환 (FLIP): 창이 누른 작품 자리 · 크기에서 창 자리로 커진다.
+ * 여기서는 작품 자리만 적고 창을 연다. 창(showModal)은 ProjectSheet 의 effect 에서 열리므로, 그 뒤 runFlip 이 움직임을 건다.
+ * 쓸 수 없으면 false 를 돌려주고, 부른 쪽이 원래대로 연다.
+ */
+export function flipOpen(card: HTMLElement | null, open: () => void): boolean {
+  if (!card || !canFlip()) return false
+  pending = { rect: card.getBoundingClientRect(), at: performance.now() }
+  open()
+  return true
+}
+
+/**
+ * 창이 막 열렸을 때 부른다 (ProjectSheet). 적어 둔 작품 자리가 있으면 그 자리에서 커진다.
+ * 시간 · 곡선은 tokens.css 의 --dur-long · --ease-out. 창의 CSS 떠오름(sheet.module.css)은 그동안 끈다(data-flip).
+ */
+export function runFlip(dialog: HTMLDialogElement) {
+  const p = pending
+  pending = null
+  if (!p || !dialog.open || performance.now() - p.at > 1000) return
+  const root = getComputedStyle(document.documentElement)
+  const duration = cssMs(root.getPropertyValue('--dur-long'), 420)
+  const easing = root.getPropertyValue('--ease-out').trim() || 'ease-out'
+  dialog.dataset.flip = ''
+  const anim = dialog.animate(
+    [
+      { transformOrigin: '0 0', transform: flipFrom(p.rect, dialog.getBoundingClientRect()), opacity: 0 },
+      { transformOrigin: '0 0', transform: 'none', opacity: 1 },
+    ],
+    { duration, easing },
+  )
+  const done = () => delete dialog.dataset.flip
+  anim.finished.then(done, done)
 }

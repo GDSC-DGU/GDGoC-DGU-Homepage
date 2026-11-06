@@ -66,7 +66,7 @@ export function projectMetaParts(p: Pick<Project, 'program' | 'year' | 'generati
   return [p.generation ? `${p.generation}기` : null, withProgram ? program : null, ...stack].filter((x): x is string => Boolean(x))
 }
 
-export const projectMeta = (p: Pick<Project, 'program' | 'year' | 'generation' | 'stack'>, withProgram = true): string => projectMetaParts(p, withProgram).join(' · ')
+export const projectMeta = (p: Pick<Project, 'program' | 'year' | 'generation' | 'stack'>, withProgram = true): string => projectMetaParts(p, withProgram).join(', ')
 
 export interface ProjectLinks {
   /** 걸어도 되는 저장소 (공개 기준을 통과한 것만. 개인 저장소는 걸지 않는다) */

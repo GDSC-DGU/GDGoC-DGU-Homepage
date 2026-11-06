@@ -25,13 +25,62 @@
     <meta property="og:image:alt" content="학생과 현업자 사이를 잇는 동국대학교 개발자 커뮤니티. GDGoC DGU 캠퍼스 지도 그림." />
     <meta name="twitter:card" content="summary_large_image" />
     <title>GDGoC DGU · 동국대학교 Google Developer Groups on Campus</title>
+    <!-- 검색 로봇용 사이트 · 단체 정보 (저장소에 있는 사실만: config/site.ts · content/chapter.json. seo.test.ts 가 확인) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://gdghomepage.vercel.app/#website",
+            "url": "https://gdghomepage.vercel.app/",
+            "name": "GDGoC DGU",
+            "inLanguage": "ko-KR",
+            "publisher": { "@id": "https://gdghomepage.vercel.app/#organization" }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://gdghomepage.vercel.app/#organization",
+            "name": "GDGoC DGU",
+            "alternateName": "동국대학교 Google Developer Groups on Campus",
+            "url": "https://gdghomepage.vercel.app/",
+            "logo": "https://gdghomepage.vercel.app/brand/gdg-dgu-logo.png",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "필동로1길 30 동국대학교 필동관 1층",
+              "addressLocality": "중구",
+              "addressRegion": "서울",
+              "addressCountry": "KR"
+            },
+            "sameAs": [
+              "https://www.instagram.com/gdg.donggukuniv/",
+              "https://www.youtube.com/@GDGoCDGU",
+              "https://linktr.ee/GDGoC_DGU",
+              "https://gdg.community.dev/gdg-on-campus-dongguk-university-seoul-south-korea/",
+              "https://github.com/GDSC-DGU"
+            ]
+          }
+        ]
+      }
+    </script>
     <!-- 글꼴: 영문·숫자 Google Sans Flex, 한글 Pretendard (디자인 시스템 기준) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..700&display=swap" />
     <!-- 손글씨 층(지도 메모): 나눔손글씨 펜 (OFL 1.1). 메모에 쓰는 글자만 받는다(text=). 메모 문구를 바꾸면 여기 글자도 더한다 -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap&text=%EB%A7%A4%EC%A3%BC%ED%99%94%EC%9A%94%EC%9D%BC%EC%84%B8%EC%85%98%EB%A7%8C%EB%93%9C%EB%8A%94%EC%A4%91%EB%8D%B0%EB%AA%A8%EB%8D%B0%EC%9D%B4%ED%8C%80GSprint0123456789.%3A-%21%20" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+    <!--
+      한글 Pretendard: npm 1.3.9 판을 고정 주소로 받고, 받은 파일이 그 판 그대로인지 integrity 로 확인한다 (보안 검사 2026-11-06).
+      .min.css 는 jsDelivr 가 따로 줄인 파일이라 해시가 고정되지 않아, 패키지에 들어 있는 .css 를 그대로 쓴다.
+      판을 바꾸면 integrity 도 다시 계산한다: openssl dgst -sha384 -binary <파일> | openssl base64 -A
+    -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"
+      integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
     <div id="root"></div>

@@ -21,7 +21,7 @@ interface Props {
 const Instagram = () => (
   <a href={SITE.links.instagram} target="_blank" rel="noreferrer">
     인스타그램 {SITE.links.instagramHandle}
-    <span aria-hidden="true"> ↗</span>
+    
   </a>
 )
 
@@ -72,7 +72,7 @@ export function UpcomingList({ events, today, status, limit = 4, onPoint }: Prop
                   {e.url ? (
                     <a href={e.url} target="_blank" rel="noreferrer">
                       {e.title}
-                      <span aria-hidden="true"> ↗</span>
+                      
                     </a>
                   ) : (
                     e.title

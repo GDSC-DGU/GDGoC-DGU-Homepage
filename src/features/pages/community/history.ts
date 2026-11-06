@@ -13,10 +13,10 @@ export interface Tally {
   unit: string
 }
 
-/** '2023.09–2024.07' · 지금 기수는 '2026.09–' · 기간을 모르면 빈 글자 (화면에서 숨김) */
+/** '2023.09~2024.07' · 지금 기수는 '2026.09~' · 기간을 모르면 빈 글자 (화면에서 숨김) */
 export function generationPeriod(g: Pick<Generation, 'start' | 'end'>): string {
   if (!g.start && !g.end) return ''
-  return `${g.start ? dotMonth(g.start) : ''}–${g.end ? dotMonth(g.end) : ''}`
+  return `${g.start ? dotMonth(g.start) : ''}~${g.end ? dotMonth(g.end) : ''}`
 }
 
 /** 숫자 한 줄: 0 이면 뺀다 */

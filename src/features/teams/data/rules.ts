@@ -68,7 +68,7 @@ export function validatePost(input: PostInput): FieldErrors {
   const content = input.content.trim()
   if (!content) e.content = '내용을 적어 주세요.'
   else if (content.length > CONTENT_MAX) e.content = `내용은 ${CONTENT_MAX.toLocaleString()}자까지 적을 수 있습니다.`
-  if (input.headcount !== null && (!Number.isInteger(input.headcount) || input.headcount < 1 || input.headcount > HEADCOUNT_MAX)) e.headcount = `1–${HEADCOUNT_MAX}명 중에서 골라 주세요.`
+  if (input.headcount !== null && (!Number.isInteger(input.headcount) || input.headcount < 1 || input.headcount > HEADCOUNT_MAX)) e.headcount = `1~${HEADCOUNT_MAX}명 중에서 골라 주세요.`
   if (input.parts.some((p) => !isPart(p))) e.parts = '파트를 다시 골라 주세요.'
   const urlError = input.contactUrl ? contactUrlError(input.contactUrl) : null
   if (urlError) e.contactUrl = urlError
@@ -84,7 +84,7 @@ export function reopenError(endDate: Ymd, today: Ymd): string | null {
 /** 첨부파일 하나 확인 */
 export function fileError(file: { name: string; type: string; size: number }): string | null {
   const type = file.type || guessType(file.name)
-  if (!FILE_TYPES[type]) return `${file.name}: PDF · JPG · PNG 파일만 올릴 수 있습니다.`
+  if (!FILE_TYPES[type]) return `${file.name}: PDF, JPG, PNG 파일만 올릴 수 있습니다.`
   if (file.size > FILE_MAX_BYTES) return `${file.name}: 파일 하나는 10MB까지 올릴 수 있습니다.`
   return null
 }
@@ -106,11 +106,11 @@ export function dotDate(isoOrYmd: string): string {
   return ymd.replaceAll('-', '.')
 }
 
-/** 모집 기간: '2026.10.14–10.31' (해가 다르면 '2026.12.20–2027.01.10'. 기간 표기는 사이트 전체 '–' 하나) */
+/** 모집 기간: '2026.10.14~10.31' (해가 다르면 '2026.12.20~2027.01.10'. 기간 표기는 사이트 전체 '~' 하나) */
 export function periodLabel(start: Ymd, end: Ymd): string {
   const a = dotDate(start)
   const b = dotDate(end)
-  return start.slice(0, 4) === end.slice(0, 4) ? `${a}–${b.slice(5)}` : `${a}–${b}`
+  return start.slice(0, 4) === end.slice(0, 4) ? `${a}~${b.slice(5)}` : `${a}~${b}`
 }
 
 /** 목록 주소 ?cat=스터디&status=모집중&part=frontend&q=…&page=2 ↔ ListQuery (뒤로 가기 · 목록으로 돌아올 때 그대로) */

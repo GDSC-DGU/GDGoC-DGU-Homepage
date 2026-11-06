@@ -10,8 +10,8 @@
   margin-top: calc(-1 * var(--header-h));
   padding-top: calc(var(--header-h) + 32px);
   padding-bottom: 120px;
-  background: #000;
-  color: #fff;
+  background: var(--black);
+  color: var(--white);
 }
 .hero::before {
   content: '';
@@ -19,12 +19,12 @@
   inset: 0;
   z-index: -1;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    linear-gradient(var(--white-a8) 1px, transparent 1px),
+    linear-gradient(90deg, var(--white-a8) 1px, transparent 1px);
   background-size: 96px 96px;
   background-position: -1px -1px;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.55) 60%, transparent 92%);
-  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.55) 60%, transparent 92%);
+  -webkit-mask-image: linear-gradient(to bottom, var(--black) 0%, var(--black-a55) 60%, transparent 92%);
+  mask-image: linear-gradient(to bottom, var(--black) 0%, var(--black-a55) 60%, transparent 92%);
 }
 .hero::after {
   content: '';
@@ -32,10 +32,10 @@
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(to bottom, transparent 78%, #000 100%),
-    radial-gradient(70% 55% at 62% 88%, rgba(255, 110, 50, 0.85) 0%, rgba(232, 80, 20, 0.55) 30%, rgba(150, 45, 10, 0.3) 55%, transparent 78%),
-    radial-gradient(120% 80% at 30% 100%, rgba(160, 50, 12, 0.55) 0%, transparent 60%),
-    #000;
+    linear-gradient(to bottom, transparent 78%, var(--band-bg) 100%),
+    radial-gradient(70% 55% at 62% 88%, var(--glow-ff6e32-a85) 0%, var(--glow-e85014-a55) 30%, var(--glow-962d0a-a30) 55%, transparent 78%),
+    radial-gradient(120% 80% at 30% 100%, var(--glow-a0320c-a55) 0%, transparent 60%),
+    var(--band-bg);
 }
 .inner {
   position: relative;
@@ -54,22 +54,22 @@
   gap: 6px;
   min-height: 32px;
   padding: 0 16px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--white-a90);
   border-radius: var(--r-pill);
   background: transparent;
   font: 500 14px/20px var(--font-kr);
-  color: #fff;
+  color: var(--white);
   cursor: pointer;
   transition: background 300ms var(--ease);
 }
 .share:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--white-a12);
 }
 .title {
   margin-top: 64px;
   font: 600 56px/1.2 var(--font-kr);
   letter-spacing: -0.02em;
-  color: #fff;
+  color: var(--white);
   word-break: keep-all;
   text-wrap: balance;
 }
@@ -95,13 +95,13 @@
 }
 .statLabel {
   font: 600 16px/1.2 var(--font-kr);
-  color: #948f8d;
+  color: var(--band-ink-4);
 }
 .statValue {
   margin: 0;
   font: 600 48px/1.1 var(--font-kr);
   letter-spacing: -0.02em;
-  color: #ff5e27;
+  color: var(--brand);
 }
 .statValue :global(.num) {
   font-weight: 600;
@@ -113,7 +113,7 @@
 .note {
   margin-top: 24px;
   font: 400 14px/1.5 var(--font-kr);
-  color: #d5d2cf;
+  color: var(--band-ink-2);
 }
 .text {
   display: grid;
@@ -121,7 +121,7 @@
   min-width: 0;
   font: 400 18px/1.6 var(--font-kr);
   letter-spacing: -0.01em;
-  color: #d5d2cf;
+  color: var(--band-ink-2);
   word-break: keep-all;
 }
 

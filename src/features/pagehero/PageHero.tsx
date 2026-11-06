@@ -2,12 +2,12 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
 import type { PlaceId } from '@/domain/types'
+import { Chevron } from '@/features/common/Glyphs'
 import { Crumbs } from '@/features/dcamp/Crumbs'
 import s from './pageHero.module.css'
 
-/** 검정 띠 카드 (dcamp 'Startup' 목록 머리의 행사 띠): 주황 · 파랑 빛 위에 작은 이름표 · 한 줄 · 화살표 */
+/** 검정 띠 카드 (dcamp 'Startup' 목록 머리의 행사 띠): 주황 · 파랑 빛 위에 한 줄 + 오른쪽 끝 꺾쇠. 제목 위 이름표는 두지 않는다 (hallmark 54) */
 export interface HeroBanner {
-  kicker: string
   title: ReactNode
   to: string
 }
@@ -25,11 +25,8 @@ export function PageHero({ place, title, lead, meta, banner }: { place: PlaceId;
       {meta && <div className={s.meta}>{meta}</div>}
       {banner && (
         <Link className={s.banner} to={banner.to}>
-          <span className={s.bannerKicker}>{banner.kicker}</span>
           <span className={s.bannerTitle}>{banner.title}</span>
-          <span className={s.bannerGo} aria-hidden="true">
-            →
-          </span>
+          <Chevron className={s.bannerGo} />
         </Link>
       )}
     </header>

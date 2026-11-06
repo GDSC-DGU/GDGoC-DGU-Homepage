@@ -6,8 +6,8 @@ describe('연혁 (dcamp Our Evolution)', () => {
   it('최근 기수 먼저, 기간은 generations.json 그대로, 지금 기수는 끝을 비운다', () => {
     const rows = evolutionRows(GENERATIONS)
     expect(rows.map((r) => r.n)).toEqual([4, 3, 2, 1])
-    expect(rows[0]).toMatchObject({ label: '4기', period: '2026.09–', current: true })
-    expect(rows[3].period).toBe('2023.09–2024.07')
+    expect(rows[0]).toMatchObject({ label: '4기', period: '2026.09~', current: true })
+    expect(rows[3].period).toBe('2023.09~2024.07')
   })
 
   it('첫 기수는 시작 이름, 이름이 바뀐 기수는 바뀐 줄이 맨 앞 (지어낸 줄 없이 highlights 만)', () => {

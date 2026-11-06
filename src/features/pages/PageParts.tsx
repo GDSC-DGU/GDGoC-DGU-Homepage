@@ -50,7 +50,7 @@ export function PageHead({
 /**
  * 참고 섹션: 1px 괘선 + 제목(28) + 한 줄 설명, 섹션 사이 96 (폰 64).
  * head: top(기본) = 머리를 위에, 내용은 12칸 전체 (일정 줄 · 단계 그림처럼 넓은 내용)
- *       side = 머리는 왼쪽 3칸, 내용은 4–12칸 (FAQ · 짧은 목록). 1023 이하에서는 위아래로 쌓는다
+ *       side = 머리는 왼쪽 3칸, 내용은 4~12칸 (FAQ · 짧은 목록). 1023 이하에서는 위아래로 쌓는다
  * aside: 머리 오른쪽 끝(side 면 설명 아래)에 붙는 짧은 것 (거르기 · 작은 숫자).
  * quiet: 마지막 짧은 안내처럼 덜 중요한 섹션 (제목 한 단계 작게).
  * 이야기 섹션(주장 제목 48 · 면)은 common/StorySection 을 쓴다.
@@ -89,7 +89,7 @@ export function Section({
 }
 
 /**
- * 사이트 밖으로 나가는 링크: 새 탭, rel=noreferrer, 끝에 ↗.
+ * 사이트 밖으로 나가는 링크: 새 탭, rel=noreferrer.
  * context 는 화면 읽기 프로그램에만 읽힌다 ('자세히' 가 여러 개일 때 무엇의 자세히인지).
  */
 export function ExternalLink({ href, children, context, className = 'link' }: { href: string; children: ReactNode; context?: string; className?: string }) {
@@ -98,9 +98,6 @@ export function ExternalLink({ href, children, context, className = 'link' }: { 
       <span className={s.extText}>{children}</span>
       <span className="visually-hidden">
         {context ? `: ${context}` : ''} (새 창)
-      </span>
-      <span className={s.arrow} aria-hidden="true">
-        ↗
       </span>
     </a>
   )

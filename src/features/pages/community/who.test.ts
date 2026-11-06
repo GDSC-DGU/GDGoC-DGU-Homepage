@@ -19,7 +19,7 @@ describe('소개 · 우리는', () => {
   it('판: 확인된 G-Sprint 숫자만, 멤버 수가 없으면 판을 뺀다', () => {
     const full = whoCards({ members: { value: 244, asOf: '2026-10-16' }, sprint: { teams: 5, members: 27, verified: true }, demoDay: '12.29' })
     expect(full.map((c) => c.id)).toEqual(['sessions', 'sprint', 'joint', 'members'])
-    expect(full[1]).toMatchObject({ value: '5팀 27명', sub: '한 학기 팀 프로젝트 · 12.29 데모데이' })
+    expect(full[1]).toMatchObject({ value: '5팀 27명', sub: '한 학기 팀 프로젝트, 12.29 데모데이' })
     expect(full[3]).toMatchObject({ label: '챕터 페이지 가입자', value: '244명', sub: 'gdg.community.dev, 2026.10 기준' })
     const bare = whoCards({ sprint: { teams: 5, members: 27, verified: false } })
     expect(bare.map((c) => c.id)).toEqual(['sessions', 'sprint', 'joint'])

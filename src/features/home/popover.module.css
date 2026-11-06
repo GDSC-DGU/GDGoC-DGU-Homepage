@@ -20,16 +20,38 @@
   padding: 14px 20px 16px;
   border-radius: var(--r-card);
   visibility: hidden; /* 자리를 재기 전 한 프레임 */
+  /* 처음 열 때는 자리를 잰 뒤(data-placed)에야 움직임이 시작되므로, 재기 전 모양을 시작 모양으로 둔다 */
+  opacity: 0;
+  transform: scale(0.96);
 }
+/*
+ * 스프링 (움직임 9가지): 열 때 0.96 에서 살짝 넘쳤다 제자리 (--ease-spring 420ms, 투명도는 220ms 감속).
+ * 닫을 때는 150ms 가속(--ease-in)으로 0.98 로 줄며 사라진다. hidden 이 붙어도 display 를 넘겨 끝까지 보인다.
+ * (hallmark 12 의 '튕김 금지'는 4기 Organizer 가 고른 이 자리에서만 풀었다, 2026-11-06)
+ */
 .pop[data-placed] {
   visibility: visible;
-  animation: pop var(--dur-open) var(--ease);
+  opacity: 1;
+  transform: none;
+  transform-origin: top center;
+  transition:
+    opacity var(--dur-short) var(--ease-out),
+    transform var(--dur-long) var(--ease-spring),
+    display var(--dur-short-exit) allow-discrete;
 }
-@keyframes pop {
-  from {
+@starting-style {
+  .pop[data-placed] {
     opacity: 0;
-    transform: translateY(4px);
+    transform: scale(0.96);
   }
+}
+.pop[data-placed][hidden] {
+  opacity: 0;
+  transform: scale(0.98);
+  transition:
+    opacity var(--dur-short-exit) var(--ease-in),
+    transform var(--dur-short-exit) var(--ease-in),
+    display var(--dur-short-exit) allow-discrete;
 }
 
 /* 폰: 아래에서 올라오는 시트 */
@@ -44,12 +66,21 @@
   overscroll-behavior: contain;
   padding: 12px max(20px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
   border-radius: var(--r-card) var(--r-card) 0 0;
-  animation: sheetUp var(--dur-sheet) var(--ease);
+  /* 폰: 아래에서 420ms 감속으로 올라오고, 280ms 가속으로 내려간다 */
+  transition:
+    transform var(--dur-long) var(--ease-out),
+    display var(--dur-long-exit) allow-discrete;
 }
-@keyframes sheetUp {
-  from {
+@starting-style {
+  .sheet {
     transform: translateY(100%);
   }
+}
+.sheet[hidden] {
+  transform: translateY(100%);
+  transition:
+    transform var(--dur-long-exit) var(--ease-in),
+    display var(--dur-long-exit) allow-discrete;
 }
 
 .head {
@@ -179,8 +210,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pop[data-placed],
-  .sheet {
-    animation: none;
+  .pop[data-placed][hidden],
+  .sheet,
+  .sheet[hidden] {
+    transition: none;
   }
 }
 

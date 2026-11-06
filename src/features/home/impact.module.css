@@ -34,15 +34,15 @@
   width: 120px;
   height: 120px;
   fill: none;
-  stroke: #b8b3b0;
+  stroke: var(--line-art);
   stroke-width: 1.2;
 }
 .art .fill {
-  fill: #ff5e27;
+  fill: var(--brand);
   stroke: none;
 }
 .art .grey {
-  fill: #b8b3b0;
+  fill: var(--line-art);
   stroke: none;
 }
 .line {

@@ -14,7 +14,7 @@ export const KIND_FILTERS: readonly { id: KindFilterId; label: string; kinds: re
   { id: 'session', label: '세션', kinds: ['session'] },
   { id: 'event', label: '행사', kinds: ['event'] },
   { id: 'project', label: '프로젝트', kinds: ['project', 'sprint'] },
-  { id: 'recruit', label: '모집 · OT', kinds: ['recruit'] },
+  { id: 'recruit', label: '모집, OT', kinds: ['recruit'] },
 ]
 
 export const isKindFilter = (v: string | null): v is KindFilterId => KIND_FILTERS.some((f) => f.id === v)
@@ -62,13 +62,13 @@ export function kindCounts(events: readonly ScheduleEvent[]): Record<KindFilterI
 }
 
 /**
- * '2025.09–2026.06' · 지금 기수는 '2026.09–지금' · 끝을 모르면 '2023.09–'.
+ * '2025.09~2026.06' · 지금 기수는 '2026.09~지금' · 끝을 모르면 '2023.09~'.
  * 시작을 모르면(공개 기록이 없는 기수) 기간을 지어내지 않고 null.
  */
 export function generationRange(g: Pick<Generation, 'start' | 'end' | 'current'>): string | null {
   if (!g.start) return null
-  if (g.end) return `${dotMonth(g.start)}–${dotMonth(g.end)}`
-  return `${dotMonth(g.start)}–${g.current ? '지금' : ''}`
+  if (g.end) return `${dotMonth(g.start)}~${dotMonth(g.end)}`
+  return `${dotMonth(g.start)}~${g.current ? '지금' : ''}`
 }
 
 /** 접힌 목록에서 보일 개수 */

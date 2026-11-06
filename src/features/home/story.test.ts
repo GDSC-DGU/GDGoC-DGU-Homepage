@@ -106,7 +106,7 @@ describe('홈 문구 (content/story.ts)', () => {
   it('연합 행사 칸의 큰 숫자는 문장에 적은 챕터 수와 같다', () => {
     const joint = WAYS.find((w) => w.id === 'joint')!
     const n = Number(joint.key.match(/\d+/)?.[0])
-    const names = joint.body.split('챕터와')[0].split('·').map((x) => x.trim()).filter(Boolean)
+    const names = joint.body.split('챕터와')[0].split(/[,·]/).map((x) => x.trim()).filter(Boolean)
     expect(names.length).toBeGreaterThan(1)
     expect(n).toBe(names.length)
   })

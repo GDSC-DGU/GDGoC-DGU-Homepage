@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
+import { useStaggerReveal } from '@/hooks/useStaggerReveal'
 import s from './darkProgram.module.css'
 
 export interface GlassStat {
@@ -28,12 +29,11 @@ function SquareIcon({ kind }: { kind: DarkCard['icon'] }) {
 }
 
 /**
- * 검정 프로그램 띠 (dcamp batch 가운데): 검정 위 주황 · 파랑 빛줄기 → 주황 이름표 · 큰 흰 제목 → 반투명 숫자 카드 세 장
+ * 검정 프로그램 띠 (dcamp batch 가운데): 검정 위 주황 · 파랑 빛줄기 → 큰 흰 제목 (제목 위 이름표 없음, hallmark 54) → 반투명 숫자 카드 세 장
  * → '주요 활동' 검정 카드 여섯 장 (주황 네모 아이콘 · 제목 · • 줄).
  */
 export function DarkProgram({
   id,
-  eyebrow,
   title,
   stats,
   statNote,
@@ -42,7 +42,6 @@ export function DarkProgram({
   children,
 }: {
   id: string
-  eyebrow: string
   title: ReactNode
   stats: readonly GlassStat[]
   statNote?: string
@@ -50,11 +49,12 @@ export function DarkProgram({
   cards: readonly DarkCard[]
   children?: ReactNode
 }) {
+  const cardsRef = useRef<HTMLUListElement>(null)
+  useStaggerReveal(cardsRef) // 지원하기 페이지의 순차 등장은 여기 한 곳 ('주요 활동' 카드)
   return (
     <section id={id} className={`on-dark ${s.band}`} data-band="dark" aria-labelledby={`${id}-title`}>
       <div className={s.light} aria-hidden="true" />
       <div className={`container ${s.inner}`}>
-        <p className={s.eyebrow}>{eyebrow}</p>
         <h2 id={`${id}-title`} className={s.title}>
           {title}
         </h2>
@@ -69,7 +69,7 @@ export function DarkProgram({
         {statNote && <p className={s.statNote}>{statNote}</p>}
 
         <h3 className={s.cardsTitle}>{cardsTitle}</h3>
-        <ul className={s.cards}>
+        <ul ref={cardsRef} className={s.cards}>
           {cards.map((c) => (
             <li key={c.id} className={s.card}>
               <SquareIcon kind={c.icon} />

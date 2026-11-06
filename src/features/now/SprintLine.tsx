@@ -3,7 +3,7 @@ import { SITE, SPRINT } from '@/config/site'
 import { monthDay } from '@/lib/date'
 import s from './now.module.css'
 
-/** 학기 레일의 빨간 막대 설명 한 줄: 'G-Sprint · 10.13 킥오프–12.29 데모데이 · 5팀 27명' */
+/** 학기 레일의 빨간 막대 설명 한 줄: 'G-Sprint · 10.13 킥오프~12.29 데모데이 · 5팀 27명' */
 export function SprintLine({ sprint }: { sprint: { start: string; end: string } }) {
   const team = CHAPTER.sprint.verified && CHAPTER.sprint.generation === +SITE.generation.replace(/\D/g, '') ? CHAPTER.sprint : null
   return (
@@ -16,7 +16,7 @@ export function SprintLine({ sprint }: { sprint: { start: string; end: string } 
       <span className={s.sg}>
         <span className="num">{monthDay(sprint.start)}</span> 킥오프<span className="visually-hidden">부터</span>
         <span className={s.dash} aria-hidden="true">
-          –
+          ~
         </span>
         <span className="num">{monthDay(sprint.end)}</span> 데모데이
       </span>

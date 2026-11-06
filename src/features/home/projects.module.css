@@ -47,7 +47,7 @@
   inset: 0;
   z-index: 2;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(25, 27, 31, 0.07);
+  box-shadow: inset 0 0 0 1px var(--ink-a7);
   pointer-events: none;
 }
 
@@ -64,7 +64,7 @@
 
 /* 실제 화면 둘 겹치기: 바탕은 화면 자체의 바탕과 같은 계열 */
 .duo {
-  background: #e9eef6;
+  background: var(--tone-blue-soft);
 }
 .desk,
 .phone {
@@ -84,7 +84,7 @@
   top: 8cqi;
   width: 137cqi;
   border-radius: 10px;
-  box-shadow: 0 0 0 1px rgba(25, 27, 31, 0.08);
+  box-shadow: 0 0 0 1px var(--ink-a8);
 }
 /* 폰 화면: 데스크톱 제목이 끝나는 곳 오른쪽에 떠서 아래 끝 밖으로 이어진다 */
 .phone {
@@ -93,7 +93,7 @@
   width: 24cqi;
   border-radius: 3.6cqi;
   box-shadow:
-    0 0 0 1px rgba(25, 27, 31, 0.1),
+    0 0 0 1px var(--ink-a10),
     var(--shadow-float);
 }
 

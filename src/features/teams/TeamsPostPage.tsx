@@ -16,7 +16,7 @@ import { usePageTitle } from '@/hooks/usePageTitle'
  * 팀원 모집 글 (/teams/:postId, P-TEM-003). 참고: 모집 글 상세(인프런 · 홀라)의 '요약 카드 + 연락하기'.
  * [본문 | 요약 카드] 두 칸 (폰은 한 칸: 머리 → 요약 카드 → 본문).
  * - 본문: 분류 · 상태 · 제목 · 작성자 · 시각 · 조회 → 내용 → 첨부 → 댓글 → [목록으로] · [수정] [삭제] → 이전 · 다음 글 → 같은 분류 모집 중인 글
- * - 요약 카드: 마감까지 · 모집 기간 · 구하는 파트 · 모집 인원 · 작성자 → [연락하기 ↗] · [링크 복사]
+ * - 요약 카드: 마감까지 · 모집 기간 · 구하는 파트 · 모집 인원 · 작성자 → [연락하기] · [링크 복사]
  * 들어올 때마다 조회수 +1. 수정 · 삭제 버튼은 모두에게 보이고, 본인 확인을 거친 작성자만 진행한다.
  */
 export function TeamsPostPage() {
@@ -253,7 +253,7 @@ function SummaryCard({ post, today }: { post: TeamPost; today: string }) {
       <div className={s.summaryActions}>
         {post.contactUrl && post.status === '모집중' && (
           <a className={`btn-primary btn-sm ${s.contactBtn}`} href={post.contactUrl} target="_blank" rel="noopener noreferrer nofollow">
-            {contactAction(post.contactUrl)}<span aria-hidden="true">↗</span>
+            {contactAction(post.contactUrl)}
             <span className="visually-hidden">(새 창)</span>
           </a>
         )}
@@ -286,7 +286,7 @@ function Neighbors({ id, from }: { id: string; from: string }) {
     </li>
   )
   return (
-    <nav className={s.neighbors} aria-label="이전 · 다음 글">
+    <nav className={s.neighbors} aria-label="이전 글과 다음 글">
       <ul>
         {item('다음 글', adj.data.next)}
         {item('이전 글', adj.data.prev)}

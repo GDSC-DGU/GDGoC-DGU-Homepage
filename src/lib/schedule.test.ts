@@ -41,12 +41,12 @@ describe('rangeLabel', () => {
     expect(rangeLabel({ date: '2026-10-27' })).toBe('10.27 (화)')
   })
   it('같은 달', () => {
-    expect(rangeLabel({ date: '2027-01-30', endDate: '2027-01-31' })).toBe('01.30–31')
+    expect(rangeLabel({ date: '2027-01-30', endDate: '2027-01-31' })).toBe('01.30~31')
   })
-  it('달이 다르면 달을 다시 쓴다 (10.31–02 처럼 헷갈리지 않게)', () => {
-    expect(rangeLabel({ date: '2026-10-31', endDate: '2026-11-02' })).toBe('10.31–11.02')
+  it('달이 다르면 달을 다시 쓴다 (10.31~02 처럼 헷갈리지 않게)', () => {
+    expect(rangeLabel({ date: '2026-10-31', endDate: '2026-11-02' })).toBe('10.31~11.02')
   })
   it('해가 다르면 연도까지', () => {
-    expect(rangeLabel({ date: '2026-12-31', endDate: '2027-01-01' })).toBe('2026.12.31–2027.01.01')
+    expect(rangeLabel({ date: '2026-12-31', endDate: '2027-01-01' })).toBe('2026.12.31~2027.01.01')
   })
 })

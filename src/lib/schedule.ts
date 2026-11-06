@@ -26,12 +26,12 @@ export function eventsInMonth(events: readonly ScheduleEvent[], year: number, mo
 
 /**
  * 날짜 표시.
- * 하루: '10.27 (화)' · 같은 달: '01.30–31' · 달이 다름: '10.31–11.02' · 해가 다름: '2026.12.31–2027.01.01'
+ * 하루: '10.27 (화)' · 같은 달: '01.30~31' · 달이 다름: '10.31~11.02' · 해가 다름: '2026.12.31~2027.01.01'
  */
 export function rangeLabel(e: Pick<ScheduleEvent, 'date' | 'endDate'>): string {
   const { date, endDate } = e
   if (!endDate || endDate === date) return `${monthDay(date)} (${weekday(date)})`
-  if (date.slice(0, 4) !== endDate.slice(0, 4)) return `${date.slice(0, 4)}.${monthDay(date)}–${endDate.slice(0, 4)}.${monthDay(endDate)}`
-  if (date.slice(0, 7) !== endDate.slice(0, 7)) return `${monthDay(date)}–${monthDay(endDate)}`
-  return `${monthDay(date)}–${endDate.slice(8, 10)}`
+  if (date.slice(0, 4) !== endDate.slice(0, 4)) return `${date.slice(0, 4)}.${monthDay(date)}~${endDate.slice(0, 4)}.${monthDay(endDate)}`
+  if (date.slice(0, 7) !== endDate.slice(0, 7)) return `${monthDay(date)}~${monthDay(endDate)}`
+  return `${monthDay(date)}~${endDate.slice(8, 10)}`
 }

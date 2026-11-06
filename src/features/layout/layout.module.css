@@ -25,29 +25,29 @@
   background: var(--paper);
 }
 .header[data-scrolled] .bar {
-  box-shadow: 0 6px 24px -10px rgba(17, 17, 17, 0.18);
+  box-shadow: 0 6px 24px -10px var(--ink-a18);
 }
 /* 검정 섹션 위: 검정 띠 · 흰 글자 (on-dark 가 글자 단계를 바꾼다) */
 .header[data-on-dark] .bar {
-  background: #000;
+  background: var(--black);
   box-shadow: none;
 }
 .header[data-on-dark] .searchBox {
-  background: #262525;
-  color: #a8a3a1;
+  background: var(--band-raise);
+  color: var(--band-ink-3);
 }
 .header[data-on-dark] .searchBox:hover {
-  border-color: #4a4645;
+  border-color: var(--band-line-strong);
 }
 .header[data-on-dark] .applyCta {
-  background: #fff;
-  color: #000;
+  background: var(--white);
+  color: var(--black);
 }
 .header[data-on-dark] .applyCtaActive {
-  box-shadow: 0 0 0 2px #000, 0 0 0 4px #fff;
+  box-shadow: 0 0 0 2px var(--black), 0 0 0 4px var(--white);
 }
 .header[data-on-dark] .navActive::after {
-  background: #fff;
+  background: var(--white);
 }
 
 .bar {
@@ -199,13 +199,13 @@
   border-radius: var(--r-pill);
   background: var(--band-bg);
   font: 700 15px/20px var(--font-kr);
-  color: #fff;
+  color: var(--white);
   text-decoration: none;
   white-space: nowrap;
   transition: background var(--dur-hover) var(--ease);
 }
 .applyCta:hover {
-  background: #000;
+  background: var(--black);
 }
 .applyCta:focus-visible {
   outline: 2px solid var(--focus);
@@ -287,7 +287,7 @@
 /*
  * 지원 행동 (ApplyLink): 모집 상태를 따른다. 모양은 두 번째 버튼 작은 크기(global .btn-secondary.btn-sm: 높이 40 · radius 10 · 옅은 면).
  * 평소(모집 전 · 마감 뒤): '지원 안내'. 상태 점이 없어 '지금 열려 있다'로 읽히지 않는다.
- * 모집 중: '지원서 쓰기 | 10.31 마감 ↗' (머리말에서도 두 번째 버튼: 첫 화면의 먹색 주 버튼과 겹치지 않게).
+ * 모집 중: '지원서 쓰기 | 10.31 마감' (머리말에서도 두 번째 버튼: 첫 화면의 먹색 주 버튼과 겹치지 않게).
  * 지원 안내 페이지에 있을 때(.applyActive): 먹색 바탕 · 흰 글자 = '지금 여기'.
  */
 .apply {
@@ -297,15 +297,10 @@
 }
 .applyActive {
   --btn2-bg: var(--ink-900);
-  --btn2-bg-hover: #000;
-  --btn2-ink: #fff;
+  --btn2-bg-hover: var(--black);
+  --btn2-ink: var(--white);
   --btn2-line: transparent;
   --btn2-line-hover: transparent;
-}
-/* 테두리 버튼 안의 ↗ 는 밑줄이 없으니 흐름 안에 둔다 (global.css 바깥 화살표 규칙에서 뺀다) */
-.apply > span[aria-hidden='true'],
-.applySheet > span[aria-hidden='true'] {
-  position: static;
 }
 .applySheet:active {
   transform: scale(var(--press));
@@ -314,12 +309,12 @@
 .applySheet.applyNow,
 .applySheet.applyActive {
   background: var(--ink-900);
-  color: #fff;
+  color: var(--white);
 }
 @media (hover: hover) {
   .applySheet.applyNow:hover,
   .applySheet.applyActive:hover {
-    background: #000;
+    background: var(--black);
   }
 }
 /* 마감일: 가는 세로 괘선 뒤 옅은 글자 */
@@ -383,9 +378,6 @@
     margin-right: 4px;
     padding: 0 10px;
   }
-  .applyBar > [aria-hidden='true'] {
-    display: none;
-  }
 }
 /*
  * 워드마크와 겹치는 아주 좁은 폭: 지원 버튼은 메뉴 시트 안에만.
@@ -416,44 +408,43 @@
   background: var(--paper);
   color: var(--ink-900);
   /*
-   * 열 때 320ms 위에서 8px 내려오며 나타나고, 닫을 때 140ms 로 빠르게 사라진다.
+   * 슬라이드 (움직임 9가지): 열 때 오른쪽 밖에서 420ms 감속(--ease-out)으로 밀려 들어오고,
+   * 닫을 때 280ms 가속(--ease-in)으로 오른쪽으로 빠진다. 뒤 페이지는 옅게 어두워진다.
    * 닫히는 동안에도 맨 위 층(top layer)에 남도록 overlay · display 를 함께 넘긴다 (지원하지 않는 브라우저는 바로 닫힌다)
    */
   z-index: 100;
   /* 닫히는 동안에도 열린 때와 같은 배치를 지킨다 ([open] 이 먼저 빠지므로 방향은 여기에) */
   flex-direction: column;
-  opacity: 0;
-  transform: translateY(-8px);
+  transform: translateX(100%);
   transition:
-    opacity var(--dur-close) var(--ease),
-    transform var(--dur-close) var(--ease),
-    overlay var(--dur-close) allow-discrete,
-    display var(--dur-close) allow-discrete;
+    transform var(--dur-long-exit) var(--ease-in),
+    overlay var(--dur-long-exit) allow-discrete,
+    display var(--dur-long-exit) allow-discrete;
 }
 .sheet[open] {
   display: flex;
-  opacity: 1;
   transform: none;
-  transition-duration: var(--dur-sheet);
+  transition-duration: var(--dur-long);
+  transition-timing-function: var(--ease-out);
 }
 @starting-style {
   .sheet[open] {
-    opacity: 0;
-    transform: translateY(-8px);
+    transform: translateX(100%);
   }
 }
-/* 뒤 페이지에서 시트로 바로 바뀌지 않고 겹쳐 바뀐다 (흰 바탕이 먼저 '팍' 덮이지 않게) */
+/* 시트가 미끄러지는 동안 뒤 페이지가 옅게 어두워진다 */
 .sheet::backdrop {
-  background: var(--paper);
+  background: var(--ink-a32);
   opacity: 0;
   transition:
-    opacity var(--dur-close) var(--ease),
-    overlay var(--dur-close) allow-discrete,
-    display var(--dur-close) allow-discrete;
+    opacity var(--dur-long-exit) var(--ease-in),
+    overlay var(--dur-long-exit) allow-discrete,
+    display var(--dur-long-exit) allow-discrete;
 }
 .sheet[open]::backdrop {
   opacity: 1;
-  transition-duration: var(--dur-open);
+  transition-duration: var(--dur-long);
+  transition-timing-function: var(--ease-out);
 }
 @starting-style {
   .sheet[open]::backdrop {
@@ -533,7 +524,7 @@
 }
 @media (hover: hover) {
   .applySheet:hover {
-    background: #dedad6;
+    background: var(--field-line);
   }
 }
 .applySheet .applyName {

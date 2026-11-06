@@ -77,7 +77,7 @@ function PlanNotes({ id, plan }: { id: PagePlanId; plan: PagePlan }) {
 const LEADS: Partial<Record<PagePlanId, ReactNode>> = {
   teams: (
     <>
-      GDGoC DGU 멤버끼리 스터디 · 프로젝트 · 공모전을 같이할 팀원을 찾는 게시판입니다. 동아리 멤버를 뽑는 곳은 아닙니다.
+      GDGoC DGU 멤버끼리 스터디, 프로젝트, 공모전을 같이할 팀원을 찾는 게시판입니다. 동아리 멤버를 뽑는 곳은 아닙니다.
       <DetourLink to={PLACE_BY_ID.recruits.path} place="recruits">
         동아리 지원은 지원 안내에서
       </DetourLink>

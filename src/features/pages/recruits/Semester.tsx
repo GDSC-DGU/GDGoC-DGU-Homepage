@@ -19,7 +19,7 @@ const springKey = (when: string, name: string) => `spring:${when}:${name}`
 
 /**
  * '들어오면 이런 한 해': 일정 표현은 달별 목록 하나만 둔다 (학기 레일은 커뮤니티 '다가오는 일정' 에 있다).
- * 9월–1월은 지금 기수(4기)의 실제 일정, 마지막 칸 '3–7월 봄 학기' 는 지금 기수 일정이 공개되기 전까지 지난 기수가 연 행사로.
+ * 9월~1월은 지금 기수(4기)의 실제 일정, 마지막 칸 '3~7월 봄 학기' 는 지금 기수 일정이 공개되기 전까지 지난 기수가 연 행사로.
  * 넓은 화면은 세 칸 두 줄(9 · 10 · 11월 / 12 · 1월 · 봄), 폰은 달마다 한 줄.
  * 달 이름은 크게, 표식(장소색 네모 + 굵게)은 G-Sprint 단계에만 둔다: 세션 · 행사 · 휴회는 맨 글자 (한 해의 뼈대가 G-Sprint 로 보이게).
  * 날짜가 지났는데 계획으로만 남은 일정은 뺀다 (content/plan.ts).
@@ -62,8 +62,8 @@ export function SemesterPicture({ events, today, generation }: { events: readonl
                   <li key={e.id} className={k.mEvent} data-rest={rest || undefined} data-past={past || undefined} data-sprint={sprint || undefined}>
                     <span className={`${k.mDate} num`}>
                       {/* '2일 월': 날짜 뒤에 '일' 을 붙여 요일 '월' 이 달(2월)로 읽히지 않게.
-                          여러 날이면 요일 없이 '3–30일' (요일 하나를 붙이면 기간 전체가 그 요일로 읽혔다: 문구 검토 2026-11-05) */}
-                      {e.endDate && e.endDate !== e.date ? `${+e.date.slice(8, 10)}–${+e.endDate.slice(8, 10)}일` : `${+e.date.slice(8, 10)}일 ${weekday(e.date)}`}
+                          여러 날이면 요일 없이 '3~30일' (요일 하나를 붙이면 기간 전체가 그 요일로 읽혔다: 문구 검토 2026-11-05) */}
+                      {e.endDate && e.endDate !== e.date ? `${+e.date.slice(8, 10)}~${+e.endDate.slice(8, 10)}일` : `${+e.date.slice(8, 10)}일 ${weekday(e.date)}`}
                     </span>
                     <span className={k.mTitle}>
                       {sprint && <span className={k.mMark} style={{ '--c': placeColor(e.place) } as CSSProperties} aria-hidden="true" />}
@@ -79,7 +79,7 @@ export function SemesterPicture({ events, today, generation }: { events: readonl
         {spring && (
           <li className={k.month} data-spring>
             <h3 className={k.monthName}>
-              <span className="num">3–7월</span>
+              <span className="num">3~7월</span>
               <span className={k.monthCaption}>봄 학기</span>
             </h3>
             <div>
@@ -93,7 +93,7 @@ export function SemesterPicture({ events, today, generation }: { events: readonl
                     <span className={k.mTitle}>
                       {it.names.map((n, i) => (
                         <span key={n}>
-                          {i > 0 && ' · '}
+                          {i > 0 && ', '}
                           <TermText text={n} terms={terms.get(springKey(it.when, n))} />
                         </span>
                       ))}

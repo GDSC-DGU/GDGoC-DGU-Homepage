@@ -84,8 +84,8 @@ describe('아이콘 표지 글자', () => {
 
 describe('커밋 기간', () => {
   it('달 단위로 줄여 쓴다', () => {
-    expect(monthSpan('2026-05-19', '2026-06-26')).toBe('2026.05–06')
-    expect(monthSpan('2024-12-01', '2025-02-01')).toBe('2024.12–2025.02')
+    expect(monthSpan('2026-05-19', '2026-06-26')).toBe('2026.05~06')
+    expect(monthSpan('2024-12-01', '2025-02-01')).toBe('2024.12~2025.02')
     expect(monthSpan('2024-02-09', '2024-02-20')).toBe('2024.02')
     expect(monthSpan(undefined, '2024-02-20')).toBe('2024.02')
     expect(monthSpan(undefined, undefined)).toBeNull()
@@ -143,7 +143,7 @@ describe('전시실', () => {
   })
 
   it('여러 해가 섞인 방은 연도를 기간으로, 기수는 겹치지 않게', () => {
-    expect(rooms[2].yearLabel).toBe('2024–2025')
+    expect(rooms[2].yearLabel).toBe('2024~2025')
     expect(rooms[2].generations).toEqual([1])
     expect(rooms[0].generations).toEqual([3])
   })

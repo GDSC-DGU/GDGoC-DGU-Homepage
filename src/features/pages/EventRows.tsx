@@ -8,15 +8,15 @@ import { RoomPlate } from './community/Signage'
 import { Mark } from './PageParts'
 import s from './pages.module.css'
 
-/** 날짜 칸. 기간이면 '–' 뒤에서만 줄을 바꾼다 ('08.18 화–' / '08.31 월') */
+/** 날짜 칸. 기간이면 '~' 뒤에서만 줄을 바꾼다 ('08.18 화~' / '08.31 월') */
 function RowDate({ from: start, to: end, today }: { from: string; to?: string; today: string }) {
-  const [from, to] = dateLabel(start, end && end !== start ? end : null, today).split('–')
+  const [from, to] = dateLabel(start, end && end !== start ? end : null, today).split('~')
   return (
     <span className={`${s.rowDate} num`}>
       {to && end ? (
         <>
           <time className={s.nowrap} dateTime={start}>
-            {from}–
+            {from}~
           </time>
           <wbr />
           <time className={s.nowrap} dateTime={end}>
@@ -33,8 +33,8 @@ function RowDate({ from: start, to: end, today }: { from: string; to?: string; t
 }
 
 /**
- * 일정 · 행사 한 줄: 날짜 / 제목 + 연속 행사 · 호실 이름표 / 종류 / 끝 칸(D-day 같은 짧은 말 · ↗).
- * 원래 행사 페이지가 있으면 줄 전체가 그 페이지로 가는 링크이고, 끝에 작은 ↗ 하나를 둔다.
+ * 일정 · 행사 한 줄: 날짜 / 제목 + 연속 행사 · 호실 이름표 / 종류 / 끝 칸(D-day 같은 짧은 말 ).
+ * 원래 행사 페이지가 있으면 줄 전체가 그 페이지로 가는 링크이고,
  * size='lg': 대표 행사(연합 행사 · 컨퍼런스 · 데모데이)는 이름을 크게. title: 이름 자리를 바꿔 그릴 때 (용어 풀이)
  */
 export function EventRow({ e, today, note, size, title }: { e: ScheduleEvent; today: string; note?: ReactNode; size?: 'lg'; title?: ReactNode }) {
@@ -58,11 +58,6 @@ export function EventRow({ e, today, note, size, title }: { e: ScheduleEvent; to
       </span>
       <span className={s.rowEnd}>
         {note && <span className={`${s.until} num`}>{note}</span>}
-        {e.url && (
-          <span className={s.rowArrow} aria-hidden="true">
-            ↗
-          </span>
-        )}
       </span>
     </>
   )
@@ -97,7 +92,7 @@ export function SeriesRow({ run, today, title }: { run: SeriesRun; today: string
           <span className={s.rowTitle}>{title ?? run.series}</span>
           <span className={s.rowSub}>
             <span>
-              <span className="num">{run.events.length}</span>회{wd && ` · 주로 ${wd}요일`}
+              <span className="num">{run.events.length}</span>회{wd && `, 주로 ${wd}요일`}
             </span>
             {venue && <RoomPlate venue={venue} prefix="주로 쓴 장소" />}
           </span>

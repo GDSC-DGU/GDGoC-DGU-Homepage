@@ -41,7 +41,7 @@ describe('날짜 계산', () => {
     expect(lastOfMonth('2028-02-01')).toBe('2028-02-29')
   })
 
-  it('반년 단위: 9–2월, 3–8월', () => {
+  it('반년 단위: 9~2월, 3~8월', () => {
     expect(halfYearOf('2026-10-17')).toEqual(FALL)
     expect(halfYearOf('2027-01-30')).toEqual(FALL)
     expect(halfYearOf('2027-02-28')).toEqual(FALL)
@@ -51,7 +51,7 @@ describe('날짜 계산', () => {
 })
 
 describe('가로 위치', () => {
-  it('9.1–2.28 은 181일', () => {
+  it('9.1~2.28 은 181일', () => {
     expect(periodDays(FALL)).toBe(181)
   })
 
@@ -112,7 +112,7 @@ describe('레일 기간', () => {
     expect(currentGeneration(events, '2025-01-01')).toBe(3)
   })
 
-  it('4기 일정이 있는 2학기: 2026.09.01–2027.02.28', () => {
+  it('4기 일정이 있는 2학기: 2026.09.01~2027.02.28', () => {
     expect(railPeriod(events, '2026-10-17')).toEqual(FALL)
   })
 
@@ -207,8 +207,8 @@ describe('표기', () => {
   })
 
   it('여러 날 일정', () => {
-    expect(spanLabel({ date: '2027-01-30', endDate: '2027-01-31' }, '2026-10-17')).toBe('2027.01.30–31 토–일')
-    expect(spanLabel({ date: '2026-10-31', endDate: '2026-11-02' }, '2026-10-17')).toBe('10.31–11.02 토–월')
+    expect(spanLabel({ date: '2027-01-30', endDate: '2027-01-31' }, '2026-10-17')).toBe('2027.01.30~31 토~일')
+    expect(spanLabel({ date: '2026-10-31', endDate: '2026-11-02' }, '2026-10-17')).toBe('10.31~11.02 토~월')
     expect(spanLabel({ date: '2026-10-27' }, '2026-10-17')).toBe('10.27 화')
   })
 

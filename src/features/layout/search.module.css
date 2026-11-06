@@ -20,23 +20,25 @@
   box-shadow: var(--shadow-float);
   overflow: hidden;
   /*
-   * 열 때 200ms 6px 내려오며, 닫을 때 140ms 로 빠르게 사라진다 (배경도 같이 옅어진다).
+   * 이즈 아웃 · 이즈 인 (hallmark craft 5): 열 때 220ms 감속(--ease-out)으로 6px 내려오고,
+   * 닫을 때 150ms 가속(--ease-in)으로 더 빨리 사라진다 (배경도 같이 옅어진다).
    * 닫히는 동안에도 맨 위 층에 남게 overlay · display 를 넘긴다. 지원하지 않는 브라우저는 바로 닫힌다
    */
   z-index: 100;
   opacity: 0;
   transform: translateY(-6px) scale(0.99);
   transition:
-    opacity var(--dur-close) var(--ease),
-    transform var(--dur-close) var(--ease),
-    overlay var(--dur-close) allow-discrete,
-    display var(--dur-close) allow-discrete;
+    opacity var(--dur-short-exit) var(--ease-in),
+    transform var(--dur-short-exit) var(--ease-in),
+    overlay var(--dur-short-exit) allow-discrete,
+    display var(--dur-short-exit) allow-discrete;
 }
 .dialog[open] {
   display: flex;
   opacity: 1;
   transform: none;
-  transition-duration: var(--dur-open);
+  transition-duration: var(--dur-short);
+  transition-timing-function: var(--ease-out);
 }
 @starting-style {
   .dialog[open] {
@@ -45,16 +47,17 @@
   }
 }
 .dialog::backdrop {
-  background: rgba(25, 27, 31, 0.32);
+  background: var(--ink-a32);
   opacity: 0;
   transition:
-    opacity var(--dur-close) var(--ease),
-    overlay var(--dur-close) allow-discrete,
-    display var(--dur-close) allow-discrete;
+    opacity var(--dur-short-exit) var(--ease-in),
+    overlay var(--dur-short-exit) allow-discrete,
+    display var(--dur-short-exit) allow-discrete;
 }
 .dialog[open]::backdrop {
   opacity: 1;
-  transition-duration: var(--dur-open);
+  transition-duration: var(--dur-short);
+  transition-timing-function: var(--ease-out);
 }
 @starting-style {
   .dialog[open]::backdrop {

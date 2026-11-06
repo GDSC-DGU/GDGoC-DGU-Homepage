@@ -28,7 +28,7 @@ export interface RecruitStatus {
   channelUrl: string
   /** 남은 날: soon 이면 열리는 날까지, open 이면 마감일까지 (마감일 당일 0) */
   daysLeft?: number
-  /** 지난 모집 시기 '2026.08–09' (가장 최근 기수 기록, OT 제외) */
+  /** 지난 모집 시기 '2026.08~09' (가장 최근 기수 기록, OT 제외) */
   lastWindow?: string
   /** 지난 모집 기수 (4) */
   lastGeneration?: number
@@ -69,7 +69,7 @@ export function recruitingProblems(cur: RecruitingCurrent): string[] {
   return out
 }
 
-/** 가장 최근 기수의 모집 시기 (OT 제외): '2026.08–09' · 같은 달 '2026.08' · 해를 넘으면 '2026.12–2027.01' */
+/** 가장 최근 기수의 모집 시기 (OT 제외): '2026.08~09' · 같은 달 '2026.08' · 해를 넘으면 '2026.12~2027.01' */
 export function lastWindowOf(history: RecruitingSource['history']): { generation?: number; label?: string } {
   const last = [...history].sort((a, b) => b.generation - a.generation)[0]
   if (!last) return {}
@@ -82,7 +82,7 @@ export function lastWindowOf(history: RecruitingSource['history']): { generation
     .at(-1)!
   const [y1, m1] = start.split('-')
   const [y2, m2] = end.split('-')
-  const label = y1 === y2 ? (m1 === m2 ? `${y1}.${m1}` : `${y1}.${m1}–${m2}`) : `${y1}.${m1}–${y2}.${m2}`
+  const label = y1 === y2 ? (m1 === m2 ? `${y1}.${m1}` : `${y1}.${m1}~${m2}`) : `${y1}.${m1}~${y2}.${m2}`
   return { generation: last.generation, label }
 }
 

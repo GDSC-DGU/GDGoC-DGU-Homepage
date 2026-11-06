@@ -27,7 +27,7 @@ export interface JoinStripProps {
 /**
  * 페이지 끝 '{gen}기에서 만나요' (아트 디렉션 4-7): 옅은 회색 이야기 섹션 → 바로 아래 먹색 꼬리말.
  * 제목 → 모집 상태 한 문장 → 주 버튼 + 두 번째 버튼('지원 안내 보기') | 오른쪽 자주 묻는 질문 세 개.
- * - 주 버튼: 모집 중이고 지원서 주소가 있으면 '지원서 쓰기 ↗', 아니면 '{gen}기 소식 받기 ↗' (홈 마무리와 같은 링크)
+ * - 주 버튼: 모집 중이고 지원서 주소가 있으면 '지원서 쓰기', 아니면 '{gen}기 소식 받기' (홈 마무리와 같은 링크)
  * - 질문은 펼치지 않고 지원 안내의 그 답(/recruits#faq-{id})으로 보낸다. 답은 한 곳(지원 안내)에만 있다.
  * 페이지가 <main> 맨 끝에 직접 넣는다 (/recruits 는 넣지 않는다: 페이지 자체가 같은 내용).
  */
@@ -61,7 +61,7 @@ export function JoinStrip({ variant = 'default', id = 'join', title, sub }: Join
             <div className={`btn-row ${j.actions}`}>
               <a className="btn-primary" href={primary.href} target="_blank" rel="noreferrer">
                 {primary.label}
-                <span aria-hidden="true">↗</span>
+                
                 <span className="visually-hidden">{primary.hidden}</span>
               </a>
               <Link className="btn-secondary" to={PLACE_BY_ID.recruits.path}>

@@ -28,7 +28,7 @@ export function projectGallery(p: Pick<Project, 'cover' | 'images'>, showUnclear
   return all.filter((img, i) => all.findIndex((x) => x.src === img.src) === i)
 }
 
-/** 그림 원본을 '원본 ↗' 으로 걸어도 되는지: 누구나 열 수 있는 GitHub 주소만 (노션 '전 기수 데이터 모음집'은 챕터 안 문서라 걸지 않는다) */
+/** 그림 원본을 '원본' 으로 걸어도 되는지: 누구나 열 수 있는 GitHub 주소만 (노션 '전 기수 데이터 모음집'은 챕터 안 문서라 걸지 않는다) */
 export const isOpenSource = (url: string): boolean => /^https:\/\/(github\.com|raw\.githubusercontent\.com)\//.test(url)
 
 /** 화면 캡처 · 소개 이미지처럼 그 자체로 작업을 보여 주는 그림인지 (로고 · 구조도가 아닌 것) */
@@ -62,8 +62,8 @@ export function stageShots(gallery: readonly ProjectImage[]): { wide: ProjectIma
 }
 
 /**
- * 자세히 보기 창의 바깥 링크 줄: GitHub 저장소 ↗ · 데모 영상 ↗ (개인 저장소는 걸지 않는다: 공개 기준을 통과한 저장소만).
- * 지금 열리는 서비스(지금 써 보기 ↗)는 따로 주 버튼으로 건다.
+ * 자세히 보기 창의 바깥 링크 줄: GitHub 저장소 · 데모 영상 (개인 저장소는 걸지 않는다: 공개 기준을 통과한 저장소만).
+ * 지금 열리는 서비스(지금 써 보기)는 따로 주 버튼으로 건다.
  */
 export function outLinks(p: Pick<Project, 'repo' | 'url' | 'demo'>, isPublicRepo: (p: Pick<Project, 'repo'>) => boolean = isPublicProject): { href: string; label: string }[] {
   const { repo } = projectLinks(p, isPublicRepo)
@@ -132,7 +132,7 @@ export function monogram(name: string): string {
 /* ───────────── 날짜 ───────────── */
 
 /**
- * 커밋 기간을 달 단위로: '2026.05–06' · 해를 넘으면 '2024.12–2025.02' · 한 달이면 '2024.02'.
+ * 커밋 기간을 달 단위로: '2026.05~06' · 해를 넘으면 '2024.12~2025.02' · 한 달이면 '2024.02'.
  * 하루하루 날짜(요일)가 아니라 '언제 만들었나'를 보여 주는 값이라 달까지만 쓴다.
  */
 export function monthSpan(first: string | undefined, last: string | undefined): string | null {
@@ -141,8 +141,8 @@ export function monthSpan(first: string | undefined, last: string | undefined): 
   const b = (last ?? first)!.slice(0, 7)
   const dot = (ym: string) => ym.replace('-', '.')
   if (a === b) return dot(a)
-  if (a.slice(0, 4) === b.slice(0, 4)) return `${dot(a)}–${b.slice(5, 7)}`
-  return `${dot(a)}–${dot(b)}`
+  if (a.slice(0, 4) === b.slice(0, 4)) return `${dot(a)}~${b.slice(5, 7)}`
+  return `${dot(a)}~${dot(b)}`
 }
 
 /* ───────────── 전시실 (프로그램 · 연도 묶음) ───────────── */
@@ -151,7 +151,7 @@ export interface Room {
   /** 같은 페이지 안 주소 '#solution-challenge-apac-2025' 에 쓰는 id */
   id: string
   title: string
-  /** '2026' 또는 여러 해가 섞이면 '2024–2025' */
+  /** '2026' 또는 여러 해가 섞이면 '2024~2025' */
   yearLabel: string
   /** 묶음 안 기수 (겹치지 않게, 작은 것부터) */
   generations: number[]
@@ -189,7 +189,7 @@ export function toRooms(groups: readonly ProjectGroup[], showUncleared = SHOW_UN
       return d < 0 || (d === 0 && richness(p) > richness(top)) ? p : top
     }, undefined)
     const projects = featured ? [featured, ...ranked.filter((p) => p !== featured)] : ranked
-    return { id, title: g.program, yearLabel: lo === hi ? String(lo) : `${lo}–${hi}`, generations, projects, featured }
+    return { id, title: g.program, yearLabel: lo === hi ? String(lo) : `${lo}~${hi}`, generations, projects, featured }
   })
 }
 

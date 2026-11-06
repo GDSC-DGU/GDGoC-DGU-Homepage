@@ -66,7 +66,7 @@ describe('기수별 모집 목록', () => {
 })
 
 describe('들어오면 이런 한 해', () => {
-  it('4기 첫 반년은 2026.09–2027.02', () => {
+  it('4기 첫 반년은 2026.09~2027.02', () => {
     expect(firstHalfYear(EVENTS, 4)).toEqual({ start: '2026-09-01', end: '2027-02-28' })
     expect(firstHalfYear(EVENTS, 99)).toBeNull()
   })
@@ -82,7 +82,7 @@ describe('들어오면 이런 한 해', () => {
     ])
   })
 
-  it('봄 학기: 지금 기수 봄 일정이 없으면 앞 기수의 3–7월 공개 행사를 시리즈별로 접는다', () => {
+  it('봄 학기: 지금 기수 봄 일정이 없으면 앞 기수의 3~7월 공개 행사를 시리즈별로 접는다', () => {
     const url = 'https://gdg.community.dev/x/'
     const list = [
       ev('c10', '2026-03-06', { generation: 3, series: 'Camping Seminar', url }),
@@ -96,7 +96,7 @@ describe('들어오면 이런 한 해', () => {
     expect(springOf(list, [{ n: 3, end: '2026-07' }], 4)).toEqual({
       generation: 3,
       items: [
-        { when: '3–4월', names: ['Camping Seminar 3회'] },
+        { when: '3~4월', names: ['Camping Seminar 3회'] },
         { when: '5월', names: ['Alumni Seminar', 'Open Seminar'] },
         { when: '7월', names: ['기수 마무리'] },
       ],
@@ -153,13 +153,13 @@ describe('네 파트: 지난 프로젝트 예', () => {
 })
 
 describe('모집 상태 문구', () => {
-  const base: RecruitStatus = { state: 'unscheduled', generation: 5, channelUrl: 'https://www.instagram.com/x/', lastWindow: '2026.08–09', lastGeneration: 4 }
+  const base: RecruitStatus = { state: 'unscheduled', generation: 5, channelUrl: 'https://www.instagram.com/x/', lastWindow: '2026.08~09', lastGeneration: 4 }
   const H = '@gdg.donggukuniv'
 
   it('unscheduled: 지난 모집 시기 + 인스타그램', () => {
     const v = statusView(base, '2026-10-18', H)
     expect(v.title).toBe('5기 모집은 아직 열리지 않았습니다')
-    expect(v.lines).toEqual(['지난 4기는 2026.08–09에 모집했습니다.', `열리면 인스타그램 ${H}에 알립니다.`])
+    expect(v.lines).toEqual(['지난 4기는 2026.08~09에 모집했습니다.', `열리면 인스타그램 ${H}에 알립니다.`])
     expect(v.primary).toBe('channel')
     expect(v.dday).toBeUndefined()
   })

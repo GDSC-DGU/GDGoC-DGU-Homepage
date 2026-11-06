@@ -1,0 +1,37 @@
+{
+  "note": "주소별 검색 · 공유 문구. 빌드 뒤 scripts/route-html.mjs 가 dist/index.html 을 바탕으로 주소마다 <주소>.html 을 만든다 (title · description · og · canonical). title 은 화면의 usePageTitle 과 같아야 한다 (seo.test.ts). 주소를 더하면 public/sitemap.xml 에도 더한다.",
+  "origin": "https://gdghomepage.vercel.app",
+  "routes": [
+    {
+      "path": "/",
+      "place": "about",
+      "title": "GDGoC DGU · 동국대학교 Google Developer Groups on Campus",
+      "description": "동국대학교 Google Developer Groups on Campus(GDGoC DGU)입니다. 매주 화요일 파트별로 모이고, 한 학기 동안 팀을 짜서 서비스를 만듭니다.",
+      "ogDescription": "학생과 현업자 사이를 잇는 동국대학교 개발자 커뮤니티입니다."
+    },
+    {
+      "path": "/about",
+      "place": "community",
+      "title": "소개 · GDGoC DGU",
+      "description": "매주 화요일 18:00에 모입니다. 다가오는 일정과 기수마다 연 행사 기록을 볼 수 있습니다."
+    },
+    {
+      "path": "/archive",
+      "place": "projects",
+      "title": "아카이브 · GDGoC DGU",
+      "description": "1기부터 만든 프로젝트와 멤버 세미나 발표를 모았습니다."
+    },
+    {
+      "path": "/recruits",
+      "place": "recruits",
+      "title": "지원하기 · GDGoC DGU",
+      "description": "지원 자격과 활동, 자주 묻는 질문, 지난 모집 기록을 볼 수 있습니다."
+    },
+    {
+      "path": "/teams",
+      "place": "teams",
+      "title": "팀원 찾기 · GDGoC DGU",
+      "description": "멤버끼리 스터디, 프로젝트, 공모전 팀원을 찾는 게시판입니다. 동아리 지원은 지원하기 페이지에서 합니다."
+    }
+  ]
+}

@@ -63,7 +63,7 @@ export function buildBatches(data: RecruitingData, events: readonly ScheduleEven
   return out
 }
 
-/** 그 기수 일정이 있는 첫 반년 (4기: 2026.09–2027.02). 일정이 없으면 null */
+/** 그 기수 일정이 있는 첫 반년 (4기: 2026.09~2027.02). 일정이 없으면 null */
 export function firstHalfYear(events: readonly ScheduleEvent[], generation: number): Period | null {
   const first = events.filter((e) => e.generation === generation).sort((a, b) => a.date.localeCompare(b.date))[0]
   return first ? halfYearOf(first.date) : null
@@ -89,7 +89,7 @@ export function monthsOf(events: readonly ScheduleEvent[], period: Period): Mont
 
 /**
  * 달마다 붙이는 짧은 이름 (9월 시작 한 해의 흐름). 그 달에 일정이 있을 때만 보인다.
- * 4기 운영 계획 · G-Sprint 일정(킥오프 10월 · 데모데이 12월)과 기수 기간(9월–다음 해 7월)에서 온 흐름이다.
+ * 4기 운영 계획 · G-Sprint 일정(킥오프 10월 · 데모데이 12월)과 기수 기간(9월~다음 해 7월)에서 온 흐름이다.
  */
 export const MONTH_CAPTION: Readonly<Record<number, string>> = {
   9: '첫 만남',
@@ -101,17 +101,17 @@ export const MONTH_CAPTION: Readonly<Record<number, string>> = {
 }
 
 export interface SpringItem {
-  /** '3–4월' */
+  /** '3~4월' */
   when: string
   /** 'Camping Seminar 6회', 'Open Seminar' */
   names: string[]
 }
 
-const monthWord = (a: number, b: number) => (a === b ? `${a}월` : `${a}–${b}월`)
+const monthWord = (a: number, b: number) => (a === b ? `${a}월` : `${a}~${b}월`)
 
 /**
- * 봄 학기 한 줄: 지금 기수의 봄 일정이 아직 없을 때, 바로 앞 기수가 3–7월에 연 공개 행사를 시리즈별로 접는다.
- * 'Camping Seminar 10–15회' 여섯 줄 → '3–4월 Camping Seminar 6회'. 같은 달 묶음은 한 칸으로 ('5월 Alumni Seminar · Open Seminar').
+ * 봄 학기 한 줄: 지금 기수의 봄 일정이 아직 없을 때, 바로 앞 기수가 3~7월에 연 공개 행사를 시리즈별로 접는다.
+ * 'Camping Seminar 10~15회' 여섯 줄 → '3~4월 Camping Seminar 6회'. 같은 달 묶음은 한 칸으로 ('5월 Alumni Seminar · Open Seminar').
  * 앞 기수의 끝 달(generations.json end)이 있으면 '7월 기수 마무리' 를 붙인다. 지금 기수의 봄 일정이 있으면 null.
  */
 export function springOf(events: readonly ScheduleEvent[], generations: readonly Pick<Generation, 'n' | 'end'>[], generation: number): { generation: number; items: SpringItem[] } | null {

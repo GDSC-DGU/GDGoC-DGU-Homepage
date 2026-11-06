@@ -1,8 +1,8 @@
 /* 연혁 (dcamp 'Our Evolution'): 검정 면 · 위아래 120 · 두 칸 [제목 | 줄] */
 .evo {
   padding-block: 120px;
-  background: #000;
-  color: #fff;
+  background: var(--black);
+  color: var(--white);
 }
 .grid {
   display: grid;
@@ -35,7 +35,7 @@
   top: 26px;
   bottom: -40px;
   width: 1px;
-  background: #4a4645;
+  background: var(--band-line-strong);
 }
 .when {
   display: grid;
@@ -47,7 +47,7 @@
 }
 .period {
   font: 500 13px/1.4 var(--font-num);
-  color: #948f8d;
+  color: var(--band-ink-4);
 }
 .dot {
   position: relative;
@@ -55,13 +55,13 @@
   width: 16px;
   height: 16px;
   margin-top: 6px;
-  border: 3px solid #ff5e27;
+  border: 3px solid var(--brand);
   border-radius: 50%;
-  background: #000;
+  background: var(--black);
 }
 .row[data-current] .dot {
-  background: #ff5e27;
-  box-shadow: 0 0 0 6px rgba(255, 94, 39, 0.22);
+  background: var(--brand);
+  box-shadow: 0 0 0 6px var(--brand-a22);
 }
 .lines {
   display: grid;
@@ -70,11 +70,11 @@
   padding: 4px 0 0;
   list-style: none;
   font: 500 15px/1.5 var(--font-kr);
-  color: #fff;
+  color: var(--white);
   word-break: keep-all;
 }
 .lines li:not(:first-child) {
-  color: #d5d2cf;
+  color: var(--band-ink-2);
   font-weight: 400;
 }
 .more {
@@ -86,9 +86,9 @@
   padding: 0 16px;
   border: 0;
   border-radius: var(--r-pill);
-  background: #262525;
+  background: var(--band-raise);
   font: 600 14px/1 var(--font-kr);
-  color: #fff;
+  color: var(--white);
   cursor: pointer;
 }
 .more svg {

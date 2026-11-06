@@ -4,7 +4,7 @@
  * 기록 한 줄은 공통 일정 줄(EventRows · pages.module.css).
  */
 
-/* 이름 링크 (행사 페이지가 있을 때만): 먹색 + 밑줄, 끝에 ↗ */
+/* 이름 링크 (행사 페이지가 있을 때만): 먹색 + 밑줄 */
 .titleLink {
   /* 글줄 안 링크: 줄 높이는 그대로 두고 누르는 자리만 위아래로 넓힌다 */
   padding-block: 13px;
@@ -18,13 +18,6 @@
   .titleLink:hover {
     text-decoration-color: currentColor;
   }
-}
-.titleArrow {
-  display: inline-block;
-  margin-left: 0.25em;
-  font-family: var(--font-num);
-  font-weight: 500;
-  color: var(--ink-500);
 }
 
 /* 이야기 섹션 머리 한 줄을 문장마다 끊는다 (낱말 중간 '칸 / 하나가' 처럼 꺾이지 않게). 폰은 이어서 */
@@ -99,9 +92,14 @@
 .upTime {
   font-weight: 600;
 }
+/* 시간과 장소 사이: 가운뎃점 대신 1px 세로 괘선 (hallmark 63) */
 .upDot {
-  margin-inline: 6px;
-  color: var(--ink-500);
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin-inline: 10px;
+  background: var(--line-strong);
+  vertical-align: -0.1em;
 }
 .upNoVenue {
   color: var(--ink-500);
@@ -206,9 +204,14 @@
 .tallyItem {
   white-space: nowrap;
 }
+/* 숫자 사이: 가운뎃점 대신 1px 세로 괘선 (hallmark 63) */
 .tallySep {
-  margin-inline: 10px;
-  color: var(--ink-500);
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin-inline: 12px;
+  background: var(--line-strong);
+  vertical-align: -0.1em;
 }
 .tallyValue {
   font-weight: 600;
@@ -270,6 +273,10 @@
   letter-spacing: 0;
   color: var(--ink-700);
 }
+.genRange {
+  margin-left: 4px;
+  color: var(--ink-500);
+}
 .genSummary {
   max-width: 38em;
   font: var(--t-lead);
@@ -293,9 +300,7 @@
   list-style: none;
 }
 .genPhoto {
-  display: grid;
-  gap: 8px;
-  margin: 0;
+  min-width: 0;
 }
 .genPhoto img {
   display: block;
@@ -305,10 +310,6 @@
   object-fit: cover;
   border-radius: var(--r-card);
   background: var(--field);
-}
-.genPhoto figcaption {
-  font: 500 13px/20px var(--font-kr);
-  color: var(--ink-700);
 }
 
 /* ── 태블릿: 일정 줄은 시간 · 장소 · 종류를 이름 아래 한 줄로 ── */
@@ -460,9 +461,5 @@
   }
   .genPhoto img {
     border-radius: 12px;
-  }
-  .genPhoto figcaption {
-    font-size: 13px;
-    line-height: 18px;
   }
 }

@@ -314,8 +314,17 @@ describe('화면 문구 (콘텐츠 JSON · config · mock)', () => {
     expect(offenders(SPACED_PARTICLE)).toEqual([])
   })
 
-  it('날짜는 2026.08.18 · 2026.09.08–09.10 처럼 점으로 쓴다 (2026-08-18 · 09-08~09-10 금지)', () => {
+  it('날짜는 2026.08.18 · 2026.09.08~09.10 처럼 점으로 쓴다 (2026-08-18 · 09-08~09-10 금지)', () => {
     expect(offenders(/\d{4}-\d{2}|\b\d{2}-\d{2}\b/)).toEqual([])
+  })
+
+  it('가운뎃점으로 이은 정보 줄이 없다 (hallmark 63: 두 개부터 금지, 하나는 이름표 · 출처 줄만)', () => {
+    // note 는 파일 설명이라 화면에 나오지 않는다
+    expect(offenders(/·[^·]*·/).filter((x) => !/^[\w.]+\.json\.note: /.test(x))).toEqual([])
+  })
+
+  it('기간 · 범위는 물결표로 쓴다 (줄표 – — 금지, hallmark 19)', () => {
+    expect(offenders(/[–—]/)).toEqual([])
   })
 
   it('같은 것을 한 이름으로 부른다', () => {

@@ -6,6 +6,7 @@ import { CHAPTER } from '@/content'
 import { GLOSSARY } from '@/content/glossary'
 import { useProjects, useSeminars } from '@/data/queries'
 import { PageHero } from '@/features/pagehero/PageHero'
+import { useChanged } from '@/hooks/useChanged'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { SeminarsView } from './archive/SeminarsView'
 import { useHashScroll } from './community/useHashScroll'
@@ -25,7 +26,7 @@ const PANEL_ID = 'archive-panel'
 /** 머리 아래 검정 띠 카드: 지금 기수 G-Sprint (확인된 숫자만) → 아래 G-Sprint 띠로 */
 const SPRINT_OK = CHAPTER.sprint?.verified ? CHAPTER.sprint : null
 const BANNER = SPRINT_OK
-  ? { kicker: `4기 ${GLOSSARY['g-sprint'].term} · ${GLOSSARY['g-sprint'].short}`, title: `${SPRINT_OK.teams}팀 ${SPRINT_OK.members}명이 ${SPRINT.demoDay.slice(5).replace('-', '.')} 데모데이를 향해 만들고 있습니다`, to: '/archive#now' }
+  ? { title: `4기 ${GLOSSARY['g-sprint'].term}에서 ${SPRINT_OK.teams}팀 ${SPRINT_OK.members}명이 ${SPRINT.demoDay.slice(5).replace('-', '.')} 데모데이를 향해 만들고 있습니다`, to: '/archive#now' }
   : undefined
 const viewTabId = (v: View) => `archive-view-${v}`
 
@@ -41,6 +42,7 @@ export function ArchivePage() {
   usePageTitle(PLACE_BY_ID.projects.label)
   const [params, setParams] = useSearchParams()
   const view: View = params.get(VIEW_PARAM) === 'seminars' && !params.get(SHEET_PARAM) ? 'seminars' : 'projects'
+  const viewMoved = useChanged(view) // 보기를 바꿨을 때만 페이드
   const projects = useProjects()
   const seminars = useSeminars()
   const projectCount = projects.data?.filter((p) => p.status === 'done').length
@@ -96,7 +98,7 @@ export function ArchivePage() {
         })}
       </div>
 
-      <div id={PANEL_ID} role="tabpanel" aria-labelledby={viewTabId(view)}>
+      <div key={view} id={PANEL_ID} role="tabpanel" aria-labelledby={viewTabId(view)} className={viewMoved ? 'fade-in' : undefined}>
         {view === 'projects' ? <ProjectsView /> : <SeminarsView />}
       </div>
     </div>

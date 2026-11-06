@@ -173,7 +173,7 @@ describe('페이지 끝 출처 한 줄', () => {
         'https://gdg.community.dev/events/a/',
         ['https://gdg.community.dev/events/b/', 'https://forms.gle/abc'],
         '4기 운영 계획',
-        '인스타그램 4기 모집 게시물 (2026.09.03) · D-day 게시물 (2026.09.08–09.10)',
+        '인스타그램 4기 모집 게시물 (2026.09.03) · D-day 게시물 (2026.09.08~09.10)',
         'https://www.instagram.com/gdg.donggukuniv/',
         '4기 Organizer 이도윤 확인 (2026.10.17): 1기 …',
         'src/content/projects.json stack',
@@ -193,9 +193,9 @@ describe('페이지 끝 출처 한 줄', () => {
 })
 
 describe('기수별 기록 (시안 C 홈 기록에서 옮김)', () => {
-  it('기간: 시작–끝, 지금 기수는 끝을 비우고, 모르면 빈 글자', () => {
-    expect(generationPeriod({ start: '2023-09', end: '2024-07' })).toBe('2023.09–2024.07')
-    expect(generationPeriod({ start: '2026-09' })).toBe('2026.09–')
+  it('기간: 시작~끝, 지금 기수는 끝을 비우고, 모르면 빈 글자', () => {
+    expect(generationPeriod({ start: '2023-09', end: '2024-07' })).toBe('2023.09~2024.07')
+    expect(generationPeriod({ start: '2026-09' })).toBe('2026.09~')
     expect(generationPeriod({})).toBe('')
   })
 
