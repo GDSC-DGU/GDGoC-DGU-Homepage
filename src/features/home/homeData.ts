@@ -126,8 +126,18 @@ export function pickFaqs<T extends { id: string; source?: string }>(faqs: readon
   return [...picked, ...sourced.filter((f) => !picked.includes(f))].slice(0, n)
 }
 
-/** 멤버 회고에서 지금 보일 사람: 접혀 있으면 앞의 first 명, 펼치면 전부 */
-export const voicesShown = <T,>(all: readonly T[], open: boolean, first: number): readonly T[] => (open ? all : all.slice(0, first))
+/** 홈 멤버 회고에 싣는 사람 수: 3 × 3 (4기 Organizer 2026-11-06) */
+export const VOICE_LIMIT = 9
+
+/**
+ * 멤버 회고를 n 줄기로 나눈다: i 번째 사람은 i % n 줄기 (넓은 화면에서 왼쪽 → 오른쪽, 위 → 아래로 읽힌다).
+ * index 는 원래 순서 (폰에서 한 줄로 펼 때 order 로 쓴다)
+ */
+export function voiceColumns<T>(all: readonly T[], n: number): { item: T; index: number }[][] {
+  const cols: { item: T; index: number }[][] = Array.from({ length: n }, () => [])
+  all.forEach((item, index) => cols[index % n].push({ item, index }))
+  return cols
+}
 
 /** 홈에 실을 수 있는 '사람' 한 줄: 공개 동의 기록이 있고 말이 비어 있지 않은 것만 */
 export const isShowableVoice = (v: { quote: string; name: string; consent?: { date: string; by: string } | null }) =>

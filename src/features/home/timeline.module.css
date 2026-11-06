@@ -1,104 +1,167 @@
 /*
- * 홈 '{n}기의 1년': 가로 한 줄 다섯 단계 (AI 티 점검 2026-11-05).
- * 단계마다 위 2px 줄 + 왼쪽 끝 점. 시작한 단계는 먹색, 남은 단계는 옅은 줄 · 빈 점. 오늘 걸린 단계 위에만 '지금'.
- * 폰(≤767): 왼쪽 세로줄 + 단계 목록.
+ * 홈 '{n}기의 1년' (4기 Figma 시안 2026-11, 4기 Organizer 2026-11-06 에 되돌림).
+ * 가운데 주황(기수색 --gen) 4px 세로줄 + 16px 점. 줄마다 [왼쪽 | 점 | 오른쪽], 단계는 줄 쪽으로 붙여 쓴다.
+ * 지나간 단계 점은 채우고, 남은 단계 점은 흰 바탕에 주황 테두리. 오늘 걸린 단계 위에 주황 '지금' 이름표.
+ * 폰(≤767): 줄을 왼쪽으로, 단계와 그림을 모두 오른쪽 한 칸에 (단계 → 그림).
  */
+.section {
+  --story-head-gap: 40px;
+}
 .line {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  margin: 0;
-  padding: 36px 0 0;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 40px 0 48px;
   list-style: none;
 }
-.step {
+.line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--gen);
+  transform: translateX(-50%);
+}
+.row {
   position: relative;
-  min-width: 0;
-  padding: 28px 24px 0 0;
-  border-top: 2px solid var(--line-strong);
-}
-.step[data-done] {
-  border-top-color: var(--ink-900);
-}
-/* 마지막 단계(수료) 뒤로는 줄을 잇지 않는다: 점에서 끝난다 */
-.step:last-child {
-  border-top-color: transparent;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
+  align-items: center;
+  min-height: 112px;
 }
 .dot {
-  position: absolute;
-  top: -8px;
-  left: 0;
-  width: 14px;
-  height: 14px;
-  border: 2px solid var(--line-strong);
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  width: 16px;
+  height: 16px;
+  border: 3px solid var(--gen);
   border-radius: 50%;
   background: var(--paper);
+  box-shadow: 0 0 0 4px var(--paper);
 }
-.step[data-done] .dot {
-  border-color: var(--ink-900);
-  background: var(--ink-900);
+.row[data-done] .dot {
+  background: var(--gen);
 }
-.step[data-now] .dot {
-  background: var(--paper);
-  box-shadow: inset 0 0 0 3px var(--ink-900);
+.row[data-now] .dot {
+  width: 22px;
+  height: 22px;
+  box-shadow:
+    0 0 0 4px var(--paper),
+    0 0 0 8px rgba(255, 99, 9, 0.2);
+}
+.left {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+}
+.right {
+  display: flex;
+  justify-content: flex-start;
+}
+.step {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+.left .step {
+  justify-items: end;
 }
 .now {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  font: 600 13px/20px var(--font-kr);
-  color: var(--ink-900);
+  margin-bottom: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--gen);
+  font: 700 13px/20px var(--font-kr);
+  color: var(--on-gen);
 }
 .title {
-  font: var(--t-h3);
-  letter-spacing: -0.015em;
+  font: 700 24px/32px var(--font-kr);
+  letter-spacing: -0.01em;
   color: var(--ink-900);
   word-break: keep-all;
 }
 .when {
-  margin-top: 6px;
-  font: 400 15px/23px var(--font-kr);
-  color: var(--ink-700);
-  word-break: keep-all;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.art {
+  display: block;
+  width: 168px;
+  height: auto;
+  max-width: 100%;
+  margin-block: 8px;
+}
+/* 시안처럼 그림은 줄에서 조금 떨어뜨린다 */
+.right .art {
+  margin-left: clamp(16px, 8vw, 96px);
+}
+.left .art {
+  margin-right: clamp(8px, 4vw, 48px);
+}
+.art[data-art='coding'] {
+  width: 184px;
 }
 
 @media (max-width: 767px) {
   .line {
-    grid-template-columns: minmax(0, 1fr);
-    padding-top: 0;
+    padding: 24px 0 32px;
   }
-  .step {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: baseline;
-    column-gap: 10px;
-    padding: 0 0 28px 28px;
-    border-top: 0;
-    border-left: 2px solid var(--line-strong);
+  .line::before {
+    left: 10px;
+    transform: none;
   }
-  .title {
-    grid-area: 1 / 1;
-  }
-  .when {
-    grid-column: 1 / -1;
-  }
-  .step:last-child {
-    padding-bottom: 0;
-    border-left-color: transparent;
-  }
-  .step[data-done] {
-    border-left-color: var(--ink-900);
+  .row {
+    grid-template-columns: 24px minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: start;
+    min-height: 0;
+    padding: 12px 0;
   }
   .dot {
-    top: 4px;
-    left: -8px;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    margin: 8px 0 0 4px;
   }
-  /* 폰: '지금' 은 단계 이름 오른쪽에 */
-  .now {
-    position: static;
-    grid-area: 1 / 2;
+  .row[data-now] .dot {
+    margin: 5px 0 0 1px;
   }
-  .when {
-    font-size: 14px;
-    line-height: 22px;
+  .left,
+  .right {
+    grid-column: 2;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .left .step {
+    justify-items: start;
+  }
+  .row[data-side='left'] .left,
+  .row[data-side='right'] .right {
+    grid-row: 1;
+  }
+  .row[data-side='left'] .right,
+  .row[data-side='right'] .left {
+    grid-row: 2;
+  }
+  .left:empty,
+  .right:empty {
+    display: none;
+  }
+  .title {
+    font-size: 20px;
+    line-height: 28px;
+  }
+  .art,
+  .art[data-art='coding'] {
+    width: 128px;
+  }
+  .left .art,
+  .right .art {
+    margin: 8px 0 0;
   }
 }

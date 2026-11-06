@@ -23,6 +23,33 @@ export const REGULAR_SESSION = {
   faqId: 'when-sessions',
 } as const
 
+/** 정기 세션 일정을 채울 기간: 그 기수 첫 화요일 세션 날부터 이 날까지 (4기는 G-Sprint 데모데이까지. 겨울 일정은 정해지면) */
+export const REGULAR_UNTIL: Readonly<Record<number, string>> = { 4: '2026-12-29' }
+
+/**
+ * 매주 화요일 정기 세션을 일정에 채운다 (4기 Organizer 2026-11-06: 달력에 매주 화요일 모임이 보여야 한다).
+ * 그 기수의 첫 화요일 세션(공개 행사 페이지가 있는 세션)부터 REGULAR_UNTIL 까지 화요일마다 '정기 세션' 하나.
+ * 그날 다른 하루짜리 일정(특강 · 발표 · MT · 휴회 …)이 있으면 그 일정이 그날 모임이라 넣지 않는다.
+ * 여러 날에 걸친 기간(G-Sprint 팀별 개발 기간)은 그날 모임이 아니므로 정기 세션을 넣는다.
+ * 지난 기록(기수별 기록) · 검색에는 쓰지 않는다: 다가오는 일정 · 달력에만.
+ */
+export function withRegularSessions(events: readonly ScheduleEvent[], rule: { generation: number; weekday: number } = REGULAR_SESSION, until: string | undefined = REGULAR_UNTIL[rule.generation]): ScheduleEvent[] {
+  const mine = events.filter((e) => e.generation === rule.generation)
+  const first = mine.filter((e) => e.kind === 'session' && dow(e.date) === rule.weekday && !isPlanOnly(e)).sort((a, b) => a.date.localeCompare(b.date))[0]
+  if (!first || !until) return [...events]
+  const taken = new Set(mine.filter((e) => !isPeriod(e)).map((e) => e.date))
+  const added: ScheduleEvent[] = []
+  for (let d = first.date; d <= until; d = addDays(d, 7)) {
+    if (taken.has(d)) continue
+    added.push({ id: `regular-${rule.generation}-${d}`, date: d, title: '정기 세션', kind: 'session', place: 'community', generation: rule.generation, source: REGULAR_SOURCE })
+  }
+  return [...events, ...added]
+}
+
+/** 정기 세션으로 채운 일정의 출처 (isRegularFill 로 알아본다) */
+export const REGULAR_SOURCE = '4기 정기 세션 (매주 화요일 18:00, 4기 Organizer 2026.11.06)'
+export const isRegularFill = (e: Pick<ScheduleEvent, 'source'>) => e.source === REGULAR_SOURCE
+
 /** 여러 날에 걸친 기간인지 (G-Sprint 팀별 개발 기간 · 동지톤 등) */
 export const isPeriod = (e: Pick<ScheduleEvent, 'date' | 'endDate'>) => Boolean(e.endDate && e.endDate !== e.date)
 

@@ -1,5 +1,202 @@
 {
-  "note": "행사 사진. 얼굴이 보이는 사람 모두에게 웹 공개 동의를 받은 사진만 넣는다 (consent 가 없으면 화면에 나오지 않는다). 사진 파일은 public/photos/ 에 1600px 폭 webp 로. 고치는 법: docs/CONTENT.md '행사 사진'",
-  "updatedAt": "2026-11-05",
-  "photos": []
+  "note": "행사 사진. 얼굴이 보이는 사람이 있으면 공개 확인을 받은 사진만 넣는다 (consent 가 없으면 화면에 나오지 않는다). 지금 사진은 모두 1기(2023–24) 행사, 출처는 챕터 구글 드라이브 '04_1기 (2023-24)/사진·영상' (4기 Organizer 이도윤 공개 확인 2026-11-06). 이름 · 연락처가 보이는 슬라이드 사진은 넣지 않는다. 사진 파일은 public/photos/ 에 1600px 폭 webp 로. 고치는 법: docs/CONTENT.md '행사 사진'",
+  "updatedAt": "2026-11-06",
+  "photos": [
+    {
+      "id": "2024-05-16-open-seminar-group",
+      "src": "photos/2024-05-16-open-seminar-group.webp",
+      "alt": "2차 오픈세미나에서 Open Seminar 현수막을 들고 모인 멤버 40여 명",
+      "width": 1600,
+      "height": 900,
+      "date": "2024-05-16",
+      "event": "2차 오픈세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-09-15-welcome-group",
+      "src": "photos/2023-09-15-welcome-group.webp",
+      "alt": "1기 웰컴세션에서 손가락 브이를 하며 함께 찍은 멤버 40여 명",
+      "width": 1600,
+      "height": 900,
+      "date": "2023-09-15",
+      "event": "1기 웰컴세션",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-12-22-closing-group",
+      "src": "photos/2023-12-22-closing-group.webp",
+      "alt": "2학기 종강총회를 마치고 강의실 앞쪽에 모여 찍은 단체 사진",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-12-22",
+      "event": "2학기 종강총회",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-11-24-part-seminar",
+      "src": "photos/2023-11-24-part-seminar.webp",
+      "alt": "1차 파트별세미나에서 테이블에 둘러앉은 멤버 20여 명",
+      "width": 1600,
+      "height": 1067,
+      "date": "2023-11-24",
+      "event": "1차 파트별세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-09-15-welcome-room",
+      "src": "photos/2023-09-15-welcome-room.webp",
+      "alt": "GDSC DGU 1st Welcome Session 화면을 띄운 강의실에 테이블마다 앉은 멤버들",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-09-15",
+      "event": "1기 웰컴세션",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-10-06-camping-seminar-2",
+      "src": "photos/2023-10-06-camping-seminar-2.webp",
+      "alt": "GDSC DGU 2nd Seminar 화면 앞에서 발표하는 멤버와 노트북을 편 청중",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-10-06",
+      "event": "2차 캠핑세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-09-22-camping-seminar-1",
+      "src": "photos/2023-09-22-camping-seminar-1.webp",
+      "alt": "README.pdf 슬라이드 앞에서 마이크를 들고 발표하는 멤버",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-09-22",
+      "event": "1차 캠핑세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-10-06-camping-seminar-2-talk",
+      "src": "photos/2023-10-06-camping-seminar-2-talk.webp",
+      "alt": "조건부 확률 수식 슬라이드를 가리키며 발표하는 멤버",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-10-06",
+      "event": "2차 캠핑세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-12-22-closing-teams",
+      "src": "photos/2023-12-22-closing-teams.webp",
+      "alt": "종강총회에서 포스트잇을 두고 이야기하는 멤버 네 명",
+      "width": 1440,
+      "height": 1081,
+      "date": "2023-12-22",
+      "event": "2학기 종강총회",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-12-22-closing-room",
+      "src": "photos/2023-12-22-closing-room.webp",
+      "alt": "넓은 강의실에서 테이블마다 팀을 이뤄 이야기하는 멤버들",
+      "width": 1440,
+      "height": 1081,
+      "date": "2023-12-22",
+      "event": "2학기 종강총회",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-12-22-closing-sharing",
+      "src": "photos/2023-12-22-closing-sharing.webp",
+      "alt": "External Sharing 슬라이드 앞에서 활동을 나누는 코어 멤버",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-12-22",
+      "event": "2학기 종강총회",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-12-01-camping-seminar-5",
+      "src": "photos/2023-12-01-camping-seminar-5.webp",
+      "alt": "화생공 VS 인공지능 슬라이드를 띄운 무대에서 발표하는 멤버",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-12-01",
+      "event": "5차 캠핑세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2023-12-01-camping-seminar-5-hall",
+      "src": "photos/2023-12-01-camping-seminar-5-hall.webp",
+      "alt": "시큐어 코딩 발표를 듣는 멤버들로 가득 찬 강의실 뒤편",
+      "width": 1600,
+      "height": 1200,
+      "date": "2023-12-01",
+      "event": "5차 캠핑세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    },
+    {
+      "id": "2024-05-16-open-seminar-talk",
+      "src": "photos/2024-05-16-open-seminar-talk.webp",
+      "alt": "MVVM 구조도 슬라이드 앞에서 발표하는 멤버",
+      "width": 1600,
+      "height": 900,
+      "date": "2024-05-16",
+      "event": "2차 오픈세미나",
+      "generation": 1,
+      "consent": {
+        "date": "2026-11-06",
+        "by": "4기 Organizer 이도윤 (공개 확인)"
+      }
+    }
+  ]
 }

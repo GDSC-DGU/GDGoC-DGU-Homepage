@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { FAQS, PROJECTS, PUBLIC_PROJECTS, isPublicProject } from '@/content'
 import { BAND, CLOSING, FEATURED_PROJECTS, HERO, PROJECTS_STORY, SPRINT_LINE, VOICES, voices, WAYS } from '@/content/story'
-import { isShowableVoice, projectCounts, restProjects, voicesShown } from './homeData'
+import { isShowableVoice, projectCounts, restProjects, voiceColumns, VOICE_LIMIT } from './homeData'
 
 /** 화면에 나오는 홈 문장 */
 const shown: { where: string; text: string }[] = [
@@ -152,11 +152,20 @@ describe('홈 문구 (content/story.ts)', () => {
     for (const v of voices) expect(isShowableVoice(v), v.id).toBe(true)
   })
 
-  it('멤버 회고: 한국어 제목, 끝맺음을 한 말투로 맞추지 않는다 (원문 그대로), 처음엔 세 사람', () => {
+  it('멤버 회고: 한국어 제목, 끝맺음을 한 말투로 맞추지 않는다 (원문 그대로), 아홉 사람 모두 굵은 한 줄이 있다', () => {
     expect(VOICES.title).toBe('멤버 회고')
     const endings = new Set(voices.map((v) => (v.quote.trim().endsWith('습니다.') ? '습니다' : 'other')))
     expect(endings.size).toBe(2)
-    expect(voicesShown(voices, false, 3)).toHaveLength(3)
-    expect(voicesShown(voices, true, 3)).toHaveLength(voices.length)
+    // 3 × 3 (4기 Organizer 2026-11-06): headline 이 없는 카드는 싣지 않는다
+    expect(voices).toHaveLength(VOICE_LIMIT)
+    for (const v of voices) expect(v.headline?.trim(), v.id).toBeTruthy()
+    expect(voices.map((v) => v.id)).not.toContain('retro-kim-gyuri')
+  })
+
+  it('멤버 회고 줄기: i 번째 사람은 i % 3 줄기, 줄기마다 세 사람', () => {
+    const cols = voiceColumns(voices, 3)
+    expect(cols.map((c) => c.length)).toEqual([3, 3, 3])
+    expect(cols[1].map((c) => c.index)).toEqual([1, 4, 7])
+    expect(cols.flat().map((c) => c.item)).toHaveLength(voices.length)
   })
 })

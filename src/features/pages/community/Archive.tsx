@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CHAPTER } from '@/content'
+import { CHAPTER, PHOTOS } from '@/content'
 import type { TermId } from '@/content/glossary'
 import type { Generation, ScheduleEvent } from '@/domain/types'
+import { assetUrl } from '@/features/pages/projects/exhibit'
 import { EventRow, SeriesRow } from '../EventRows'
 import { ExternalLink, StateLine, ToggleGroup } from '../PageParts'
 import { generationRange } from '../records'
@@ -14,6 +15,9 @@ import s from '../pages.module.css'
 import c from './community.module.css'
 
 const summaryKey = (n: number) => `summary:${n}`
+
+/** 기수별 기록 위에 놓는 행사 사진 수 (3 × 2) */
+const PHOTO_LIMIT = 6
 
 /**
  * 기수별 기록 (시안 E): 기수 버튼 하나 → 그 기수의 한 줄 요약 + 기록 목록.
@@ -56,6 +60,8 @@ export function Archive({
   }
 
   const events = past.filter((e) => e.generation === info.n)
+  // 그 기수 행사 사진 (content/photos.json): 목록만 이어지던 기록에 사람이 보이게 (4기 Organizer 2026-11-06). 여섯 장까지
+  const photos = PHOTOS.filter((p) => p.generation === info.n).slice(0, PHOTO_LIMIT)
   const { signature, routes, rows } = partitionGeneration(events)
   const mentions: Mention[] = [
     ...(info.summary ? [{ key: summaryKey(info.n), text: info.summary }] : []),
@@ -105,6 +111,20 @@ export function Archive({
             </p>
           )}
         </div>
+        {photos.length > 0 && (
+          <ul className={c.genPhotos} aria-label={`${info.n}기 행사 사진`}>
+            {photos.map((p) => (
+              <li key={p.id}>
+                <figure className={c.genPhoto}>
+                  <img src={p.src.startsWith('https://') ? p.src : assetUrl(p.src)} alt={p.alt} width={p.width} height={p.height} loading="lazy" decoding="async" />
+                  <figcaption>
+                    {p.event} · <time className="num" dateTime={p.date}>{p.date.replaceAll('-', '.')}</time>
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </ul>
+        )}
         {events.length === 0 ? (
           <p className={c.genEmpty}>
             gdg.community.dev에 공개된 {info.n}기 행사 기록은 없습니다. 이 기수가 남긴 프로젝트와 세미나는{' '}

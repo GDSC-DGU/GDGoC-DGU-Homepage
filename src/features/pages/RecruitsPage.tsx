@@ -6,7 +6,7 @@ import { recruitStatus, type RecruitStatus } from '@/content/recruitingStatus'
 import { useSchedule } from '@/data/queries'
 import { StorySection } from '@/features/common'
 import { Term } from '@/features/glossary/Term'
-import { PlaceHero } from '@/features/placehero/PlaceHero'
+import { PageHero } from '@/features/pagehero/PageHero'
 import { useToday } from '@/hooks/useToday'
 import { useHashScroll } from './community/useHashScroll'
 import { Section, StateLine } from './PageParts'
@@ -91,9 +91,8 @@ export function RecruitsPage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PlaceHero
-        place="recruits"
-        state={isOpen ? 'open' : 'closed'}
+      <PageHero
+        photoId="2024-05-16-open-seminar-group"
         title={
           view.titleSub ? (
             <>

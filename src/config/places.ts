@@ -48,13 +48,14 @@ export const PLACES: readonly Place[] = [
     path: '/teams',
     color: '#fbbc04',
     description: PROTOTYPE
-      ? '멤버끼리 스터디, 프로젝트, 공모전 팀원을 찾는 게시판입니다. 동아리 지원은 지원 안내에서 합니다.'
-      : '멤버끼리 스터디, 프로젝트, 공모전 팀원을 찾는 게시판입니다. 아직 준비 중이고, 동아리 지원은 지원 안내에서 합니다.',
+      ? '멤버끼리 스터디, 프로젝트, 공모전 팀원을 찾는 게시판입니다. 동아리 지원은 지원하기 페이지에서 합니다.'
+      : '멤버끼리 스터디, 프로젝트, 공모전 팀원을 찾는 게시판입니다. 아직 준비 중이고, 동아리 지원은 지원하기 페이지에서 합니다.',
     footprint: { x: 0.9, y: 9.7, w: 3.4, d: 3.4, h: 0.95, door: 'R', roof: 'arch', pinGap: 0.7 },
   },
   {
     id: 'recruits',
-    label: '지원 안내',
+    // '지원 안내' → '지원하기' (4기 Organizer 2026-11-06: 머리말에서 상자 단추로 따로 보인다)
+    label: '지원하기',
     sub: '5기 모집',
     path: '/recruits',
     color: '#34a853',
@@ -84,12 +85,11 @@ export const SOON_LABEL = '준비 중'
 export const navLabel = (id: PlaceId) => (id === 'about' ? '홈' : PLACE_BY_ID[id].label)
 
 /**
- * 넓은 화면 머리말 메뉴: 로고(= 홈) 오른쪽에 소개 · 아카이브 · 팀원 찾기 · 지원 안내 (4기 Organizer 2026-11-05).
- * 지원 안내는 모집 중일 때 '지원하기' 로 메뉴 줄 끝에. 폰 메뉴 시트 · 꼬리말 · 검색은 NAV_ORDER 를 그대로 쓴다.
+ * 넓은 화면 머리말 메뉴: 로고(= 홈) | 가운데 검색창 | 소개 · 아카이브 · 팀원 찾기 + 상자 단추 '지원하기' (4기 Organizer 2026-11-06).
+ * 지원하기(APPLY_PLACE)는 메뉴 줄이 아니라 끝의 먹색 상자 단추로 따로 그린다. 폰 메뉴 시트 · 꼬리말 · 검색은 NAV_ORDER 를 그대로 쓴다.
  */
-export const HEADER_NAV: readonly PlaceId[] = ['community', 'projects', 'teams', 'recruits']
-/** 모집 중일 때만 '지원하기' (모집 전 · 후에 행동 버튼처럼 보이면 지원 안내 페이지의 '아직 열리지 않았습니다'와 어긋난다: 전체 점검 2026-11-03) */
-export const headerLabel = (id: PlaceId, recruitingOpen = false) => (id === 'recruits' && recruitingOpen ? '지원하기' : navLabel(id))
+export const HEADER_NAV: readonly PlaceId[] = ['community', 'projects', 'teams']
+export const headerLabel = (id: PlaceId) => navLabel(id)
 
 /** 화면에 칠할 색. 소개 장소의 잉크색은 토큰을 따른다 */
 export const placeColor = (id: PlaceId) => (id === 'about' ? 'var(--ink)' : PLACE_BY_ID[id].color)

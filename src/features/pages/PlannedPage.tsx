@@ -6,7 +6,7 @@ import { SHOW_PLAN } from '@/config/site'
 import { CONTENT_UPDATED_AT } from '@/content'
 import type { PlaceId } from '@/domain/types'
 import { JoinStrip } from '@/features/common'
-import { PlaceHero } from '@/features/placehero/PlaceHero'
+import { PageHero } from '@/features/pagehero/PageHero'
 import { useToday } from '@/hooks/useToday'
 import { DetourLink } from './community/Signage'
 import { dateLabel } from './format'
@@ -108,13 +108,7 @@ export function PlannedPage({ id }: { id: PagePlanId }) {
   return (
     <div className={`container ${s.page}`}>
       {/* 이름 · 부제는 지도 장소(config/places.ts)와 같게: 메뉴 · 지도 이름표 · 이 페이지가 한 이름을 쓴다 */}
-      <PlaceHero
-        place={place}
-        state="construction"
-        title={PLACE_BY_ID[place].label}
-        lead={LEADS[id] ?? plan.lead}
-        meta={meta}
-      />
+      <PageHero title={PLACE_BY_ID[place].label} lead={LEADS[id] ?? plan.lead} meta={meta} photoId="2023-12-22-closing-teams" />
 
       {/* 개발 화면에서만: 팀 기획 메모 (JoinStrip 뒤에 두면 꼬리말 위에 흰 여백이 생겨 앞에 둔다) */}
       {SHOW_PLAN && <PlanNotes id={id} plan={plan} />}

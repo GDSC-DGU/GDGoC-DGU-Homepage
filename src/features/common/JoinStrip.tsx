@@ -65,7 +65,7 @@ export function JoinStrip({ variant = 'default', id = 'join', title, sub }: Join
                 <span className="visually-hidden">{primary.hidden}</span>
               </a>
               <Link className="btn-secondary" to={PLACE_BY_ID.recruits.path}>
-                {PLACE_BY_ID.recruits.label} 보기
+                지원 방법 보기
               </Link>
             </div>
           </div>

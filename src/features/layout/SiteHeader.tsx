@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { HEADER_NAV, PLACE_BY_ID, headerLabel } from '@/config/places'
+import { APPLY_PLACE, HEADER_NAV, PLACE_BY_ID, headerLabel } from '@/config/places'
 import { recruitStatus } from '@/content/recruitingStatus'
 import { useToday } from '@/hooks/useToday'
 import { useCampusActions } from '@/state/useCampus'
@@ -25,9 +25,9 @@ const LOGO = { w: 280, h: 137 } as const
 
 /**
  * 모든 페이지 공통 머리말 (4기 Figma 시안 2026-11): 80px 흰 띠(폰 64), 위에 붙어 있다.
- * 왼쪽 로고(= 홈, 글자 없이 로고만: 4기 Organizer 2026-11-05) · 오른쪽 메뉴 넷(소개 · 아카이브 · 팀원 찾기 · 지원 안내). 지금 메뉴는 먹색 글자 + 먹색 밑줄.
+ * 왼쪽 로고(= 홈, 글자 없이 로고만: 4기 Organizer 2026-11-05) · 가운데 검색창 · 오른쪽 메뉴 셋(소개 · 아카이브 · 팀원 찾기) + 먹색 상자 '지원하기'. 지금 메뉴는 먹색 글자 + 먹색 밑줄.
  * 메뉴에 마우스를 올리면 지도에서 같은 건물이 올라온다 (메뉴 = 지도).
- * 검색은 넓은 화면 오른쪽 돋보기 단추(4기 Organizer 2026-11-05) · Ctrl/⌘ + K · 폰 메뉴 시트에서. 폰(900px 이하)은 이름 · 메뉴 버튼 한 줄, 메뉴는 전체 화면 시트로 연다.
+ * 검색은 넓은 화면 가운데 검색창(4기 Organizer 2026-11-06) · Ctrl/⌘ + K · 폰 메뉴 시트에서. 폰(900px 이하)은 이름 · 메뉴 버튼 한 줄, 메뉴는 전체 화면 시트로 연다.
  */
 export function SiteHeader() {
   const { hover } = useCampusActions()
@@ -70,6 +70,25 @@ export function SiteHeader() {
             <img className={s.brandLogo} src={`${import.meta.env.BASE_URL}brand/gdg-dgu-logo.png`} alt="" width={LOGO.w} height={LOGO.h} />
             <span className="visually-hidden">GDGoC DGU 홈</span>
           </Link>
+          {/* 가운데 검색창 (링커리어처럼: 4기 Organizer 2026-11-06). 누르면 검색 창이 열린다. 폰에서는 메뉴 시트 안에 */}
+          <button
+            ref={searchBtnRef}
+            type="button"
+            className={s.searchBox}
+            aria-haspopup="dialog"
+            aria-expanded={searchOpen}
+            aria-keyshortcuts="Control+K Meta+K"
+            onClick={() => {
+              setMenuAt(null)
+              setSearchAt(here)
+            }}
+          >
+            <span className={s.searchHint}>세미나, 프로젝트, 행사 검색</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6.5" />
+              <path d="M16 16l4.5 4.5" />
+            </svg>
+          </button>
           <nav className={s.nav} aria-label="주요 메뉴">
             <ul>
               {HEADER_NAV.map((id) => (
@@ -83,32 +102,28 @@ export function SiteHeader() {
                     onBlur={() => hover(null)}
                   >
                     {/* 메뉴는 이름만 ('준비 중' 표시는 그 페이지 머리에서) */}
-                    {headerLabel(id, recruitingOpen)}
+                    {headerLabel(id)}
                   </NavLink>
                 </li>
               ))}
+              {/* 지원하기: 메뉴 끝의 먹색 상자 단추 (다른 동아리 사이트처럼 지원을 따로 눈에 띄게: 4기 Organizer 2026-11-06) */}
+              <li>
+                <NavLink
+                  to={PLACE_BY_ID[APPLY_PLACE].path}
+                  className={({ isActive }) => `${s.applyCta} ${isActive ? s.applyCtaActive : ''}`}
+                  onMouseEnter={() => hover(APPLY_PLACE)}
+                  onMouseLeave={() => hover(null)}
+                  onFocus={() => hover(APPLY_PLACE)}
+                  onBlur={() => hover(null)}
+                >
+                  {recruitingOpen && <span className={s.applyDot} aria-hidden="true" />}
+                  {PLACE_BY_ID[APPLY_PLACE].label}
+                  {recruitingOpen && <span className="visually-hidden"> (모집 중)</span>}
+                </NavLink>
+              </li>
             </ul>
           </nav>
           <div className={s.tools}>
-            {/* 넓은 화면: 메뉴 오른쪽 돋보기 (폰은 메뉴 시트 안에 검색이 있다) */}
-            <button
-              ref={searchBtnRef}
-              type="button"
-              className={`${s.iconBtn} ${s.searchBtn}`}
-              aria-haspopup="dialog"
-              aria-expanded={searchOpen}
-              aria-keyshortcuts="Control+K Meta+K"
-              onClick={() => {
-                setMenuAt(null)
-                setSearchAt(here)
-              }}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="11" cy="11" r="6.5" />
-                <path d="M16 16l4.5 4.5" />
-              </svg>
-              <span className="visually-hidden">검색</span>
-            </button>
             <button ref={menuBtnRef} type="button" className={`${s.iconBtn} ${s.menuBtn}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuAt(here)}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M4 7h16M4 12h16M4 17h16" />

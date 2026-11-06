@@ -5,21 +5,18 @@ import { CHAPTER, FAQS, GENERATIONS, PUBLIC_PROJECTS } from '@/content'
 import { withoutStalePlans } from '@/content/plan'
 import { useSchedule } from '@/data/queries'
 import type { ScheduleEvent } from '@/domain/types'
-import { PhotoStrip, StorySection } from '@/features/common'
-import { PlaceHero } from '@/features/placehero/PlaceHero'
+import { StorySection } from '@/features/common'
+import { PageHero } from '@/features/pagehero/PageHero'
 import { useToday } from '@/hooks/useToday'
 import { monthDay } from '@/lib/date'
 import { Archive } from './community/Archive'
-import { yearRows } from './community/heatmap'
 import { sortGenerations, tallies } from './community/history'
 import { OverviewToggle } from './community/OverviewToggle'
 import { explainedTerms, firstMentions, mentionKey } from './community/terms'
-import { REGULAR_SESSION, regularTime, weekState } from './community/thisWeek'
+import { REGULAR_SESSION, regularTime, withRegularSessions } from './community/thisWeek'
 import { Upcoming } from './community/Upcoming'
 import { useHashScroll } from './community/useHashScroll'
 import { WHO_TERMS, nameChange, whoCards, whoSpan } from './community/who'
-import { WeekBand } from './community/WeekBand'
-import { YearHeatmap } from './community/YearHeatmap'
 import { Section, StateLine } from './PageParts'
 import { pastEvents } from './records'
 import s from './pages.module.css'
@@ -43,10 +40,9 @@ const WHO = whoCards({ members: CHAPTER.members, sprint: CHAPTER.sprint, demoDay
 const withNums = (text: string) => text.split(/(\d+(?:\.\d+)*)/).map((part, i) => (i % 2 ? <span key={i} className="num">{part}</span> : part))
 
 /**
- * 소개 (/about, 예전 커뮤니티. 4기 Organizer 결정 2026-11-05): 건물 앞 머리 → 옅은 회색 '우리는'(몇 기째인지 · 활동 · 멤버 수)
- * → 먹색 '이번 주'(다음 모임 큰 표) → 다가오는 일정(참고, 촘촘한 목록)
- * → 옅은 회색 '세 기수의 1년'(행사 달력, 주장 '세 기수가 연 공개 행사 45번') → 기수별 기록(참고). 페이지 끝 지원 안내(JoinStrip)는 붙이지 않는다 (4기 시안 2026-11).
- * 면: 흰(머리) → 옅은 회색 → 먹색 → 흰 → 옅은 회색 → 흰 → 회색 꼬리말. 그룹 멤버 수는 '우리는' 에만 (기록 옆 숫자 줄에서는 뺀다).
+ * 소개 (/about, 예전 커뮤니티. 4기 Organizer 결정 2026-11-05 · 06): 제목 + 큰 행사 사진 → 옅은 회색 연혁(몇 기째인지 · 활동 · 멤버 수)
+ * → 다가오는 일정(매주 화요일 정기 세션 포함, 달력으로 보기) → 기수별 기록(사진이 있는 기수는 사진).
+ * 먹색 '이번 주' 전광판 띠와 행사 달력(히트맵)은 뺐다 (4기 Organizer 2026-11-06: 디자인이 혼자 동떨어지고, 달력은 다들 관심 없다).
  * 날짜가 지났는데 계획으로만 남은 일정은 처음부터 뺀다 (content/plan.ts).
  * 우리끼리 말은 화면에 처음 나오는 자리에서 한 번만 풀어 쓴다: 다가오는 일정 → 기수 요약 · 기록 순서.
  */
@@ -55,21 +51,19 @@ export function CommunityPage() {
   const today = useToday()
   const { data, isPending, isError, refetch } = useSchedule()
   const all = useMemo(() => withoutStalePlans(data ?? EMPTY, today), [data, today])
-  // 휴회(시험 기간 등)는 화면에 싣지 않는다 (4기 Organizer 2026-11-05: 쉬는 얘기는 브랜드에 쓸모없다).
-  // '이번 주' 계산(weekState)만 휴회를 알아야 다음 모임을 고른다
+  // 다가오는 일정 · 달력: 매주 화요일 정기 세션을 채우고(휴회 · 다른 일정이 있는 화요일은 빼고) 휴회는 싣지 않는다
+  // (4기 Organizer 2026-11-05 · 06: 쉬는 얘기는 빼고, 달력에는 매주 화요일 모임이 보여야 한다). 지난 기록에는 채운 세션을 넣지 않는다
   const events = useMemo(() => all.filter((e) => e.kind !== 'rest'), [all])
+  const shown = useMemo(() => withRegularSessions(all).filter((e) => e.kind !== 'rest'), [all])
   const ready = !isPending && !isError
   const past = useMemo(() => pastEvents(events, today), [events, today])
   const ahead = useMemo(
-    () => events.filter((e) => (e.endDate ?? e.date) >= today).sort((a, b) => a.date.localeCompare(b.date) || a.title.localeCompare(b.title, 'ko')),
-    [events, today],
+    () => shown.filter((e) => (e.endDate ?? e.date) >= today).sort((a, b) => a.date.localeCompare(b.date) || a.title.localeCompare(b.title, 'ko')),
+    [shown, today],
   )
-  const week = useMemo(() => weekState(all, today), [all, today])
   // G-Sprint · 동홍동락은 위 '우리는' 에서 풀었으므로 일정 · 기록에서는 다시 풀지 않는다
   const lineTerms = useMemo(() => firstMentions(ahead.map((e) => ({ key: mentionKey.line(e), text: e.title })), WHO_TERMS), [ahead])
   const explainedAbove = useMemo(() => explainedTerms(lineTerms, WHO_TERMS), [lineTerms])
-  const year = useMemo(() => yearRows(GENS, events, today), [events, today])
-  const held = year.reduce((n, r) => n + r.past, 0)
   // 기록 섹션의 숫자 글줄: 지난 행사 수는 달력 제목이, 멤버 수는 '우리는' 이 말하므로 여기서는 프로젝트만
   const tally = tallies(undefined, 0, PUBLIC_PROJECTS.length)
   useHashScroll(ready)
@@ -77,16 +71,14 @@ export function CommunityPage() {
   const loading = isPending && <StateLine>일정을 불러오는 중입니다.</StateLine>
   const failed = isError && <StateLine onRetry={() => void refetch()}>일정을 불러오지 못했습니다.</StateLine>
 
-  const { next } = week
 
 
   return (
     <div className={`container ${s.page}`}>
-      <PlaceHero
-        place="community"
+      <PageHero
         title={PLACE_BY_ID.community.label}
         lead="동국대학교 학생들이 운영하는 Google 개발자 동아리입니다. 매주 화요일에 모이고, 학기마다 행사를 엽니다."
-        screen={next ? { date: next.date, title: next.title } : undefined}
+        photoId="2023-09-15-welcome-group"
       />
 
       <StorySection
@@ -122,7 +114,6 @@ export function CommunityPage() {
         </dl>
       </StorySection>
 
-      {loading || failed || <WeekBand week={week} timeOf={timeOf} regular={Boolean(sessionFaq)} />}
 
       <Section id="upcoming" title="다가오는 일정">
         {loading ||
@@ -132,31 +123,11 @@ export function CommunityPage() {
           ) : (
             <>
               <Upcoming events={ahead} today={today} timeOf={timeOf} terms={lineTerms} />
-              <OverviewToggle events={events} today={today} />
+              <OverviewToggle events={shown} today={today} />
             </>
           ))}
       </Section>
 
-      {ready && year.length > 0 && (
-        <StorySection
-          id="year"
-          tone="field"
-          titleSize="h2"
-          title="행사 달력"
-          sub={
-            <>
-              <span className={c.subLine}>
-                <span className="num">{year[0].gen.n}</span>기부터 연 행사 <span className="num">{held}</span>개입니다.
-              </span>{' '}
-              <span className={c.subLine}>한 줄이 9월부터 다음 해 8월까지, 칸 하나가 하루입니다.</span>
-            </>
-          }
-        >
-          <YearHeatmap rows={year} events={events} today={today} />
-        </StorySection>
-      )}
-
-      <PhotoStrip id="about-photos" limit={8} />
 
       <Section
         id="records"

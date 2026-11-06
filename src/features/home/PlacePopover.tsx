@@ -12,6 +12,8 @@ import { useToday } from '@/hooks/useToday'
 import { iso } from '@/lib/iso'
 import { useCampus } from '@/state/useCampus'
 import { shortDay } from './homeData'
+import { placePhotos } from './placePhotos'
+import { assetUrl } from '@/features/pages/projects/exhibit'
 import { dockInset, placePopover, type PopoverPlacement, type Rect } from './popoverPosition'
 import { revealElement } from './scrollTo'
 import s from './popover.module.css'
@@ -58,6 +60,25 @@ function Row({ item, today }: { item: PreviewItem; today: string }) {
         {item.sample && <span className="sample-badge">예시</span>}
       </span>
     </li>
+  )
+}
+
+/** 미리보기 맨 위 행사 사진 (큰 한 장 + 작은 두 장). 꾸밈이 아니라 실제 행사라 alt 를 단다. 첫 장 아래 행사 이름 · 날짜 */
+function Photos({ id }: { id: PlaceId }) {
+  const photos = placePhotos(id)
+  if (photos.length === 0) return null
+  const [first] = photos
+  return (
+    <figure className={s.photos}>
+      <div className={s.photoGrid} data-n={photos.length}>
+        {photos.map((p) => (
+          <img key={p.id} src={p.src.startsWith('https://') ? p.src : assetUrl(p.src)} alt={p.alt} width={p.width} height={p.height} decoding="async" />
+        ))}
+      </div>
+      <figcaption className={s.photoCap}>
+        {first.event} · <span className="num">{first.date.slice(0, 7).replace('-', '.')}</span>
+      </figcaption>
+    </figure>
   )
 }
 
@@ -251,6 +272,7 @@ export function PlacePopover({ frameRef, sheet }: Props) {
           <span className="visually-hidden">미리보기 닫기</span>
         </button>
       </div>
+      {open && <Photos id={selected} />}
       <p className={s.desc}>{place.description}</p>
       <ul className={s.list} aria-label={about ? '한눈에' : '최근 기록'}>
         {open && <Latest id={selected} today={today} />}

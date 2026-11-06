@@ -1,11 +1,27 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { EVENTS, PHOTOS } from '@/content'
 import { useSeminars } from '@/data/queries'
 import type { Seminar } from '@/domain/types'
 import { weekday } from '@/lib/date'
 import { StateLine } from '../PageParts'
 import { GenTabs } from '../projects/GenTabs'
-import { matchesByGeneration, parseSeminarGen, periodLabel, seminarFileState, seminarGenerations, seminarGroup, seminarTabs, speakerCount, type SeminarGroup } from './seminars'
+import { assetUrl } from '../projects/exhibit'
+import {
+  matchesByGeneration,
+  parseSeminarGen,
+  periodLabel,
+  seminarDayLabel,
+  seminarDays,
+  seminarFileState,
+  seminarGenerations,
+  seminarGroup,
+  seminarTabs,
+  speakerInitial,
+  speakerTone,
+  type SeminarDay,
+  type SeminarGroup,
+} from './seminars'
 import a from './archive.module.css'
 
 const EMPTY: Seminar[] = []
@@ -34,26 +50,18 @@ function Highlight({ text, q }: { text: string; q: string }): ReactNode {
 }
 
 /**
- * 발표 한 줄: 날짜(같은 날이 이어지면 첫 줄에만) | 제목 · 발표자 | 자료.
- * 자료가 올라와 있으면 줄 전체가 링크(새 창으로 PDF 열기, PPT 받기). 아직이면 비워 둔다 (맨 위 안내 한 줄이 말한다).
+ * 발표 카드 한 장: 발표자 동그라미 | 제목 · 발표자 (+ 자료).
+ * 자료가 올라와 있으면 카드 전체가 링크(새 창으로 PDF 열기, PPT 받기). 아직이면 누르는 곳이 없다.
  */
-function TalkRow({ talk, showDate, q }: { talk: Seminar; showDate: boolean; q: string }) {
+function TalkCard({ talk, q }: { talk: Seminar; q: string }) {
   const state = seminarFileState(talk)
   const kind = kindOf(talk)
   const title = <Highlight text={talk.title} q={q} />
   return (
-    <li className={a.talk} data-first={showDate || undefined} data-file={state}>
-      <span className={a.talkDate} aria-hidden={!showDate || undefined}>
-        {showDate && (
-          <>
-            <time className="num" dateTime={talk.date}>
-              {dot(talk.date)}
-            </time>{' '}
-            <span className={a.talkWeek}>{weekday(talk.date)}</span>
-          </>
-        )}
+    <li className={a.talk} data-file={state}>
+      <span className={a.avatar} data-tone={speakerTone(talk.speaker)} aria-hidden="true">
+        {speakerInitial(talk.speaker)}
       </span>
-      {!showDate && <span className="visually-hidden">{dot(talk.date)}</span>}
       <span className={a.talkMain}>
         {state === 'ready' && talk.fileUrl ? (
           <a className={`${a.talkTitle} ${a.talkLink}`} href={talk.fileUrl} target="_blank" rel="noreferrer">
@@ -69,17 +77,45 @@ function TalkRow({ talk, showDate, q }: { talk: Seminar; showDate: boolean; q: s
         <span className={a.talkSpeaker}>
           <Highlight text={talk.speaker} q={q} />
         </span>
+        {state === 'ready' && (
+          <span className={a.talkFile} aria-hidden="true">
+            {kind === 'PPT' ? 'PPT 받기 ↓' : 'PDF 열기 ↗'}
+          </span>
+        )}
       </span>
-      {state === 'ready' && (
-        <span className={a.talkFile} aria-hidden="true">
-          {kind === 'PPT' ? 'PPT 받기 ↓' : 'PDF 열기 ↗'}
-        </span>
-      )}
     </li>
   )
 }
 
-/** 한 기수: 머리(3기 세미나 · 기간 · 개수) → 발표 전부 (게시판처럼 나열, 접지 않는다) */
+/** 하루 묶음: 날짜 칸(날짜 · 요일 · 그날 세션 이름 · 발표 수 · 그날 사진) | 그날 발표 카드 */
+function DayBlock({ day, generation, q }: { day: SeminarDay; generation: number; q: string }) {
+  const label = seminarDayLabel(day.date, generation, EVENTS, PHOTOS)
+  const photo = PHOTOS.find((p) => p.date === day.date && p.generation === generation)
+  return (
+    <li className={a.day}>
+      <div className={a.dayHead}>
+        <p className={a.dayDate}>
+          <time className="num" dateTime={day.date}>
+            {dot(day.date)}
+          </time>{' '}
+          <span className={a.dayWeek}>{weekday(day.date)}</span>
+        </p>
+        {label && <p className={a.dayName}>{label}</p>}
+        <p className={a.dayCount}>
+          발표 <span className="num">{day.talks.length}</span>개
+        </p>
+        {photo && <img className={a.dayPhoto} src={photo.src.startsWith('https://') ? photo.src : assetUrl(photo.src)} alt={photo.alt} width={photo.width} height={photo.height} loading="lazy" decoding="async" />}
+      </div>
+      <ul className={a.talks}>
+        {day.talks.map((t) => (
+          <TalkCard key={t.id} talk={t} q={q} />
+        ))}
+      </ul>
+    </li>
+  )
+}
+
+/** 한 기수: 머리(3기 세미나 · 기간 · 개수) → 날짜별 묶음 전부 (접지 않는다) */
 function GenGroup({ group, q }: { group: SeminarGroup; q: string }) {
   const headId = `seminars-${group.generation}`
   const items = group.items
@@ -102,9 +138,9 @@ function GenGroup({ group, q }: { group: SeminarGroup; q: string }) {
           )}
         </p>
       </header>
-      <ol className={a.talks}>
-        {items.map((t, i) => (
-          <TalkRow key={t.id} talk={t} showDate={i === 0 || items[i - 1].date !== t.date} q={q} />
+      <ol className={a.days}>
+        {seminarDays(items).map((d) => (
+          <DayBlock key={d.date} day={d} generation={group.generation} q={q} />
         ))}
       </ol>
     </section>
@@ -112,7 +148,8 @@ function GenGroup({ group, q }: { group: SeminarGroup; q: string }) {
 }
 
 /**
- * 아카이브 '세미나' 보기: 요약 한 줄 → 기수 탭(프로젝트 보기와 같은 모양, 3기 · 2기 · 1기) · 찾기 → 고른 기수의 발표 전부.
+ * 아카이브 '세미나' 보기: 기수 탭(프로젝트 보기와 같은 모양, 3기 · 2기 · 1기) · 찾기 → 고른 기수의 발표 전부를 날짜별 카드로.
+ * 맨 위 '1–3기 세미나 발표 104개 · 발표자 85명' 요약 줄은 뺐다 (4기 Organizer 2026-11-06: 프로젝트처럼 바로 기수 탭).
  * 발표 자료(PDF)는 백엔드가 R2 에 올린 주소(fileUrl)가 있을 때만 줄을 눌러 연다. 없으면 '준비 중'.
  */
 export function SeminarsView() {
@@ -160,10 +197,6 @@ export function SeminarsView() {
       <h2 id="seminars-title" className="visually-hidden">
         세미나 발표 {list.length}개
       </h2>
-      <p className={a.summary}>
-        <span className="num">{gens.length > 1 ? `${gens[gens.length - 1]}–${gens[0]}` : gens[0]}</span>기 세미나 발표 <span className="num">{list.length}</span>개 · 발표자{' '}
-        <span className="num">{speakerCount(list)}</span>명
-      </p>
       {/* 자료가 하나라도 올라온 뒤에만 (아직 올리지 않았는데 '올리고 있다' 고 하지 않는다: 4기 Organizer 2026-11-05) */}
       {ready > 0 && pending > 0 && <p className={a.fileNote}>자료가 올라온 발표는 눌러서 볼 수 있습니다.</p>}
 
