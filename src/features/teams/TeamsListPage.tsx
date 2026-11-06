@@ -4,7 +4,7 @@ import { PLACE_BY_ID } from '@/config/places'
 import { CONTENT_UPDATED_AT } from '@/content'
 import { DetourLink } from '@/features/pages/community/Signage'
 import { dateLabel } from '@/features/pages/format'
-import { PlaceHero } from '@/features/placehero/PlaceHero'
+import { PageHero } from '@/features/pagehero/PageHero'
 import { useToday } from '@/hooks/useToday'
 import { authorLabel, isNew, listSearch, parseListParams, periodLabel, timeAgo } from './data/rules'
 import { TEAMS_SAMPLE, TEAMS_SAMPLE_DATA, useTeamsList, useTeamsSummary } from './data/teamsRepo'
@@ -23,7 +23,7 @@ const LEAD = (
   <>
     멤버끼리 스터디, 프로젝트, 공모전 팀원을 구하는 게시판입니다. 동아리 멤버를 뽑는 곳은 아닙니다.
     <DetourLink to={PLACE_BY_ID.recruits.path} place="recruits">
-      동아리 지원은 지원 안내에서
+      동아리 지원은 지원하기 페이지에서
     </DetourLink>
   </>
 )
@@ -80,7 +80,7 @@ export function TeamsListPage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PlaceHero place="teams" state={TEAMS_SAMPLE ? 'construction' : 'open'} title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} />
+      <PageHero title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} photoId="2023-12-22-closing-teams" />
 
       <section id="board" ref={boardRef} className={`story paper ${s.board}`} aria-labelledby="board-title">
         <h2 id="board-title" className="visually-hidden">

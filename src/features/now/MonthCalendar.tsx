@@ -100,8 +100,10 @@ export function MonthCalendar({ id, events: all, today }: Props) {
                   {list.length > 0 && (
                     <ul className={s.cellEvents}>
                       {list.map((e) => {
-                        // 여러 날 일정은 첫날과 각 주의 첫 칸에만 이름을 쓰고, 나머지 날은 이어지는 띠만 (같은 이름이 한 달 내내 반복되지 않게)
-                        const cont = Boolean(e.endDate && e.endDate !== e.date && c.ymd !== e.date && i !== 0)
+                        // 여러 날 일정은 첫날(이 달에 이어서 시작하면 이 달 1일)에만 이름을 쓰고, 나머지 날은 이어지는 띠만.
+                        // 주마다 첫 칸(일요일)에 이름을 다시 쓰면 일요일 일정처럼 읽혔다 (4기 Organizer 2026-11-06)
+                        const labelDay = e.date < `${c.ymd.slice(0, 8)}01` ? `${c.ymd.slice(0, 8)}01` : e.date
+                        const cont = Boolean(e.endDate && e.endDate !== e.date && c.ymd !== labelDay)
                         return cont ? (
                           <li key={e.id} data-cont="">
                             <i className={s.contBar} style={{ '--c': placeColor(e.place) } as CSSProperties} aria-hidden="true" />

@@ -92,3 +92,58 @@ export function parseSeminarGen(v: string | null, gens: readonly number[]): numb
 /** 자료 상태: 열 수 있음 · 올리는 중(파일은 있는데 주소가 아직 없음) · 자료 없음 */
 export type SeminarFileState = 'ready' | 'pending' | 'none'
 export const seminarFileState = (s: Pick<Seminar, 'format' | 'fileUrl'>): SeminarFileState => (s.fileUrl ? 'ready' : s.format ? 'pending' : 'none')
+
+/** 같은 날 발표 묶음 (아카이브 세미나: 날짜 칸 | 그날 발표 카드). items 는 이미 최근 먼저 */
+export interface SeminarDay {
+  date: string
+  talks: Seminar[]
+}
+
+/** 최근 먼저 정렬된 발표를 날짜로 묶는다 (순서는 그대로) */
+export function seminarDays(items: readonly Seminar[]): SeminarDay[] {
+  const days: SeminarDay[] = []
+  for (const t of items) {
+    const last = days.at(-1)
+    if (last && last.date === t.date) last.talks.push(t)
+    else days.push({ date: t.date, talks: [t] })
+  }
+  return days
+}
+
+/**
+ * 그날 세션 이름: 같은 기수 · 같은 날의 일정(events.json) 이름, 없으면 같은 날 행사 사진(photos.json)의 행사 이름.
+ * 일정이 둘이면 '세미나' 가 든 이름을 먼저 (2026-01-16 Gemini Study Jams · Camping Seminar 5회 → Camping Seminar 5회). 없으면 null
+ */
+export function seminarDayLabel(
+  date: string,
+  generation: number,
+  events: readonly { date: string; title: string; kind: string; generation?: number }[],
+  photos: readonly { date: string; event: string; generation?: number }[] = [],
+): string | null {
+  const same = events.filter((e) => e.date === date && e.generation === generation && e.kind !== 'rest')
+  const named = same.find((e) => /seminar|세미나/i.test(e.title)) ?? same[0]
+  if (named) return named.title
+  return photos.find((p) => p.date === date && (p.generation === undefined || p.generation === generation))?.event ?? null
+}
+
+/** 발표자 동그라미 글자: 한글 세 글자 이름은 뒤 두 글자(이름), 그 밖에는 앞 한 글자 */
+export function speakerInitial(name: string): string {
+  const n = name.trim()
+  if (/^[가-힣]{3}$/.test(n)) return n.slice(1)
+  return n.slice(0, 1).toUpperCase()
+}
+
+/** 발표자 동그라미 색: 이름으로 정해지는 Google 네 색 중 하나 (같은 사람은 늘 같은 색) */
+export const SPEAKER_TONES = ['blue', 'red', 'yellow', 'green'] as const
+export function speakerTone(name: string): (typeof SPEAKER_TONES)[number] {
+  let h = 0
+  for (const ch of name) h = (h * 31 + (ch.codePointAt(0) ?? 0)) >>> 0
+  return SPEAKER_TONES[h % SPEAKER_TONES.length]
+}
+
+/** 홈 '멤버 세미나' 카드: 최근 기수 셋, 둘, 둘 (첫 장은 크게). 기수가 하나뿐이면 그 기수에서 일곱 */
+export function homeSeminarCards(list: readonly Seminar[]): Seminar[] {
+  const groups = latestByGeneration(list, 7)
+  if (groups.length === 1) return groups[0].items.slice(0, 7)
+  return groups.flatMap((g, i) => g.items.slice(0, i === 0 ? 3 : 2)).slice(0, 7)
+}

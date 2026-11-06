@@ -1,28 +1,65 @@
 /*
- * 홈 멤버 회고 (AI 티 점검 2026-11-05): 옅은 회색 면에 글만.
- * 넓은 화면 세 칸 · 그보다 좁으면 한 칸 (세 사람이 2 + 1 로 갈리지 않게). 한 사람마다 위 괘선 한 줄 → 굵은 한 문장 → 회고 → 이름 · 파트.
- * 상자 · 그림자 · 색 따옴표 · 이름 동그라미를 두지 않는다 (참고: 국내 IT 회사 채용 페이지의 구성원 이야기).
+ * 홈 멤버 회고 (4기 Organizer 2026-11-06: 괘선 목록이 너무 정적 → 카드 아홉 장).
+ * 옅은 회색 면 위 흰 카드. 넓은 화면은 세 줄기에 세 장씩, 가운데 줄기만 64px 내려 엇갈리게.
+ * 1 · 5 · 9번째(대각선)는 먹색 카드. 카드 왼쪽 위에 큰 따옴표 하나, 마우스를 올리면 4px 떠오른다.
+ * 태블릿 · 폰: 한 줄로 옆으로 넘긴다 (스크롤 스냅, 다음 카드가 조금 보이게).
  */
-.list {
+.cols {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 56px 48px;
+  align-items: start;
+  gap: 24px;
+}
+.cols:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: var(--r-card);
+}
+.col {
+  display: grid;
+  gap: 24px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
+.col:nth-child(2) {
+  margin-top: 64px;
+}
 .item {
   min-width: 0;
-  padding-top: 24px;
-  border-top: 2px solid var(--ink-900);
 }
-.figure {
+
+.card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   height: 100%;
   margin: 0;
+  padding: 32px 28px 28px;
+  border: 1px solid var(--field-line);
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--ink-900);
+  transition:
+    transform var(--dur-open) var(--ease),
+    box-shadow var(--dur-open) var(--ease);
+}
+.item:hover .card {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-float);
+}
+.item[data-dark] .card {
+  border-color: transparent;
+  background: var(--band-bg, #191b1f);
+  color: #fff;
+}
+
+.mark {
+  display: block;
+  height: 28px;
+  font: 700 56px/56px var(--font-num);
+  color: var(--gen);
 }
 .sampleTag {
   align-self: flex-start;
@@ -39,17 +76,20 @@
   margin: 0;
 }
 .headline {
-  font: var(--t-h3);
+  font: 700 19px/29px var(--font-kr);
   letter-spacing: -0.015em;
-  color: var(--ink-900);
+  color: inherit;
   text-wrap: pretty;
   word-break: keep-all;
 }
 .body {
-  font: 400 16px/27px var(--font-kr);
+  font: 400 15px/25px var(--font-kr);
   color: var(--ink-700);
   text-wrap: pretty;
   word-break: keep-all;
+}
+.item[data-dark] .body {
+  color: rgba(255, 255, 255, 0.78);
 }
 .who {
   display: flex;
@@ -57,46 +97,71 @@
   align-items: baseline;
   gap: 4px 10px;
   margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.item[data-dark] .who {
+  border-top-color: rgba(255, 255, 255, 0.18);
 }
 .name {
   font: 600 15px/22px var(--font-kr);
-  color: var(--ink-900);
+  color: inherit;
 }
 .meta {
   font: var(--t-meta);
   color: var(--ink-700);
 }
-.more {
-  display: flex;
-  justify-content: center;
-  margin-top: 56px;
+.item[data-dark] .meta {
+  color: rgba(255, 255, 255, 0.72);
 }
 
+/* ── 태블릿 · 폰: 한 줄로 옆으로 넘긴다. 줄기(ul)는 풀고 카드 순서는 li 의 order(1 → 9) ── */
 @media (max-width: 1023px) {
-  .list {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 48px;
+  .cols {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    margin-inline: calc(-1 * var(--side)) calc(-1 * var(--side-r));
+    padding: 4px var(--side-r) 12px var(--side);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--side);
+    scrollbar-width: none;
   }
-  .quote {
-    max-width: 40em;
+  .cols::-webkit-scrollbar {
+    display: none;
+  }
+  .col {
+    display: contents;
+  }
+  .col:nth-child(2) {
+    margin-top: 0;
+  }
+  .item {
+    flex: none;
+    width: min(360px, 82vw);
+    scroll-snap-align: start;
+  }
+  .item:hover .card {
+    transform: none;
+    box-shadow: none;
   }
 }
 @media (max-width: 767px) {
-  .list {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 40px;
+  .card {
+    padding: 28px 22px 22px;
+    gap: 16px;
   }
-  .item {
-    padding-top: 20px;
+  .headline {
+    font-size: 18px;
+    line-height: 27px;
   }
-  .figure {
-    gap: 20px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
   }
-  .body {
-    font-size: 15px;
-    line-height: 25px;
-  }
-  .more {
-    margin-top: 40px;
+  .item:hover .card {
+    transform: none;
   }
 }

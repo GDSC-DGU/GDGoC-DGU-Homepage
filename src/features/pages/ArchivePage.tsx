@@ -2,7 +2,7 @@ import { useRef, type KeyboardEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
 import { useProjects, useSeminars } from '@/data/queries'
-import { PlaceHero } from '@/features/placehero/PlaceHero'
+import { PageHero } from '@/features/pagehero/PageHero'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { SeminarsView } from './archive/SeminarsView'
 import { useHashScroll } from './community/useHashScroll'
@@ -58,7 +58,7 @@ export function ArchivePage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PlaceHero place="projects" title={PLACE_BY_ID.projects.label} lead="1기부터 지금까지 만든 프로젝트와 세미나 발표입니다." />
+      <PageHero title={PLACE_BY_ID.projects.label} lead="1기부터 지금까지 만든 프로젝트와 세미나 발표입니다." photoId="2023-10-06-camping-seminar-2" />
 
       <div id="archive-views" className={a.views} role="tablist" aria-label="아카이브 보기">
         {VIEWS.map((v, i) => {

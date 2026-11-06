@@ -51,7 +51,7 @@ export const PAGE_PLANS = {
   },
   recruits: {
     place: 'recruits',
-    title: '지원 안내',
+    title: '지원하기',
     sub: '5기 모집',
     lead: '5기 모집 일정과 지원 방법을 이곳에 안내합니다.',
     wireframe: '05 · 05-1 · 05-2',

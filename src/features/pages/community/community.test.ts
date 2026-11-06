@@ -5,7 +5,6 @@ import { mainVenue, mainWeekday, partitionGeneration, stationLabel } from './arc
 import { countByGeneration, generationPeriod, highlightMentions, sortGenerations, tallies } from './history'
 import { dotDate, pageSources } from './pageSources'
 import { pastEvents } from '../records'
-import { academicYear, cellEvent, cellOf, countWord, dayAt, eventsByDay, monthColumns, nearestCell, yearOrigin, yearRows } from './heatmap'
 import { meetingCycle, regularTime, weekState } from './thisWeek'
 import { isRoomCode, splitVenue } from './venue'
 
@@ -160,74 +159,6 @@ describe('행사 기록 나누기', () => {
     expect(stationLabel({ title: 'Camping Seminar 12회' }, 0)).toBe('12회')
     expect(stationLabel({ title: 'Gemini Study Jams 2주차' }, 0)).toBe('2주차')
     expect(stationLabel({ title: 'Alumni Seminar' }, 1)).toBe('2')
-  })
-})
-
-describe('세 기수의 1년 (달력 칸)', () => {
-  it('9월 1일이 든 주의 월요일에서 시작한다', () => {
-    expect(yearOrigin(2026)).toBe('2026-08-31') // 2026.09.01 화
-    expect(yearOrigin(2025)).toBe('2025-09-01') // 월
-    expect(yearOrigin(2024)).toBe('2024-08-26') // 일
-  })
-
-  it('날짜 ↔ 칸', () => {
-    const o = yearOrigin(2026)
-    expect(cellOf('2026-10-20', o)).toEqual({ week: 7, row: 1 }) // 화
-    expect(dayAt(o, 7, 1)).toBe('2026-10-20')
-    expect(cellOf('2027-08-31', o).week).toBeLessThan(53)
-  })
-
-  it('달 이름 자리와 학년', () => {
-    const cols = monthColumns(2026)
-    expect(cols[0]).toEqual({ month: 9, week: 0 })
-    expect(cols.map((c) => c.month)).toEqual([9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8])
-    expect(academicYear('2025-03')).toBe(2024)
-    expect(academicYear('2025-09')).toBe(2025)
-  })
-
-  it('같은 날 여럿이면 대표 행사 먼저, 휴회는 마지막', () => {
-    expect(cellEvent([ev('s', '2026-01-16'), ev('p', '2026-01-16', { kind: 'project' })])?.id).toBe('p')
-    expect(cellEvent([ev('r', '2026-10-20', { kind: 'rest' }), ev('s', '2026-10-20')])?.id).toBe('s')
-  })
-
-  it('여러 날 행사는 날마다 칸을 채운다', () => {
-    const m = eventsByDay([ev('t', '2027-01-30', { endDate: '2027-01-31' })])
-    expect([...m.keys()]).toEqual(['2027-01-30', '2027-01-31'])
-  })
-
-  it('누른 자리에서 가장 가까운 칸', () => {
-    const cells = [
-      { week: 2, row: 3, id: 'a' },
-      { week: 10, row: 1, id: 'b' },
-    ]
-    expect(nearestCell(cells, 9, 6)?.id).toBe('b')
-    expect(nearestCell(cells, 0, 0)?.id).toBe('a')
-    expect(nearestCell([], 0, 0)).toBeNull()
-  })
-
-  it('기수 한 줄: 휴회는 세지 않고, 시작 달을 모르거나 칸이 없는 기수는 뺀다', () => {
-    const gens = [
-      { n: 1, start: '2022-09' },
-      { n: 3, start: null },
-      { n: 4, start: '2026-09' },
-    ]
-    const rows = yearRows(
-      gens,
-      [ev('a', '2026-09-15'), ev('r', '2026-10-20', { kind: 'rest' }), ev('b', '2026-10-27', { kind: 'sprint' }), ev('x', '2025-03-01', { generation: 3 })],
-      '2026-10-18',
-    )
-    expect(rows.map((r) => r.gen.n)).toEqual([4])
-    expect(rows[0]).toMatchObject({ past: 1, plan: 1 })
-    expect(rows[0].days.map((d) => d.key)).toEqual(['2026-09-15', '2026-10-20', '2026-10-27'])
-    expect(rows[0].weeks.map((w) => w.week)).toEqual([2, 7, 8])
-  })
-
-  it('실제 콘텐츠: 공개 기록이 있는 세 기수, 제목 숫자는 지난 공개 행사 수와 같다', () => {
-    const today = '2026-10-18'
-    const rows = yearRows(GENERATIONS, EVENTS, today)
-    expect(countWord(rows.length)).toBe('세')
-    expect(rows.reduce((n, r) => n + r.past, 0)).toBe(pastEvents(EVENTS, today).length)
-    expect(countWord(12)).toBe('12')
   })
 })
 

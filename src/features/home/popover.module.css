@@ -11,7 +11,7 @@
   z-index: 5;
   left: 0;
   top: 0;
-  width: 340px;
+  width: 380px;
   max-width: calc(100% - 32px);
   padding: 14px 20px 16px;
   border-radius: var(--r-card);
@@ -174,4 +174,42 @@
 .soon {
   font: 600 12px/18px var(--font-kr);
   color: var(--ink-500);
+}
+
+/* 맨 위 행사 사진 (4기 Organizer 2026-11-06): 큰 한 장 | 작은 두 장 */
+.photos {
+  margin: 12px 0 0;
+}
+.photoGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  height: 168px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.photoGrid[data-n='1'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.photoGrid img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--field);
+}
+.photoGrid img:first-child {
+  grid-row: span 2;
+}
+.photoGrid[data-n='2'] img {
+  grid-row: span 2;
+}
+.photoCap {
+  margin-top: 6px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.sheet .photoGrid {
+  height: 140px;
 }

@@ -125,7 +125,7 @@ flowchart LR
 
 ## 13. 하위 페이지의 계산은 화면 밖에서
 
-- 커뮤니티 '이번 주'(`pages/community/thisWeek.ts`), '세 기수의 1년' 달력(`heatmap.ts`), 기록 묶기(`archive.ts`), 지원 안내 한 해 · 네 파트(`pages/recruits/batches.ts` · `parts.ts`), 프로젝트 전시실 묶기 · 표지 고르기(`pages/projects/exhibit.ts`), G-Sprint 띠 단계 · 주장(`pages/projects/sprint.ts`)은 DOM 없이 계산하고 테스트합니다.
+- 소개 '이번 주' · 매주 화요일 정기 세션 채우기(`pages/community/thisWeek.ts`), 기록 묶기(`archive.ts`), 지원 안내 한 해 · 네 파트(`pages/recruits/batches.ts` · `parts.ts`), 프로젝트 전시실 묶기 · 표지 고르기(`pages/projects/exhibit.ts`), G-Sprint 띠 단계 · 주장(`pages/projects/sprint.ts`)은 DOM 없이 계산하고 테스트합니다.
 - 프로젝트 자세히 보기 창은 브라우저 기본 `<dialog>` 이고, 열린 프로젝트를 주소 `?p=<id>` 에 남겨 링크로 공유됩니다. 라우터를 건드리지 않고 검색 매개변수만 씁니다.
 - 프로젝트 그림은 `teamCleared` 로 팀 확인 여부를 들고 다닙니다. `SHOW_UNCLEARED_IMAGES` 하나로 '확인된 그림만'으로 바꿀 수 있습니다.
 
