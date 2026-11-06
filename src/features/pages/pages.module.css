@@ -346,7 +346,7 @@
   color: var(--ink-500);
 }
 button[aria-pressed='true'] .count {
-  color: #c9cdd2;
+  color: var(--line-strong);
 }
 
 /* 누른 칸 먹색 판 (ToggleGroup): 흰 글자 사본 한 줄을 누른 칸 크기로 잘라 위에 얹는다. 다른 칸을 누르면 잘린 창이 미끄러진다 */
@@ -390,7 +390,7 @@ button[aria-pressed='true'] .count {
   border-left: 1px solid transparent;
 }
 .segInkItem .count {
-  color: #c9cdd2;
+  color: var(--line-strong);
 }
 /* 초점 링은 먹색 판 위에 보여야 한다: 초점 받은 칸만 판 위로 올리고 바탕을 비운다 */
 .segmented[data-slide] button:focus-visible {
@@ -402,7 +402,7 @@ button[aria-pressed='true'] .count {
   color: #fff;
 }
 .segmented[data-slide] button[aria-pressed='true']:focus-visible .count {
-  color: #c9cdd2;
+  color: var(--line-strong);
 }
 
 /* ── 사실 목록 (준비 중) ── */

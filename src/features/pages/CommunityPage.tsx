@@ -76,6 +76,7 @@ export function CommunityPage() {
   return (
     <div className={`container ${s.page}`}>
       <PageHero
+        place="community"
         title={PLACE_BY_ID.community.label}
         lead="동국대학교 학생들이 운영하는 Google 개발자 동아리입니다. 매주 화요일에 모이고, 학기마다 행사를 엽니다."
         photoId="2023-09-15-welcome-group"

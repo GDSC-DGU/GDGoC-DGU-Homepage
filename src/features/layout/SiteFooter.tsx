@@ -46,7 +46,7 @@ const CHANNELS: Channel[] = (
  */
 export function SiteFooter() {
   return (
-    <footer className={s.footer}>
+    <footer className={`on-dark ${s.footer}`}>
       <div className={`container ${s.footerGrid}`}>
         <div className={s.footerInfo}>
           <p className={s.footerBrand} lang="en">

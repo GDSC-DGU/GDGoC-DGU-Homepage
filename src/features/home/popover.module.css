@@ -13,6 +13,10 @@
   top: 0;
   width: 380px;
   max-width: calc(100% - 32px);
+  /* 지도 틀보다 길어지지 않게 (넘치면 안에서 내린다) */
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 14px 20px 16px;
   border-radius: var(--r-card);
   visibility: hidden; /* 자리를 재기 전 한 프레임 */
@@ -98,8 +102,8 @@
 }
 
 .desc {
-  margin-top: 10px;
-  font: 400 15px/24px var(--font-kr);
+  margin-top: 12px;
+  font: 400 14px/22px var(--font-kr);
   color: var(--ink-700);
 }
 
@@ -115,7 +119,7 @@
 }
 .row {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
+  grid-template-columns: 64px minmax(0, 1fr);
   column-gap: 12px;
   align-items: baseline;
   padding: 10px 0;
@@ -127,11 +131,21 @@
 }
 .what {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 4px 8px;
+  gap: 8px;
+  min-width: 0;
   font: 600 15px/22px var(--font-kr);
   color: var(--ink-900);
+}
+/* 제목은 한 줄 (길면 … ). 예정 · 예시 표시는 줄 끝에 */
+.whatText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.what > :not(.whatText) {
+  flex: none;
 }
 .state {
   display: flex;
@@ -176,40 +190,24 @@
   color: var(--ink-500);
 }
 
-/* 맨 위 행사 사진 (4기 Organizer 2026-11-06): 큰 한 장 | 작은 두 장 */
+/*
+ * 맨 위 행사 사진 세 장 (4기 Organizer 2026-11-06): 한 줄에 작게 (4:3, 모서리 6).
+ * 처음엔 큰 한 장 + 작은 두 장이었는데 미리보기가 지도 아래로 넘쳤다 → 한 줄 띠로 줄였다.
+ */
 .photos {
-  margin: 12px 0 0;
-}
-.photoGrid {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  height: 168px;
-  overflow: hidden;
-  border-radius: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
 }
-.photoGrid[data-n='1'] {
-  grid-template-columns: minmax(0, 1fr);
-}
-.photoGrid img {
+.photos img {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
+  border-radius: 6px;
   background: var(--field);
-}
-.photoGrid img:first-child {
-  grid-row: span 2;
-}
-.photoGrid[data-n='2'] img {
-  grid-row: span 2;
-}
-.photoCap {
-  margin-top: 6px;
-  font: var(--t-meta);
-  color: var(--ink-500);
-}
-.sheet .photoGrid {
-  height: 140px;
 }

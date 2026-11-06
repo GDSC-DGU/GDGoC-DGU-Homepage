@@ -92,6 +92,7 @@ export function RecruitsPage() {
   return (
     <div className={`container ${s.page}`}>
       <PageHero
+        place="recruits"
         photoId="2024-05-16-open-seminar-group"
         title={
           view.titleSub ? (

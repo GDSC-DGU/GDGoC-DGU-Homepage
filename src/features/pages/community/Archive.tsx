@@ -16,8 +16,8 @@ import c from './community.module.css'
 
 const summaryKey = (n: number) => `summary:${n}`
 
-/** 기수별 기록 위에 놓는 행사 사진 수 (3 × 2) */
-const PHOTO_LIMIT = 6
+/** 기수별 기록 위에 놓는 행사 사진 수 (4 × 2, dcamp 소식 목록처럼 작게: 4기 Organizer 2026-11-06 사진이 크면 부담스럽다) */
+const PHOTO_LIMIT = 8
 
 /**
  * 기수별 기록 (시안 E): 기수 버튼 하나 → 그 기수의 한 줄 요약 + 기록 목록.
@@ -60,7 +60,7 @@ export function Archive({
   }
 
   const events = past.filter((e) => e.generation === info.n)
-  // 그 기수 행사 사진 (content/photos.json): 목록만 이어지던 기록에 사람이 보이게 (4기 Organizer 2026-11-06). 여섯 장까지
+  // 그 기수 행사 사진 (content/photos.json): 목록만 이어지던 기록에 사람이 보이게 (4기 Organizer 2026-11-06). 여덟 장까지
   const photos = PHOTOS.filter((p) => p.generation === info.n).slice(0, PHOTO_LIMIT)
   const { signature, routes, rows } = partitionGeneration(events)
   const mentions: Mention[] = [

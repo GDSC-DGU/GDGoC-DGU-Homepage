@@ -283,10 +283,10 @@
   color: var(--ink-700);
 }
 
-/* 그 기수 행사 사진 (3 × 2, 4:3). 사진 아래에 행사 이름 · 날짜 */
+/* 그 기수 행사 사진 (4 × 2, 3:2). 사진 아래에 행사 이름 · 날짜 */
 .genPhotos {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin: 0 0 32px;
   padding: 0;
@@ -301,13 +301,13 @@
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
   object-fit: cover;
   border-radius: var(--r-card);
   background: var(--field);
 }
 .genPhoto figcaption {
-  font: 500 14px/20px var(--font-kr);
+  font: 500 13px/20px var(--font-kr);
   color: var(--ink-700);
 }
 
