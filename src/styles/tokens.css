@@ -4,6 +4,7 @@
  * 기수색(주황)은 '지금 기수' 표시에만, 그 위 글자는 ink-900.
  * 면은 세 가지뿐: 흰(--paper) · 옅은 회색(--field) · 먹색(--band-bg). 섹션 단위로만 칠한다.
  * 밝은 화면 하나로 고정한다 (다크 모드를 따라가지 않음, 팀 결정 2026-10-16).
+ * 2026-11-06: 4기 Organizer 결정으로 dcamp.kr 의 디자인을 따른다 — 따뜻한 회색(#ECEAE8) 면 · 검정 글자 · 8px 모서리 · 알약 버튼.
  */
 
 /*
@@ -14,14 +15,14 @@
 .on-light {
   /* 바탕 · 선 */
   --paper: #ffffff;
-  --subtle: #f6f7f8; /* hover · 누름 면 전용 (섹션 면은 --field) */
-  --line: #e4e6e9;
-  --line-strong: #c9cdd2;
+  --subtle: #f5f3f1; /* hover · 누름 면 전용 (섹션 면은 --field). dcamp hover 면 */
+  --line: #e3e0dd;
+  --line-strong: #d5d2cf; /* dcamp gray2 */
 
-  /* 글자 (ink-500 보다 옅은 글자는 쓰지 않는다: 흰 5.8:1 · --field 위 5.2:1) */
-  --ink-900: #191b1f;
-  --ink-700: #474c55;
-  --ink-500: #61666f;
+  /* 글자 (dcamp gray4 계열. ink-500 보다 옅은 글자는 쓰지 않는다: 흰 5.7:1 · --field 위 4.7:1) */
+  --ink-900: #111111;
+  --ink-700: #595453;
+  --ink-500: #6b6664;
 
   /* 포커스 링: 밝은 면은 파랑, 먹색 면은 #8AB4F8 (8.2:1) */
   --focus: #4285f4;
@@ -30,9 +31,9 @@
 :root {
   color-scheme: light;
 
-  /* 면 (섹션 단위). 옅은 회색 면 위 ink-900 15.6:1 · ink-700 7.8:1 · ink-500 5.2:1 */
-  --field: #f2f4f6;
-  --field-line: #e3e6ea; /* 옅은 면 위 1px 안쪽 선 · 그림 타일 테두리 */
+  /* 면 (섹션 단위, dcamp gray1). 따뜻한 회색 면 위 ink-900 15.7:1 · ink-700 6.2:1 · ink-500 4.7:1 */
+  --field: #eceae8;
+  --field-line: #dedad6; /* 옅은 면 위 1px 안쪽 선 · 그림 타일 테두리 */
 
   /* 장소색 = 구글 4색. 글자 · 테두리 · 면에는 쓰지 않는다 */
   --g-blue: #4285f4;
@@ -53,10 +54,14 @@
 
   /* 기수색: 4기 주황. '지금 기수' 표시에만 */
   --gen: #ff6309;
-  --on-gen: #191b1f;
+  --on-gen: #111111;
+  /* 주황을 글자로 쓸 때 (dcamp 의 주황 이름표: 'dcamp batch' 처럼 제목 위 한 줄). 흰 바탕 5.2:1 */
+  --gen-text: #c2410c;
 
   /* 떠 있는 것(지도 미리보기 · 바텀시트 · 검색 창 · 겹친 폰 화면)에만 */
-  --shadow-float: 0 12px 32px rgba(25, 27, 31, 0.14);
+  --shadow-float: 0 12px 32px rgba(17, 17, 17, 0.12);
+  /* 카드에 마우스를 올렸을 때 (넓고 옅게) */
+  --shadow-lift: 0 18px 40px -12px rgba(17, 17, 17, 0.16);
 
   /* 글꼴: 한글 문장은 Pretendard, 숫자 덩어리 · 영문 워드마크만 Google Sans Flex */
   --font-kr: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -66,10 +71,10 @@
    * 글자 크기/줄 높이 (DESIGN 3장 표). 폭에 따라 아래 미디어 쿼리에서 바뀐다.
    * 80(--t-hero) → 64(display) → 48(section) → 28(h2) 로 단계를 둔다. 40(--t-h1)은 예전 화면용으로만 남긴다.
    */
-  --t-display: 700 64px/76px var(--font-kr); /* 하위 페이지 h1 · 먹색 띠 주장 (800 → 700: 참고 회사들은 제목 700) */
-  --t-section: 700 48px/60px var(--font-kr); /* 이야기 섹션 주장 제목 */
+  --t-display: 600 48px/62px var(--font-kr); /* 먹색 띠 주장. dcamp 처럼 크기 · 굵기를 낮췄다 (2026-11-06) */
+  --t-section: 600 36px/48px var(--font-kr); /* 이야기 섹션 주장 제목 (dcamp 섹션 제목 32 · 500 에 맞춰 낮춤) */
   --t-h1: 700 40px/52px var(--font-kr); /* (예전) 참고 화면 제목. 새 화면은 --t-section */
-  --t-h2: 700 28px/38px var(--font-kr); /* 참고 섹션 제목 · 묶음 제목 */
+  --t-h2: 600 26px/36px var(--font-kr); /* 참고 섹션 제목 · 묶음 제목 */
   --t-h3: 700 20px/30px var(--font-kr); /* 항목 제목 */
   --t-lead: 400 20px/32px var(--font-kr); /* 제목 아래 한 줄 */
   --t-body: 400 17px/28px var(--font-kr);
@@ -87,10 +92,12 @@
   --ls-num-m: -0.02em;
 
   /* 모양 */
-  --r-tag: 6px; /* 태그 */
-  --r-control: 12px; /* 버튼 · 입력 · 거르기 */
-  --r-card: 16px; /* 글자 카드 · 표 · 판 */
-  --r-media: 20px; /* 그림 타일 · 일정 표 */
+  /* 모서리 (dcamp: 카드 · 그림 · 입력 8px, 버튼은 알약) */
+  --r-tag: 4px; /* 태그 */
+  --r-control: 8px; /* 입력 · 거르기 */
+  --r-pill: 999px; /* 버튼 */
+  --r-card: 8px; /* 글자 카드 · 표 · 판 */
+  --r-media: 8px; /* 그림 타일 · 일정 표 */
   /* 아이콘 타일은 정사각 기준 border-radius: 24% (common/IconTile) */
 
   /* 간격: 묶음 안 / 묶음 사이 / 섹션 사이 */
@@ -120,6 +127,10 @@
   /* 그림 hover 확대: 천천히, 아주 조금 */
   --dur-media: 480ms;
   --media-zoom: 1.03;
+  /* 카드 hover: 툭 올라가지 않고 스윽 (4기 Organizer 2026-11-06). 올라갈 때 · 내려올 때 같은 곡선 */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-lift: 600ms;
+  --lift: -6px;
   /* 페이지 전환 (View Transitions) */
   --dur-page-out: 120ms;
   --dur-page-in: 240ms;
@@ -140,15 +151,15 @@
 
 @media (max-width: 1279px) {
   :root {
-    --t-display: 700 56px/68px var(--font-kr);
-    --t-section: 700 44px/56px var(--font-kr);
+    --t-display: 600 44px/58px var(--font-kr);
+    --t-section: 600 34px/46px var(--font-kr);
     --gap-section: 120px;
   }
 }
 
 @media (max-width: 1023px) {
   :root {
-    --t-section: 700 40px/52px var(--font-kr);
+    --t-section: 600 32px/44px var(--font-kr);
     --t-num: 600 72px/72px var(--font-num);
     --story-pad: 104px;
     --head-gap: 44px;
@@ -157,10 +168,10 @@
 
 @media (max-width: 767px) {
   :root {
-    --t-display: 700 36px/46px var(--font-kr);
-    --t-section: 700 30px/40px var(--font-kr);
+    --t-display: 600 32px/44px var(--font-kr);
+    --t-section: 600 26px/36px var(--font-kr);
     --t-h1: 700 26px/36px var(--font-kr);
-    --t-h2: 700 22px/32px var(--font-kr);
+    --t-h2: 600 22px/32px var(--font-kr);
     --t-h3: 700 18px/27px var(--font-kr);
     --t-lead: 400 17px/28px var(--font-kr);
     --t-body: 400 16px/26px var(--font-kr);
@@ -187,12 +198,12 @@
   --ls-hero: -0.035em;
 
   /* 먹색 면 (먹색 바탕 위 흰색 · 회색 단계). band-ink-3 도 바탕과 6.6:1 */
-  --band-bg: #191b1f;
+  --band-bg: #000000; /* dcamp: 검정 */
   --band-ink: #ffffff;
-  --band-ink-2: #c9cdd3; /* 10.8:1 */
-  --band-ink-3: #9ba0a8; /* 6.6:1, 먹색 위 가장 옅은 글자 */
-  --band-line: #33373e;
-  --band-raise: #2b2e34; /* 먹색 위 두 번째 버튼 면 (흰 글자 13.6:1) */
+  --band-ink-2: #d5d2cf; /* 13.9:1 */
+  --band-ink-3: #a8a3a1; /* 8.4:1, 먹색 위 가장 옅은 글자 */
+  --band-line: #333131;
+  --band-raise: #262525; /* 먹색 위 두 번째 버튼 면 (dcamp gray5) */
 }
 
 @media (max-width: 1279px) {

@@ -151,15 +151,15 @@ img {
   --ink-700: var(--band-ink-2);
   --ink-500: var(--band-ink-3);
   --line: var(--band-line);
-  --line-strong: #4b5058;
+  --line-strong: #4a4645;
   --subtle: var(--band-raise);
   --focus: #8ab4f8;
   /* 버튼: 먹색 위 주 버튼은 흰 바탕, 두 번째 버튼은 한 단계 밝은 먹색 */
   --btn-bg: #ffffff;
-  --btn-bg-hover: #e9ebee;
+  --btn-bg-hover: #eceae8;
   --btn-ink: var(--band-bg);
   --btn2-bg: var(--band-raise);
-  --btn2-bg-hover: #363a41;
+  --btn2-bg-hover: #3a3837;
   --btn2-ink: var(--band-ink);
   --btn2-line: transparent;
   --btn2-line-hover: transparent;
@@ -170,7 +170,7 @@ img {
   --btn-bg-hover: #000;
   --btn-ink: #fff;
   --btn2-bg: var(--field);
-  --btn2-bg-hover: #e6e9ed;
+  --btn2-bg-hover: #dedad6;
   --btn2-ink: var(--ink-900);
   --btn2-line: transparent;
   --btn2-line-hover: transparent;
@@ -237,7 +237,7 @@ img {
   min-height: 52px;
   padding: 0 24px;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: var(--r-pill);
   font: 600 16px/1 var(--font-kr);
   text-align: center;
   text-decoration: none;
@@ -261,7 +261,7 @@ img {
 .btn-sm {
   min-height: 40px;
   padding: 0 16px;
-  border-radius: 10px;
+  border-radius: var(--r-pill);
   font: var(--t-ui);
 }
 /* 작은 버튼도 누르는 자리는 44 (보이는 틀은 40) */
@@ -339,7 +339,7 @@ img {
     background: var(--btn-bg-hover, #000);
   }
   .btn-secondary:hover {
-    background: var(--btn2-bg-hover, #e6e9ed);
+    background: var(--btn2-bg-hover, #dedad6);
     box-shadow: inset 0 0 0 1px var(--btn2-line-hover, transparent);
   }
   .link:hover {

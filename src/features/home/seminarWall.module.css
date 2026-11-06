@@ -2,7 +2,8 @@
  * 홈 멤버 세미나 (4기 Organizer 2026-11-06: 발표 카드).
  * 네 칸 두 줄: 첫 장(가장 최근 발표)은 두 칸 · 먹색, 나머지는 흰 카드. 카드 뒤 오른쪽 아래에 기수 숫자를 옅게 크게.
  * 위: 기수 이름표 · 날짜 → 그날 세션 이름 → 제목(주인공) → 아래: 발표자 동그라미 · 이름 · 화살표.
- * 마우스를 올리면 4px 떠오르고 화살표가 움직인다. 태블릿 두 칸, 폰은 옆으로 넘긴다.
+ * dcamp 카드처럼 흰 면 위 따뜻한 회색 카드 (모서리 8 · 테두리 없음). 마우스를 올리면 0.6초에 걸쳐 스윽 떠오르고 화살표가 나아간다.
+ * 태블릿 두 칸, 폰은 옆으로 넘긴다.
  */
 .grid {
   display: grid;
@@ -28,16 +29,15 @@
   height: 100%;
   padding: 24px;
   overflow: hidden;
-  border: 1px solid var(--line);
   border-radius: var(--r-card);
-  background: var(--paper);
+  background: var(--field);
   color: var(--ink-900);
   text-decoration: none;
   isolation: isolate;
+  box-shadow: 0 0 0 rgba(17, 17, 17, 0);
   transition:
-    transform var(--dur-open) var(--ease),
-    box-shadow var(--dur-open) var(--ease),
-    border-color var(--dur-open) var(--ease);
+    transform var(--dur-lift) var(--ease-soft),
+    box-shadow var(--dur-lift) var(--ease-soft);
 }
 .item[data-feature] .card {
   padding: 32px;
@@ -51,9 +51,8 @@
 }
 @media (hover: hover) {
   .card:hover {
-    transform: translateY(-4px);
-    border-color: var(--line-strong);
-    box-shadow: var(--shadow-float);
+    transform: translateY(var(--lift));
+    box-shadow: var(--shadow-lift);
   }
   .card:hover .go {
     transform: translateX(4px);
@@ -68,7 +67,7 @@
   z-index: -1;
   font: 700 168px/1 var(--font-num);
   letter-spacing: -0.06em;
-  color: var(--field);
+  color: rgba(17, 17, 17, 0.05);
   pointer-events: none;
 }
 .item[data-feature] .bigGen {
@@ -86,7 +85,7 @@
 .gen {
   padding: 2px 10px;
   border-radius: 999px;
-  background: var(--field);
+  background: var(--paper);
   font: 700 13px/20px var(--font-kr);
   color: var(--ink-900);
 }
@@ -160,7 +159,7 @@
 .go {
   margin-left: auto;
   font: 600 18px/1 var(--font-kr);
-  transition: transform var(--dur-open) var(--ease);
+  transition: transform var(--dur-lift) var(--ease-soft);
 }
 
 @media (max-width: 1023px) {

@@ -1,13 +1,16 @@
-/* ── 머리말: 80px 흰 띠(폰 64), 위에 붙는다. 내려가면 아래 1px 선 ── */
+/*
+ * ── 머리말 (dcamp.kr 을 따름, 4기 Organizer 2026-11-06): 위에서 16px 떠 있는 따뜻한 회색 둥근 띠(높이 64, 모서리 8).
+ * 띠는 본문 폭보다 좌우로 32px 넓고, 로고와 메뉴는 본문 끝선에 맞는다. 차지하는 높이는 전과 같은 80 (폰 8 + 56 = 64).
+ * 내려가면 띠 아래에 옅은 그림자.
+ */
 .header {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
   z-index: 50;
   /* 폰 머리말 버튼을 숨길 폭은 화면이 아니라 실제로 남은 폭(스크롤 막대 뺀 폭)으로 잰다 */
   container: header / inline-size;
-  background: var(--paper);
-  box-shadow: inset 0 -1px 0 transparent;
-  transition: box-shadow var(--dur-hover) var(--ease);
+  padding-top: 16px;
+  background: transparent;
   /* 페이지를 옮길 때 머리말은 그대로 두고 본문만 바뀌게 (global.css 페이지 전환) */
   view-transition-name: site-header;
 }
@@ -21,15 +24,32 @@
   height: env(safe-area-inset-top, 0px);
   background: var(--paper);
 }
-.header[data-scrolled] {
-  box-shadow: inset 0 -1px 0 var(--line);
+.header[data-scrolled] .bar {
+  box-shadow: 0 6px 24px -10px rgba(17, 17, 17, 0.18);
 }
 
 .bar {
   display: flex;
   align-items: center;
   gap: 24px;
-  height: 80px;
+  height: 64px;
+  border-radius: var(--r-card);
+  background: var(--field);
+  transition: box-shadow var(--dur-open) var(--ease);
+}
+/* 본문 틀(.container) 의 좌우 여백 안에서 띠만 32px 넓게: 안쪽 여백으로 로고 · 메뉴는 본문 끝선 그대로.
+   .container 의 width: 100% 는 풀어 둔다 (바깥 여백과 더해지면 화면보다 넓어진다) */
+.header .bar {
+  width: auto;
+  max-width: calc(var(--max) + 64px);
+  padding-inline: 32px;
+  margin-inline: auto;
+}
+@media (max-width: 1279px) {
+  .header .bar {
+    max-width: none;
+    margin-inline: calc(var(--side) - 32px) calc(var(--side-r) - 32px);
+  }
 }
 
 .brand {
@@ -64,18 +84,17 @@
   height: 44px;
   margin-inline: auto;
   padding: 0 14px 0 16px;
-  border: 1px solid var(--line);
+  border: 1px solid transparent;
   border-radius: var(--r-control);
-  background: var(--field);
+  background: var(--paper);
   font: 500 15px/20px var(--font-kr);
   color: var(--ink-500);
   text-align: left;
   cursor: text;
-  transition: border-color var(--dur-hover) var(--ease), background var(--dur-hover) var(--ease);
+  transition: border-color var(--dur-hover) var(--ease);
 }
 .searchBox:hover {
   border-color: var(--line-strong);
-  background: var(--paper);
 }
 .searchBox:focus-visible {
   outline: 2px solid var(--focus);
@@ -107,13 +126,13 @@
   display: flex;
   align-items: center;
   height: 44px;
-  padding: 0 12px;
+  padding: 0 14px;
   border-radius: var(--r-control);
-  font: 600 16px/24px var(--font-kr);
+  font: 500 16px/24px var(--font-kr);
   color: var(--ink-900);
   text-decoration: none;
   white-space: nowrap;
-  transition: color var(--dur-hover) var(--ease);
+  transition: opacity 300ms var(--ease);
 }
 /* 지금 메뉴: 먹색 글자 + 2px 먹색 밑줄 (AI 티 점검 2026-11-05: 메뉴마다 다른 장소색 글자 → 한 가지 표시) */
 .navActive {
@@ -145,15 +164,15 @@
   opacity: 1;
   transform: none;
 }
-/* 지원하기: 메뉴 끝의 먹색 상자 단추 (40px · radius 12). 모집 중이면 앞에 주황 점(지금 기수) */
+/* 지원하기: 메뉴 끝의 검정 알약 단추 (40px, dcamp 버튼). 모집 중이면 앞에 주황 점(지금 기수) */
 .applyCta {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 40px;
   margin-left: 12px;
-  padding: 0 18px;
-  border-radius: var(--r-control);
+  padding: 0 20px;
+  border-radius: var(--r-pill);
   background: var(--band-bg);
   font: 700 15px/20px var(--font-kr);
   color: #fff;
@@ -169,7 +188,7 @@
   outline-offset: 2px;
 }
 .applyCtaActive {
-  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink-900);
+  box-shadow: 0 0 0 2px var(--field), 0 0 0 4px var(--ink-900);
 }
 .applyDot {
   width: 6px;
@@ -299,8 +318,15 @@
 }
 
 @media (max-width: 900px) {
+  .header {
+    padding-top: 8px;
+  }
   .bar {
-    height: 64px;
+    height: 56px;
+  }
+  .header .bar {
+    margin-inline: calc(var(--side) - 12px) calc(var(--side-r) - 12px);
+    padding-inline: 12px 16px;
   }
   .brandLogo {
     height: 28px;
@@ -483,7 +509,7 @@
 }
 @media (hover: hover) {
   .applySheet:hover {
-    background: #e6e9ed;
+    background: #dedad6;
   }
 }
 .applySheet .applyName {
@@ -519,11 +545,12 @@
  * 왼쪽 이름 · 주소 · 저작권 | 오른쪽 '채널 바로가기' 아이콘. 본문 좌우 끝선(.container)에 맞춘다.
  * 본문이 옅은 회색 JoinStrip 으로 끝나도 위 1px 선으로 나뉜다.
  */
+/* 꼬리말: dcamp 처럼 검정 면 (on-dark 가 글자 · 선 단계를 흰 쪽으로 바꾼다) */
 .footer {
   margin-top: var(--gap-section);
-  padding: 48px 0 calc(48px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--line);
-  background: var(--field);
+  padding: 56px 0 calc(56px + env(safe-area-inset-bottom, 0px));
+  background: var(--band-bg);
+  color: var(--ink-900);
 }
 /* 본문이 이야기 섹션(면)으로 끝나면 꼬리말을 바로 붙인다. 아카이브는 섹션이 탭 칸 안 한 단계 더 깊다 (main > .container > 탭 칸 > 띠) */
 :global(main):has(> :global(.story):last-child, > :last-child > :global(.story):last-child, > :last-child > :last-child > :global(.story):last-child) + .footer {

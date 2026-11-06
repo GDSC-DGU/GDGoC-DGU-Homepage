@@ -80,7 +80,7 @@ export function TeamsListPage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PageHero title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} photoId="2023-12-22-closing-teams" />
+      <PageHero place="teams" title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} photoId="2023-12-22-closing-room" />
 
       <section id="board" ref={boardRef} className={`story paper ${s.board}`} aria-labelledby="board-title">
         <h2 id="board-title" className="visually-hidden">
