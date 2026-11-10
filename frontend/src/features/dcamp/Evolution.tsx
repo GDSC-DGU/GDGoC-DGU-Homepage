@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Generation } from '@/domain/types'
-import { evolutionRows } from './evolution'
+import { evolutionRows } from './evolutionRows'
 import s from './evolution.module.css'
 
 /** 처음에 보이는 기수 수 (dcamp 처럼 나머지는 '더보기') */
