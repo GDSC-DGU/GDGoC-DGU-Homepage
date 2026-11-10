@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 검색 로봇용 주소 목록. src/content/seo.json 의 주소와 같아야 한다 (seo.test.ts 가 확인) -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://gdghomepage.vercel.app/</loc></url>
+  <url><loc>https://gdghomepage.vercel.app/about</loc></url>
+  <url><loc>https://gdghomepage.vercel.app/archive</loc></url>
+  <url><loc>https://gdghomepage.vercel.app/recruits</loc></url>
+  <url><loc>https://gdghomepage.vercel.app/teams</loc></url>
+</urlset>

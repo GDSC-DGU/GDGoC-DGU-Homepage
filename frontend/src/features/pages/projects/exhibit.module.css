@@ -1,0 +1,535 @@
+/*
+ * 전시실 안 작품 (시안 E): 대표 작품 한 점(무대 + 이름표) → 줄 목록(아이콘 표지 + 이름 · 한 줄 · 쓴 기술).
+ * 표지 체계 (DESIGN 4 · 8장): 그림 타일은 radius 20, 로고는 흰 판 위, 아이콘은 정사각 radius 24%. 회색 자리 표시 칸 없음.
+ * 이름 링크 하나가 작품 전체를 덮는다 (누르면 자세히 보기 창). 바깥 링크(지금 써 보기)만 그 위로 따로 누른다.
+ * hover 는 마우스가 있는 화면에서만, 움직임은 동작 줄이기에서 끈다.
+ */
+
+/* ── 공통: 이름 링크가 작품 전체를 덮는다 ── */
+.open {
+  color: inherit;
+  text-decoration: none;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+.open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.open:focus-visible {
+  outline: none;
+}
+/* 작품 전체 링크 위에 따로 누르는 것 (지금 써 보기) */
+.raise {
+  position: relative;
+  z-index: 2;
+}
+.part {
+  white-space: nowrap;
+}
+
+/* ───────────── 대표 작품: 무대 7칸 | 이름표 4칸 ───────────── */
+.feature {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas: 'stage stage stage stage stage stage stage . text text text text';
+  column-gap: var(--gutter);
+  align-items: center;
+}
+.feature:has(.open:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 8px;
+  border-radius: var(--r-media);
+}
+.featureText {
+  grid-area: text;
+  min-width: 0;
+}
+.featureName {
+  font: 800 48px/58px var(--font-kr);
+  letter-spacing: -0.03em;
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+.featureSummary {
+  margin-top: 16px;
+  font: var(--t-lead);
+  letter-spacing: -0.01em;
+  color: var(--ink-700);
+}
+.featureStack {
+  margin-top: 14px;
+  font: 500 14px/22px var(--font-kr);
+  color: var(--ink-500);
+}
+.featureActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  margin-top: 28px;
+}
+/* '자세히 보기': 이름 링크(작품 전체)의 보이는 신호. .link-go 와 같은 모양 */
+.cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font: 600 16px/24px var(--font-kr);
+  color: var(--ink-900);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 5px;
+}
+
+/* 무대: 16:10 · radius 20 · 1px 안쪽 선 (그림 위에 그어 그림이 선을 덮지 않게) */
+.stage {
+  grid-area: stage;
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--r-media);
+  background: var(--field);
+}
+.stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--ink-a8);
+  pointer-events: none;
+}
+/* 실제 화면 둘 겹치기 (약조심): 바탕은 화면 자체와 같은 계열의 옅은 파랑 */
+.stage[data-stage='duo'] {
+  background: var(--tone-blue-soft);
+}
+.desk,
+.phone {
+  position: absolute;
+  height: auto;
+  background: var(--paper);
+  transition: transform var(--dur-media) var(--ease);
+}
+.desk {
+  left: 6%;
+  top: 10%;
+  width: 78%;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--ink-a8);
+}
+.phone {
+  right: 6%;
+  top: 22%;
+  width: 23%;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px var(--ink-a10),
+    var(--shadow-float);
+}
+/* 표지 한 장 (Greenap 소개 그림): 자르지 않고 가득. 왼쪽 글자 쪽을 붙든다 */
+.single {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  transition: transform var(--dur-media) var(--ease);
+}
+.stage[data-stage='screen'] .single {
+  object-position: top center;
+}
+.stage[data-stage='logo'] {
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+}
+.stage[data-stage='logo'] .single {
+  position: static;
+  width: auto;
+  height: auto;
+  max-width: 40%;
+  max-height: 44%;
+  object-fit: contain;
+}
+.stagePlate {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+
+/* ───────────── 줄 목록: 아이콘 표지 + 이름표, 넓은 화면 3칸 ───────────── */
+.list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px var(--gutter);
+}
+.feature + .list {
+  margin-top: 56px;
+}
+/* 아이콘 · 이름 · 한 줄 (· 쓴 기술): 세 줄 글자 높이가 아이콘 높이와 같다 */
+.work {
+  position: relative;
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  column-gap: 18px;
+  align-items: start;
+  min-width: 0;
+}
+.work:has(.open:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 6px;
+  border-radius: var(--r-card);
+}
+/* 이름 · 한 줄 · 쓴 기술 세 줄(74px)을 아이콘(80px) 가운데에. 한 줄에 놓인 작품끼리 이름 높이가 같다 */
+.label {
+  min-width: 0;
+  padding-top: 3px;
+}
+.name {
+  font: 700 18px/26px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+/* 한 줄 설명: 두 줄까지 (전문은 자세히 보기 창). 한 줄에서 자르면 거의 모든 설명이 '…'로 끝났다 (화면 검토 2026-11-05) */
+.summary {
+  display: -webkit-box;
+  margin-top: 2px;
+  overflow: hidden;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+  word-break: keep-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.meta {
+  margin-top: 2px;
+  overflow: hidden;
+  font: var(--t-meta);
+  color: var(--ink-500);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 줄 목록의 '지금 써 보기': 밑줄 없는 굵은 글자 (hover 때 밑줄) */
+.liveLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: -6px 0 -14px;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-900);
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+/* ── 아이콘 표지: 정사각 흰 판 · radius 24% · 로고 62% ── */
+.icon {
+  aspect-ratio: 1;
+  border-radius: 24%;
+}
+.icon[data-kind='logo'] img {
+  max-width: 62%;
+  max-height: 62%;
+}
+/* 가로로 긴 글자 로고 (Bravication · InGlo · Wave) */
+.icon[data-wide] img {
+  max-width: 82%;
+}
+/* 그림이 없는 작품: 먹색 판 + 머리글자 + 저장소 언어 막대 (실제 데이터만. 로고처럼 보이게 꾸미지 않는다) */
+.icon[data-kind='type'] {
+  --ink-900: var(--band-ink);
+  --ink-700: var(--band-ink-2);
+  --ink-500: var(--band-ink-3);
+  --line-strong: var(--ink-600);
+  --line: var(--band-line);
+  border-color: var(--band-bg);
+  background: var(--band-bg);
+  color: var(--band-ink);
+}
+.icon [data-part='type'] {
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+.icon [data-part='name'],
+.icon [data-part='span'],
+.icon [data-part='legend'] {
+  display: none;
+}
+.icon [data-part='mono'] {
+  display: block;
+  margin-top: -10%;
+  font: 600 32cqi / 1 var(--font-num);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.icon [data-part='mono'][data-len='3'] {
+  font-size: 27cqi;
+}
+.icon [data-part='mono'][data-len='4'] {
+  font-size: 23cqi;
+}
+.icon [data-part='mono'][data-len='5'] {
+  font-size: 19cqi;
+}
+.icon [data-part='foot'] {
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  bottom: 20%;
+}
+
+/* ───────────── 기수 탭 카드 격자: 넓은 화면 3칸 · 태블릿 2칸 · 폰 1칸 ───────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px var(--gutter);
+}
+/* 실제 그림이 있는 작품만 크게 두 칸 (아카이브 전시실: 4기 Organizer 2026-11-05). 나머지는 아래 줄 목록 */
+.gridWide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.gridWide + .list {
+  margin-top: 48px;
+}
+/* 카드: 그림(16:9) → 이름 → 한 줄 설명. 1px 괘선 틀, 그림자 없음 */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
+  transition: border-color var(--dur-hover) var(--ease);
+}
+.card:has(.open:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.stage.thumb {
+  flex: none;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+}
+.stage.thumb::after {
+  display: none;
+}
+/* 격자 카드의 글자 표지: 이름은 바로 아래 카드 제목이 말하므로 표지에는 머리글자만 (이름이 두 번 나왔다: 화면 검토 2026-11-05) */
+.thumb [data-part='name'] {
+  display: none;
+}
+.thumb [data-part='mono'] {
+  display: block;
+  font: 600 clamp(40px, 16cqi, 88px) / 1 var(--font-num);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.cardBody {
+  flex: 1;
+  padding: 16px 20px 20px;
+}
+.cardName {
+  font: 700 19px/28px var(--font-kr);
+  letter-spacing: -0.015em;
+  color: var(--ink-900);
+}
+.cardMeta {
+  margin-top: 2px;
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.cardSummary {
+  display: -webkit-box;
+  margin-top: 6px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+
+/* ───────────── hover · 초점 (마우스가 있는 화면에서만) ───────────── */
+@media (hover: hover) {
+  .feature:hover .open,
+  .work:hover .open {
+    text-decoration-line: underline;
+  }
+  .feature:hover .cue {
+    text-decoration-color: currentColor;
+  }
+  .work:hover .icon {
+    border-color: var(--ink-500);
+  }
+  .card:hover {
+    border-color: var(--line-strong);
+  }
+  .card:hover .open {
+    text-decoration-line: underline;
+  }
+  .liveLink:hover {
+    text-decoration-line: underline;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .feature:hover .phone {
+    transform: translateY(-6px);
+  }
+  .feature:hover .single {
+    transform: scale(var(--media-zoom));
+  }
+  .card:hover .single,
+  .card:hover .desk {
+    transform: scale(var(--media-zoom));
+  }
+}
+.open:focus-visible {
+  text-decoration-line: underline;
+}
+
+/* ───────────── 태블릿: 무대 위 · 이름표 아래, 줄 목록 2칸 ───────────── */
+@media (max-width: 1023px) {
+  .feature {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'stage'
+      'text';
+    row-gap: 28px;
+  }
+  .featureText {
+    max-width: 36em;
+  }
+  .featureName {
+    font-size: 40px;
+    line-height: 50px;
+  }
+  .featureSummary {
+    margin-top: 12px;
+  }
+  .featureActions {
+    margin-top: 16px;
+  }
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px var(--gutter);
+  }
+  .feature + .list {
+    margin-top: 48px;
+  }
+  .work {
+    grid-template-columns: 72px minmax(0, 1fr);
+    column-gap: 16px;
+  }
+  .label {
+    padding-top: 0;
+  }
+}
+
+/* ───────────── 폰: 무대는 폰 화면을 크게, 줄 목록 한 칸 (아이콘 64 · 한 줄 설명) ───────────── */
+@media (max-width: 767px) {
+  .feature {
+    row-gap: 20px;
+  }
+  .stage[data-stage='duo'] {
+    aspect-ratio: 4 / 3;
+  }
+  .desk {
+    left: 6%;
+    top: 12%;
+    width: 86%;
+    border-radius: 8px;
+  }
+  .phone {
+    right: 5%;
+    top: 20%;
+    width: 33%;
+    border-radius: 12px;
+  }
+  .featureName {
+    font-size: 30px;
+    line-height: 40px;
+  }
+  .featureSummary {
+    margin-top: 8px;
+    font-size: 16px;
+    line-height: 26px;
+  }
+  .featureStack {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 20px;
+  }
+  .featureActions {
+    gap: 4px 20px;
+    margin-top: 12px;
+  }
+  .featureActions :global(.btn-secondary) {
+    min-height: 48px;
+  }
+  .feature + .list {
+    margin-top: 32px;
+  }
+  .list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .work {
+    grid-template-columns: 64px minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: center;
+    padding: 12px 0;
+  }
+  .work + .work {
+    border-top: 1px solid var(--line);
+  }
+  .work:has(.open:focus-visible) {
+    outline-offset: 2px;
+  }
+  .name {
+    font-size: 17px;
+    line-height: 24px;
+  }
+  .summary {
+    font-size: 14px;
+    line-height: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk,
+  .phone,
+  .single {
+    transition: none;
+  }
+}
+
+/* 카드 격자: 태블릿 2칸 · 폰 1칸 */
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 20px;
+  }
+}
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .cardBody {
+    padding: 14px 16px 18px;
+  }
+  .cardName {
+    font-size: 18px;
+    line-height: 26px;
+  }
+}

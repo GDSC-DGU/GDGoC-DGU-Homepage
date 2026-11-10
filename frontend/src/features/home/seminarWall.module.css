@@ -1,0 +1,207 @@
+/*
+ * 홈 멤버 세미나 (4기 Organizer 2026-11-06: 발표 카드).
+ * 네 칸 두 줄: 첫 장(가장 최근 발표)은 두 칸 · 먹색, 나머지는 흰 카드. 카드 뒤 오른쪽 아래에 기수 숫자를 옅게 크게.
+ * 제목(주인공) → 기수 · 날짜 · 그날 세션 이름 한 줄 → 아래: 발표자 동그라미 · 이름. 제목 위 이름표는 두지 않는다 (hallmark 54).
+ * dcamp 카드처럼 흰 면 위 따뜻한 회색 카드 (모서리 8 · 테두리 없음). 마우스를 올리면 0.6초에 걸쳐 스윽 떠오르고 화살표가 나아간다.
+ * 태블릿 두 칸, 폰은 옆으로 넘긴다. 마우스를 올리면 카드가 2px 떠오른다 (--lift).
+ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(248px, auto);
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  min-width: 0;
+}
+.item[data-feature] {
+  grid-column: span 2;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  padding: 24px;
+  overflow: hidden;
+  border-radius: var(--r-card);
+  background: var(--field);
+  color: var(--ink-900);
+  text-decoration: none;
+  isolation: isolate;
+  box-shadow: 0 0 0 var(--ink-a0);
+  transition:
+    transform var(--dur-lift) var(--ease-soft),
+    box-shadow var(--dur-lift) var(--ease-soft);
+}
+.item[data-feature] .card {
+  padding: 32px;
+  border-color: transparent;
+  background: var(--band-bg, var(--ink-900));
+  color: var(--white);
+}
+.card:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(var(--lift));
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+/* 뒤에 깔리는 큰 기수 숫자 */
+.bigGen {
+  position: absolute;
+  right: -6px;
+  bottom: -34px;
+  z-index: -1;
+  font: 700 168px/1 var(--font-num);
+  letter-spacing: -0.06em;
+  color: var(--ink-a5);
+  pointer-events: none;
+}
+.item[data-feature] .bigGen {
+  right: 8px;
+  bottom: -56px;
+  font-size: 280px;
+  color: var(--white-a7);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+.gen {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--paper);
+  font: 700 13px/20px var(--font-kr);
+  color: var(--ink-900);
+}
+.item[data-feature] .gen {
+  background: var(--gen);
+  color: var(--on-gen);
+}
+.date {
+  font: 600 14px/20px var(--font-num);
+  color: var(--ink-500);
+}
+.item[data-feature] .date {
+  color: var(--white-a72);
+}
+.day {
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.item[data-feature] .day {
+  color: var(--white-a80);
+}
+.title {
+  font: 700 20px/30px var(--font-kr);
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.item[data-feature] .title {
+  max-width: 16em;
+  font-size: 32px;
+  line-height: 44px;
+  letter-spacing: -0.02em;
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font: 700 13px/1 var(--font-kr);
+  letter-spacing: -0.02em;
+}
+.avatar[data-tone='blue'] {
+  background: var(--tone-blue-bg);
+  color: var(--tone-blue-ink);
+}
+.avatar[data-tone='red'] {
+  background: var(--tone-red-bg);
+  color: var(--tone-red-ink);
+}
+.avatar[data-tone='yellow'] {
+  background: var(--tone-yellow-bg);
+  color: var(--tone-yellow-ink);
+}
+.avatar[data-tone='green'] {
+  background: var(--tone-green-bg);
+  color: var(--tone-green-ink);
+}
+.speaker {
+  font: 600 15px/22px var(--font-kr);
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(220px, auto);
+  }
+  .item[data-feature] .title {
+    font-size: 28px;
+    line-height: 38px;
+  }
+}
+/* 폰: 한 줄로 옆으로 넘긴다 (다음 카드가 조금 보이게) */
+@media (max-width: 767px) {
+  .grid {
+    display: flex;
+    gap: 12px;
+    margin-inline: calc(-1 * var(--side)) calc(-1 * var(--side-r));
+    padding: 4px var(--side-r) 12px var(--side);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--side);
+    scrollbar-width: none;
+  }
+  .grid::-webkit-scrollbar {
+    display: none;
+  }
+  .item,
+  .item[data-feature] {
+    flex: none;
+    width: min(300px, 80vw);
+    min-height: 260px;
+    scroll-snap-align: start;
+  }
+  .item[data-feature] .card {
+    padding: 24px;
+  }
+  .item[data-feature] .title {
+    font-size: 22px;
+    line-height: 32px;
+  }
+  .item[data-feature] .bigGen {
+    font-size: 200px;
+    bottom: -40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card:hover {
+    transform: none;
+  }
+}

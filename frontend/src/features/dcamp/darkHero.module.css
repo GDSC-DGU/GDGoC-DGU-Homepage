@@ -1,0 +1,172 @@
+/*
+ * 검정 머리 (dcamp 'Who we are'). 머리말 높이(--header-h)만큼 위로 끌어올려 머리말 뒤까지 검정이 닿게 한다.
+ * 배경 세 겹: 검정 → 아래쪽 주황 빛(타원) → 옅은 흰 격자(위에서 아래로 사라짐). 맨 아래는 검정으로 닫혀 다음 검정 섹션과 이어진다.
+ */
+.hero {
+  --header-h: 80px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: calc(-1 * var(--header-h));
+  padding-top: calc(var(--header-h) + 32px);
+  padding-bottom: 120px;
+  background: var(--black);
+  color: var(--white);
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--white-a8) 1px, transparent 1px),
+    linear-gradient(90deg, var(--white-a8) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: -1px -1px;
+  -webkit-mask-image: linear-gradient(to bottom, var(--black) 0%, var(--black-a55) 60%, transparent 92%);
+  mask-image: linear-gradient(to bottom, var(--black) 0%, var(--black-a55) 60%, transparent 92%);
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(to bottom, transparent 78%, var(--band-bg) 100%),
+    radial-gradient(70% 55% at 62% 88%, var(--glow-ff6e32-a85) 0%, var(--glow-e85014-a55) 30%, var(--glow-962d0a-a30) 55%, transparent 78%),
+    radial-gradient(120% 80% at 30% 100%, var(--glow-a0320c-a55) 0%, transparent 60%),
+    var(--band-bg);
+}
+.inner {
+  position: relative;
+}
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 34px;
+}
+.share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--white-a90);
+  border-radius: var(--r-pill);
+  background: transparent;
+  font: 500 14px/20px var(--font-kr);
+  color: var(--white);
+  cursor: pointer;
+  transition: background 300ms var(--ease);
+}
+.share:hover {
+  background: var(--white-a12);
+}
+.title {
+  margin-top: 64px;
+  font: 600 56px/1.2 var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--white);
+  word-break: keep-all;
+  text-wrap: balance;
+}
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 512px) minmax(0, 640px);
+  justify-content: space-between;
+  align-items: end;
+  gap: 48px 64px;
+  margin-top: 64px;
+}
+.statsCol {
+  min-width: 0;
+}
+.stats {
+  display: grid;
+  gap: 32px;
+  margin: 0;
+}
+.stat {
+  display: grid;
+  gap: 14px;
+}
+.statLabel {
+  font: 600 16px/1.2 var(--font-kr);
+  color: var(--band-ink-4);
+}
+.statValue {
+  margin: 0;
+  font: 600 48px/1.1 var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--brand);
+}
+.statValue :global(.num) {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+.plus {
+  font-weight: 400;
+}
+.note {
+  margin-top: 24px;
+  font: 400 14px/1.5 var(--font-kr);
+  color: var(--band-ink-2);
+}
+.text {
+  display: grid;
+  gap: 1.5em;
+  min-width: 0;
+  font: 400 18px/1.6 var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--band-ink-2);
+  word-break: keep-all;
+}
+
+@media (max-width: 1023px) {
+  .title {
+    font-size: 44px;
+  }
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+  .text {
+    order: -1;
+  }
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    gap: 24px 48px;
+  }
+}
+@media (max-width: 900px) {
+  .hero {
+    --header-h: 64px;
+  }
+}
+@media (max-width: 767px) {
+  .hero {
+    padding-top: calc(var(--header-h) + 24px);
+    padding-bottom: 72px;
+  }
+  .title {
+    margin-top: 40px;
+    font-size: 32px;
+  }
+  .body {
+    margin-top: 32px;
+    gap: 32px;
+  }
+  .text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .statValue {
+    font-size: 30px;
+  }
+  .stats {
+    gap: 20px 32px;
+  }
+}

@@ -1,0 +1,780 @@
+/*
+ * '지금 4기는' (docs/DESIGN.md)
+ * 상자 없이 흰 바탕 + 1px 괘선. 장소색은 8px 표식과 G-Sprint 막대에만, 글자는 먹색.
+ * 레일 안 세로 자리(px)는 SemesterRail.tsx 의 BASE_Y · LANE_STEP 과 맞춘다.
+ */
+
+/* ── 틀: 12칸 중 머리 3칸 · 내용 9칸 ── */
+.root {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: 32px;
+  align-items: start;
+}
+.head {
+  grid-column: 1 / span 3;
+}
+.body {
+  grid-column: 4 / -1;
+  min-width: 0;
+}
+
+.title {
+  font: var(--t-h1);
+  letter-spacing: var(--ls-h1);
+}
+.lede {
+  margin-top: 12px;
+  max-width: 22em;
+  font: var(--t-body);
+  color: var(--ink-700);
+}
+.basis {
+  margin-top: 8px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+
+/* 폰에서만 보이는 '일정 모두 보기' (넓은 화면은 달력 펼침) */
+.homeMore {
+  display: none;
+}
+
+/* 다음 일정 D-n: 홈에서 D-숫자는 여기 하나 (위 괘선으로 묶은 데이터) */
+.next {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: 14px;
+  max-width: 22em;
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ink-900);
+}
+.nextLabel {
+  grid-column: 1 / -1;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.nextDday {
+  margin-top: 4px;
+  font: 600 40px/40px var(--font-num);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.nextWhat {
+  padding-bottom: 2px;
+  font: 600 15px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+
+/* ── 학기 레일 ── */
+.rail {
+  position: relative; /* 떠 있는 이름표 자리 */
+}
+.scroller {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+/* 넘어가는 폭에서는 스크롤 막대가 '오늘' 이름에 붙지 않게 아래를 띄운다 */
+.scroller[data-scrollable] {
+  padding-bottom: 12px;
+}
+/* 넘길 거리가 남은 쪽만 흐리게 */
+.scroller[data-more-right] {
+  -webkit-mask-image: linear-gradient(270deg, transparent 0, var(--black) 40px);
+  mask-image: linear-gradient(270deg, transparent 0, var(--black) 40px);
+}
+.scroller[data-more-left] {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, var(--black) 40px);
+  mask-image: linear-gradient(90deg, transparent 0, var(--black) 40px);
+}
+.scroller[data-more-left][data-more-right] {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, var(--black) 40px, var(--black) calc(100% - 40px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, var(--black) 40px, var(--black) calc(100% - 40px), transparent 100%);
+}
+
+.track {
+  position: relative;
+  min-width: 860px;
+  height: 108px;
+}
+.deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 기준선 · 화요일 눈금 · 달 경계 */
+.base,
+.basePast {
+  position: absolute;
+  top: 52px;
+  height: 1px;
+}
+.base {
+  left: 0;
+  right: 0;
+  background: var(--line-strong);
+}
+/* 지나온 구간은 한 단계 진하게 */
+.basePast {
+  left: 0;
+  background: var(--ink-500);
+}
+.tick {
+  position: absolute;
+  top: 53px;
+  width: 1px;
+  height: 5px;
+  background: var(--line-strong);
+}
+.month {
+  position: absolute;
+  top: 52px;
+  height: 30px;
+  border-left: 1px solid var(--line-strong);
+}
+.monthName {
+  position: absolute;
+  left: 7px;
+  top: 10px;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+
+/* G-Sprint: 킥오프와 데모데이를 괄호처럼 세운 얇은 막대. 오늘까지 지난 부분만 굵게 */
+.barThin,
+.barDone {
+  position: absolute;
+  background: var(--place-projects);
+}
+.barThin {
+  top: 29px;
+  height: 1px;
+}
+.barDone {
+  top: 28px;
+  height: 3px;
+}
+.barTick {
+  position: absolute;
+  top: 26px;
+  width: 1px;
+  height: 7px;
+  background: var(--place-projects);
+}
+.barTick[data-end] {
+  top: 24px;
+  height: 11px;
+}
+.step {
+  position: absolute;
+  top: 0;
+  font: 500 13px/20px var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+
+/* 오늘: 먹색 1px 세로선, 아래 끝에 이름 */
+.today {
+  position: absolute;
+  top: 20px;
+  height: 88px;
+  width: 1px;
+  background: var(--ink-900);
+}
+.todayLabel {
+  position: absolute;
+  left: 6px;
+  bottom: -2px;
+  font: 600 13px/20px var(--font-kr);
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+.today[data-flip] .todayLabel {
+  left: auto;
+  right: 6px;
+}
+
+/* 일정 표식: 보이는 것은 8px, 누르는 자리는 44px */
+.mk {
+  position: absolute;
+  z-index: 1;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sq {
+  display: block;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--c);
+  /* 노랑처럼 옅은 장소색도 흰 바탕에서 모양이 보이게 안쪽에 아주 옅은 테 */
+  box-shadow: inset 0 0 0 1px var(--ink-a12);
+  transition: box-shadow var(--dur-hover) var(--ease);
+}
+.mk[data-rest] .sq {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--ink-500);
+}
+.mk[data-on] .sq {
+  box-shadow:
+    inset 0 0 0 1px var(--ink-a12),
+    0 0 0 2px var(--paper),
+    0 0 0 3px var(--ink-900);
+}
+.mk[data-rest][data-on] .sq {
+  box-shadow:
+    inset 0 0 0 1px var(--ink-500),
+    0 0 0 2px var(--paper),
+    0 0 0 3px var(--ink-900);
+}
+.mk:focus-visible {
+  outline: none;
+}
+.mk:focus-visible .sq {
+  outline: 2px solid var(--g-blue);
+  outline-offset: 3px;
+  box-shadow: inset 0 0 0 1px var(--ink-a12);
+}
+.mk[data-rest]:focus-visible .sq {
+  box-shadow: inset 0 0 0 1px var(--ink-500);
+}
+
+/* 떠 있는 이름표 */
+.tip {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  max-width: 240px;
+  padding: 10px 14px 11px 12px;
+  border-radius: var(--r-control);
+  background: var(--paper);
+  box-shadow: var(--shadow-float);
+  animation: tipIn var(--dur-hover) var(--ease);
+}
+.tipDate {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ink-700);
+}
+.tipTitle {
+  font: 600 15px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+.tipMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.tipSq {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--c);
+  flex: none;
+}
+.tipSq[data-rest] {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--ink-500);
+}
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+/* ── G-Sprint 한 줄 (레일의 빨간 막대 설명) ── */
+.sprint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 12px;
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+.sprint b {
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.swatch {
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  height: 3px;
+  margin: -2px 10px 0 0;
+  background: var(--place-projects);
+}
+/* 묶음 단위로만 줄을 바꾼다. 묶음 사이는 가운뎃점 대신 1px 세로 괘선 (hallmark 63) */
+.sg {
+  white-space: nowrap;
+}
+.sg + .sg::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin: 0 12px 0 4px;
+  background: var(--line-strong);
+  vertical-align: -0.1em;
+}
+/* 기간 사이 물결표: 숫자에 붙여 쓴다 ('10.13 킥오프~12.29 데모데이') */
+.dash {
+  margin-inline: 2px;
+  color: var(--ink-500);
+}
+
+/* ── 다가오는 일정 ── */
+.up {
+  margin-top: 56px;
+}
+.upTitle {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--ink-900);
+  font: var(--t-h3);
+  letter-spacing: var(--ls-h3);
+}
+.upNote {
+  padding-block: 20px;
+  max-width: 38em;
+  font: var(--t-body);
+  color: var(--ink-700);
+}
+.upNote[data-reserve] {
+  min-height: 272px; /* 네 줄 자리를 미리 잡아 화면이 출렁이지 않게 */
+}
+/* 줄: 날짜 | 제목(아래에 장소 13px) | 종류. 모든 줄이 같은 모양이고, 휴회도 날짜 순서대로 한 줄 (먹색 대신 ink-500) */
+.upList {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  column-gap: 32px;
+}
+.row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  align-items: start;
+  min-height: 64px;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.rowDate {
+  grid-column: 1;
+  padding-top: 2px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.rowTitle {
+  grid-column: 2;
+  min-width: 0;
+  font: 600 17px/26px var(--font-kr);
+  color: var(--ink-900);
+}
+.rowVenue {
+  display: block;
+  margin-top: 2px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.rowKind {
+  grid-column: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 3px;
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.row[data-rest] .rowTitle {
+  font-weight: 500;
+  color: var(--ink-500);
+}
+.row[data-rest] .rowDate,
+.row[data-rest] .rowKind,
+.row[data-rest] .rowVenue {
+  color: var(--ink-500);
+}
+/* 휴회 표식: 속이 빈 8px 네모 */
+.restSq {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--ink-500);
+}
+
+/* ── 달력 펼치기 ── */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--t-ui);
+  color: var(--ink-900);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .toggle:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+.toggleIcon {
+  transition: transform var(--dur-open) var(--ease);
+}
+.toggle[aria-expanded='true'] .toggleIcon {
+  transform: rotate(180deg);
+}
+.calWrap {
+  margin-top: 8px;
+  animation: calIn var(--dur-open) var(--ease);
+}
+@keyframes calIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* ── 월 달력 ── */
+.calBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 8px 12px;
+}
+.calTitle {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.calNav {
+  display: flex;
+  gap: 8px;
+}
+.calNav button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  background: var(--paper);
+  color: var(--ink-900);
+  cursor: pointer;
+  transition: border-color var(--dur-hover) var(--ease);
+}
+@media (hover: hover) {
+  .calNav button:hover {
+    border-color: var(--ink-500);
+  }
+}
+.calTable {
+  border-top: 1px solid var(--ink-900);
+  border-bottom: 1px solid var(--line);
+}
+.calRow {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.calRow + .calRow {
+  border-top: 1px solid var(--line);
+}
+.calHead {
+  padding: 8px 10px;
+  font: 500 13px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.calHead[data-meet] {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.calHead[data-meet],
+.cell[data-meet] {
+  background: var(--subtle);
+}
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  min-height: 100px;
+  padding: 8px 10px 12px;
+}
+.dayNum {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -2px 0 0 -7px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-900);
+}
+.cell[data-weekend] .dayNum {
+  color: var(--ink-500);
+}
+.cell[data-today] .dayNum {
+  background: var(--ink-900);
+  color: var(--white);
+  font-weight: 600;
+}
+.cellEvents {
+  display: grid;
+  gap: 6px;
+}
+.cellEvents li {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font: 500 13px/18px var(--font-kr);
+  color: var(--ink-900);
+}
+.cellEvents li > i {
+  margin-top: 5px;
+}
+/* 휴회는 옅게. 화요일 열의 옅은 면 위에서도 4.5:1 이 되도록 ink-700 (ink-500 은 4.4:1) */
+.cellEvents li[data-rest] {
+  color: var(--ink-700);
+}
+/* 여러 날 일정이 이어지는 날: 이름 없이 장소색 띠 */
+.cellEvents li[data-cont] {
+  align-items: center;
+  min-height: 18px;
+}
+.contBar {
+  flex: 1;
+  height: 4px;
+  margin-top: 0 !important;
+  border-radius: 2px;
+  background: var(--c);
+  opacity: 0.5;
+}
+.cellTitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.phoneOnly,
+.calList {
+  display: none;
+}
+
+/* ── 폰 · 좁은 화면 ── */
+@media (max-width: 1279px) {
+  .head,
+  .body {
+    grid-column: 1 / -1;
+  }
+  .lede {
+    max-width: 38em;
+  }
+  .next {
+    margin-top: 20px;
+  }
+  /* 레일이 넘어가는 폭에서는 화면 끝까지 넓혀, 흐린 가장자리가 글 여백 안쪽을 자르지 않게 */
+  .scroller {
+    margin-inline: calc(-1 * var(--side)) calc(-1 * var(--side-r));
+    padding-inline: var(--side) var(--side-r);
+  }
+}
+
+@media (max-width: 767px) {
+  .root {
+    row-gap: 24px;
+  }
+  /* 홈 폰: 학기 레일은 가로로 넘겨야 보여서 빼고, G-Sprint 한 줄과 다가오는 일정만 (커뮤니티 · 지원 안내의 레일은 그대로) */
+  .homeRail,
+  .homeCal {
+    display: none;
+  }
+  .homeMore {
+    display: block;
+    margin-top: 12px;
+  }
+  .homeMore :global(.link) {
+    min-height: 44px;
+  }
+  .sprint {
+    column-gap: 14px;
+    font-size: 14px;
+  }
+  .sg + .sg::before {
+    content: none;
+  }
+  .up {
+    margin-top: 40px;
+  }
+
+  .upList {
+    display: block;
+  }
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'date kind'
+      'title title';
+    column-gap: 16px;
+    row-gap: 2px;
+    min-height: 0;
+    padding-block: 14px;
+  }
+  .rowDate {
+    grid-area: date;
+    padding-top: 0;
+    font-size: 14px;
+  }
+  .rowTitle {
+    grid-area: title;
+  }
+  .rowKind {
+    grid-area: kind;
+    padding-top: 0;
+    font-size: 13px;
+  }
+
+  .calHead {
+    padding: 8px 0;
+    text-align: center;
+  }
+  .cell {
+    align-items: center;
+    gap: 4px;
+    min-height: 60px;
+    padding: 6px 0 8px;
+  }
+  .dayNum {
+    margin: 0;
+    font-size: 13px;
+  }
+  .cellEvents {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3px;
+  }
+  .cellEvents li > i {
+    margin-top: 0;
+  }
+  .cellEvents li[data-cont] {
+    min-height: 0;
+  }
+  .contBar {
+    flex: none;
+    width: 12px;
+  }
+  /* 칸에는 표식만: 제목은 화면 읽기용으로 남긴다 */
+  .cellTitle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .phoneOnly {
+    display: inline-block;
+  }
+  .calList {
+    display: block;
+    margin-top: 8px;
+  }
+  .calList li {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 16px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .calListWhen {
+    grid-row: span 2;
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 500;
+    color: var(--ink-700);
+  }
+  .calListTitle {
+    font: 600 15px/22px var(--font-kr);
+    color: var(--ink-900);
+  }
+  .calList li[data-rest] .calListTitle {
+    font-weight: 500;
+    color: var(--ink-500);
+  }
+  .calListKind {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: var(--t-meta);
+    color: var(--ink-700);
+  }
+  .calEmpty {
+    display: block !important;
+    font: var(--t-body);
+    color: var(--ink-700);
+  }
+}
+
+/* 손가락으로 넘기는 화면: 막대 대신 흐린 가장자리로 넘길 거리를 알린다 */
+@media (pointer: coarse) {
+  .scroller {
+    scrollbar-width: none;
+  }
+  .scroller::-webkit-scrollbar {
+    display: none;
+  }
+  .scroller[data-scrollable] {
+    padding-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tip,
+  .calWrap {
+    animation: none;
+  }
+  .sq,
+  .toggleIcon,
+  .calNav button {
+    transition: none;
+  }
+}

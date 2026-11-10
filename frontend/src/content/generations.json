@@ -1,0 +1,56 @@
+{
+  "note": "기수 연혁. 확인된 사실만. start · end = 활동 기간 (운영진이 확인한 기간, 없으면 첫 · 마지막 공개 행사의 달). 기록이 없으면 비운다 (docs/CONTENT.md). highlights의 숫자는 events.json · projects.json에서 센 값이고 content.test.ts가 맞는지 확인한다.",
+  "updatedAt": "2026-10-17",
+  "generations": [
+    {
+      "n": 1,
+      "name": "GDSC DGU",
+      "start": "2023-09",
+      "end": "2024-07",
+      "summary": "Google Developer Student Clubs(GDSC) 이름으로 활동했고, Solution Challenge 2024 프로젝트 9개를 남겼습니다.",
+      "highlights": ["Solution Challenge 2024 프로젝트 9개", "GDSC DGU 웹사이트"],
+      "source": ["https://github.com/orgs/GDSC-DGU/repositories?type=all", "https://github.com/GDSC-DGU/gdsc-dgu", "4기 Organizer 이도윤 확인 (2026.10.17): 1기 2023.09~2024.07, 2기 2024.09~2025.07, 3기 2025.09~2026.07, Solution Challenge는 해마다 초에 열려 3기가 Solution Challenge 2026에 참여"]
+    },
+    {
+      "n": 2,
+      "name": "GDGoC DGU",
+      "start": "2024-09",
+      "end": "2025-07",
+      "summary": "GDG on Campus 이름으로 활동한 첫 기수입니다. 목요일에 Camping Seminar를 열고 Solution Challenge 2025 프로젝트 7개를 만들었습니다.",
+      "highlights": ["Camping Seminar 공개 기록 8건", "Solution Challenge 2025 프로젝트 7개", "홍익대, 중앙대, 건국대와 합동 세미나", "2기 데모데이 (2025.07.26)"],
+      "source": [
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdg-on-campus-dgu-2st-orientation/",
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdgoc-dgu-2st-demoday/",
+        "https://github.com/orgs/GDSC-DGU/repositories?type=all"
+      ]
+    },
+    {
+      "n": 3,
+      "name": "GDGoC DGU",
+      "start": "2025-09",
+      "end": "2026-07",
+      "summary": "금요일에 Camping Seminar를 열고, 동국대 동아리 8곳과 동국대 Dev Conference 2025를 공동 주최했습니다. 2026년 초에는 Solution Challenge 2026 프로젝트 6개를 만들었습니다.",
+      "highlights": ["Camping Seminar 공개 기록 14건", "동국대 Dev Conference 2025 공동 주최", "Solution Challenge 2026 프로젝트 6개", "Winter Gemini Study Jams 3주"],
+      "source": [
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdgoc-dgu-3rd-ot/",
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-dongguk-university-dev-conference-2025/",
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdg-on-campus-dgu-open-seminar-1/",
+        "https://github.com/orgs/GDSC-DGU/repositories?type=all",
+        "4기 Organizer 이도윤 확인 (2026.10.17): 1기 2023.09~2024.07, 2기 2024.09~2025.07, 3기 2025.09~2026.07, Solution Challenge는 해마다 초에 열려 3기가 Solution Challenge 2026에 참여"
+      ]
+    },
+    {
+      "n": 4,
+      "name": "GDGoC DGU",
+      "start": "2026-09",
+      "summary": "화요일 정기 세션과 팀 프로젝트 G-Sprint로 활동합니다.",
+      "highlights": ["G-Sprint 5팀 27명", "Frontend, Backend, AI/ML, Product Design 파트", "G-Sprint 데모데이 2026.12.29"],
+      "current": true,
+      "source": [
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdgoc-dgu-4th-ot/",
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdgoc-dgu-4th-member-introduction-amp-part-sessions/",
+        "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdgoc-dgu-g-sprint-kickoff-team-meetings/"
+      ]
+    }
+  ]
+}

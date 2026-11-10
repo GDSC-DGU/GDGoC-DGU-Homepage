@@ -1,0 +1,199 @@
+/*
+ * 관리자 표: 진짜 <table> (caption · th scope). 줄 높이 48 안팎, 글자 15.
+ * 넓은 표는 자기 상자 안에서만 가로로 넘긴다 (페이지 전체 가로 넘침 0).
+ * 음영: shaded = 관리자 게시글 (F-ABD-006), muted = 비활성 사용자 (F-AMB-001 6). 음영만으로 뜻을 전하지 않도록 행 안에 글자(운영진 · 비활성)를 같이 둔다.
+ */
+.wrap {
+  min-width: 0;
+}
+.scroll {
+  /* position: 안의 화면 읽기 전용 글자(absolute)도 이 상자에서 잘리게 (아니면 페이지가 가로로 넘친다) */
+  position: relative;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
+}
+.scroll.bare {
+  border: 0;
+  border-radius: 0;
+}
+.scroll:focus-visible {
+  outline-offset: 2px;
+}
+.table {
+  width: 100%;
+  min-width: var(--table-min, 720px);
+  border-collapse: collapse;
+  font: 400 15px/22px var(--font-kr);
+  color: var(--ink-900);
+  font-variant-numeric: tabular-nums;
+}
+.caption {
+  padding: 14px 16px 0;
+  font: 700 17px/26px var(--font-kr);
+  text-align: left;
+}
+.table th,
+.table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+.table thead th {
+  padding-top: 11px;
+  padding-bottom: 11px;
+  border-bottom-color: var(--line-strong);
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+  background: var(--paper);
+}
+.table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.table tbody th {
+  font-weight: 600;
+}
+.table [data-align='center'] {
+  text-align: center;
+}
+.table [data-align='end'] {
+  text-align: right;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.selectCell {
+  width: 52px;
+  padding-right: 0 !important;
+}
+.selectCell input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--ink-900);
+  cursor: pointer;
+  vertical-align: middle;
+}
+/* 체크 칸 전체가 누르는 자리 (32 이상) */
+.selectLabel {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -7px 0 -7px -7px;
+  cursor: pointer;
+}
+.row[data-tone='shaded'] > * {
+  background: var(--field);
+}
+.row[data-tone='muted'] > * {
+  background: var(--field);
+  color: var(--ink-500);
+}
+.row[data-selected='true'] > * {
+  background: var(--adm-select);
+}
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  margin: -6px -8px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.sortButton[data-active='true'] {
+  color: var(--ink-900);
+}
+.busy tbody {
+  opacity: 0.55;
+  transition: opacity var(--dur-open) var(--ease);
+}
+.skeleton {
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--field);
+}
+.message {
+  padding: 0 !important;
+}
+.errorRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  padding: 32px 16px;
+  font: 500 15px/22px var(--font-kr);
+  color: var(--adm-danger-ink);
+}
+@media (hover: hover) {
+  .row:hover > * {
+    background: var(--subtle);
+  }
+  .row[data-selected='true']:hover > * {
+    background: var(--adm-select);
+  }
+  .sortButton:hover {
+    background: var(--subtle);
+  }
+}
+
+/* ── 페이지 나누기 ── */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+.pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.page {
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font: 500 15px/1 var(--font-num);
+  color: var(--ink-700);
+  cursor: pointer;
+}
+.page[aria-current='page'] {
+  background: var(--ink-900);
+  color: #fff;
+  font-weight: 600;
+}
+.page:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.pageText {
+  font: 600 14px/1 var(--font-kr);
+}
+.gap {
+  min-width: 24px;
+  text-align: center;
+  color: var(--ink-500);
+}
+@media (hover: hover) {
+  .page:hover:not(:disabled):not([aria-current='page']) {
+    background: var(--subtle);
+    color: var(--ink-900);
+  }
+}

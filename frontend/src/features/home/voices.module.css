@@ -1,0 +1,172 @@
+/*
+ * 홈 멤버 회고 (4기 Organizer 2026-11-06: 괘선 목록이 너무 정적 → 카드 아홉 장).
+ * 옅은 회색 면 위 흰 카드. 넓은 화면은 세 줄기에 세 장씩, 가운데 줄기만 64px 내려 엇갈리게.
+ * 1 · 5 · 9번째(대각선)는 검정 카드. 카드 왼쪽 위에 큰 따옴표 그림 하나 (글자 대신 SVG, hallmark 30a; dcamp 카드: 모서리 8 · 테두리 없음).
+ * 마우스를 올리면 0.6초에 걸쳐 6px 스윽 떠오르고 그림자가 옅게 번진다. 내려올 때도 같은 곡선 (4기 Organizer 2026-11-06: 툭 올라가는 게 딱딱하다).
+ * 태블릿 · 폰: 한 줄로 옆으로 넘긴다 (스크롤 스냅, 다음 카드가 조금 보이게).
+ */
+.cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+}
+.cols:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: var(--r-card);
+}
+.col {
+  display: grid;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.col:nth-child(2) {
+  margin-top: 64px;
+}
+.item {
+  min-width: 0;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  margin: 0;
+  padding: 32px 28px 28px;
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--ink-900);
+  box-shadow: 0 0 0 var(--ink-a0);
+  transition:
+    transform var(--dur-lift) var(--ease-soft),
+    box-shadow var(--dur-lift) var(--ease-soft);
+  will-change: transform;
+}
+@media (hover: hover) {
+  .item:hover .card {
+    transform: translateY(var(--lift));
+    box-shadow: var(--shadow-lift);
+  }
+}
+.item[data-dark] .card {
+  border-color: transparent;
+  background: var(--band-bg, var(--ink-900));
+  color: var(--white);
+}
+
+.mark {
+  display: block;
+  flex: none;
+  width: 32px;
+  height: 24px;
+  color: var(--gen);
+}
+.sampleTag {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.quote {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+.headline {
+  font: 700 19px/29px var(--font-kr);
+  letter-spacing: -0.015em;
+  color: inherit;
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.body {
+  font: 400 15px/25px var(--font-kr);
+  color: var(--ink-700);
+  text-wrap: pretty;
+  word-break: keep-all;
+}
+.item[data-dark] .body {
+  color: var(--white-a78);
+}
+.who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.item[data-dark] .who {
+  border-top-color: var(--white-a18);
+}
+.name {
+  font: 600 15px/22px var(--font-kr);
+  color: inherit;
+}
+.meta {
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.item[data-dark] .meta {
+  color: var(--white-a72);
+}
+
+/* ── 태블릿 · 폰: 한 줄로 옆으로 넘긴다. 줄기(ul)는 풀고 카드 순서는 li 의 order(1 → 9) ── */
+@media (max-width: 1023px) {
+  .cols {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    margin-inline: calc(-1 * var(--side)) calc(-1 * var(--side-r));
+    padding: 4px var(--side-r) 12px var(--side);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--side);
+    scrollbar-width: none;
+  }
+  .cols::-webkit-scrollbar {
+    display: none;
+  }
+  .col {
+    display: contents;
+  }
+  .col:nth-child(2) {
+    margin-top: 0;
+  }
+  .item {
+    flex: none;
+    width: min(360px, 82vw);
+    scroll-snap-align: start;
+  }
+  .item:hover .card {
+    transform: none;
+    box-shadow: none;
+  }
+}
+@media (max-width: 767px) {
+  .card {
+    padding: 28px 22px 22px;
+    gap: 16px;
+  }
+  .headline {
+    font-size: 18px;
+    line-height: 27px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .item:hover .card {
+    transform: none;
+  }
+}

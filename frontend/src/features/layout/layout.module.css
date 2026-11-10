@@ -1,0 +1,703 @@
+/*
+ * ── 머리말 (dcamp.kr 을 따름, 4기 Organizer 2026-11-06): 위에서 16px 떠 있는 따뜻한 회색 둥근 띠(높이 64, 모서리 8).
+ * 띠는 본문 폭보다 좌우로 32px 넓고, 로고와 메뉴는 본문 끝선에 맞는다. 차지하는 높이는 전과 같은 80 (폰 8 + 56 = 64).
+ * 내려가면 띠 아래에 옅은 그림자.
+ */
+.header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 50;
+  /* 폰 머리말 버튼을 숨길 폭은 화면이 아니라 실제로 남은 폭(스크롤 막대 뺀 폭)으로 잰다 */
+  container: header / inline-size;
+  padding-top: 16px;
+  background: transparent;
+  /* 페이지를 옮길 때 머리말은 그대로 두고 본문만 바뀌게 (global.css 페이지 전환) */
+  view-transition-name: site-header;
+}
+/* 노치 영역(폰 상태 표시줄 아래)으로 본문이 비치지 않게 */
+.header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--paper);
+}
+.header[data-scrolled] .bar {
+  box-shadow: 0 6px 24px -10px var(--ink-a18);
+}
+/* 검정 섹션 위: 검정 띠 · 흰 글자 (on-dark 가 글자 단계를 바꾼다) */
+.header[data-on-dark] .bar {
+  background: var(--black);
+  box-shadow: none;
+}
+.header[data-on-dark] .searchBox {
+  background: var(--band-raise);
+  color: var(--band-ink-3);
+}
+.header[data-on-dark] .searchBox:hover {
+  border-color: var(--band-line-strong);
+}
+.header[data-on-dark] .applyCta {
+  background: var(--white);
+  color: var(--black);
+}
+.header[data-on-dark] .applyCtaActive {
+  box-shadow: 0 0 0 2px var(--black), 0 0 0 4px var(--white);
+}
+.header[data-on-dark] .navActive::after {
+  background: var(--white);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 64px;
+  border-radius: var(--r-card);
+  background: var(--field);
+  transition:
+    box-shadow var(--dur-open) var(--ease),
+    background 300ms var(--ease);
+}
+/* 본문 틀(.container) 의 좌우 여백 안에서 띠만 32px 넓게: 안쪽 여백으로 로고 · 메뉴는 본문 끝선 그대로.
+   .container 의 width: 100% 는 풀어 둔다 (바깥 여백과 더해지면 화면보다 넓어진다) */
+.header .bar {
+  width: auto;
+  max-width: calc(var(--max) + 64px);
+  padding-inline: 32px;
+  margin-inline: auto;
+}
+@media (max-width: 1279px) {
+  .header .bar {
+    max-width: none;
+    margin-inline: calc(var(--side) - 32px) calc(var(--side-r) - 32px);
+  }
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--ink-900);
+  text-decoration: none;
+  flex: none;
+}
+.brandLogo {
+  display: block;
+  width: auto;
+  height: 32px;
+}
+.wordmark {
+  font: 700 18px/1 var(--font-num);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+
+/* 가운데 검색창: 누르면 검색 창(SearchDialog)이 열린다. 생김새는 입력칸 (링커리어 · 잡코리아 머리말) */
+.searchBox {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: clamp(220px, 30vw, 420px);
+  height: 44px;
+  margin-inline: auto;
+  padding: 0 14px 0 16px;
+  border: 1px solid transparent;
+  border-radius: var(--r-control);
+  background: var(--paper);
+  font: 500 15px/20px var(--font-kr);
+  color: var(--ink-500);
+  text-align: left;
+  cursor: text;
+  transition: border-color var(--dur-hover) var(--ease);
+}
+.searchBox:hover {
+  border-color: var(--line-strong);
+}
+.searchBox:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.searchHint {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.searchBox svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--ink-700);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.nav {
+  flex: none;
+}
+.nav ul {
+  display: flex;
+  gap: 8px;
+}
+.navLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--r-control);
+  font: 500 16px/24px var(--font-kr);
+  color: var(--ink-900);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 300ms var(--ease);
+}
+/* 지금 메뉴: 먹색 글자 + 2px 먹색 밑줄 (AI 티 점검 2026-11-05: 메뉴마다 다른 장소색 글자 → 한 가지 표시) */
+.navActive {
+  color: var(--ink-900);
+}
+/* 넓은 화면의 도구 묶음은 폰 메뉴 단추뿐이라 통째로 숨긴다 (빈 칸이 간격만 차지하지 않게) */
+@media (min-width: 901px) {
+  .tools {
+    display: none;
+  }
+}
+/* 마우스를 올린 메뉴: 옅은 회색 밑줄이 가운데에서 펴진다. 지금 메뉴는 같은 자리에 먹색 밑줄이 늘 있다 */
+.navLink::after {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 6px;
+  height: 2px;
+  content: '';
+  background: var(--line-strong);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition:
+    opacity var(--dur-hover) var(--ease),
+    transform var(--dur-open) var(--ease);
+}
+.navActive::after {
+  background: var(--ink-900);
+  opacity: 1;
+  transform: none;
+}
+/* 지원하기: 메뉴 끝의 검정 알약 단추 (40px, dcamp 버튼). 모집 중이면 앞에 주황 점(지금 기수) */
+.applyCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  margin-left: 12px;
+  padding: 0 20px;
+  border-radius: var(--r-pill);
+  background: var(--band-bg);
+  font: 700 15px/20px var(--font-kr);
+  color: var(--white);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur-hover) var(--ease);
+}
+.applyCta:hover {
+  background: var(--black);
+}
+.applyCta:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.applyCtaActive {
+  box-shadow: 0 0 0 2px var(--field), 0 0 0 4px var(--ink-900);
+}
+.applyDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gen);
+}
+@media (hover: hover) {
+  .navLink:hover::after {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  color: var(--ink-900);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--dur-hover) var(--ease);
+}
+@media (hover: hover) {
+  .iconBtn:hover {
+    background: var(--subtle);
+  }
+}
+.iconBtn:active {
+  background: var(--line);
+}
+.iconBtn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.menuBtn {
+  display: none;
+}
+
+/*
+ * 아직 열지 않은 장소 옆 '준비 중' (분류 태그 모양: 바탕 없이 1px 괘선).
+ * 꼬리말 둘러보기에서만 쓴다 (머리말 · 폰 메뉴는 메뉴 이름만: 맨 위에 미완성 표시를 내걸지 않는다).
+ * 먹색 꼬리말에서는 .on-dark 가 선 · 글자 단계를 바꿔 끼운다.
+ */
+.soon {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-tag);
+  font: 500 13px/1 var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+
+/*
+ * 지원 행동 (ApplyLink): 모집 상태를 따른다. 모양은 두 번째 버튼 작은 크기(global .btn-secondary.btn-sm: 높이 40 · radius 10 · 옅은 면).
+ * 평소(모집 전 · 마감 뒤): '지원 안내'. 상태 점이 없어 '지금 열려 있다'로 읽히지 않는다.
+ * 모집 중: '지원서 쓰기 | 10.31 마감' (머리말에서도 두 번째 버튼: 첫 화면의 먹색 주 버튼과 겹치지 않게).
+ * 지원 안내 페이지에 있을 때(.applyActive): 먹색 바탕 · 흰 글자 = '지금 여기'.
+ */
+.apply {
+  gap: 8px;
+  white-space: nowrap;
+  flex: none;
+}
+.applyActive {
+  --btn2-bg: var(--ink-900);
+  --btn2-bg-hover: var(--black);
+  --btn2-ink: var(--white);
+  --btn2-line: transparent;
+  --btn2-line-hover: transparent;
+}
+.applySheet:active {
+  transform: scale(var(--press));
+}
+/* 모집 중 (폰 메뉴 시트): 먹색 바탕 */
+.applySheet.applyNow,
+.applySheet.applyActive {
+  background: var(--ink-900);
+  color: var(--white);
+}
+@media (hover: hover) {
+  .applySheet.applyNow:hover,
+  .applySheet.applyActive:hover {
+    background: var(--black);
+  }
+}
+/* 마감일: 가는 세로 괘선 뒤 옅은 글자 */
+.applyDue {
+  display: inline-flex;
+  align-items: center;
+  height: 16px;
+  padding-left: 8px;
+  border-left: 1px solid var(--line-strong);
+  font: 500 13px/1 var(--font-kr);
+  color: var(--ink-700);
+}
+.applyActive .applyDue {
+  border-color: var(--band-line);
+  color: var(--band-ink-2);
+}
+/* .apply.* : global .btn-secondary(inline-flex)보다 앞서도록 두 class 로 */
+.apply.applyBar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .header {
+    padding-top: 8px;
+  }
+  .bar {
+    height: 56px;
+  }
+  .header .bar {
+    margin-inline: calc(var(--side) - 12px) calc(var(--side-r) - 12px);
+    padding-inline: 12px 16px;
+  }
+  .brandLogo {
+    height: 28px;
+  }
+  .nav {
+    display: none;
+  }
+  .menuBtn {
+    display: grid;
+  }
+  .searchBox {
+    display: none;
+  }
+  /* 메뉴 줄이 없으니 워드마크 오른쪽 여백은 도구 묶음과의 최소 간격만 */
+  .brand {
+    margin-right: 8px;
+  }
+  .tools {
+    gap: 0;
+    margin-left: auto;
+    margin-right: -12px; /* 아이콘 버튼 안쪽 여백만큼 바깥 줄에 맞춘다 */
+  }
+  .apply.applyWide {
+    display: none;
+  }
+  /* 폰 머리말: 글자만 (마감일 · 새 창 표시는 시트에서) */
+  .apply.applyBar {
+    display: inline-flex;
+    gap: 4px;
+    margin-right: 4px;
+    padding: 0 10px;
+  }
+}
+/*
+ * 워드마크와 겹치는 아주 좁은 폭: 지원 버튼은 메뉴 시트 안에만.
+ * 워드마크 149 + 버튼 + 아이콘 둘 88 + 양옆 여백 40 이 들어가는지로 정했다 ('지원 안내' 77 · '지원서 쓰기' 90)
+ */
+@container header (max-width: 353px) {
+  .apply.applyBar {
+    display: none;
+  }
+}
+@container header (max-width: 366px) {
+  .apply.applyBar.applyNow {
+    display: none;
+  }
+}
+
+/* ── 폰 메뉴: 전체 화면 시트 ── */
+.sheet {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+  border: 0;
+  background: var(--paper);
+  color: var(--ink-900);
+  /*
+   * 슬라이드 (움직임 9가지): 열 때 오른쪽 밖에서 420ms 감속(--ease-out)으로 밀려 들어오고,
+   * 닫을 때 280ms 가속(--ease-in)으로 오른쪽으로 빠진다. 뒤 페이지는 옅게 어두워진다.
+   * 닫히는 동안에도 맨 위 층(top layer)에 남도록 overlay · display 를 함께 넘긴다 (지원하지 않는 브라우저는 바로 닫힌다)
+   */
+  z-index: 100;
+  /* 닫히는 동안에도 열린 때와 같은 배치를 지킨다 ([open] 이 먼저 빠지므로 방향은 여기에) */
+  flex-direction: column;
+  transform: translateX(100%);
+  transition:
+    transform var(--dur-long-exit) var(--ease-in),
+    overlay var(--dur-long-exit) allow-discrete,
+    display var(--dur-long-exit) allow-discrete;
+}
+.sheet[open] {
+  display: flex;
+  transform: none;
+  transition-duration: var(--dur-long);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .sheet[open] {
+    transform: translateX(100%);
+  }
+}
+/* 시트가 미끄러지는 동안 뒤 페이지가 옅게 어두워진다 */
+.sheet::backdrop {
+  background: var(--ink-a32);
+  opacity: 0;
+  transition:
+    opacity var(--dur-long-exit) var(--ease-in),
+    overlay var(--dur-long-exit) allow-discrete,
+    display var(--dur-long-exit) allow-discrete;
+}
+.sheet[open]::backdrop {
+  opacity: 1;
+  transition-duration: var(--dur-long);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .sheet[open]::backdrop {
+    opacity: 0;
+  }
+}
+.sheetNav {
+  flex: 1;
+  overflow: auto;
+  padding-top: 16px;
+  padding-bottom: 32px;
+}
+.sheetNav ul {
+  border-top: 1px solid var(--line);
+}
+.sheetRow {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-900);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* 누르는 동안 줄 뒤에 옅은 면 (괘선 밖으로 12px 넉넉하게, 모서리 둥글게) */
+.sheetRow::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 3px -12px;
+  border-radius: var(--r-control);
+  background: var(--subtle);
+  opacity: 0;
+  transition: opacity var(--dur-hover) var(--ease);
+}
+.sheetRow:active::before {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .sheetRow:hover::before {
+    opacity: 1;
+  }
+}
+.sheetName {
+  font: 600 17px/26px var(--font-kr);
+}
+.sheetSub {
+  margin-left: auto;
+  font: var(--t-meta);
+  color: var(--ink-700);
+  text-align: right;
+}
+.sheetActive .sheetName {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+/* 시트 아래 지원 행동: 폭 가득한 두 번째 버튼 (목록 줄과 같은 이름 · 설명 배치). 모양 규칙은 머리말 버튼과 같다 */
+.applySheet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  margin-top: 24px;
+  padding: 0 18px;
+  border-radius: var(--r-control);
+  background: var(--field);
+  color: var(--ink-900);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--dur-hover) var(--ease),
+    transform var(--dur-press) var(--ease);
+}
+@media (hover: hover) {
+  .applySheet:hover {
+    background: var(--field-line);
+  }
+}
+.applySheet .applyName {
+  font: 600 17px/26px var(--font-kr);
+}
+.applySub {
+  margin-left: auto;
+  font: var(--t-meta);
+  color: var(--ink-700);
+  text-align: right;
+}
+.applySheet.applyNow .applySub,
+.applySheet.applyActive .applySub {
+  color: var(--band-ink-2);
+}
+.sheetFoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  margin-top: 24px;
+}
+.sheetFoot :global(.link) {
+  min-height: 44px;
+}
+.sheetFootMeta {
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+
+/*
+ * ── 꼬리말: 옅은 회색 띠 (4기 Figma 시안 2026-11) ──
+ * 왼쪽 이름 · 주소 · 저작권 | 오른쪽 '채널 바로가기' 아이콘. 본문 좌우 끝선(.container)에 맞춘다.
+ * 본문이 옅은 회색 JoinStrip 으로 끝나도 위 1px 선으로 나뉜다.
+ */
+/* 꼬리말: dcamp 처럼 검정 면 (on-dark 가 글자 · 선 단계를 흰 쪽으로 바꾼다) */
+.footer {
+  margin-top: var(--gap-section);
+  padding: 56px 0 calc(56px + env(safe-area-inset-bottom, 0px));
+  background: var(--band-bg);
+  color: var(--ink-900);
+}
+/* 본문이 이야기 섹션(면)으로 끝나면 꼬리말을 바로 붙인다. 아카이브는 섹션이 탭 칸 안 한 단계 더 깊다 (main > .container > 탭 칸 > 띠) */
+:global(main):has(> :global(.story):last-child, > :last-child > :global(.story):last-child, > :last-child > :last-child > :global(.story):last-child) + .footer {
+  margin-top: 0;
+}
+.footerGrid {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px 48px;
+}
+.footerInfo {
+  min-width: 0;
+  max-width: 640px;
+}
+.footerBrand {
+  font: 800 22px/28px var(--font-num);
+  letter-spacing: 0.01em;
+  color: var(--ink-900);
+}
+.footerAddress {
+  margin-top: 6px;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-500);
+}
+.footerCopy {
+  margin-top: 20px;
+  font: 400 13px/20px var(--font-num);
+  color: var(--ink-500);
+}
+
+/* 채널 바로가기: 오른쪽 정렬, 아이콘 44px 누르는 자리 (아이콘 그림은 20px) */
+.channels {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+.channelsTitle {
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.channelList {
+  display: flex;
+  margin-right: -12px;
+}
+.channel {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-control);
+  color: var(--ink-500);
+  transition:
+    color var(--dur-hover) var(--ease),
+    background-color var(--dur-hover) var(--ease);
+}
+.channel svg {
+  width: 20px;
+  height: 20px;
+}
+.channelFill {
+  fill: currentColor;
+}
+.channelLine {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+@media (hover: hover) {
+  .channel:hover {
+    background: var(--line);
+    color: var(--ink-900);
+  }
+}
+
+/* 운영진 로그인: 오른쪽 아래 구석. 평소 보이지 않고, 키보드 초점이 오거나 마우스를 올리면 보인다 */
+.admin {
+  position: absolute;
+  right: var(--side-r);
+  bottom: -40px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 4px;
+  font: 500 13px/20px var(--font-kr);
+  color: var(--ink-700);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--dur-hover) var(--ease);
+}
+.admin:hover,
+.admin:focus-visible {
+  opacity: 1;
+  text-decoration-line: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .footer {
+    padding-top: 40px;
+  }
+  .footerGrid {
+    flex-direction: column;
+    gap: 28px;
+  }
+  .channels {
+    justify-items: start;
+  }
+  .channelList {
+    margin-right: 0;
+    margin-left: -12px;
+  }
+  .footerBrand {
+    font-size: 20px;
+  }
+  .footerAddress {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheet::backdrop,
+  .navLink::after,
+  .applySheet {
+    transition: none;
+  }
+  .applySheet:active {
+    transform: none;
+  }
+}

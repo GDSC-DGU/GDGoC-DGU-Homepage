@@ -1,0 +1,31 @@
+{
+  "note": "챕터 기본 정보. 숫자는 출처 · 기준일과 함께.",
+  "updatedAt": "2026-10-17",
+  "members": {
+    "value": 244,
+    "asOf": "2026-10-16",
+    "source": "https://gdg.community.dev/gdg-on-campus-dongguk-university-seoul-south-korea/"
+  },
+  "chapterPage": "https://gdg.community.dev/gdg-on-campus-dongguk-university-seoul-south-korea/",
+  "organizers": [
+    {
+      "name": "이도윤",
+      "nameEn": "DOYUN LEE",
+      "role": "Organizer",
+      "generation": 4,
+      "source": "https://gdg.community.dev/gdg-on-campus-dongguk-university-seoul-south-korea/"
+    }
+  ],
+  "email": "gdsc.dgu@gmail.com",
+  "emailSource": "https://linktr.ee/GDGoC_DGU",
+  "github": "https://github.com/GDSC-DGU",
+  "sprint": {
+    "generation": 4,
+    "teams": 5,
+    "members": 27,
+    "demoDay": "2026-12-29",
+    "verified": true,
+    "source": "https://gdg.community.dev/events/details/google-gdg-on-campus-dongguk-university-seoul-south-korea-presents-gdgoc-dgu-g-sprint-kickoff-team-meetings/",
+    "note": "킥오프 페이지: 피칭 · 팀빌딩 뒤 5팀 27명, 데모데이 12월 29일 (2026.10.17 확인)"
+  }
+}

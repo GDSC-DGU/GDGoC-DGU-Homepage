@@ -1,0 +1,499 @@
+/*
+ * 사용자 관리 (P-AMB-01~05). 공통 부품(ui/)은 그대로 쓰고, 이 구역에만 필요한 배치만 여기에.
+ * 글자 13 이상, 색은 상태 배지(글자 + 모양)로만 말한다.
+ */
+
+/* ── 상단 안내: 관리 유형별 권한 | PIN 미설정 ── */
+.summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  margin-bottom: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--paper);
+}
+.roles,
+.pinSummary {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 16px 20px;
+  min-width: 0;
+}
+.pinSummary {
+  border-left: 1px solid var(--line);
+  background: var(--field);
+  border-radius: 0 var(--r-card) var(--r-card) 0;
+}
+.summaryTitle {
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.roleList {
+  display: grid;
+  gap: 2px;
+}
+.roleList > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 10px;
+  margin: 0 -10px;
+  border-radius: 8px;
+  font: 400 15px/22px var(--font-kr);
+}
+.roleList > div[data-me] {
+  background: var(--field);
+}
+.roleList dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.roleList dd {
+  color: var(--ink-700);
+}
+.pinCount {
+  font: 700 22px/30px var(--font-kr);
+  color: var(--ink-900);
+}
+.pinCount .num,
+.pinCount :global(.num) {
+  font-weight: 700;
+}
+.pinBreakdown {
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+
+.meTag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: var(--r-tag);
+  background: var(--ink-900);
+  font: 600 13px/18px var(--font-kr);
+  color: #fff;
+  vertical-align: 1px;
+}
+
+/* ── 목록 머리 · 개수 줄 ── */
+.listHeading {
+  margin-bottom: 12px;
+  font: 700 17px/26px var(--font-kr);
+  letter-spacing: -0.01em;
+  scroll-margin-top: 24px;
+}
+.listHeading:focus {
+  outline: none;
+}
+.listHeading:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.countRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  min-height: 40px;
+  margin-bottom: 12px;
+}
+.rangeNote {
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.errorRow {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── 표: 칸이 많아 안쪽 여백을 조금 줄인다 (공통 16 → 12) ── */
+.tableWrap :is(th, td) {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+.tableWrap :is(th, td):first-child {
+  padding-left: 16px;
+}
+.nameCell {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.name {
+  font-weight: 600;
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+.email {
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+  white-space: nowrap;
+}
+.adminType {
+  font-weight: 600;
+}
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+}
+.badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+.sub {
+  flex-basis: 100%;
+  font: 500 13px/18px var(--font-kr);
+  color: var(--ink-500);
+  white-space: nowrap;
+}
+.statusCell {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+.actions {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.resend {
+  min-width: 104px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.actions :global(.btn-secondary) {
+  white-space: nowrap;
+}
+
+/* ── 변경 이력 ── */
+.historyFilters {
+  display: flex;
+  flex-wrap: wrap;
+  /* 위쪽 맞춤: 날짜 칸 아래 오류 글이 생겨도 다른 칸이 움직이지 않게 */
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+/* 라벨이 없는 검색 칸을 라벨(20) + 간격(6)만큼 내려 입력 칸 줄을 맞춘다 */
+.searchSlot {
+  padding-top: 26px;
+}
+.periodField {
+  width: 160px;
+}
+.dateField {
+  width: 168px;
+}
+.quiet {
+  color: var(--ink-700);
+}
+.actionLabel {
+  font-weight: 600;
+}
+.detail {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+/* ── 팝업 안 ── */
+.form {
+  display: grid;
+  gap: 18px;
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.numField input {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.summaryFacts {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  gap: 4px 24px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--field);
+}
+.summaryFacts dt {
+  font: 600 13px/18px var(--font-kr);
+  color: var(--ink-500);
+}
+.summaryFacts dd {
+  margin-top: 4px;
+  font: 400 14px/20px var(--font-kr);
+}
+.facts {
+  display: grid;
+  gap: 6px;
+}
+.facts > div {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 12px;
+  font: 400 15px/22px var(--font-kr);
+}
+.facts dt {
+  color: var(--ink-500);
+  font-weight: 500;
+}
+.facts dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.fieldLabel {
+  font: 600 15px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+.note {
+  font: 400 14px/21px var(--font-kr);
+  color: var(--ink-500);
+}
+.warn {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--adm-warn-soft);
+  font: 500 14px/21px var(--font-kr);
+  color: var(--adm-warn-ink);
+}
+.warn svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--adm-warn);
+}
+.inlineError {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--adm-danger-soft);
+  font: 500 14px/21px var(--font-kr);
+  color: var(--adm-danger-ink);
+}
+.inlineError svg {
+  flex: none;
+  color: var(--adm-danger);
+}
+.loadingLine {
+  padding: 24px 0;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-500);
+}
+
+.loginBox {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.boxTitle {
+  font: 700 15px/22px var(--font-kr);
+}
+.idRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+}
+.idButton {
+  /* 칸 라벨(22) + 간격만큼 내려 입력 칸과 줄을 맞춘다 */
+  margin-top: 26px;
+}
+.okLine {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -6px;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-900);
+}
+.boxActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.lockedLine {
+  display: grid;
+  gap: 6px;
+}
+.lockedLine p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font: 400 15px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+
+/* 임시 비밀번호 */
+.credential {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--ink-900);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.credentialTitle {
+  font: 700 15px/22px var(--font-kr);
+}
+.copyRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  margin-top: -4px;
+}
+.readonlyInput {
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--field);
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  color: var(--ink-900);
+}
+.readonlyInput:focus {
+  border-color: var(--ink-900);
+}
+.copyStatus {
+  min-height: 20px;
+  margin-top: -4px;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-900);
+}
+.copyStatus:empty {
+  min-height: 0;
+  margin-top: -10px;
+}
+
+/* 결과 단계 */
+.done {
+  display: grid;
+  gap: 14px;
+}
+.done:focus {
+  outline: none;
+}
+.doneLead {
+  font: 400 16px/26px var(--font-kr);
+}
+.mailLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font: 400 15px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+
+/* 보낸 메일 보기 */
+.mail {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.mail summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  font: 600 15px/22px var(--font-kr);
+  cursor: pointer;
+}
+.mailBody {
+  display: grid;
+  gap: 8px;
+  padding: 4px 16px 16px;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.mailLink {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 14px;
+  color: var(--ink-500);
+}
+.fakeButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--ink-900);
+  font: 600 14px/20px var(--font-kr);
+  color: #fff;
+}
+
+/* 비활성화에서 빠지는 사람 */
+.excluded {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--field);
+}
+.excluded ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 18px;
+  list-style: disc;
+  font: 400 14px/21px var(--font-kr);
+  color: var(--ink-700);
+}
+
+@media (max-width: 1023px) {
+  .summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pinSummary {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0 0 var(--r-card) var(--r-card);
+  }
+}
+@media (max-width: 600px) {
+  .grid2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .summaryFacts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .roleList > div,
+  .facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .periodField,
+  .dateField {
+    width: 100%;
+  }
+}

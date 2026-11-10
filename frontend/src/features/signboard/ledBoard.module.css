@@ -1,0 +1,44 @@
+/*
+ * 전광판: 따로 판(상자)을 두지 않고 먹색 띠 위에 점을 바로 찍는다. 꺼진 점 격자가 판의 크기를 보여 준다.
+ * 점은 canvas 가 그린다 (ledMatrix.ts). 위에 띠의 칸 나눔 선과 같은 1px 선 하나로 '안내판 한 줄'을 나눈다.
+ */
+.board {
+  display: block;
+  padding-top: 22px;
+  border-top: 1px solid var(--white-a14);
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.large {
+  padding-top: 0;
+  border-top: 0;
+}
+.board:focus-visible {
+  outline: 2px solid var(--focus-dark);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+.screen {
+  display: flex;
+  justify-content: flex-start;
+  min-height: 48px;
+}
+.canvas {
+  display: block;
+  transition: filter var(--dur-hover) var(--ease);
+}
+/* 누를 수 있는 판: 마우스를 올리면 점이 조금 더 밝게 */
+@media (hover: hover) {
+  .linked:hover .canvas {
+    filter: brightness(1.18);
+  }
+}
+.linked:active .canvas {
+  filter: brightness(1.18);
+}
+@media (max-width: 767px) {
+  .board {
+    padding-top: 18px;
+  }
+}

@@ -1,0 +1,95 @@
+.process {
+  padding-block: 120px;
+  background: var(--field);
+}
+.title {
+  font: 500 32px/1.2 var(--font-num);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  margin: 48px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  position: relative;
+  min-width: 0;
+}
+/* 번호 사이 가는 선 */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 44px;
+  right: -16px;
+  top: 16px;
+  height: 1px;
+  background: var(--line-strong);
+}
+.n {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gen-text);
+  font: 600 12px/1 var(--font-num);
+  color: var(--white);
+}
+.stepTitle {
+  margin-top: 20px;
+  font: 600 18px/1.35 var(--font-kr);
+  color: var(--ink-900);
+}
+.when {
+  margin-top: 8px;
+  font: 400 14px/1.5 var(--font-kr);
+  color: var(--ink-700);
+}
+.note {
+  margin-top: 4px;
+  font: 400 13px/1.5 var(--font-kr);
+  color: var(--ink-700);
+}
+.note::before {
+  content: '• ';
+}
+.foot {
+  margin-top: 40px;
+  font: 400 14px/1.6 var(--font-kr);
+  color: var(--ink-700);
+}
+@media (max-width: 767px) {
+  .process {
+    padding-block: 80px;
+  }
+  .title {
+    font-size: 24px;
+  }
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .step {
+    padding-left: 52px;
+  }
+  .n {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .stepTitle {
+    margin-top: 4px;
+  }
+  .step:not(:last-child)::after {
+    left: 16px;
+    right: auto;
+    top: 40px;
+    bottom: -24px;
+    width: 1px;
+    height: auto;
+  }
+}

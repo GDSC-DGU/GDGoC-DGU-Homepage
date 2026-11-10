@@ -1,0 +1,105 @@
+/*
+ * 목록 페이지 머리 (dcamp 'Story' · 'Startup'): 지금 위치 → 제목 40 → 한 줄(16, 회색) → 검정 띠 카드(높이 110, 모서리 8).
+ */
+.hero {
+  padding-top: 24px;
+}
+.title {
+  margin-top: 72px;
+  font: 600 40px/1.25 var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  word-break: keep-all;
+}
+.lead {
+  max-width: 44em;
+  margin-top: 16px;
+  font: 400 16px/1.6 var(--font-kr);
+  color: var(--ink-700);
+  word-break: keep-all;
+}
+.meta {
+  margin-top: 20px;
+}
+.banner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-height: 88px;
+  margin-top: 40px;
+  padding: 24px 80px 24px 32px;
+  border-radius: var(--r-card);
+  background: var(--black);
+  color: var(--white);
+  text-decoration: none;
+}
+.banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    repeating-linear-gradient(100deg, transparent 0 14px, var(--glow-a0beff-a10) 14px 15px, transparent 15px 30px),
+    radial-gradient(40% 140% at 72% 40%, var(--glow-5078ff-a45), transparent 70%),
+    radial-gradient(30% 120% at 92% 70%, var(--glow-bef0a0-a35), transparent 70%),
+    radial-gradient(30% 140% at 56% 100%, var(--brand-a45), transparent 70%);
+  transition: transform 700ms var(--ease-soft);
+}
+@media (hover: hover) {
+  .banner:hover::before {
+    transform: scale(1.04);
+  }
+  .banner:hover .bannerGo {
+    transform: translateX(4px);
+  }
+}
+.banner:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.bannerTitle {
+  font: 600 20px/1.4 var(--font-kr);
+  letter-spacing: -0.02em;
+  word-break: keep-all;
+}
+.bannerGo {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin-top: -12px;
+  transition: transform var(--dur-short) var(--ease-out);
+}
+@media (max-width: 767px) {
+  .hero {
+    padding-top: 16px;
+  }
+  .title {
+    margin-top: 40px;
+    font-size: 30px;
+  }
+  .banner {
+    padding: 20px 56px 20px 20px;
+  }
+  .bannerTitle {
+    font-size: 17px;
+  }
+  .bannerGo {
+    right: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner::before,
+  .bannerGo {
+    transition: none;
+  }
+  .banner:hover::before,
+  .banner:hover .bannerGo {
+    transform: none;
+  }
+}

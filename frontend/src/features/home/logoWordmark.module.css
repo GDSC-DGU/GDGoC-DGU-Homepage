@@ -1,0 +1,59 @@
+/*
+ * 홈 첫 화면 이름: 로고(두 꺾쇠) → 꺾쇠가 양쪽으로 벌어지며 가운데 'GDGoC DGU' 가 드러난다 (LogoWordmark.tsx).
+ * 글자 크기는 놓인 자리(hero.module.css .wordmark)의 font 를 따른다. 꺾쇠 높이 = 글자 크기의 0.7.
+ */
+.mark {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 0.16em;
+}
+.chevron {
+  flex: none;
+  width: auto;
+  height: 0.7em;
+}
+.text {
+  white-space: nowrap;
+}
+
+/* 닫힘: 두 꺾쇠가 가운데에서 로고 모양으로 붙어 있고 글자는 숨는다. 꺾쇠는 살짝 커지며 나타난다 */
+.mark[data-state='closed'] .left {
+  transform: translateX(var(--d));
+}
+.mark[data-state='closed'] .right {
+  transform: translateX(calc(-1 * var(--d)));
+}
+.mark[data-state='closed'] .chevron {
+  animation: appear 420ms var(--ease) both;
+}
+.mark[data-state='closed'] .text {
+  clip-path: inset(0 50%);
+  opacity: 0;
+}
+
+/* 열림: 로고를 잠깐 보여 준 뒤 꺾쇠가 벌어지고, 글자는 가운데에서 양쪽으로 드러난다 */
+.mark[data-state='open'] .chevron {
+  transition: transform 900ms var(--ease-in-out) 520ms;
+}
+.mark[data-state='open'] .text {
+  clip-path: inset(0 0);
+  opacity: 1;
+  transition:
+    clip-path 900ms var(--ease-in-out) 520ms,
+    opacity 300ms var(--ease) 560ms;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    scale: 0.86;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron,
+  .text {
+    transition: none !important;
+    animation: none !important;
+  }
+}

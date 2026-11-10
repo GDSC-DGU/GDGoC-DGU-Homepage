@@ -1,0 +1,188 @@
+/*
+ * 팝업(<dialog>) · 토스트.
+ * 팝업은 열림 200ms(살짝 커지며 나타남) · 닫힘은 바로. 배경 클릭으로 닫지 않는다 (쓰던 내용을 잃지 않게): Esc · [닫기] · [취소].
+ */
+.dialog {
+  width: min(var(--dialog-w, 560px), calc(100vw - 32px));
+  max-width: none;
+  max-height: min(88vh, 880px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+}
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+  animation: dialog-in var(--dur-open) var(--ease);
+}
+.dialog::backdrop {
+  background: rgba(25, 27, 31, 0.44);
+}
+.sm {
+  --dialog-w: 440px;
+}
+.md {
+  --dialog-w: 560px;
+}
+.lg {
+  --dialog-w: 760px;
+}
+.xl {
+  --dialog-w: 960px;
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 20px 12px 24px;
+}
+.headText {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 6px;
+}
+.title {
+  font: 700 19px/28px var(--font-kr);
+  letter-spacing: -0.01em;
+}
+.desc {
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.close {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink-700);
+  cursor: pointer;
+}
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 24px 20px;
+  overflow-y: auto;
+  font: 400 15px/24px var(--font-kr);
+}
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--line);
+}
+.footStart {
+  margin-right: auto;
+}
+@media (hover: hover) {
+  .close:hover {
+    background: var(--subtle);
+    color: var(--ink-900);
+  }
+}
+
+/* ── 토스트: 오른쪽 아래, 먹색 판. 성공은 5초 뒤 사라지고(마우스 · 초점이 있으면 멈춤), 오류는 닫을 때까지 ── */
+.toasts {
+  position: fixed;
+  z-index: 50;
+  right: 24px;
+  bottom: 24px;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  width: min(420px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.toastRegion {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  width: 100%;
+}
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 8px 12px 16px;
+  border-radius: 12px;
+  background: var(--ink-900);
+  color: #fff;
+  box-shadow: var(--shadow-float);
+  font: 500 15px/22px var(--font-kr);
+  pointer-events: auto;
+  animation: toast-in var(--dur-open) var(--ease);
+}
+.toast svg {
+  flex: none;
+  margin-top: 3px;
+  --icon-on: var(--ink-900);
+}
+.toastClose svg {
+  --icon-on: initial;
+}
+.toast[data-tone='error'] svg {
+  color: #ff8a80;
+}
+.toastText {
+  flex: 1;
+  min-width: 0;
+}
+.toastClose {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -5px 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--band-ink-2);
+  cursor: pointer;
+}
+.toastClose:focus-visible {
+  outline-color: #8ab4f8;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (hover: hover) {
+  .toastClose:hover {
+    background: #2b2e34;
+    color: #fff;
+  }
+}
+@media (max-width: 767px) {
+  .toasts {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open],
+  .toast {
+    animation: none;
+  }
+}

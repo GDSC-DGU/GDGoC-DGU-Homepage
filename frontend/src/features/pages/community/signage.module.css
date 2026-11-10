@@ -1,0 +1,85 @@
+/*
+ * 안내판 조각 (Signage.tsx). docs/DESIGN.md 9장 이름표: 흰 판 · radius 4 · 왼쪽 장소색 네모.
+ * 장소색은 네모에만, 글자는 먹색.
+ */
+
+/* ── 장소 글자 (상자 없이) ── */
+.plate {
+  display: inline;
+  font: 500 13px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.building {
+  color: var(--ink-700);
+}
+.room {
+  font-weight: 600;
+  color: var(--ink-900);
+}
+
+/* ── 출처 링크 (출처 한 줄 안) ── */
+.sourceLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  /* 작은 글자 링크도 누르는 자리는 44px: 위아래로 넓히고 줄 높이(24)는 그대로 */
+  padding-block: 10px;
+  margin-block: -10px;
+  color: var(--ink-700);
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+@media (hover: hover) {
+  .sourceLink:hover {
+    color: var(--ink-900);
+    text-decoration-color: currentColor;
+  }
+}
+
+/* ── 페이지 끝 출처 한 줄: 위 괘선은 내용 폭 전체 (위 목록 · 표의 괘선과 같은 끝) ── */
+.pageSources {
+  margin-top: 40px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.pageSourcesLabel {
+  margin-right: 10px;
+  font-weight: 600;
+  color: var(--ink-700);
+}
+
+/* ── 길 돌림 안내 한 줄 (리드 아래) ── */
+.detour {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+  font: 600 17px/26px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+  text-decoration: none;
+}
+.detourMark {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--c);
+}
+.detourText {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+@media (hover: hover) {
+  .detour:hover .detourText {
+    text-decoration-thickness: 2px;
+  }
+}

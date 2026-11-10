@@ -1,0 +1,411 @@
+/*
+ * 지원 안내 섹션 조각: 지원 자격(옅은 회색 면 + 흰 판 셋) · 한 해(흰, 달별 목록 + 봄 학기) · 네 파트(옅은 회색 면 + 2 × 2 흰 판) · 자주 묻는 질문 · 각주 · 공유.
+ * 면 순서: 머리(흰) → 회색 → 흰 → 회색 → 흰 → 먹색 꼬리말 (같은 면이 두 번 이어지지 않게).
+ * 흰 종이 + 먹색 + 괘선. 장소색은 표식 네모에만(한 해에서는 G-Sprint 단계만), 주황은 지금 기수 태그에만.
+ */
+
+/* ── 지원 자격: 옅은 회색 면 위 흰 판 세 장 (작은 이름 → 값 28/38 → 풀이) ── */
+.who {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 40px;
+}
+/* 흰 카드 n장 대신 위 2px 먹색 줄 칸 (홈 멤버 회고와 같은 모양: 4기 Organizer 2026-11-05) */
+.whoCard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px 0 0;
+  border-top: 2px solid var(--ink-900);
+}
+.whoLabel {
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.whoValue {
+  margin: 14px 0 0;
+  font: 700 28px/38px var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.whoValue :global(.num) {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.whoSub {
+  margin: 8px 0 0;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+
+/* ── 각주: 묶음 아래 회색 한 줄 (페이지에 두 개까지) ── */
+.note {
+  max-width: 52em;
+  margin-top: 14px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+
+/* ── 공유: 보조 행동(밑줄 링크) + 확인 문구 ── */
+.share {
+  /* 버튼과 확인 문구가 바깥 줄(.actions)의 칸이 된다: 문구는 다음 줄 전체 폭으로 */
+  display: contents;
+}
+.shareButton {
+  min-height: 44px;
+}
+.shareStatus {
+  flex-basis: 100%;
+  font: 500 14px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+.shareUrl {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+/* ── 들어오면 이런 한 해: 세 칸 두 줄, 달 이름 크게, G-Sprint 단계만 표식 ── */
+.months {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 48px;
+  border-top: 2px solid var(--ink-900);
+}
+.month {
+  min-width: 0;
+  padding: 24px 0 32px;
+}
+/* 둘째 줄부터 위 괘선 */
+.month:nth-child(n + 4) {
+  border-top: 1px solid var(--line);
+}
+.monthName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 12px;
+  margin: 0 0 14px;
+  font: 600 36px/44px var(--font-num);
+  letter-spacing: -0.025em;
+}
+/* 그 달의 흐름 한 낱말 ('팀 꾸리기') */
+.monthCaption {
+  font: 600 16px/24px var(--font-kr);
+  letter-spacing: -0.005em;
+  color: var(--ink-700);
+}
+.mEvent {
+  display: grid;
+  grid-template-columns: 4.4em minmax(0, 1fr);
+  column-gap: 10px;
+  padding: 5px 0;
+}
+.mDate {
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 500;
+  color: var(--ink-500);
+  white-space: nowrap;
+}
+.mTitle {
+  font: 500 16px/24px var(--font-kr);
+  color: var(--ink-900);
+}
+/* G-Sprint 단계: 장소색 네모 + 굵게 */
+.mEvent[data-sprint] .mTitle {
+  font-weight: 700;
+}
+.mEvent[data-sprint] .mDate {
+  color: var(--ink-900);
+}
+.mMark {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 8px;
+  border-radius: 2px;
+  background: var(--c);
+  vertical-align: 1px;
+}
+.mEvent[data-past] .mTitle {
+  color: var(--ink-700);
+}
+.mEvent[data-rest] .mTitle {
+  color: var(--ink-500);
+}
+
+/* ── 봄 학기 칸: 지난 기수 기록 ── */
+.springLead {
+  margin-bottom: 8px;
+  font: 400 14px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+
+/* ── 네 파트 (시안 E): 옅은 회색 면 위 2 × 2 흰 판 (이름 28 → 맡는 일 → 화요일에 비교하는 것 → 지난 프로젝트 아이콘 줄) ── */
+.parts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gutter);
+}
+.part {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 32px 32px 28px;
+  border-radius: var(--r-media);
+  background: var(--paper);
+}
+.partName {
+  font: 700 28px/38px var(--font-kr);
+  letter-spacing: -0.02em;
+}
+.partRole {
+  margin-top: 8px;
+  font: 400 17px/28px var(--font-kr);
+  color: var(--ink-900);
+}
+.partFacts {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+.partFacts dt {
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.partFacts dd {
+  margin: 4px 0 0;
+}
+.partCompare {
+  font: 600 17px/26px var(--font-kr);
+  color: var(--ink-900);
+}
+/* 아이콘 줄(40px + 이름): 위 글자와 붙지 않게 조금 띄운다 */
+.partIcons {
+  padding-top: 4px;
+}
+
+/* ── 자주 묻는 질문 (dcamp): 알약 탭(고른 탭 주황) → 따뜻한 회색 카드마다 주황 Q · 질문 · 꺾쇠 ── */
+.tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  background: var(--paper);
+  font: 600 15px/20px var(--font-kr);
+  color: var(--ink-900);
+  cursor: pointer;
+  transition: background 300ms var(--ease), color 300ms var(--ease), border-color 300ms var(--ease);
+}
+@media (hover: hover) {
+  .tab:hover {
+    border-color: var(--ink-900);
+  }
+}
+.tab[aria-selected='true'] {
+  border-color: var(--gen-text);
+  background: var(--gen-text);
+  color: var(--white);
+}
+.tab[aria-selected='true'] .tabCount {
+  color: var(--white);
+}
+.tab:focus-visible {
+  outline-offset: 2px;
+}
+.tabCount {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-500);
+}
+.faq {
+  display: grid;
+  gap: 12px;
+}
+.qa {
+  scroll-margin-top: 96px;
+  border-radius: var(--r-card);
+  background: var(--field);
+}
+.qa summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 18px 24px;
+  cursor: pointer;
+  list-style: none;
+}
+.qa summary::-webkit-details-marker {
+  display: none;
+}
+.qa summary::before {
+  content: 'Q';
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--brand);
+  font: 700 12px/1 var(--font-num);
+  color: var(--white);
+}
+.q {
+  flex: 1;
+  font: 600 17px/26px var(--font-kr);
+}
+/* 꺾쇠: 열면 위로 */
+.sign {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: -4px;
+  border-right: 1.6px solid var(--ink-900);
+  border-bottom: 1.6px solid var(--ink-900);
+  transform: rotate(45deg);
+  transition: transform 400ms var(--ease-soft);
+}
+.qa[open] .sign {
+  margin-top: 4px;
+  transform: rotate(-135deg);
+}
+.a {
+  max-width: none;
+  padding: 0 24px 24px 60px;
+  font: 400 16px/1.7 var(--font-kr);
+  color: var(--ink-700);
+}
+
+@media (max-width: 1023px) {
+  .who {
+    gap: 28px 32px;
+  }
+  .whoCard {
+    padding-top: 18px;
+  }
+  .whoValue {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  /* 태블릿: 두 칸 세 줄 (세 칸이면 일정 이름이 두세 줄로 꺾인다) */
+  .months {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 32px;
+  }
+  .month:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+  .monthName {
+    font-size: 30px;
+    line-height: 38px;
+  }
+  .part {
+    padding: 28px 26px 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .who {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .whoCard {
+    padding-top: 16px;
+  }
+  .whoValue {
+    margin-top: 8px;
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .whoSub {
+    margin-top: 4px;
+  }
+  .months {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /*
+   * 폰: 달 이름 줄('9월 첫 만남') 아래에 일정을 화면 폭 그대로.
+   * (달 이름을 왼쪽 칸에 두면 일정 이름 자리가 320 폭에서 120px 남짓이라 두세 줄로 꺾였다)
+   */
+  .month,
+  .month:nth-child(n + 3) {
+    padding: 16px 0 14px;
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .monthName {
+    column-gap: 10px;
+    margin: 0 0 6px;
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .monthCaption {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .mEvent {
+    grid-template-columns: 4.2em minmax(0, 1fr);
+    padding: 3px 0;
+  }
+  .mTitle {
+    font-size: 15px;
+  }
+  .parts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .part {
+    padding: 22px 20px 20px;
+  }
+  .partName {
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .partRole {
+    margin-top: 4px;
+    font-size: 16px;
+    line-height: 26px;
+  }
+  .partFacts {
+    gap: 14px;
+    margin-top: 16px;
+    padding-top: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sign::before,
+  .sign::after,
+  .tab {
+    transition: none;
+  }
+}
+@media (max-width: 767px) {
+  .qa summary {
+    min-height: 64px;
+    padding: 16px 18px;
+  }
+  .q {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .a {
+    padding: 0 18px 20px 54px;
+    font-size: 15px;
+  }
+}

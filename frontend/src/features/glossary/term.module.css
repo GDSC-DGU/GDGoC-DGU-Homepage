@@ -1,0 +1,69 @@
+/*
+ * 용어 풀이 (Term.tsx). 둘레 글자 크기 · 굵기를 그대로 따르고, 풀이만 옅게.
+ * 옅은 글자는 ink-500 까지 (흰 바탕 4.7:1, docs/DESIGN.md 4장).
+ */
+
+.term {
+  /* 용어와 괄호 풀이 사이에서 줄이 끊기지 않게 하지는 않는다: 좁은 폰에서 넘치지 않는 게 먼저 */
+  overflow-wrap: break-word;
+}
+
+.short {
+  margin-left: 0.08em;
+  font-weight: 400;
+  color: var(--ink-500);
+}
+
+/* more: 용어 자체가 버튼. 점선 밑줄 = '눌러서 뜻을 볼 수 있음' */
+.word {
+  position: relative;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--ink-500);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: text-decoration-color var(--dur-hover) var(--ease);
+}
+/* 글자는 작아도 누르는 자리는 44px (줄 높이는 그대로) */
+.word::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+.word:focus-visible {
+  outline-offset: 1px;
+}
+.word[aria-expanded='true'] {
+  text-decoration-style: solid;
+  text-decoration-color: currentColor;
+}
+@media (hover: hover) {
+  .word:hover {
+    text-decoration-style: solid;
+    text-decoration-color: currentColor;
+  }
+}
+
+/* 펼친 풀이: 괄호 안에서 짧은 풀이보다 한 단계 진하게 (읽을 문장이므로) */
+.long {
+  color: var(--ink-700);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word {
+    transition: none;
+  }
+}

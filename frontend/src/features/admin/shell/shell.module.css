@@ -1,0 +1,236 @@
+/*
+ * 관리자 틀: 왼쪽 사이드바(248) + 본문. 공개 사이트 머리말 · 꼬리말 · 페이지 전환은 쓰지 않는다.
+ * 1024 미만: 사이드바가 위 띠로 접히고(메뉴 열기 버튼), 위에 '넓은 화면에 맞춰져 있습니다' 안내.
+ * 페이지 전체 가로 넘침은 0 (넓은 표는 자기 상자 안에서만 넘긴다).
+ */
+.shell {
+  display: grid;
+  grid-template-columns: var(--adm-side-w) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+/* ── 사이드바: 바깥 칸은 페이지 끝까지 회색, 안쪽 판은 화면 높이에 붙어 있다 ── */
+.sideCol {
+  --focus: var(--adm-side-accent);
+  background: var(--adm-side);
+  color: var(--adm-side-ink);
+}
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+}
+.top {
+  display: grid;
+  gap: 12px;
+  padding: 20px 16px 16px;
+}
+.brandRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 4px;
+  border-radius: 8px;
+  font: 700 17px/24px var(--font-num);
+  letter-spacing: -0.02em;
+  color: #fff;
+  text-decoration: none;
+}
+.brandSub {
+  font: 600 14px/20px var(--font-kr);
+  letter-spacing: 0;
+  color: var(--adm-side-muted);
+}
+
+/* 예시 표시: 늘 보이되 조용하게 (점선 테두리 = 사이트의 '예시' 표기와 같은 모양) */
+.sample {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: transparent;
+}
+.sampleTag {
+  font: 700 13px/20px var(--font-kr);
+  color: #fff;
+}
+.sampleText {
+  font: 400 13px/20px var(--font-kr);
+  color: var(--adm-side-muted);
+}
+.sampleReset {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 600 13px/20px var(--font-kr);
+  color: var(--adm-side-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.collapsible {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+.nav {
+  flex: 1;
+  padding: 4px 12px 16px;
+}
+.navList {
+  display: grid;
+  gap: 2px;
+}
+.groupLabel {
+  display: block;
+  padding: 14px 10px 4px;
+  font: 600 13px/20px var(--font-kr);
+  color: var(--adm-side-muted);
+}
+.subList {
+  display: grid;
+  gap: 2px;
+}
+.link {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font: 600 15px/22px var(--font-kr);
+  color: #c4c7cc;
+  text-decoration: none;
+  transition:
+    background var(--dur-hover) var(--ease),
+    color var(--dur-hover) var(--ease);
+}
+.subList .link {
+  padding-left: 18px;
+}
+/* 지금 메뉴: 옅은 파랑 면 + 흰 글자 + 왼쪽 파랑 띠 */
+.link[aria-current='page'] {
+  background: var(--adm-side-active);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--adm-side-accent);
+}
+
+.account {
+  display: grid;
+  gap: 10px;
+  margin: 0 12px 16px;
+  padding: 14px 12px 12px;
+  border-top: 1px solid var(--adm-side-line);
+}
+.accountName {
+  font: 600 15px/22px var(--font-kr);
+  color: #fff;
+}
+.accountRole {
+  font-weight: 500;
+  color: var(--adm-side-muted);
+}
+.accountActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font: 600 14px/20px var(--font-kr);
+  color: #c4c7cc;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .link:hover:not([aria-current='page']) {
+    background: var(--adm-side-hover);
+    color: #fff;
+  }
+  .homeLink:hover,
+  .sampleReset:hover {
+    color: #fff;
+    text-decoration-line: underline;
+  }
+}
+
+/* ── 본문 ── */
+.content {
+  min-width: 0;
+}
+.content:focus {
+  outline: none;
+}
+.narrow {
+  display: none;
+}
+.main {
+  width: 100%;
+  max-width: 1360px;
+  padding: 32px var(--adm-gutter) 72px;
+}
+.blocked {
+  padding: 48px 0;
+  color: var(--ink-500);
+}
+
+/* ── 1024 미만: 데스크톱 전용 안내 + 사이드바 접기 ── */
+@media (max-width: 1023px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sideCol {
+    border-bottom: 1px solid var(--adm-side-line);
+  }
+  .sidebar {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+  .top {
+    padding: 12px 16px;
+  }
+  .nav {
+    padding-top: 0;
+  }
+  .narrow {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    font: 500 14px/22px var(--font-kr);
+    color: var(--ink-700);
+  }
+  .narrow svg {
+    flex: none;
+    margin-top: 3px;
+  }
+  .main {
+    --adm-gutter: 16px;
+    padding-top: 24px;
+  }
+}
