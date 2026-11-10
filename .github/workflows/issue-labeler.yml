@@ -1,0 +1,60 @@
+# 이슈 폼에서 선택한 값을 라벨로 바꿉니다.
+#  - "작업 영역" / "의심 영역"  → area:*
+#  - "심각도"                   → severity:*
+# 이슈 폼 응답은 본문에 "### <항목 이름>\n\n<값>" 형태로 저장되므로 그 구간을 읽습니다.
+# 항목 이름 뒤에 "(다중 선택)" 같은 문구가 붙어도 매칭됩니다.
+name: issue-labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+
+            // "### 제목" 다음부터 다음 "###" 전까지의 값을 읽음
+            const section = (heading) => {
+              const re = new RegExp(`###\\s*${heading}[^\\n]*\\n+([\\s\\S]*?)(?=\\n###|$)`);
+              const m = body.match(re);
+              if (!m) return [];
+              const v = m[1].trim();
+              if (!v || v === '_No response_') return [];
+              return v.split(',').map(s => s.trim()).filter(Boolean);
+            };
+
+            const AREAS = ['frontend', 'backend', 'ai', 'contracts', 'infra', 'ci'];
+            const labels = new Set();
+
+            for (const h of ['작업 영역', '의심 영역']) {
+              for (const v of section(h)) {
+                if (AREAS.includes(v)) labels.add(`area:${v}`);
+              }
+            }
+
+            const severity = section('심각도')[0];
+            if (severity) {
+              const level = severity.split(':')[0].trim();
+              if (['critical', 'high', 'medium', 'low'].includes(level)) {
+                labels.add(`severity:${level}`);
+              }
+            }
+
+            if (labels.size === 0) return;
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: [...labels],
+            });
+            core.info(`added: ${[...labels].join(', ')}`);

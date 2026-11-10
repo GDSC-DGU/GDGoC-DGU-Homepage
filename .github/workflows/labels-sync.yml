@@ -1,0 +1,30 @@
+# .github/labels.yml 을 레포 라벨과 동기화합니다.
+# - PR에서는 dry-run(변경 예정 내용만 로그 출력), develop 머지 후 실제 적용
+name: labels-sync
+
+on:
+  push:
+    branches: [develop]
+    paths: [".github/labels.yml", ".github/workflows/labels-sync.yml"]
+  pull_request:
+    paths: [".github/labels.yml", ".github/workflows/labels-sync.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: crazy-max/ghaction-github-labeler@548a7c3603594ec17c819e1239f281a3b801ab4d # v6.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          yaml-file: .github/labels.yml
+          dry-run: ${{ github.event_name == 'pull_request' }}

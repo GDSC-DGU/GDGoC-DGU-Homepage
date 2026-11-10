@@ -1,0 +1,49 @@
+# PR 자동 라벨 규칙 (actions/labeler v5+ 문법)
+# 실행: .github/workflows/pr-labeler.yml
+
+# ── 변경 경로 → 영역 라벨 ──
+"area:frontend":
+  - changed-files:
+      - any-glob-to-any-file: "frontend/**"
+"area:backend":
+  - changed-files:
+      - any-glob-to-any-file: "backend/**"
+"area:ai":
+  - changed-files:
+      - any-glob-to-any-file: "ai/**"
+"area:contracts":
+  - changed-files:
+      - any-glob-to-any-file: "packages/contracts/**"
+"area:infra":
+  - changed-files:
+      - any-glob-to-any-file: ["infra/**", "docker-compose.yml"]
+"area:ci":
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+"area:docs":
+  - changed-files:
+      - any-glob-to-any-file: ["RULEBOOKS/**", "**/*.md"]
+
+# ── 브랜치 접두사 → 종류 라벨 (이슈와 같은 라벨) ──
+feature:
+  - head-branch: ["^feature/"]
+design:
+  - head-branch: ["^design/"]
+bug:
+  - head-branch: ["^fix/", "^hotfix/"]
+hotfix:
+  - head-branch: ["^hotfix/"]
+task:
+  - head-branch: ["^task/"]
+docs:
+  - head-branch: ["^docs/"]
+
+# ── 브랜치 흐름 → 릴리스 라벨 ──
+release:
+  - all:
+      - base-branch: ["^main$"]
+      - head-branch: ["^develop$"]
+back-merge:
+  - all:
+      - base-branch: ["^develop$"]
+      - head-branch: ["^main$"]

@@ -1,0 +1,57 @@
+name: "🔧 작업 (Task)"
+description: "기능·디자인이 아닌 개발 작업: 설정, CI/CD, 리팩터링, 테스트, 의존성. 브랜치: task/<이슈번호>-<설명>"
+title: "[작업] "
+labels: ["task"]
+body:
+  - type: dropdown
+    id: task-kind
+    attributes:
+      label: 작업 종류
+      options:
+        - chore (설정, 의존성, 빌드)
+        - ci (GitHub Actions, 배포)
+        - refactor (동작 변화 없는 구조 개선)
+        - test (테스트 추가 · 보강)
+        - infra (Firestore rules · indexes, GCP 설정)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 작업 영역 (다중 선택)
+      description: 선택 사항입니다. 선택한 영역은 area 라벨로 자동 등록됩니다.
+      multiple: true
+      options:
+        - frontend
+        - backend
+        - ai
+        - contracts
+        - infra
+        - ci
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-why
+    attributes:
+      label: 무엇을, 왜
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 완료 조건
+      value: |
+        - [ ] 
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 영향 범위
+      description: 배포 파이프라인, 팀원 로컬 환경, 비용 등에 영향이 있으면 적습니다.
+    validations:
+      required: false

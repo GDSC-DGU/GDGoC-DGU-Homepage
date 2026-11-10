@@ -1,0 +1,24 @@
+# 리뷰 자동 요청은 현재 사용하지 않아 아래 규칙을 주석 처리했습니다. 경로별 담당 팀 정리용으로만 남깁니다.
+# - 규칙을 되살릴 때 팀은 Visible이어야 하고, 레포에 Write 권한이 연결돼 있어야 합니다.
+# - 아래쪽 규칙이 위쪽보다 우선합니다. 한 파일에는 마지막으로 일치한 줄 하나만 적용됩니다.
+# - 기수가 바뀌어도 이 파일은 고치지 않습니다. 조직 Teams 화면에서 팀 멤버만 바꿉니다. (RULEBOOKS/repo-settings.md 1번)
+# - 팀 이름은 화면 이름이 아니라 주소용 이름(slug)으로 씁니다. Homepage-Lead/PM → homepage-lead-pm
+#
+# 팀 구성
+#   homepage-fe       Homepage-FE       frontend 담당
+#   homepage-be       Homepage-BE       backend 담당, infra · scripts · docker-compose 공동 담당
+#   homepage-ai       Homepage-AI       ai 담당
+#   homepage-lead-pm  Homepage-Lead/PM  Lead, PM(인프라·레포 구성 담당)
+
+# /frontend/                            @GDSC-DGU/homepage-fe
+# /backend/                             @GDSC-DGU/homepage-be
+# /ai/                                  @GDSC-DGU/homepage-ai
+
+# /packages/contracts/openapi.yaml      @GDSC-DGU/homepage-fe @GDSC-DGU/homepage-be
+# /packages/contracts/ai-internal.yaml  @GDSC-DGU/homepage-be @GDSC-DGU/homepage-ai
+
+# /infra/                               @GDSC-DGU/homepage-lead-pm @GDSC-DGU/homepage-be
+# /scripts/                             @GDSC-DGU/homepage-lead-pm @GDSC-DGU/homepage-be
+# /docker-compose.yml                   @GDSC-DGU/homepage-lead-pm @GDSC-DGU/homepage-be
+# /.github/                             @GDSC-DGU/homepage-lead-pm
+# /RULEBOOKS/                           @GDSC-DGU/homepage-lead-pm

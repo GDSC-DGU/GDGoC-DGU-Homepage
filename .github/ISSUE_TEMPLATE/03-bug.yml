@@ -1,0 +1,103 @@
+name: "🐞 버그 (Bug)"
+description: "의도와 다르게 동작하는 것을 제보합니다. 브랜치: fix/<이슈번호>-<설명> (긴급이면 hotfix/)"
+title: "[버그] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **공개 레포입니다.** 스크린샷·로그의 지원자 정보, 학번, 이메일, 토큰, 쿠키 값은 가린 뒤 첨부하세요.
+        🔒 인증 우회·개인정보 노출 같은 **보안 취약점은 이 양식이 아니라 Security 탭 → Report a vulnerability**로 제보합니다.
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 발생 환경
+      options:
+        - production (gdgoc-dgu.com)
+        - staging (dev.gdgoc-dgu.com)
+        - PR 프리뷰
+        - local
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 의심 영역 (다중 선택)
+      description: 모르면 비워두세요. 선택하면 area 라벨이 자동 등록됩니다.
+      multiple: true
+      options:
+        - frontend
+        - backend
+        - ai
+        - contracts
+        - infra
+    validations:
+      required: false
+
+  - type: input
+    id: device
+    attributes:
+      label: 브라우저 · 기기
+      placeholder: "Chrome 140 / macOS, Safari / iOS 19"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: auth-state
+    attributes:
+      label: 로그인 상태
+      options:
+        - 비회원
+        - General
+        - Core
+        - Lead
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      value: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대한 동작
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 동작
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 스크린샷 · 로그
+      description: 이 칸에 파일을 끌어다 놓으면 첨부됩니다. 민감 정보는 가리세요.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 심각도
+      description: 선택하면 severity 라벨이 자동 등록됩니다.
+      options:
+        - "critical: 서비스 이용 불가, 데이터 손상, 개인정보 노출 위험 (hotfix 대상)"
+        - "high: 주요 기능 오동작, 우회 방법 없음"
+        - "medium: 우회 가능하거나 일부 화면만 영향"
+        - "low: 문구, 스타일"
+    validations:
+      required: true
