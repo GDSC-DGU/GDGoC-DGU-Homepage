@@ -1,0 +1,68 @@
+/*
+ * 스크롤 이야기 (캠퍼스로 걸어 들어가기). 움직임은 homeStory.ts(GSAP ScrollTrigger)가 맡고,
+ * 여기는 그 움직임이 기대는 모양만 둔다. html[data-story] 는 움직임이 실제로 켜졌을 때만 붙는다
+ * ('동작 줄이기' · 스크립트 실패면 붙지 않아서 지금 사이트와 같은 정적 화면).
+ */
+
+/* ── 움직임이 켜졌을 때만 ── */
+
+/* 프로젝트 섹션 = 지도 위로 올라오는 판. 위 모서리만 둥글게, 위쪽에만 옅은 그림자 (떠 있는 것) */
+html[data-story] #projects {
+  z-index: 1;
+  background: var(--paper);
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -14px 40px -16px var(--ink-a18);
+}
+@media (max-width: 767px) {
+  html[data-story] #projects {
+    border-radius: 20px 20px 0 0;
+  }
+}
+
+/* 넓은 화면: 지도 판은 첫 화면이 나가는 동안 따로 움직이는 층 (옮기기만 하므로 다시 그리지 않는다) */
+@media (min-width: 1024px) {
+  html[data-story] [data-story='map'] {
+    will-change: transform;
+  }
+}
+
+/* 큰 타일의 겹친 폰 화면: 데스크톱 화면보다 조금 빨리 움직인다 (깊이). hover 의 transform 과 따로 놀게 translate 로 */
+html[data-story] [data-float] {
+  translate: 0 var(--float, 0px);
+}
+
+/* 지도에 도착: 프로젝트 안내판이 먹색으로 뒤집힌다 ('지금 여기') */
+[data-arrive] [data-place-label='projects'] > rect:first-child {
+  fill: var(--ink-900);
+  stroke: var(--ink-900);
+  transition: fill 200ms var(--ease), stroke 200ms var(--ease);
+}
+[data-arrive] [data-place-label='projects'] > text {
+  fill: var(--paper);
+  transition: fill 200ms var(--ease);
+}
+
+/*
+ * 폰 · 태블릿: 지도가 머리말 밑에 닿으면 지도 높이만큼 붙어 있고(sticky), 프로젝트 섹션이 그 위로 올라와 덮는다.
+ * 첫 화면 끝에 지도 높이만큼 빈 칸(::after)을 두고 같은 만큼 아래 여백을 당겨서, 아래 섹션 위치는 그대로다.
+ */
+@media (max-width: 1023px) {
+  html[data-story] [data-story='hero'] {
+    --hold: clamp(360px, 52vw, 520px);
+    margin-bottom: calc(-1 * var(--hold));
+  }
+  html[data-story] [data-story='hero']::after {
+    content: '';
+    display: block;
+    height: var(--hold);
+  }
+  html[data-story] [data-story='map'] {
+    position: sticky;
+    top: 64px;
+  }
+}
+@media (max-width: 767px) {
+  html[data-story] [data-story='hero'] {
+    --hold: 300px;
+  }
+}

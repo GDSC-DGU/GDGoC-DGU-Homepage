@@ -1,0 +1,79 @@
+/*
+ * 관리자 화면 맨 바깥 (AdminRoot). 공개 사이트 토큰(tokens.css) 위에 관리자 전용 값만 더한다.
+ * 이 파일은 관리자 코드와 함께 늦게 받는다 (공개 페이지 첫 CSS 를 늘리지 않음).
+ */
+.root {
+  /* 틀 */
+  --adm-side-w: 248px;
+  --adm-gutter: 40px;
+
+  /* 위험 · 실패 (장소색 빨강과 다른 어두운 빨강, 흰 바탕 위 5.6:1). 되돌리기 어려운 확인 버튼 · 오류 글자 · 실패 배지에만 */
+  --adm-danger: #c5221f;
+  --adm-danger-hover: #a50e0e;
+  --adm-danger-ink: #a50e0e;
+  --adm-danger-soft: #fce8e6;
+  /* 주의 (링크 만료 · 일정 미정): 아이콘만 주황 갈색, 글자는 어두운 갈색 */
+  --adm-warn: #b06000;
+  --adm-warn-ink: #6e3d00;
+  --adm-warn-soft: #fef3e0;
+  /* 표에서 고른 행 */
+  --adm-select: #eceff3;
+
+  /*
+   * 면 나누기 (리뷰 2026-11-03: 사이드바 · 바탕 · 카드가 다 흰색 계열이라 구분이 안 됨)
+   * 먹색 사이드바 | 옅은 회색 바탕 | 흰 카드. 지금 메뉴는 구글 파랑(밝은 쪽, 먹색 위 9:1).
+   */
+  --adm-canvas: #eef0f3;
+  --adm-side: #191b1f;
+  --adm-side-line: rgba(255, 255, 255, 0.1);
+  --adm-side-ink: #e8eaed;
+  --adm-side-muted: #9aa0a6;
+  --adm-side-hover: rgba(255, 255, 255, 0.07);
+  --adm-side-active: rgba(138, 180, 248, 0.16);
+  --adm-side-accent: #8ab4f8;
+  /* 회색 바탕 위 두 번째 버튼은 흰 바탕 + 1px 선 (공개 사이트 .story.field 와 같은 규칙) */
+  --btn2-bg: #ffffff;
+  --btn2-bg-hover: #ffffff;
+  --btn2-line: var(--line-strong);
+  --btn2-line-hover: var(--ink-500);
+
+  min-height: 100vh;
+  background: var(--adm-canvas);
+  color: var(--ink-900);
+  font: 400 15px/24px var(--font-kr);
+}
+
+/* 불러오는 중 (로그인 확인 · 구역 파일 받기) */
+.loading {
+  display: grid;
+  place-items: center;
+  min-height: 60vh;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-500);
+}
+.loading.full {
+  min-height: 100vh;
+}
+
+/* 오류 */
+.error {
+  display: grid;
+  gap: 12px;
+  max-width: 560px;
+  margin: 48px auto;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+}
+.errorTitle {
+  font: 700 22px/32px var(--font-kr);
+}
+.errorText {
+  color: var(--ink-700);
+}
+.errorActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}

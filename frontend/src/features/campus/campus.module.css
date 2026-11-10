@@ -1,0 +1,217 @@
+/*
+ * 캠퍼스 지도. 색은 styles/tokens.css 의 토큰을 쓴다 (docs/DESIGN.md §9).
+ * - 벽은 중립색(--wall-*), 장소색은 지붕 · 화면 틀 · 차양 · 톱니창 틀 · 문틀에만 (컴포넌트에서 칠함)
+ * - 빛은 왼쪽 위 한 방향. 꾸밈용 빛 번짐(drop-shadow) 없음
+ */
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: manipulation;
+}
+
+/* 땅: 종이와 같은 흰색. 회색 땅이면 위아래 흰 바탕과 만나 '받침판' 띠처럼 보인다 (DESIGN 9장: 받침판 없이).
+   길 · 잔디 · 광장만 색이 있어 화면 밖으로 이어진다 */
+.ground { fill: var(--paper); }
+.lawn {
+  fill: var(--scene-grass);
+  stroke: var(--scene-grass-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.walk { fill: var(--scene-walk); }
+.plaza {
+  fill: var(--scene-plaza);
+  stroke: var(--scene-plaza-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.plazaRing {
+  fill: none;
+  stroke: var(--scene-plaza-line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+/* 벽 · 받침 (중립색). 바닥과 색이 비슷해서 1px 테두리로 또렷하게 */
+.wallT { fill: var(--wall-top); }
+.wallL { fill: var(--wall-left); }
+.wallR { fill: var(--wall-right); }
+.padT { fill: var(--scene-plaza); }
+.padL { fill: var(--wall-left); }
+.padR { fill: var(--wall-right); }
+.edge {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.shadow { fill: rgba(25, 27, 31, 0.06); }
+.mullionL { stroke: var(--wall-left); stroke-width: 1.6; }
+.mullionR { stroke: var(--wall-right); stroke-width: 1.6; }
+.door { fill: var(--ink-700); }
+/* 닫힌 문 (하위 페이지 장면에서 '문 닫음' 상태일 때만): 벽보다 한 단 진한 회색 두 짝 */
+.doorShut { fill: #b9bec6; stroke: var(--line-strong); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.doorSeam { stroke: #8f959e; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.doorHandle { stroke: var(--ink-700); stroke-width: 1.4; stroke-linecap: round; }
+
+/* 강당 지붕 위 발표 화면 */
+.screen { fill: var(--paper); }
+.slideTitle { fill: var(--ink-500); }
+.slideLine { fill: var(--line-strong); }
+
+/* 나무: 잔디(--scene-grass)보다 진하지만 장소색 초록(--place-recruits)과는 다른 차분한 초록 */
+.treeShadow { fill: rgba(25, 27, 31, 0.07); }
+.trunk { fill: #a3907c; }
+.crown { fill: #8cc1a1; }
+.crownLit { fill: #acd5bb; }
+.crownShade { fill: #6fa68a; }
+
+/* 깃발: 기수색 천 + 먹색 숫자 */
+.pole { stroke: var(--ink-500); stroke-width: 2; stroke-linecap: round; }
+.finial { fill: var(--ink-500); }
+/* 깃발: 흰 천 + GDG 로고 (FlagPlaza) */
+.cloth { fill: #ffffff; }
+.clothEdge { fill: none; stroke: #c9cdd2; stroke-width: 0.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+/* 세션에 한 번, 깃발이 화면에 들어오면 천이 깃대를 따라 올라간다. 튕김 없음 */
+.lowered { transform: translateY(var(--drop, 40px)); }
+.raise { animation: raise 700ms ease 160ms both; }
+@keyframes raise {
+  from { transform: translateY(var(--drop, 40px)); }
+  to { transform: translateY(0); }
+}
+
+/* 건물 · 깃발 (누르는 것) */
+.bld {
+  cursor: pointer;
+  outline: none;
+  transition: opacity var(--dur-open) var(--ease);
+}
+.lift { transition: transform var(--dur-hover) var(--ease); }
+.hov .lift,
+.sel .lift { transform: translateY(-4px); }
+.bld:focus-visible { outline: 2px solid var(--g-blue); outline-offset: 4px; }
+.dim { opacity: 0.32; }
+
+/* 안내판: 1px 지시선 + 흰 판. 고르거나 마우스를 올리면 먹색으로 뒤집힌다 */
+.sign { transition: opacity var(--dur-open) var(--ease); }
+.leader {
+  stroke: var(--ink-900);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.leaderFoot { fill: var(--ink-900); pointer-events: none; }
+.plate { cursor: pointer; }
+.plateBg {
+  fill: var(--paper);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transition: fill var(--dur-hover) var(--ease), stroke var(--dur-hover) var(--ease);
+}
+.plateText {
+  font: 600 15px var(--font-kr);
+  letter-spacing: 0;
+  fill: var(--ink-900);
+  transition: fill var(--dur-hover) var(--ease);
+}
+.signOn .plateBg { fill: var(--ink-900); stroke: var(--ink-900); }
+.signOn .plateText { fill: var(--paper); }
+/* 소개 장소의 표식은 먹색이라, 판이 먹색이 되면 흰색으로 */
+.markInk { fill: var(--place-about); }
+.signOn .markInk { fill: var(--paper); }
+/* 검색에 걸린 장소: 빛나지 않고 테두리만 진하게 */
+.signHit .plateBg { stroke: var(--ink-900); stroke-width: 2; }
+.badgeBg { fill: var(--ink-900); }
+/* 건수 글자: 안내판 이름과 같은 15px 로 그려서, 폰에서 판이 줄어도(배율 ≥ 13/15) 화면에서 13px 아래로 내려가지 않는다 */
+.badgeText { font: 700 15px var(--font-num); fill: var(--paper); }
+.signOn .badgeBg { fill: var(--paper); }
+.signOn .badgeText { fill: var(--ink-900); }
+
+@media (prefers-reduced-motion: reduce) {
+  .raise { animation: none; }
+  .lowered { transform: none; }
+  .bld,
+  .lift,
+  .sign,
+  .plateBg,
+  .plateText { transition: none; }
+}
+
+/* 손글씨 층 (PenLayer): rough.js 선 + 나눔손글씨 펜. 선은 장소색, 글씨는 먹색 */
+.pen { pointer-events: none; }
+.penInk path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.penText {
+  font-family: 'Nanum Pen Script', var(--font-kr);
+  fill: var(--ink-900);
+  letter-spacing: 0;
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+/* 처음 한 번 그려진다: 선은 stroke-dashoffset, 글씨는 왼쪽에서 오른쪽으로 걷힌다 */
+.penAnimate .penInk path {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: pen-draw var(--dur, 0.6s) cubic-bezier(0.55, 0.1, 0.35, 1) var(--delay, 0s) forwards;
+}
+.penAnimate .penText {
+  clip-path: inset(-20% 100% -20% 0);
+  animation: pen-write 0.55s steps(14, end) var(--delay, 0s) forwards;
+}
+@keyframes pen-draw { to { stroke-dashoffset: 0; } }
+@keyframes pen-write { to { clip-path: inset(-20% -2% -20% 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .penAnimate .penInk path, .penAnimate .penText { animation: none; stroke-dashoffset: 0; clip-path: none; }
+}
+
+/*
+ * ── 밤 (features/fx/useTimeOfDay): 한국 시간 19–06시.
+ * 땅 · 벽 · 유리 · 나무는 어둡게. 안내판은 흰 판 그대로(불 켜진 간판). 불은 실제로 진행 중인 곳(data-lit, 예: G-Sprint 작업실)에만.
+ * 지붕 장소색은 Building 이 NightContext 로 어둡게 칠한다.
+ */
+:global([data-tod='night']) {
+  --scene-grass: #1c2925;
+  --scene-grass-line: #24332d;
+  --scene-walk: #242a33;
+  --scene-plaza: #2b313b;
+  --scene-plaza-line: #3a414c;
+  --wall-top: #4a515d;
+  --wall-left: #373d48;
+  --wall-right: #2b303a;
+}
+:global([data-tod='night']) .ground { fill: #15191f; }
+:global([data-tod='night']) .edge { stroke: #4c5360; }
+:global([data-tod='night']) .padT { fill: #2b313b; }
+:global([data-tod='night']) [data-glass='L'] { fill: #2c3546; }
+:global([data-tod='night']) [data-glass='R'] { fill: #232b39; }
+:global([data-tod='night']) .door { fill: #0f1216; }
+:global([data-tod='night']) .shadow,
+:global([data-tod='night']) .treeShadow { fill: rgba(0, 0, 0, 0.28); }
+:global([data-tod='night']) .trunk { fill: #4a4038; }
+:global([data-tod='night']) .crown { fill: #2e4a3d; }
+:global([data-tod='night']) .crownLit { fill: #3a5b4a; }
+:global([data-tod='night']) .crownShade { fill: #243b31; }
+:global([data-tod='night']) .mullionL { stroke: #373d48; }
+:global([data-tod='night']) .mullionR { stroke: #2b303a; }
+:global([data-tod='night']) .pole,
+:global([data-tod='night']) .finial { stroke: #8a909a; fill: #8a909a; }
+/* 불 켜진 창: 따뜻한 빛이 둘레로 번진다 (SVG 필터, HeroSection 의 #fx-night-glow). 깜빡이지 않는다 */
+:global([data-tod='night']) [data-lit] { filter: url(#fx-night-glow); }
+/* 밤: 손글씨는 밝은 글씨 + 밤 바탕색 테두리 */
+:global([data-tod='night']) .penText { fill: #eef0f3; stroke: #1b2027; }
+/* 밤: 안내판 지시선은 먹색이면 땅에 묻히므로 옅은 회색 */
+:global([data-tod='night']) .leader { stroke: #c9cdd3; }
+:global([data-tod='night']) .leaderFoot { fill: #c9cdd3; }
+
+/* 서 있는 사람 발밑 그림자 (peeps/Peep) */
+.peepShadow { fill: rgba(25, 27, 31, 0.13); }
+:global([data-tod='night']) .peepShadow { fill: rgba(0, 0, 0, 0.35); }

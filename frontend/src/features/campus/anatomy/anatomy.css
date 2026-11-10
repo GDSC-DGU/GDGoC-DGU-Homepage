@@ -1,0 +1,81 @@
+/*
+ * anatomy 밝은 판(iso[data-theme=light])을 사이트 색에 맞춘 토큰. 캠퍼스 장면 svg 에 class="campus-iso" 를 단다.
+ * - 종이 = --paper(흰색), 네 단 그림자는 사이트 벽색(--wall-left #eef0f2 · --wall-right #dadde1) 사이를 4단으로 나눔
+ * - 선은 0.6px, 지도 배율과 상관없이 같은 굵기 (anatomy: Calm. Thin 0.6 px lines)
+ * - 흐린 그림자(.iso-halo, blur)는 쓰지 않는다 (DESIGN 2장: 흐림 금지). 바닥 그림자는 Building 의 Shadow 가 맡는다
+ */
+.campus-iso {
+  --anatomy-paper: #ffffff;
+  --anatomy-face: #ffffff;
+  --anatomy-top: #ffffff;
+  --anatomy-shade-0: #d9dce1;
+  --anatomy-shade-1: #e1e4e8;
+  --anatomy-shade-2: #e8eaee;
+  --anatomy-shade-3: #f0f1f3;
+  --anatomy-lit-top: #ffffff;
+  --anatomy-lit-shade: #eef0f2;
+  --anatomy-hi: #2b2f36;
+  --anatomy-mid: #878d97;
+  --anatomy-lo: #b0b5bd;
+  --anatomy-faint: #d2d6db;
+  --anatomy-lit: #000000;
+  --anatomy-dot: #3b4048;
+  --anatomy-weight: 0.6px;
+
+  /* 장면 재료색 (잔디 · 광장 · 나무 · 벤치 · 유리 · 문). 면 네 단은 0 어두움 → 3 밝음. 밤 값은 아래 [data-tod='night'] */
+  --c-grass-top: #e4f2e8; --c-grass-0: #c8e0d0; --c-grass-1: #d1e6d8; --c-grass-2: #d9ebdf; --c-grass-3: #dfeee4; --c-grass-edge: #bcd6c4; --c-grass-line: #d0e5d7;
+  --c-plaza-top: #f9fafb; --c-plaza-0: #e2e5e9; --c-plaza-1: #e8ebee; --c-plaza-2: #eef0f2; --c-plaza-3: #f3f4f6; --c-plaza-edge: #cfd4da; --c-plaza-line: #e3e7eb; --c-plaza-ring: #cfd4da;
+  --c-crown-top: #b4d9c1; --c-crown-0: #6fa68a; --c-crown-1: #7fb496; --c-crown-2: #8cc1a1; --c-crown-3: #a2cfb3; --c-crown-edge: #5a8a71;
+  --c-bark-top: #b5a492; --c-bark-0: #8a7765; --c-bark-1: #97836f; --c-bark-2: #a3907c; --c-bark-3: #b09d89; --c-bark-edge: #76675a;
+  --c-wood-top: #d4c6b0; --c-wood-0: #a8977e; --c-wood-1: #b3a28a; --c-wood-2: #bfae95; --c-wood-3: #c9b9a2; --c-wood-edge: #8f7f69;
+  --c-iron-top: #8c8478; --c-iron-0: #5f5950; --c-iron-1: #6b645a; --c-iron-2: #776f64; --c-iron-3: #82796d; --c-iron-edge: #4d4841;
+  --c-glass-l: #d6e0ea; --c-glass-r: #bccad8; --c-glass-shut-l: #c5ccd4; --c-glass-shut-r: #aab4bf;
+  --c-door-shut: #c3c8cf; --c-door-sill: #8f959e;
+  --c-glass-in: #eef1f4; --c-door-dark: #474c55; --c-plate-face: #ffffff;
+}
+
+/*
+ * 밤 (홈 첫 화면, features/fx/useTimeOfDay: 한국 시간 19–06시).
+ * 벽 · 땅 · 나무는 푸른 먹색으로 가라앉고, 선은 옅은 회색. 불 켜진 창(data-lit)만 밝다. 지붕 장소색은 Building 이 어둡게 칠한다.
+ */
+[data-tod='night'] .campus-iso {
+  --anatomy-paper: #2b313b;
+  --anatomy-face: #303744;
+  --anatomy-top: #39414e;
+  --anatomy-shade-0: #1d2229;
+  --anatomy-shade-1: #21272f;
+  --anatomy-shade-2: #252b34;
+  --anatomy-shade-3: #29303a;
+  --anatomy-lit-top: #39414e;
+  --anatomy-lit-shade: #2c333e;
+  --anatomy-hi: #a9b0bb;
+  --anatomy-mid: #5d6573;
+  --anatomy-lo: #444b57;
+  --anatomy-faint: #363c47;
+  --anatomy-dot: #8a919c;
+
+  --c-grass-top: #1f2d27; --c-grass-0: #17211d; --c-grass-1: #1a2520; --c-grass-2: #1c2923; --c-grass-3: #1e2b25; --c-grass-edge: #2a3b33; --c-grass-line: #24342d;
+  --c-plaza-top: #2a303a; --c-plaza-0: #1e232b; --c-plaza-1: #21262f; --c-plaza-2: #242a33; --c-plaza-3: #272d37; --c-plaza-edge: #3a414c; --c-plaza-line: #333a45; --c-plaza-ring: #3e4551;
+  --c-crown-top: #3b5e50; --c-crown-0: #1f3a30; --c-crown-1: #244237; --c-crown-2: #294a3e; --c-crown-3: #305446; --c-crown-edge: #172b24;
+  --c-bark-top: #5a4d40; --c-bark-0: #3a3129; --c-bark-1: #40362d; --c-bark-2: #463c32; --c-bark-3: #4d4237; --c-bark-edge: #2c251f;
+  --c-wood-top: #6b5d4a; --c-wood-0: #4a3f31; --c-wood-1: #514536; --c-wood-2: #584b3b; --c-wood-3: #5f5240; --c-wood-edge: #3a3127;
+  --c-iron-top: #4d4842; --c-iron-0: #2f2c28; --c-iron-1: #35312d; --c-iron-2: #3b3732; --c-iron-3: #423d37; --c-iron-edge: #24211e;
+  --c-glass-l: #2c3546; --c-glass-r: #232b39; --c-glass-shut-l: #272f3c; --c-glass-shut-r: #20272f;
+  --c-door-shut: #3a414c; --c-door-sill: #4a515d;
+  --c-glass-in: #252c37; --c-door-dark: #0f1216; --c-plate-face: #303744;
+}
+.campus-iso .iso-line,
+.campus-iso .iso-fill,
+.campus-iso .iso-shade,
+.campus-iso .iso-top,
+.campus-iso .iso-dots circle {
+  vector-effect: non-scaling-stroke;
+}
+.campus-iso .iso-solid[data-seamless] > .iso-shade,
+.campus-iso .iso-solid[data-seamless] > .iso-top {
+  stroke-width: 0.4;
+}
+/* 유리 · 창 깊이 · 문간 */
+.campus-iso .glass-in { fill: var(--c-glass-in); }
+.campus-iso .door-dark { fill: var(--c-door-dark); }
+.campus-iso .plate-face { fill: var(--c-plate-face); }

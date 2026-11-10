@@ -1,0 +1,465 @@
+/*
+ * 커뮤니티 (시안 E): 이번 주(먹색) 아래 한 줄 · 다가오는 일정(촘촘한 목록) · 세 기수의 1년(행사 달력, 옅은 회색 면) · 기수별 기록.
+ * docs/DESIGN.md: 흰 종이 + 먹색 글자. 장소색은 네모 표식 · 달력 칸에만. 괘선은 목록 안에서만.
+ * 기록 한 줄은 공통 일정 줄(EventRows · pages.module.css).
+ */
+
+/* 이름 링크 (행사 페이지가 있을 때만): 먹색 + 밑줄 */
+.titleLink {
+  /* 글줄 안 링크: 줄 높이는 그대로 두고 누르는 자리만 위아래로 넓힌다 */
+  padding-block: 13px;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+@media (hover: hover) {
+  .titleLink:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+/* 이야기 섹션 머리 한 줄을 문장마다 끊는다 (낱말 중간 '칸 / 하나가' 처럼 꺾이지 않게). 폰은 이어서 */
+@media (min-width: 768px) {
+  .subLine {
+    display: block;
+  }
+}
+
+/*
+ * ── 다가오는 일정: 한 줄 = 일정 하나 ──
+ * 넓은 화면: 날짜 | 이름 | 시간 · 장소 | 종류 | D-day 한 줄.
+ * 1023 이하: 날짜 | 이름 / (시간 · 장소 · 종류) | D-day. 폰: 날짜 · D-day / 이름 / 시간 · 장소 · 종류.
+ */
+.upList {
+  border-top: 2px solid var(--ink-900);
+}
+.up {
+  display: grid;
+  grid-template-columns: 156px minmax(0, 1fr) 216px 120px 48px;
+  grid-template-areas: 'when title meta kind end';
+  column-gap: 24px;
+  align-items: baseline;
+  padding: 16px 0 15px;
+  border-bottom: 1px solid var(--line);
+}
+.upWhen {
+  grid-area: when;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 6px;
+}
+.upYear {
+  flex-basis: 100%;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  color: var(--ink-500);
+}
+.upDay {
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+.upWeekday {
+  font: 600 15px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+.upTitle {
+  grid-area: title;
+  min-width: 0;
+  font: 700 18px/28px var(--font-kr);
+  letter-spacing: -0.01em;
+}
+/* 넓은 화면: 시간 · 장소와 종류가 각자 칸 (태블릿 · 폰은 이름 아래 한 줄) */
+.upSub {
+  display: contents;
+}
+.upMeta {
+  grid-area: meta;
+  min-width: 0;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.upMeta :global(.num) {
+  color: var(--ink-900);
+}
+.upTime {
+  font-weight: 600;
+}
+/* 시간과 장소 사이: 가운뎃점 대신 1px 세로 괘선 (hallmark 63) */
+.upDot {
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin-inline: 10px;
+  background: var(--line-strong);
+  vertical-align: -0.1em;
+}
+.upNoVenue {
+  color: var(--ink-500);
+}
+/* 장소 글자(RoomPlate)를 줄 글자 크기에 맞춘다 */
+.upMeta > span {
+  font-size: inherit;
+  line-height: inherit;
+}
+.upKind {
+  grid-area: kind;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 14px/24px var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.upMark {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--c);
+}
+.upEnd {
+  grid-area: end;
+  justify-self: end;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+/* 휴회: 옅게, 얇게 */
+.up[data-rest] {
+  padding: 10px 0 9px;
+}
+.up[data-rest] .upDay {
+  font-size: 17px;
+  line-height: 24px;
+  color: var(--ink-500);
+}
+.up[data-rest] .upWeekday {
+  font-size: 14px;
+  color: var(--ink-500);
+}
+.up[data-rest] .upTitle {
+  font: 500 16px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.up[data-rest] .upMeta {
+  font-size: 14px;
+  color: var(--ink-500);
+}
+
+/* '학기 한눈에 · 달력' 펼침 (now.module.css 의 '달력으로 보기' 와 같은 모양) */
+.overview {
+  margin: 16px 0 8px;
+}
+.overviewToggle {
+  margin-top: 12px;
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--t-ui);
+  color: var(--ink-900);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .toggle:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+.toggleIcon {
+  transition: transform var(--dur-open) var(--ease);
+}
+.toggle[aria-expanded='true'] .toggleIcon {
+  transform: rotate(180deg);
+}
+
+/* ── 기수별 기록 ── */
+/* 섹션 제목 오른쪽: 숫자 한 줄 (공개 프로젝트 수) */
+.tallyLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 0;
+  padding-bottom: 2px;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.tallyItem {
+  white-space: nowrap;
+}
+/* 숫자 사이: 가운뎃점 대신 1px 세로 괘선 (hallmark 63) */
+.tallySep {
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin-inline: 12px;
+  background: var(--line-strong);
+  vertical-align: -0.1em;
+}
+.tallyValue {
+  font-weight: 600;
+  color: var(--ink-900);
+}
+.tallyBasis {
+  margin-left: 14px;
+  font: var(--t-meta);
+  line-height: 24px;
+  color: var(--ink-500);
+  white-space: nowrap;
+}
+
+.archive {
+  display: grid;
+  gap: 32px;
+}
+/* 기수를 바꿀 때: 페이지 좌우 밀기와 같은 문법을 작게 (거리 32px · 240ms · 튕김 없음). 처음 열 때는 data-dir 이 없어 그대로 */
+@keyframes genIn {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--gen-dir) * 32px));
+  }
+}
+.genSlide[data-dir] {
+  animation: genIn 240ms var(--ease) both;
+}
+.genSlide[data-dir='next'] {
+  --gen-dir: 1;
+}
+.genSlide[data-dir='prev'] {
+  --gen-dir: -1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .genSlide[data-dir] {
+    animation: none;
+  }
+}
+.genIntro {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.genTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font: var(--t-h2);
+  letter-spacing: var(--ls-h2);
+}
+.genTitle :global(.gen-tag) {
+  height: 32px;
+  padding: 0 10px;
+  font-size: 20px;
+}
+.genName {
+  font: 500 16px/24px var(--font-kr);
+  letter-spacing: 0;
+  color: var(--ink-700);
+}
+.genRange {
+  margin-left: 4px;
+  color: var(--ink-500);
+}
+.genSummary {
+  max-width: 38em;
+  font: var(--t-lead);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+}
+.genEmpty {
+  max-width: 38em;
+  padding-top: 20px;
+  border-top: 2px solid var(--ink-900);
+  color: var(--ink-700);
+}
+
+/* 그 기수 행사 사진 (4 × 2, 3:2). 사진 아래에 행사 이름 · 날짜 */
+.genPhotos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+}
+.genPhoto {
+  min-width: 0;
+}
+.genPhoto img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--r-card);
+  background: var(--field);
+}
+
+/* ── 태블릿: 일정 줄은 시간 · 장소 · 종류를 이름 아래 한 줄로 ── */
+@media (max-width: 1023px) {
+  .up {
+    grid-template-columns: 120px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'when title end'
+      'when sub end';
+    row-gap: 2px;
+  }
+  .upSub {
+    grid-area: sub;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 16px;
+  }
+  .upMeta,
+  .upKind {
+    grid-area: auto;
+  }
+  .upMeta,
+  .upKind {
+    font-size: 14px;
+    line-height: 22px;
+  }
+}
+
+@media (max-width: 767px) {
+  .up {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'when end'
+      'title title'
+      'sub sub';
+    row-gap: 2px;
+    padding: 14px 0 13px;
+  }
+  .upDay {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  .upTitle {
+    font-size: 17px;
+    line-height: 26px;
+  }
+  .upEnd {
+    font-size: 16px;
+  }
+  .up[data-rest] {
+    grid-template-areas:
+      'when end'
+      'title title';
+  }
+  .up[data-rest] .upSub {
+    display: none;
+  }
+  .up[data-rest] .upDay {
+    font-size: 16px;
+  }
+  .tallyLine {
+    font-size: 14px;
+  }
+  .tallyBasis {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+  .genSummary {
+    font-size: 16px;
+    line-height: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggleIcon {
+    transition: none;
+  }
+}
+
+/* ── 소개 맨 위 '우리는': 흰 판 네 장 (옅은 회색 면 위). 지원 안내의 '누가 지원할 수 있나' 판과 같은 모양 ── */
+.who {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 40px;
+}
+/* 흰 카드 n장 대신 위 2px 먹색 줄 칸 (홈 멤버 회고와 같은 모양: 4기 Organizer 2026-11-05) */
+.whoCard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px 0 0;
+  border-top: 2px solid var(--ink-900);
+}
+.whoLabel {
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.whoValue {
+  margin: 14px 0 0;
+  font: 700 28px/38px var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+}
+.whoValue :global(.num) {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.whoSub {
+  margin: 8px 0 0;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+@media (max-width: 1199px) {
+  .who {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 32px;
+  }
+  .whoCard {
+    padding-top: 18px;
+  }
+  .whoValue {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+@media (max-width: 767px) {
+  .who {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .whoCard {
+    padding-top: 16px;
+  }
+  .whoValue {
+    margin-top: 8px;
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .whoSub {
+    margin-top: 4px;
+  }
+}
+@media (max-width: 767px) {
+  .genPhotos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .genPhoto img {
+    border-radius: 12px;
+  }
+}

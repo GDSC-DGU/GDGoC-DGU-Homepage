@@ -1,0 +1,158 @@
+/*
+ * 프로젝트 = 전시장. 머리 → 기수 탭 → 그 기수의 전시실(해 · 프로그램마다 한 방) → 먹색 4기 G-Sprint 띠(projects/sprint.module.css) → JoinStrip.
+ * 전시실: 가로 머리 한 줄(2px 먹선 → 큰 해 · 프로그램 | 오른쪽 끝 기수 · 개수) → 카드 격자 3칸.
+ * 카드 모양은 projects/exhibit.module.css, 표지는 projects/plate.module.css.
+ */
+
+/* ── 기수 탭: 2px 먹선 아래 3기 · 2기 · 1기, 고른 탭에 2px 밑줄 ── */
+/* 기수 탭: 먹선은 위의 아카이브 보기 탭(프로젝트 · 세미나)이 맡는다 */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-bottom: 48px;
+}
+.tab {
+  position: relative;
+  min-height: 48px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--r-tag);
+  background: none;
+  font: 600 22px/32px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-500);
+  cursor: pointer;
+  transition: color var(--dur-hover) var(--ease);
+}
+.tab::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: transparent;
+}
+.tab[aria-selected='true'] {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.tab[aria-selected='true']::after {
+  background: var(--ink-900);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .tab:hover {
+    color: var(--ink-900);
+  }
+}
+
+/* ── 전시실 묶음: 머리 장면 바로 아래부터 (흰 이야기 섹션, 아래는 먹색 띠가 바로 붙는다) ── */
+.archive {
+  --story-top: 40px;
+  --story-bottom: 120px;
+}
+.rooms {
+  display: grid;
+  gap: 104px;
+}
+.room {
+  min-width: 0;
+}
+
+/* 탭의 첫 방: 탭 위 먹선이 머리 선을 대신한다 */
+.rooms > .room:first-child .roomHead {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* 방 머리 한 줄 */
+.roomHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  margin-bottom: 36px;
+  padding-top: 20px;
+  border-top: 2px solid var(--ink-900);
+}
+.roomTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 18px;
+  min-width: 0;
+}
+.roomYear {
+  font: var(--t-num-m);
+  letter-spacing: var(--ls-num-m);
+  color: var(--ink-900);
+}
+.roomProgram {
+  font: 700 24px/32px var(--font-kr);
+  letter-spacing: -0.015em;
+  color: var(--ink-900);
+}
+.roomMeta {
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.roomMeta :global(.num) {
+  font-weight: 600;
+}
+
+@media (max-width: 1023px) {
+  .archive {
+    --story-bottom: 96px;
+  }
+  .rooms {
+    gap: 88px;
+  }
+  .roomHead {
+    margin-bottom: 28px;
+  }
+}
+
+@media (max-width: 767px) {
+  .tabs {
+    gap: 4px 4px;
+    margin-bottom: 32px;
+    padding-top: 20px;
+  }
+  .tab {
+    padding-inline: 12px;
+    font-size: 19px;
+    line-height: 28px;
+  }
+  .archive {
+    --story-top: 32px;
+    --story-bottom: 72px;
+  }
+  .rooms {
+    gap: 64px;
+  }
+  /* 폰: 기수 · 개수는 늘 제목 아래 한 줄 (방 이름 길이에 따라 옆에 붙었다 떨어졌다 하지 않게) */
+  .roomHead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 20px;
+    padding-top: 14px;
+  }
+  .roomTitle {
+    gap: 0 12px;
+  }
+  .roomProgram {
+    font-size: 19px;
+    line-height: 28px;
+  }
+  .roomMeta {
+    font-size: 14px;
+  }
+}

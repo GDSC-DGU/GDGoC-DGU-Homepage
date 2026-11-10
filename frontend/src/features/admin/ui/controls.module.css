@@ -1,0 +1,327 @@
+/*
+ * 관리자 버튼 · 입력 (시안 E 버튼 체계 위에 관리자 밀도만 바꾼다).
+ * 주 버튼 · 두 번째 버튼은 전역 .btn-primary · .btn-secondary 를 그대로 쓰고 높이만 고른다:
+ *   lg 52 (로그인 화면) · md 40 (.btn-sm, 누르는 자리 44) · xs 32 (표 안 행 버튼, 사이 8)
+ * 위험(danger)은 되돌리기 어려운 일의 확인 버튼에만. 색만으로 뜻을 전하지 않도록 글자가 동사다('삭제').
+ */
+
+/* ── 버튼 ── */
+.xs {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font: 600 14px/20px var(--font-kr);
+}
+.xs::before {
+  content: none;
+}
+/* 표 안 두 번째 버튼: 흰 바탕 + 1px 선 (행 hover 면 위에서도 보이게) */
+.xs:global(.btn-secondary) {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.danger {
+  background: var(--adm-danger);
+  color: #fff;
+}
+.danger:active {
+  background: var(--adm-danger-hover);
+}
+.ghost {
+  background: transparent;
+  color: var(--ink-900);
+  box-shadow: none;
+}
+.block {
+  width: 100%;
+}
+/* 막힌 버튼: 흐리게 + 누를 수 없음. 이유가 있으면 aria-disabled 로 초점은 받고 이유를 읽힌다 */
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
+.btn[aria-busy='true'] {
+  cursor: progress;
+}
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (hover: hover) {
+  .danger:hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--adm-danger-hover);
+  }
+  .ghost:hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--subtle);
+  }
+  .xs:global(.btn-secondary):hover:not(:disabled):not([aria-disabled='true']) {
+    background: var(--subtle);
+    box-shadow: inset 0 0 0 1px var(--ink-500);
+  }
+}
+
+/* ── 입력 칸 공통 ── */
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-900);
+}
+.req {
+  font: 500 13px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.help {
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font: 500 14px/20px var(--font-kr);
+  color: var(--adm-danger-ink);
+}
+.error svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--adm-danger);
+}
+.count {
+  justify-self: end;
+  font: 500 13px/20px var(--font-num);
+  color: var(--ink-500);
+  font-variant-numeric: tabular-nums;
+}
+.countOver {
+  color: var(--adm-danger-ink);
+}
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.metaRow > .count {
+  margin-left: auto;
+}
+
+.input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--paper);
+  font: 400 15px/22px var(--font-kr);
+  color: var(--ink-900);
+  transition: border-color var(--dur-hover) var(--ease);
+}
+.input::placeholder {
+  color: var(--ink-500);
+}
+.input:focus {
+  border-color: var(--ink-900);
+}
+.input:disabled,
+.input[readonly] {
+  background: var(--field);
+  color: var(--ink-700);
+}
+.input[aria-invalid='true'] {
+  border-color: var(--adm-danger);
+}
+textarea.input {
+  min-height: 120px;
+  resize: vertical;
+}
+select.input {
+  appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23474C55' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .input:hover:not(:disabled):not(:focus):not([aria-invalid='true']) {
+    border-color: var(--ink-500);
+  }
+}
+
+/* ── 체크박스 · 라디오: 진짜 input + 글자. 누르는 자리 32 이상 (표 안) / 44 (폼) ── */
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font: 400 15px/22px var(--font-kr);
+  color: var(--ink-900);
+  cursor: pointer;
+}
+.check.compact {
+  min-height: 32px;
+}
+.check input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--ink-900);
+  cursor: pointer;
+}
+.check input:disabled,
+.check input:disabled + span {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.checkDesc {
+  display: block;
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.fieldset legend {
+  padding: 0;
+  margin-bottom: 4px;
+}
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+}
+.options.vertical {
+  flex-direction: column;
+}
+
+/* ── 파일 올리기 ── */
+.drop {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
+  background: var(--field);
+  text-align: center;
+  color: var(--ink-700);
+  font: 400 14px/20px var(--font-kr);
+  transition:
+    border-color var(--dur-hover) var(--ease),
+    background var(--dur-hover) var(--ease);
+}
+.drop[data-over='true'] {
+  border-color: var(--ink-900);
+  border-style: solid;
+  background: var(--subtle);
+}
+.drop[data-invalid='true'] {
+  border-color: var(--adm-danger);
+}
+.dropIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--ink-700);
+}
+.dropTitle {
+  font: 600 15px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+.preview {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.previewMedia {
+  position: relative;
+  width: 160px;
+  aspect-ratio: var(--ratio, 16 / 9);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--field);
+}
+.previewMedia.circle {
+  width: 88px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.previewMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.previewFile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.previewInfo {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.fileName {
+  overflow: hidden;
+  font: 600 15px/22px var(--font-kr);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fileMeta {
+  font: 400 14px/20px var(--font-kr);
+  color: var(--ink-500);
+}
+.previewActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.imageMissing {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  font: 500 13px/18px var(--font-kr);
+  color: var(--ink-500);
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .preview {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+}

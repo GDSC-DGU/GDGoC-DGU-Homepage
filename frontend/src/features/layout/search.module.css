@@ -1,0 +1,276 @@
+/* 검색 창 (명령 팔레트): 떠 있는 것이라 그림자만, 테두리 없음 (DESIGN 4장) */
+.dialog {
+  /*
+   * 자리를 브라우저 기본(:modal)에 맡기지 않고 직접 정한다: 닫히는 동안(140ms)에는 :modal 이 먼저 풀려서
+   * 창이 다른 자리 · 다른 모양으로 튀었다. 방향(column)도 [open] 이 빠져도 남게 여기에.
+   */
+  position: fixed;
+  inset: 0;
+  height: fit-content;
+  flex-direction: column;
+  width: min(640px, calc(100% - 32px));
+  max-width: none;
+  max-height: min(600px, calc(100dvh - 96px));
+  margin: max(72px, 12vh) auto auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+  /*
+   * 이즈 아웃 · 이즈 인 (hallmark craft 5): 열 때 220ms 감속(--ease-out)으로 6px 내려오고,
+   * 닫을 때 150ms 가속(--ease-in)으로 더 빨리 사라진다 (배경도 같이 옅어진다).
+   * 닫히는 동안에도 맨 위 층에 남게 overlay · display 를 넘긴다. 지원하지 않는 브라우저는 바로 닫힌다
+   */
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.99);
+  transition:
+    opacity var(--dur-short-exit) var(--ease-in),
+    transform var(--dur-short-exit) var(--ease-in),
+    overlay var(--dur-short-exit) allow-discrete,
+    display var(--dur-short-exit) allow-discrete;
+}
+.dialog[open] {
+  display: flex;
+  opacity: 1;
+  transform: none;
+  transition-duration: var(--dur-short);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+}
+.dialog::backdrop {
+  background: var(--ink-a32);
+  opacity: 0;
+  transition:
+    opacity var(--dur-short-exit) var(--ease-in),
+    overlay var(--dur-short-exit) allow-discrete,
+    display var(--dur-short-exit) allow-discrete;
+}
+.dialog[open]::backdrop {
+  opacity: 1;
+  transition-duration: var(--dur-short);
+  transition-timing-function: var(--ease-out);
+}
+@starting-style {
+  .dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: none;
+  border-bottom: 1px solid var(--line);
+}
+.field:focus-within {
+  box-shadow: inset 0 -2px 0 var(--g-blue);
+}
+.icon {
+  position: absolute;
+  left: 18px;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--ink-700);
+  stroke-width: 2;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding: 0 8px 0 50px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-900);
+  font: 500 17px/26px var(--font-kr);
+}
+.input::placeholder {
+  color: var(--ink-500);
+}
+.input:focus,
+.input:focus-visible {
+  outline: none; /* 칸 아래 파란 2px 줄이 초점 표시 */
+}
+.close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  cursor: pointer;
+}
+.close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--ink-700);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+@media (hover: hover) {
+  .close:hover {
+    background: var(--subtle);
+  }
+}
+.close:active {
+  background: var(--line);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 6px 0 10px;
+}
+/* 넘쳐서 스크롤될 때만 초점을 받는다 (창이 overflow: hidden 이라 안쪽에 그린다) */
+.body:focus-visible {
+  outline: 2px solid var(--g-blue);
+  outline-offset: -2px;
+}
+.note {
+  padding: 16px 20px 8px;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+
+.group + .group {
+  margin-top: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+}
+.groupHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px 6px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.more {
+  margin-left: auto;
+}
+
+/*
+ * 결과 한 줄. 고른 줄은 창 안쪽으로 8px 들어간 옅은 면(radius 8) 하나로만 표시한다
+ * (예전: 옅은 면 + 왼쪽 먹색 띠 + 제목 밑줄 세 겹. 왼쪽 띠는 DESIGN 2장의 '카드 왼쪽 색 띠'처럼 읽혔다).
+ * 고른 줄 오른쪽 끝에 ↵ 를 띄워 Enter 로 연다는 것을 그 자리에서 알린다 (먹색 글자라 옅은 면보다 잘 보이는 '고른 줄' 표시).
+ */
+.option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+  min-height: 52px;
+  margin: 0 8px;
+  padding: 8px 12px;
+  border-radius: var(--r-control);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.option > :global(.mark) {
+  grid-row: 1 / span 2;
+}
+.option[aria-selected='true'] {
+  background: var(--subtle);
+}
+.option:active {
+  background: var(--line);
+}
+.optTitle {
+  grid-column: 2;
+  font: var(--t-ui);
+  color: var(--ink-900);
+}
+.optEnter {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-tag);
+  background: var(--paper);
+  font: 500 13px/1 var(--font-num);
+  color: var(--ink-700);
+  visibility: hidden;
+}
+.option[aria-selected='true'] .optEnter {
+  visibility: visible;
+}
+.optMeta {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+
+.keys {
+  flex: none;
+  display: flex;
+  gap: 20px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--line);
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  margin-right: 3px;
+  padding: 0 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-tag);
+  font: 500 13px/1 var(--font-num);
+  color: var(--ink-900);
+}
+
+/*
+ * 터치 화면에는 키 안내(↑↓ · Enter · Esc)가 필요 없다.
+ * 고른 줄의 ↵ 는 남긴다: 폰 자판의 '검색' 키를 누르면 열리는 줄이 어느 것인지 알려 주고,
+ * 옅은 면(대비가 낮다)만으로 고른 줄을 알아보지 않아도 되게 하는 표시다.
+ */
+@media (hover: none), (pointer: coarse) {
+  .keys {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .dialog {
+    width: calc(100% - 16px);
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px));
+    margin-top: calc(8px + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog,
+  .dialog::backdrop {
+    transition: none;
+  }
+}

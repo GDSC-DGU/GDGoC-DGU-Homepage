@@ -1,0 +1,20 @@
+/**
+ * 관리자 UI 부품 (쓰는 법: src/features/admin/README.md). 2단계는 이 폴더를 고치지 않는다.
+ *   import { Button, DataTable, Dialog, PageHeader, useToast } from '@/features/admin/ui'
+ */
+export { Button, ButtonLink, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button'
+export { PageHeader, Panel, EmptyState } from './PageHeader'
+export { Toolbar, TotalCount, SearchBox, FilterTabs, BulkBar, type FilterOption } from './Toolbar'
+export { DataTable, Pagination, type Column, type DataTableProps, type SortState, type TableSelection } from './DataTable'
+export { Dialog, ConfirmDialog, type DialogProps } from './Dialog'
+export { TextField, TextArea, SelectField, DateTimeField, Checkbox, RadioGroup, type RadioOption, type SelectOption } from './fields'
+export { FileDrop, AdminImage, type FileDropValue } from './FileDrop'
+export { StatusBadge, type BadgeTone } from './StatusBadge'
+export { Tabs, NavTabs, type TabItem } from './Tabs'
+export { ScreenPlaceholder } from './ScreenPlaceholder'
+export { useToast, useConfirm, type ToastApi, type ConfirmFn } from './feedback'
+export { deleteConfirm, doneMessage, objectParticle, type ConfirmText } from './confirmText'
+export { formatDate, formatDay, formatDateTime, formatDateTimeLong, formatPeriod, relativeTime, formatNumber, countLabel } from './format'
+export { focusFirstInvalid, hasErrors } from './forms'
+export { useAdminTitle } from './useAdminTitle'
+export * as Icons from './icons'

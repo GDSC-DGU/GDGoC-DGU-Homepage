@@ -1,0 +1,123 @@
+/*
+ * 페이지 끝 '{gen}기에서 만나요' (JoinStrip): 옅은 회색 이야기 섹션.
+ * 넓은 화면: 12칸 중 1–7칸 머리 + 버튼 줄 | 9–12칸 자주 묻는 질문 (아래끝을 버튼 줄에 맞춘다).
+ * 1023 이하: 위아래로 쌓는다. 폰: 버튼 둘 다 한 줄 가득 (global .btn-row).
+ * 바로 아래 먹색 꼬리말이 붙는다 (layout.module.css: 본문이 이야기 섹션으로 끝나면 꼬리말 위 여백 0).
+ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: 56px;
+  align-items: end;
+}
+.main {
+  grid-column: 1 / span 7;
+  min-width: 0;
+}
+.main > .head {
+  margin-bottom: 40px;
+}
+.aside {
+  grid-column: 9 / -1;
+  min-width: 0;
+}
+
+.asideTitle {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--ink-900);
+  font: 600 14px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+
+/* 자주 묻는 질문: 줄 전체가 지원 안내의 그 답으로 가는 링크 (사이트 안 → ) */
+.faq a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 60px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line-strong);
+  font: 600 17px/26px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+  text-decoration: none;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+.faq a::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  -webkit-mask: var(--icon-chevron) center / contain no-repeat;
+  mask: var(--icon-chevron) center / contain no-repeat;
+  flex: none;
+  color: var(--ink-500);
+  transition:
+    transform var(--dur-hover) var(--ease),
+    color var(--dur-hover) var(--ease);
+}
+.faq a:focus-visible {
+  outline-offset: 0;
+}
+@media (hover: hover) {
+  .faq a:hover {
+    text-decoration-line: underline;
+  }
+  .faq a:hover::after {
+    color: var(--ink-900);
+    transform: translateX(3px);
+  }
+}
+
+/* 팀원 찾기: 열리면 생길 것 세 줄 (이름 + 한 줄) */
+.will li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line-strong);
+}
+.willName {
+  font: 700 17px/26px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+}
+.willDesc {
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+
+@media (max-width: 1023px) {
+  .main,
+  .aside {
+    grid-column: 1 / -1;
+  }
+  .main {
+    max-width: 640px;
+  }
+}
+@media (max-width: 767px) {
+  .grid {
+    row-gap: 44px;
+  }
+  .main > .head {
+    margin-bottom: 28px;
+  }
+  .faq a {
+    min-height: 56px;
+    font-size: 16px;
+    line-height: 25px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq a::after {
+    transition: none;
+  }
+  .faq a:hover::after {
+    transform: none;
+  }
+}

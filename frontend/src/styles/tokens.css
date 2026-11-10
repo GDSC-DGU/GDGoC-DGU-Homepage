@@ -1,0 +1,331 @@
+/*
+ * GDGoC DGU 디자인 토큰 — '캠퍼스 안내판' · 시안 E '지도는 표지, 나머지는 전시장' (docs/DESIGN.md)
+ * 색은 '어디'를 뜻한다: 장소색은 지도 지붕 · 장소 표식(이름표 네모) · 일정 표식에만.
+ * 기수색(주황)은 '지금 기수' 표시에만, 그 위 글자는 ink-900.
+ * 면은 세 가지뿐: 흰(--paper) · 옅은 회색(--field) · 먹색(--band-bg). 섹션 단위로만 칠한다.
+ * 밝은 화면 하나로 고정한다 (다크 모드를 따라가지 않음, 팀 결정 2026-10-16).
+ * 2026-11-06: 4기 Organizer 결정으로 dcamp.kr 의 디자인을 따른다 — 따뜻한 회색(#ECEAE8) 면 · 검정 글자 · 8px 모서리 · 알약 버튼.
+ */
+
+/*
+ * 글자 · 선 단계는 :root 와 .on-light 에 같이 둔다.
+ * 먹색 면(.on-dark)은 이 단계를 흰 쪽으로 바꿔 끼우고(global.css), 그 안에 다시 놓인 흰 판(일정 표 등)은 .on-light 로 되돌린다.
+ */
+:root,
+.on-light {
+  /* 바탕 · 선 */
+  --paper: #fffdfb; /* 아주 조금 따뜻한 흰 (hallmark 7b) */
+  --subtle: #f5f3f1; /* hover · 누름 면 전용 (섹션 면은 --field). dcamp hover 면 */
+  --line: #e3e0dd;
+  --line-strong: #d5d2cf; /* dcamp gray2 */
+
+  /* 글자 (dcamp gray4 계열. ink-500 보다 옅은 글자는 쓰지 않는다: 흰 5.7:1 · --field 위 4.7:1) */
+  --ink-900: #111111;
+  --ink-700: #595453;
+  --ink-500: #6b6664;
+
+  /* 포커스 링: 밝은 면은 파랑, 먹색 면은 #8AB4F8 (8.2:1) */
+  --focus: #4285f4;
+}
+
+:root {
+  color-scheme: light;
+
+  /* 면 (섹션 단위, dcamp gray1). 따뜻한 회색 면 위 ink-900 15.7:1 · ink-700 6.2:1 · ink-500 4.7:1 */
+  --field: #eceae8;
+  --field-line: #dedad6; /* 옅은 면 위 1px 안쪽 선 · 그림 타일 테두리 */
+
+  /* 장소색 = 구글 4색. 글자 · 테두리 · 면에는 쓰지 않는다 */
+  --g-blue: #4285f4;
+  --g-red: #ea4335;
+  --g-yellow: #fbbc04;
+  --g-green: #34a853;
+  --place-community: var(--g-blue);
+  --place-projects: var(--g-red);
+  --place-teams: var(--g-yellow);
+  --place-recruits: var(--g-green);
+  --place-about: #191b1f;
+  /* 장소색을 글자로 쓸 때 (머리말 지금 메뉴): 흰 바탕 4.5:1 이상으로 짙게 */
+  --place-projects-text: #d93025;
+  --place-community-text: #1967d2;
+  --place-teams-text: #b06000;
+  --place-recruits-text: #188038;
+  --place-about-text: #191b1f;
+
+  /* 기수색: 4기 주황. '지금 기수' 표시에만 */
+  --gen: #ff6309;
+  --on-gen: #111111;
+  /* 주황을 글자로 쓸 때 (dcamp 의 주황 이름표: 'dcamp batch' 처럼 제목 위 한 줄). 흰 바탕 5.2:1 */
+  --gen-text: #c2410c;
+
+  /* 떠 있는 것(지도 미리보기 · 바텀시트 · 검색 창 · 겹친 폰 화면)에만 */
+  --shadow-float: 0 12px 32px rgba(17, 17, 17, 0.12);
+  /* 카드에 마우스를 올렸을 때 (넓고 옅게) */
+  --shadow-lift: 0 18px 40px -12px rgba(17, 17, 17, 0.16);
+
+  /* 글꼴: 한글 문장은 Pretendard, 숫자 덩어리 · 영문 워드마크만 Google Sans Flex */
+  --font-kr: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-num: 'Google Sans Flex', 'Pretendard Variable', Pretendard, sans-serif;
+
+  /*
+   * 글자 크기/줄 높이 (DESIGN 3장 표). 폭에 따라 아래 미디어 쿼리에서 바뀐다.
+   * 80(--t-hero) → 64(display) → 48(section) → 28(h2) 로 단계를 둔다. 40(--t-h1)은 예전 화면용으로만 남긴다.
+   */
+  --t-display: 600 48px/62px var(--font-kr); /* 먹색 띠 주장. dcamp 처럼 크기 · 굵기를 낮췄다 (2026-11-06) */
+  --t-section: 600 36px/48px var(--font-kr); /* 이야기 섹션 주장 제목 (dcamp 섹션 제목 32 · 500 에 맞춰 낮춤) */
+  --t-h1: 700 40px/52px var(--font-kr); /* (예전) 참고 화면 제목. 새 화면은 --t-section */
+  --t-h2: 600 26px/36px var(--font-kr); /* 참고 섹션 제목 · 묶음 제목 */
+  --t-h3: 700 20px/30px var(--font-kr); /* 항목 제목 */
+  --t-lead: 400 20px/32px var(--font-kr); /* 제목 아래 한 줄 */
+  --t-body: 400 17px/28px var(--font-kr);
+  --t-ui: 600 15px/22px var(--font-kr); /* 버튼 · 메뉴 */
+  --t-eyebrow: 600 15px/22px var(--font-kr); /* 장소 이름표 (색은 ink-700) */
+  --t-meta: 500 13px/20px var(--font-kr); /* 하한: 13px 미만 한글 금지 */
+  --t-num: 600 88px/88px var(--font-num); /* 큰 숫자 (한 화면에 한 묶음) */
+  --t-num-m: 600 40px/44px var(--font-num); /* 일정 표 날짜 · 전시실 연도 */
+  --ls-display: -0.02em;
+  --ls-section: -0.02em;
+  --ls-h1: -0.02em;
+  --ls-h2: -0.015em;
+  --ls-h3: -0.01em;
+  --ls-num: -0.03em;
+  --ls-num-m: -0.02em;
+
+  /* 모양 */
+  /* 모서리 (dcamp: 카드 · 그림 · 입력 8px, 버튼은 알약) */
+  --r-tag: 4px; /* 태그 */
+  --r-control: 8px; /* 입력 · 거르기 */
+  --r-pill: 999px; /* 버튼 */
+  --r-card: 8px; /* 글자 카드 · 표 · 판 */
+  --r-media: 8px; /* 그림 타일 · 일정 표 */
+  /* 아이콘 타일은 정사각 기준 border-radius: 24% (common/IconTile) */
+
+  /* 간격: 묶음 안 / 묶음 사이 / 섹션 사이 */
+  --gap-in: 12px;
+  --gap-group: 40px;
+  --gap-section: 144px;
+  --gap-section-near: 96px; /* 참고 섹션 (괘선 + 왼쪽 3칸 머리) 사이 */
+  --story-pad: 136px; /* 이야기 섹션 위아래 안쪽 여백 */
+  --head-gap: 56px; /* 섹션 머리 → 내용 */
+
+  /* 격자 */
+  --max: 1140px;
+  --gutter: 24px;
+  --side: max(40px, env(safe-area-inset-left, 0px));
+  --side-r: max(40px, env(safe-area-inset-right, 0px));
+
+  /*
+   * 움직임 9가지 (4기 Organizer 2026-11-06 · hallmark craft § 5 · impeccable craft floor).
+   * 이름마다 곡선 하나: 이즈 아웃 = 도착, 이즈 인 = 나감(들어옴의 60–75% 시간), 이즈 인아웃 = 토글.
+   * 스프링 · 바운스는 정한 자리에서만 (토글 손잡이 · 지도 미리보기 / '지금' 이름표). transform · opacity 만 움직인다.
+   */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* 이즈 아웃 (지수) */
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0); /* 이즈 인 (지수) */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* 이즈 인아웃 */
+  /* 스프링: 8% 넘쳤다가 멈춘다 (감쇠 0.62 · 고유진동 15 의 계단 응답) */
+  --ease-spring: linear(0, 0.083 3%, 0.271 7%, 0.49 10%, 0.693 13%, 0.856 17%, 0.971 20%, 1.042 23%, 1.076 27%, 1.083 30%, 1.075 33%, 1.059 37%, 1.041 40%, 1.024 43%, 1.011 47%, 1.002 50%, 0.996 53%, 0.993 60%, 0.997 70%, 1 80%, 1);
+  /* 바운스: 떨어져서 작게 두 번 튀고 앉는다 (한 번 재생에 '통통') */
+  --ease-bounce: linear(0, 0.019 5%, 0.076 10%, 0.17 15%, 0.303 20%, 0.473 25%, 0.681 30%, 0.926 35%, 0.97 38%, 0.86 42%, 0.788 48%, 0.75 55%, 0.772 60%, 0.833 65%, 0.931 70%, 0.994 72%, 0.952 78%, 0.938 82%, 0.962 88%, 0.991 92%, 0.985 95%, 1);
+  --dur-micro: 120ms; /* 누름 · 색 · hover */
+  --dur-short: 220ms; /* 메뉴 · 탭 · 페이드 */
+  --dur-long: 420ms; /* 창 · 시트 · 펼침 · 등장 */
+  --dur-short-exit: 150ms;
+  --dur-long-exit: 280ms;
+  --stagger: 40ms; /* 순차 등장 간격 (다 합쳐 500ms 이하) */
+  /* 줄 · 띠 전체가 링크일 때 오른쪽 끝 칸의 꺾쇠 (mask 로 그려 글자색을 따른다. 글자 화살표 대신, hallmark 30a · 63) */
+  --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 3l5 5-5 5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  /* 예전 이름 (새 코드는 위 이름을 쓴다) */
+  --ease: var(--ease-out);
+  --dur-hover: var(--dur-micro);
+  --dur-open: var(--dur-short);
+  /* 누름: 버튼이 눌리는 정도와 시간 (되돌아올 때 튕기지 않는다) */
+  --press: 0.98;
+  --dur-press: 80ms;
+  /* 그림 hover 확대: 천천히, 아주 조금 */
+  --dur-media: 480ms;
+  --media-zoom: 1.03;
+  /* 카드 hover: 툭 올라가지 않고 스윽 (4기 Organizer 2026-11-06). 올라갈 때 · 내려올 때 같은 곡선.
+   * 높이는 2px (taste-skill: 카드는 2px 만 떠오른다, 4기 Organizer 2026-11-06 '스킬 규칙 우선') */
+  --ease-soft: var(--ease-out);
+  --dur-lift: 600ms;
+  --lift: -2px;
+  /* 페이지 전환 (View Transitions) */
+  --dur-page-out: 120ms;
+  --dur-page-in: 240ms;
+
+  /* 지도 (campus) */
+  --scene-grass: #e4f2e8;
+  --scene-grass-line: #d2e8d9;
+  --scene-walk: #ebeef2;
+  --scene-plaza: #f9fafb;
+  --scene-plaza-line: #dfe3e8;
+  --wall-top: #ffffff;
+  --wall-left: #eef0f2;
+  --wall-right: #dadde1;
+
+  /* 예전 이름: 지도 · 장소 설정(config/places.ts)이 아직 '--ink' 로 부른다 */
+  --ink: var(--ink-900);
+}
+
+@media (max-width: 1279px) {
+  :root {
+    --t-display: 600 44px/58px var(--font-kr);
+    --t-section: 600 34px/46px var(--font-kr);
+    --gap-section: 120px;
+  }
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --t-section: 600 32px/44px var(--font-kr);
+    --t-num: 600 72px/72px var(--font-num);
+    --story-pad: 104px;
+    --head-gap: 44px;
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --t-display: 600 32px/44px var(--font-kr);
+    --t-section: 600 26px/36px var(--font-kr);
+    --t-h1: 700 26px/36px var(--font-kr);
+    --t-h2: 600 22px/32px var(--font-kr);
+    --t-h3: 700 18px/27px var(--font-kr);
+    --t-lead: 400 17px/28px var(--font-kr);
+    --t-body: 400 16px/26px var(--font-kr);
+    --t-num: 600 56px/56px var(--font-num);
+    --t-num-m: 600 30px/34px var(--font-num);
+    --gap-section: 88px;
+    --gap-section-near: 64px;
+    --story-pad: 72px;
+    --head-gap: 28px;
+    --side: max(20px, env(safe-area-inset-left, 0px));
+    --side-r: max(20px, env(safe-area-inset-right, 0px));
+  }
+}
+
+/*
+ * ── 홈 첫 화면 · 먹색 면 ──
+ * --t-hero 는 홈 첫 화면 h1(이름 워드마크 'GDGoC DGU') 하나에만 쓴다. 영문 워드마크라 Google Sans Flex.
+ * 넓은 화면은 오른쪽 글자 판(12칸 중 5칸) 폭에 맞춘다: 워드마크 폭은 글자 크기의 약 5.8배  → 1200 칸(글자 판 약 486px)에서 80px 가 여유 있는 끝.
+ * --band-* 는 먹색 면(홈 띠 · /projects G-Sprint 띠 · /community 이번 주 · 꼬리말)이 쓴다. 한 페이지에 먹색 면은 하나(꼬리말 제외).
+ */
+:root {
+  /* 첫 화면 h1: 이름 워드마크. 자간은 -0.035em 까지만 (DESIGN 2장 -0.04em 하한 안) */
+  --t-hero: 700 80px/1 var(--font-num);
+  --ls-hero: -0.035em;
+
+  /* 먹색 면 (먹색 바탕 위 흰색 · 회색 단계). band-ink-3 도 바탕과 6.6:1 */
+  --band-bg: #0a0909; /* dcamp: 검정. --black 과 같은 값 (hallmark 7a: 순수한 #000 은 쓰지 않는다) */
+  --band-ink: #fffdfb;
+  --band-ink-2: #d5d2cf; /* 13.9:1 */
+  --band-ink-3: #a8a3a1; /* 8.4:1, 먹색 위 가장 옅은 글자 */
+  --band-line: #333131;
+  --band-raise: #262525; /* 먹색 위 두 번째 버튼 면 (dcamp gray5) */
+}
+
+@media (max-width: 1279px) {
+  :root {
+    --t-hero: 700 64px/1 var(--font-num);
+  }
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --t-hero: 700 64px/1 var(--font-num);
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    --t-hero: 700 48px/1 var(--font-num);
+  }
+}
+
+@media (max-width: 359px) {
+  :root {
+    --t-hero: 700 42px/1 var(--font-num);
+  }
+}
+
+/*
+ * ── 색 토큰 (hallmark 48 · 7a: 색은 모두 여기서만 정한다. 순수 흰 · 검정 대신 아주 조금 따뜻하게) ──
+ * 컴포넌트 CSS 에는 #색 · rgba 를 쓰지 않는다. 새 색이 필요하면 여기에 이름을 붙여 더한다.
+ */
+:root {
+  --white: #fffdfb;
+  --black: #0a0909;
+  /* dcamp 주황: 검정 위 글자 · 장식 (흰 바탕 글자는 --gen-text, 큰 글자는 --brand-large) */
+  --brand: #ff5e27;
+  --brand-large: #e8590c;
+  --brand-deep: #3a1a0e; /* 검정 카드 위 주황 아이콘 바탕 */
+  --gen-text-deep: #ad3709; /* 따뜻한 회색 위 주황 글자 4.9:1 */
+  --band-ink-4: #948f8d; /* 검정 위 이름표 회색 6.6:1 */
+  --band-line-strong: #4a4645;
+  --band-card: #1a1919;
+  --band-card-hover: #232222;
+  --band-mute: #595453; /* 회색 띠 (QuoteBanner) */
+  --line-art: #b8b3b0; /* 선 그림 획 */
+  --field-hover: #e4e1de;
+  --focus-dark: #8ab4f8;
+  --hero-shade: #15191f;
+  --ink-600: #5b6069;
+  --band-raise-hover: #3a3837;
+  /* 발표자 동그라미 · 표시 색 (구글 네 색의 옅은 바탕 + 짙은 글자) */
+  --tone-blue-bg: #e8f0fe;
+  --tone-blue-ink: #174ea6;
+  --tone-blue-soft: #e9eef6;
+  --tone-red-bg: #fce8e6;
+  --tone-red-ink: #a50e0e;
+  --tone-red-strong: #c5221f;
+  --tone-yellow-bg: #fef7e0;
+  --tone-yellow-ink: #7a4100;
+  --tone-yellow-strong: #f9ab00;
+  --tone-green-bg: #e6f4ea;
+  --tone-green-ink: #0d652d;
+  /* 투명도 단계 (그림자 · 빛 · 덮개) */
+  --black-a15: rgba(0, 0, 0, 0.15);
+  --black-a35: rgba(0, 0, 0, 0.35);
+  --black-a55: rgba(0, 0, 0, 0.55);
+  --black-a75: rgba(0, 0, 0, 0.75);
+  --brand-a22: rgba(255, 94, 39, 0.22);
+  --brand-a45: rgba(255, 94, 39, 0.45);
+  --gen-a20: rgba(255, 99, 9, 0.2);
+  --glow-15191f-a0: rgba(21, 25, 31, 0);
+  --glow-5078ff-a45: rgba(80, 120, 255, 0.45);
+  --glow-78a0ff-a8: rgba(120, 160, 255, 0.08);
+  --glow-8caaff-a35: rgba(140, 170, 255, 0.35);
+  --glow-962d0a-a30: rgba(150, 45, 10, 0.3);
+  --glow-a0320c-a55: rgba(160, 50, 12, 0.55);
+  --glow-a0beff-a10: rgba(160, 190, 255, 0.1);
+  --glow-bef0a0-a35: rgba(190, 240, 160, 0.35);
+  --glow-d24614-a55: rgba(210, 70, 20, 0.55);
+  --glow-e85014-a55: rgba(232, 80, 20, 0.55);
+  --glow-ff6e32-a85: rgba(255, 110, 50, 0.85);
+  --glow-ff783c-a85: rgba(255, 120, 60, 0.85);
+  --glow-ff8c50-a16: rgba(255, 140, 80, 0.16);
+  --ink-a0: rgba(17, 17, 17, 0);
+  --ink-a10: rgba(17, 17, 17, 0.1);
+  --ink-a12: rgba(17, 17, 17, 0.12);
+  --ink-a18: rgba(17, 17, 17, 0.18);
+  --ink-a24: rgba(17, 17, 17, 0.24);
+  --ink-a32: rgba(17, 17, 17, 0.32);
+  --ink-a44: rgba(17, 17, 17, 0.44);
+  --ink-a48: rgba(17, 17, 17, 0.48);
+  --ink-a5: rgba(17, 17, 17, 0.05);
+  --ink-a6: rgba(17, 17, 17, 0.06);
+  --ink-a7: rgba(17, 17, 17, 0.07);
+  --ink-a8: rgba(17, 17, 17, 0.08);
+  --white-a0: rgba(255, 255, 255, 0);
+  --white-a12: rgba(255, 255, 255, 0.12);
+  --white-a14: rgba(255, 255, 255, 0.14);
+  --white-a18: rgba(255, 255, 255, 0.18);
+  --white-a7: rgba(255, 255, 255, 0.07);
+  --white-a72: rgba(255, 255, 255, 0.72);
+  --white-a78: rgba(255, 255, 255, 0.78);
+  --white-a8: rgba(255, 255, 255, 0.08);
+  --white-a80: rgba(255, 255, 255, 0.8);
+  --white-a90: rgba(255, 255, 255, 0.9);
+  --white-a96: rgba(255, 255, 255, 0.96);
+}

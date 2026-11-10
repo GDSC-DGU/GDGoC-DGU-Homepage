@@ -1,0 +1,75 @@
+/*
+ * 첫 화면 모집 상태 (예전 D-day 자리).
+ * 넓은 화면: 위 1px 먹색 괘선 + 네 줄. 폰: 가운뎃점으로 이은 줄 (가운뎃점은 읽지 않는다: content: '·' / '').
+ */
+.status {
+  display: flex;
+  flex-direction: column;
+  padding-top: 12px;
+  border-top: 1px solid var(--ink-900);
+  font: var(--t-ui);
+  font-weight: 500;
+  color: var(--ink-700);
+}
+.items {
+  display: contents;
+}
+.head {
+  display: inline-flex;
+  align-items: center;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.head :global(.mark) {
+  margin-right: 8px;
+}
+.state {
+  margin: 6px 0;
+  font: var(--t-h3);
+  letter-spacing: var(--ls-h3);
+  color: var(--ink-900);
+}
+
+/*
+ * 폰: 이어서 (세로 길이를 아낀다). 가운뎃점은 묶음마다 앞에 붙인다(폭 --sep).
+ * 묶음 줄(.items)을 왼쪽으로 --sep 만큼 내밀고 틀(.status)이 그 밖을 잘라서, 줄 맨 앞에 온 점은 보이지 않는다.
+ * 그래서 줄이 어디서 바뀌어도 줄 끝 · 줄 처음에 점이 남지 않는다.
+ */
+@media (max-width: 767px) {
+  .status {
+    --sep: 21px;
+    display: block;
+    overflow: hidden;
+    border-top-color: var(--line-strong);
+  }
+  .items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 2px;
+    margin-left: calc(-1 * var(--sep));
+  }
+  .items > span {
+    white-space: nowrap;
+  }
+  .items > span::before {
+    content: '·';
+    content: '·' / '';
+    display: inline-block;
+    width: var(--sep);
+    text-align: center;
+    color: var(--ink-500);
+    font-weight: 500;
+  }
+  .head {
+    font: inherit;
+    font-weight: 600;
+    color: var(--ink-900);
+  }
+  .state {
+    margin: 0;
+    font: inherit;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+}

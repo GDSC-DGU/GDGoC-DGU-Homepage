@@ -1,0 +1,118 @@
+<!doctype html>
+<!--
+  공유 카드(og:image) 원본: 1200×630. scripts/og/render.mjs 가 이 파일에 실제 홈 지도 캡처를 끼워 public/og.png 로 찍는다.
+  문구는 홈 첫 화면 소개 한 줄(src/content/story.ts HERO.pitch, 4기 Organizer 문구 2026-11-05) 그대로.
+  숫자 · 모집 상태 · 기수처럼 바뀌는 말은 넣지 않는다 (그림은 한번 퍼지면 고칠 수 없다).
+  로고는 public/brand/gdg-dgu-logo.png (render.mjs 가 끼운다). 구글 4색 점은 쓰지 않는다 (DESIGN 4장).
+-->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400..700&display=swap" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+    <style>
+      :root {
+        --paper: #ffffff;
+        --ink-900: #191b1f;
+        --ink-700: #474c55;
+        --line: #e4e6e9;
+        --g-blue: #4285f4;
+        --g-red: #ea4335;
+        --g-yellow: #fbbc04;
+        --g-green: #34a853;
+        --font-kr: 'Pretendard Variable', Pretendard, sans-serif;
+        --font-num: 'Google Sans Flex', 'Pretendard Variable', Pretendard, sans-serif;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: var(--paper);
+        color: var(--ink-900);
+        font-family: var(--font-kr);
+        word-break: keep-all;
+        -webkit-font-smoothing: antialiased;
+      }
+      /* 실제 홈 지도 캡처. 오른쪽 · 아래로 흘려 보내고, 글자 쪽(왼쪽 · 위) 가장자리는 종이색으로 녹인다 */
+      .campus {
+        position: absolute;
+        left: var(--campus-x, 380px);
+        top: var(--campus-y, 262px);
+        width: var(--campus-w, 980px);
+        height: auto;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 24%), linear-gradient(to bottom, transparent 0, #000 7%);
+        -webkit-mask-composite: source-in;
+        mask-image: linear-gradient(to right, transparent 0, #000 24%), linear-gradient(to bottom, transparent 0, #000 7%);
+        mask-composite: intersect;
+      }
+      .text {
+        position: absolute;
+        left: 72px;
+        top: 64px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font: 700 30px/1 var(--font-num);
+        letter-spacing: -0.01em;
+      }
+      .logo {
+        height: 40px;
+        width: auto;
+      }
+      h1 {
+        margin: 40px 0 0;
+        font: 700 60px/74px var(--font-kr);
+        letter-spacing: -0.03em;
+      }
+      h1 span {
+        display: block;
+        white-space: nowrap;
+      }
+      /* 아래 왼쪽 두 줄: 지도 땅이 비치지 않게 종이색 받침 (오른쪽 · 위 끝은 녹인다) */
+      .sub {
+        position: absolute;
+        left: 72px;
+        bottom: 56px;
+        margin: 0;
+        font: 500 22px/32px var(--font-kr);
+        color: var(--ink-700);
+      }
+      .sub::before {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        inset: -72px -96px -56px -72px;
+        background: radial-gradient(ellipse 66% 74% at 36% 72%, var(--paper) 62%, rgba(255, 255, 255, 0) 100%);
+      }
+      .sub b {
+        display: block;
+        font-weight: 600;
+        color: var(--ink-900);
+      }
+    </style>
+  </head>
+  <body>
+    <img class="campus" id="campus" src="campus.png" alt="" />
+    <div class="text">
+      <div class="brand">
+        <img class="logo" src="logo.png" alt="" />
+        <span lang="en">GDGoC DGU</span>
+      </div>
+      <h1>
+        <span>학생과 현업자 사이를 잇는</span>
+        <span>동국대학교 개발자 커뮤니티</span>
+      </h1>
+    </div>
+    <p class="sub">
+      <b>동국대학교 Google Developer Groups on Campus</b>
+      전공과 학년에 상관없이 지원할 수 있습니다
+    </p>
+  </body>
+</html>

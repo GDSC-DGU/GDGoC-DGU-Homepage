@@ -1,0 +1,63 @@
+/* 지원 안내: 머리(모집 상태) 글자 · 행동 (섹션 안 조각은 recruits/recruit.module.css) */
+
+/* 머리 리드: 문장 하나에 한 줄씩 (지난 모집 시기 / 공지 채널) */
+.leadLine {
+  display: block;
+}
+
+/* 제목 뒷부분('10.25 마감'): 넓은 화면은 다음 줄 (가운뎃점이 줄 끝에 매달리지 않게), 폰은 ' · ' 로 이어서 */
+.titleSub {
+  white-space: nowrap;
+}
+@media (min-width: 768px) {
+  .titleSep {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .titleSub {
+    display: block;
+  }
+}
+
+/* 열리기까지 · 마감까지 남은 날: 리드 첫 줄 앞의 먹색 꼬리표 (soon · open 일 때만) */
+.dday {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  margin-bottom: 8px;
+  padding: 0 10px;
+  border-radius: var(--r-tag);
+  background: var(--ink-900);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--paper);
+}
+
+/* 주 버튼 + 두 번째 버튼('친구에게 알려 주기'). 머리의 기준 줄(meta) 자리에 들어간다. 줄 모양은 전역 .btn-row */
+.actions {
+  margin-top: 12px;
+}
+
+@media (max-width: 767px) {
+  .actions {
+    margin-top: 4px;
+  }
+  /* '친구에게 알려 주기' 버튼은 ShareAction 의 display: contents 안에 있어 .btn-row 의 바로 아래가 아니다 */
+  .actions :global(.btn-secondary) {
+    flex: 1 1 100%;
+  }
+}
+
+/* dcamp 구성: 검정 띠 바로 뒤의 회색 섹션은 위 여백 없이 붙인다 */
+.flush:global(.story.field) {
+  margin-top: 0;
+}
+/* 프로그램 머리의 제목 뒷부분 (다음 줄, 같은 크기 회색) */
+.titleSub {
+  color: var(--ink-700);
+}

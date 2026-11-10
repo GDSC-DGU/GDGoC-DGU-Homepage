@@ -1,0 +1,441 @@
+/*
+ * 하위 페이지 머리: 건물 앞에서 (docs/DESIGN.md 9장 지도 · 3장 글자).
+ * 넓은 화면: 12칸 중 1–5칸 글자, 6–12칸 + 오른쪽 화면 끝까지 장면. 전체 높이 ≤ 560.
+ * 1024 미만(JS 의 HERO_STACK_QUERY, 하위 페이지 섹션이 쌓이는 기준): 글자 → 작은 장면 → 안내판 목록.
+ */
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-items: center;
+  padding-top: 20px;
+}
+
+/* ── 글자 ── */
+.text {
+  grid-column: 1 / span 5;
+  grid-row: 1;
+  position: relative;
+  z-index: 2;
+  padding-bottom: 32px;
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font: var(--t-ui);
+  color: var(--ink-700);
+}
+/* 머리 이름표 앞 색 네모도 그리지 않는다 (섹션 이름표와 같게) */
+.eyebrow :global(.mark) {
+  display: none;
+}
+.title {
+  font: var(--t-display);
+  letter-spacing: var(--ls-display);
+  color: var(--ink-900);
+}
+.lead {
+  max-width: 38em;
+  margin-top: 20px;
+  font: var(--t-lead);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+}
+.meta {
+  margin-top: 20px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+
+/* ── 장면 ── */
+.place {
+  grid-column: 6 / -1;
+  grid-row: 1;
+  position: relative;
+  min-width: 0;
+  /* 오른쪽 화면 끝까지. 값은 JS 가 스크롤 막대를 뺀 폭으로 잰다 (처음에는 좌우 여백만큼) */
+  margin-right: calc(-1 * var(--bleed, var(--side-r)));
+}
+.stage {
+  position: relative;
+  height: 536px;
+  overflow: hidden;
+  overflow: clip;
+  isolation: isolate;
+}
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+/* 홈 지도와 같은 방법: 장면 가장자리만 종이색으로 녹인다 (그림 위에 겹칠 뿐) */
+.stage::before,
+.stage::after,
+.fadeTop,
+.fadeRight {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+.stage::before {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 96px;
+  background: linear-gradient(90deg, var(--paper), rgba(255, 255, 255, 0));
+}
+.stage::after {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 64px;
+  background: linear-gradient(rgba(255, 255, 255, 0), var(--paper));
+}
+.fadeTop {
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 40px;
+  background: linear-gradient(var(--paper), rgba(255, 255, 255, 0));
+}
+/* 본문 틀 안에서 끝나는 장면(plateLow)의 오른쪽 흐림: 왼쪽과 같은 폭 */
+.fadeRight {
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 96px;
+  background: linear-gradient(270deg, var(--paper), rgba(255, 255, 255, 0));
+}
+
+/* ── 건물 안내판: 지붕 한 점 → 1px 지시선 → 판 (지도 이름표를 펼친 모양) ── */
+.pin {
+  position: absolute;
+  z-index: 3;
+  width: 0;
+  height: 0;
+}
+.pin:not([data-ready]) {
+  visibility: hidden;
+}
+.foot {
+  position: absolute;
+  left: -2.5px;
+  top: -2.5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-900);
+}
+.leader {
+  position: absolute;
+  left: -0.5px;
+  bottom: 0;
+  width: 1px;
+  height: 32px;
+  background: var(--ink-900);
+}
+.plate {
+  position: absolute;
+  /* 판 머리의 장소색 네모(여백 12 + 8 의 절반)가 지시선 바로 위에 온다 */
+  left: -16px;
+  bottom: 32px;
+  width: 336px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-tag);
+}
+.plateTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -1px -1px 0;
+  padding: 10px 12px;
+  border-radius: var(--r-tag) var(--r-tag) 0 0;
+  background: var(--ink-900);
+  color: var(--paper);
+  font: 600 15px/20px var(--font-kr);
+}
+.rows > li + li {
+  border-top: 1px solid var(--line);
+}
+/* 줄이 좁으면 이름을 끊기보다 값을 다음 줄 오른쪽으로 보낸다 */
+.row,
+.rowLink {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px 12px;
+  min-height: 44px;
+  padding: 10px 12px 10px 28px;
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-900);
+}
+.rowLink {
+  text-decoration: none;
+  transition: background-color var(--dur-hover) var(--ease);
+}
+@media (hover: hover) {
+  .rowLink:hover {
+    background: var(--subtle);
+  }
+}
+@media (hover: hover) {
+  .rowLink:hover .rowLabel {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+}
+.rowLink:focus-visible {
+  outline-offset: -2px;
+}
+.rows > li:last-child > .rowLink {
+  border-radius: 0 0 3px 3px;
+}
+.rowLabel {
+  min-width: 0;
+}
+.rowTag {
+  height: 20px;
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+.rowValue {
+  flex: none;
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.ext {
+  flex: none;
+  margin-left: -6px;
+  color: var(--ink-700);
+}
+
+/* ── 장면 속 꾸밈 ── */
+.screenBlank {
+  fill: var(--paper);
+}
+.screenDate {
+  font: 600 11.5px var(--font-num);
+  letter-spacing: -0.02em;
+  fill: var(--ink-900);
+}
+.screenTitle {
+  font: 700 7px var(--font-kr);
+  fill: var(--ink-700);
+}
+
+.tube {
+  stroke: #959ca6;
+  stroke-width: 1.15;
+  stroke-linecap: round;
+}
+.tubeBack {
+  stroke: #b3b9c1;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+.brace {
+  stroke: #a6adb6;
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+.hoardL,
+.hoardR {
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.hoardL {
+  fill: #ffffff;
+}
+.hoardR {
+  fill: #f0f1f3;
+}
+.hoardBase {
+  fill: #c9cdd2;
+}
+.hoardSeam {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.hoardBig {
+  font: 800 12.5px var(--font-kr);
+  letter-spacing: -0.02em;
+  fill: var(--ink-900);
+}
+.hoardSmall {
+  font: 600 7.2px var(--font-kr);
+  fill: var(--ink-700);
+}
+.hoardRule {
+  stroke: var(--line-strong);
+  stroke-width: 0.8;
+}
+.hoardNum {
+  font-family: var(--font-num);
+  font-weight: 500;
+}
+
+/* 불이 한 번 켜진다 (프로젝트 랩 톱니창은 하나씩). 계속 움직이지 않는다 */
+.lightsOn [data-lit] {
+  animation: litL 1200ms var(--ease) 350ms both;
+}
+.lightsOn g:nth-of-type(2) > [data-lit] {
+  animation-delay: 650ms;
+}
+.lightsOn g:nth-of-type(3) > [data-lit] {
+  animation-delay: 950ms;
+}
+.lightsOn [data-glass='L'] {
+  animation: litL 1200ms var(--ease) 350ms both;
+}
+.lightsOn [data-glass='R'] {
+  animation: litR 1200ms var(--ease) 350ms both;
+}
+@keyframes litL {
+  from {
+    fill: #d6e0ea;
+  }
+}
+@keyframes litR {
+  from {
+    fill: #bccad8;
+  }
+}
+
+/*
+ * 안내판을 글자 아래에 두는 머리 (plateAt='text', 프로젝트):
+ * 제목 → 한 줄(회색) → 안내판. 장면에는 건물만 서 있다. 넓은 화면에서만 (1024 미만은 안내판을 그리지 않는다).
+ */
+.wide.plateLow .place {
+  margin-right: 0;
+}
+.wide.plateLow .text {
+  align-self: start;
+  padding-top: 56px;
+}
+.wide.plateLow .title {
+  font: 800 56px/68px var(--font-kr);
+}
+.plateLow .lead {
+  margin-top: 12px;
+  color: var(--ink-700);
+}
+.plate.textPlate {
+  position: static;
+  margin-top: 48px;
+}
+
+/* ── 1280 미만 넓은 화면: 장면을 조금 낮게, 안내판을 조금 좁게 (건물이 너무 작아지지 않게) ── */
+@media (max-width: 1279px) {
+  .stage {
+    height: 496px;
+  }
+  .stage::before {
+    width: 64px;
+  }
+  .plate {
+    width: 296px;
+  }
+  .row,
+  .rowLink {
+    column-gap: 10px;
+    padding-left: 24px;
+    font-size: 14px;
+  }
+  .rowValue {
+    font-size: 13px;
+  }
+}
+
+/* ── 1024 미만 (JS 의 HERO_STACK_QUERY): 글자 → 작은 장면 → 안내판 목록 ── */
+.narrow {
+  display: block;
+  padding-top: 32px;
+}
+.narrow .text {
+  padding-bottom: 0;
+}
+.narrow .place {
+  margin: 12px calc(-1 * var(--side-r)) 0 calc(-1 * var(--side));
+}
+.narrow .stage {
+  height: 240px;
+}
+.narrow .stage::before {
+  display: none;
+}
+.narrow .stage::after {
+  height: 40px;
+}
+.narrow .fadeTop {
+  height: 28px;
+}
+.narrow .pin {
+  position: relative;
+  width: auto;
+  height: auto;
+  margin: 0 var(--side-r) 0 var(--side);
+}
+.narrow .foot,
+.narrow .leader {
+  display: none;
+}
+.narrow .plate {
+  position: static;
+  width: auto;
+  max-width: 560px;
+}
+.narrow .row,
+.narrow .rowLink {
+  column-gap: 12px;
+  padding-left: 28px;
+  font-size: 15px;
+}
+.narrow .rowValue {
+  font-size: 14px;
+}
+@media (max-width: 767px) {
+  .narrow {
+    padding-top: 24px;
+  }
+  .narrow .stage {
+    height: 220px;
+  }
+  .eyebrow {
+    margin-bottom: 14px;
+  }
+  .lead,
+  .meta {
+    margin-top: 14px;
+  }
+  .row,
+  .rowLink {
+    min-height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightsOn [data-lit],
+  .lightsOn [data-glass] {
+    animation: none;
+  }
+  .rowLink {
+    transition: none;
+  }
+}

@@ -1,0 +1,198 @@
+/*
+ * 3D 지도 층. SVG 지도와 같은 자리에 겹쳐 두고, 준비되면 서서히 나타난다.
+ * 안내판은 SVG 의 Sign 과 같은 모양 (흰 판 · 1px 테두리 · 8px 장소색 네모 · 1px 지시선).
+ */
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms var(--ease);
+}
+.layer[data-world='ready'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.canvas {
+  /* 폰에서 지도 위를 쓸어도 페이지가 내려가게 (가로 끌기 · 핀치는 쓰지 않는다) */
+  touch-action: pan-y;
+}
+.canvas canvas {
+  touch-action: pan-y;
+}
+
+/* 3D 가 준비되는 동안 SVG 지도는 그 밑에 깔린다 */
+.svgUnder {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+.svgUnder[data-gone] {
+  visibility: hidden;
+}
+
+.pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  --leader: 28px;
+  --pad-x: 12px;
+  --pad-y: 10px;
+  transition: opacity var(--dur-open, 200ms) var(--ease);
+}
+.pin[data-compact] {
+  --leader: 14px;
+  --pad-x: 9px;
+  --pad-y: 6px;
+}
+.pin[data-dim] {
+  opacity: 0.32;
+}
+.leader {
+  position: absolute;
+  left: -0.5px;
+  bottom: 0;
+  width: 1px;
+  height: var(--leader);
+  background: var(--ink-900);
+}
+.leader::after {
+  content: '';
+  position: absolute;
+  left: -1.5px;
+  bottom: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink-900);
+}
+.hangLine {
+  position: absolute;
+  right: 0;
+  top: calc(var(--pad-y) + 9px);
+  width: 8px;
+  height: 1px;
+  background: var(--ink-900);
+}
+.plate {
+  position: absolute;
+  bottom: var(--leader);
+  left: calc(-1 * (var(--pad-x) + 4px));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--pad-y) var(--pad-x);
+  white-space: nowrap;
+  font: 600 15px/18px var(--font-kr);
+  letter-spacing: 0;
+  color: var(--ink-900);
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--dur-hover) var(--ease), color var(--dur-hover) var(--ease), border-color var(--dur-hover) var(--ease);
+}
+.pin[data-compact] .plate {
+  font-size: 14px;
+}
+.pin[data-align='end'] .plate {
+  left: auto;
+  right: calc(-1 * (var(--pad-x) + 4px));
+}
+.pin[data-align='hang'] .plate {
+  bottom: auto;
+  top: 0;
+  left: auto;
+  right: 8px;
+}
+.plate:focus-visible {
+  outline: 2px solid var(--g-blue);
+  outline-offset: 2px;
+}
+.mark {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.mark[data-ink] {
+  background: var(--place-about);
+}
+.pin[data-on] .plate {
+  background: var(--ink-900);
+  border-color: var(--ink-900);
+  color: var(--paper);
+}
+.pin[data-on] .mark[data-ink] {
+  background: var(--paper);
+}
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  margin: -2px 0;
+  border-radius: 11px;
+  font: 700 13px/1 var(--font-num);
+  background: var(--ink-900);
+  color: var(--paper);
+}
+.pin[data-on] .badge {
+  background: var(--paper);
+  color: var(--ink-900);
+}
+
+/* 안내판 층: 캔버스 위에 겹치고, 판(버튼)만 누를 수 있다 */
+.labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.labels button {
+  pointer-events: auto;
+}
+
+/* 손글씨 메모 (PenNotes3D): 크기 1px 짜리 SVG 에서 넘쳐 그린다. 누르는 것이 아니다 */
+.pen {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+  transition: opacity 280ms var(--ease);
+}
+
+/* 건물을 골라 다가가면: 손글씨는 사라지고, 고른 곳이 아닌 안내판은 옅어진다 */
+.labels[data-focus] .pen {
+  opacity: 0;
+}
+.labels[data-focus] .pin:not([data-on]) {
+  opacity: 0.28;
+}
+
+/* 밤: 지시선은 먹색이면 땅에 묻히므로 옅은 회색 (SVG 안내판과 같게). 판은 흰 그대로 */
+:global([data-tod='night']) .leader,
+:global([data-tod='night']) .leader::after,
+:global([data-tod='night']) .hangLine {
+  background: #c9cdd3;
+}
+
+/* 스크롤 이야기로 프로젝트 건물에 도착하면 안내판이 먹색으로 뒤집힌다 ('지금 여기', motion.css 와 같게) */
+:global([data-arrive]) .pin[data-pin='projects'] .plate {
+  background: var(--ink-900);
+  border-color: var(--ink-900);
+  color: var(--paper);
+  transition: background 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease);
+}
+
+/* 색 견본 (World3D 가 CSS 변수를 읽는 자리). 보이지 않는다 */
+.probe {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
