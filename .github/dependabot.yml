@@ -1,0 +1,99 @@
+# 의존성 버전 업데이트
+# - 기본 브랜치(develop)로 PR이 열립니다.
+# - cooldown: 갓 배포된 버전은 7일 기다린 뒤 올립니다 (공급망 공격 대비). 보안 업데이트에는 적용되지 않습니다.
+# - PR 제목: "chore(deps): ..." (개발용 의존성은 "chore(deps-dev): ...") → 둘 다 pr-title 검사 통과
+#
+# ⚠️ 지금은 github-actions만 켜 두었습니다.
+#    backend/, ai/ 폴더가 아직 없어서, 켜 두면 매주 "확인할 파일 없음"으로 실패합니다.
+#    frontend/는 있지만 아직 켜지 않았습니다.
+#    각 폴더에 코드가 생기면 아래 해당 블록의 주석을 풀어 주세요.
+#      frontend → npm  (frontend/package.json · package-lock.json)
+#      backend  → gradle, docker  (backend/build.gradle.kts · Dockerfile이 생기면)
+#      ai       → uv, docker      (ai/pyproject.toml · Dockerfile이 생기면)
+version: 2
+updates:
+  # 액션 SHA 고정을 강제하므로, SHA 갱신은 Dependabot이 맡습니다.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels: ["dependencies", "area:ci"]
+
+  # ── 폴더가 생기면 주석 해제 ──
+
+  # - package-ecosystem: "npm"
+  #   directory: "/frontend"
+  #   schedule:
+  #     interval: "weekly"
+  #     day: "monday"
+  #     time: "09:00"
+  #     timezone: "Asia/Seoul"
+  #   cooldown:
+  #     default-days: 7
+  #   groups:
+  #     frontend-minor-patch:
+  #       update-types: ["minor", "patch"]
+  #   commit-message:
+  #     prefix: "chore"
+  #     include: "scope"
+  #   labels: ["dependencies", "area:frontend"]
+  #   open-pull-requests-limit: 5
+
+  # - package-ecosystem: "gradle"
+  #   directory: "/backend"
+  #   schedule:
+  #     interval: "weekly"
+  #     day: "monday"
+  #     time: "09:00"
+  #     timezone: "Asia/Seoul"
+  #   cooldown:
+  #     default-days: 7
+  #   groups:
+  #     backend-minor-patch:
+  #       update-types: ["minor", "patch"]
+  #   commit-message:
+  #     prefix: "chore"
+  #     include: "scope"
+  #   labels: ["dependencies", "area:backend"]
+  #   open-pull-requests-limit: 5
+
+  # - package-ecosystem: "uv"
+  #   directory: "/ai"
+  #   schedule:
+  #     interval: "weekly"
+  #     day: "monday"
+  #     time: "09:00"
+  #     timezone: "Asia/Seoul"
+  #   cooldown:
+  #     default-days: 7
+  #   groups:
+  #     ai-minor-patch:
+  #       update-types: ["minor", "patch"]
+  #   commit-message:
+  #     prefix: "chore"
+  #     include: "scope"
+  #   labels: ["dependencies", "area:ai"]
+  #   open-pull-requests-limit: 5
+
+  # - package-ecosystem: "docker"
+  #   directories: ["/backend", "/ai"]   # 한쪽만 생겼으면 그 경로만 남깁니다
+  #   schedule:
+  #     interval: "monthly"
+  #     timezone: "Asia/Seoul"
+  #   cooldown:
+  #     default-days: 7
+  #   commit-message:
+  #     prefix: "chore"
+  #     include: "scope"
+  #   labels: ["dependencies", "area:infra"]

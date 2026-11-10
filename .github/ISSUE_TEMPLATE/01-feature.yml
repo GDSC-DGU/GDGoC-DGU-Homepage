@@ -1,0 +1,114 @@
+name: "✨ 기능 (Feature)"
+description: "노션 기능 명세서의 기능 하나를 구현합니다. 브랜치: feature/<기능ID 소문자>-<설명> (예: feature/f-hom-001-hero)"
+title: "[기능ID] "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **공개 레포입니다.** 지원자 이름·학번·이메일, API 키, AI 채점 루브릭 본문은 적지 마세요.
+        제목 예시: `[F-HOM-001] 홈 소개 섹션`
+
+  - type: input
+    id: feature-id
+    attributes:
+      label: 기능 ID
+      description: 노션 기능 명세서의 기능 ID (대문자 그대로. 브랜치 이름에서만 소문자로 씁니다)
+      placeholder: "F-HOM-001"
+    validations:
+      required: true
+
+  - type: input
+    id: notion-link
+    attributes:
+      label: 노션 링크
+      description: 선택 사항입니다.
+      placeholder: "https://www.notion.so/..."
+    validations:
+      required: false
+
+  - type: input
+    id: screen-id
+    attributes:
+      label: 화면 ID
+      description: 노션 화면 명세서의 화면 ID
+      placeholder: "P-HOM-001"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 작업 영역 (다중 선택)
+      description: 선택 사항입니다. 선택한 영역은 area 라벨로 자동 등록됩니다.
+      multiple: true
+      options:
+        - frontend
+        - backend
+        - ai
+        - contracts
+        - infra
+    validations:
+      required: false
+
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 목적
+      description: 이 기능이 왜 필요한지 1~2문장
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 완료 조건
+      description: 리뷰어가 "됐다"고 판단할 수 있는 기준
+      value: |
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+
+  - type: dropdown
+    id: api-change
+    attributes:
+      label: API 계약 변경
+      options:
+        - 없음
+        - 있음 (openapi.yaml)
+        - 있음 (ai-internal.yaml)
+        - 있음 (둘 다)
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: operation-id
+    attributes:
+      label: 변경할 operationId
+      description: API 계약 변경이 있을 때만
+      placeholder: "createTeamPost"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: permission
+    attributes:
+      label: 사용 권한 (다중 선택)
+      multiple: true
+      options:
+        - 비회원
+        - General
+        - Core
+        - Lead
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: 참고
+      description: Figma 프레임, 관련 이슈, 미정 사항
+    validations:
+      required: false

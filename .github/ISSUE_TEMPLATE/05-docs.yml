@@ -1,0 +1,41 @@
+name: "📝 문서 (Docs)"
+description: "README, 작업 규칙, 설계·운영 문서를 쓰거나 고칩니다. 브랜치: docs/<이슈번호>-<설명>"
+title: "[문서] "
+labels: ["docs", "area:docs"]
+body:
+  - type: dropdown
+    id: doc-kind
+    attributes:
+      label: 문서 종류
+      options:
+        - README (루트 또는 앱별)
+        - 작업 · 머지 규칙 (RULE_SUMMARY, contributing, merge-rules)
+        - 아키텍처 · 설계 (ARCHITECTURE)
+        - 운영 런북 (RUNBOOK)
+        - 레포 설정 가이드
+        - 기타
+    validations:
+      required: true
+
+  - type: input
+    id: path
+    attributes:
+      label: 대상 파일 경로
+      placeholder: "RULEBOOKS/runbook.md"
+    validations:
+      required: false
+
+  - type: textarea
+    id: content
+    attributes:
+      label: 작성 · 수정할 내용
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: 이유
+      description: 문서가 실제와 달라진 계기(코드 변경, 결정 변경 등)를 적으면 리뷰가 빨라집니다.
+    validations:
+      required: false
