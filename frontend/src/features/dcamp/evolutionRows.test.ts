@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { GENERATIONS } from '@/content'
-import { evolutionRows } from './evolution'
+import { evolutionRows } from './evolutionRows'
 
 describe('연혁 (dcamp Our Evolution)', () => {
   it('최근 기수 먼저, 기간은 generations.json 그대로, 지금 기수는 끝을 비운다', () => {
