@@ -1,7 +1,8 @@
-# GDGoC DGU 홈페이지 프로토타입
+# GDGoC DGU 홈페이지 프론트엔드
 
-Google Developer Groups on Campus Dongguk University 홈페이지를 React로 만든 시안 레포입니다.
-4기 G-Sprint 팀 본 레포가 아닙니다. 폴더 구조와 패턴은 **제안**이고, 실제 규칙은 팀(FE 이도윤 · 박정은)이 정합니다.
+Google Developer Groups on Campus Dongguk University 홈페이지의 프론트엔드입니다 (Vite + React + TypeScript).
+팀 레포 [GDGoC-DGU-Homepage](https://github.com/GDSC-DGU/GDGoC-DGU-Homepage)의 `frontend/` 폴더이고, 2026-11 에 개인 레포(monggu03/gdghomepage)에서 커밋 기록째 옮겨 왔습니다.
+폴더 구조와 패턴은 프론트 파트(이도윤 · 박정은)가 정합니다.
 
 - 메뉴: 배범서 기획(노션 '기획 구체화')의 Home · Projects · Teams · Community · Recruits 를 한글로 표기 (홈 · 프로젝트 · 커뮤니티 · 팀원 찾기, 오른쪽 끝 '지원 안내' 버튼). 주소는 영어 그대로 (/projects …)
 - 첫 화면: 3D 캠퍼스 지도가 배경(넓은 화면)이고, 오른쪽에 이름 GDGoC DGU · 짧은 소개 · 버튼 · 5기 모집 상태 (폰은 글자 → 지도). 건물 하나가 메뉴 하나입니다 (지도 = 메뉴 = 사이트맵)
@@ -12,7 +13,7 @@ Google Developer Groups on Campus Dongguk University 홈페이지를 React로 �
 
 ## 실행
 
-Node.js 20.19 이상이 필요합니다.
+Node.js 20.19 이상이 필요합니다. 아래 명령은 레포 맨 위가 아니라 **`frontend` 폴더 안에서** 실행합니다 (`cd frontend`).
 
 ```bash
 npm install
