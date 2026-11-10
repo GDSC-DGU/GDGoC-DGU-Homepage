@@ -1,0 +1,48 @@
+# PR 제목을 Conventional Commits 형식으로 검사합니다.
+# squash merge 시 PR 제목이 develop에 남는 커밋 메시지가 되기 때문입니다. (RULEBOOKS/contributing.md 3번)
+# 잡 이름 `pr-title`을 ruleset 필수 체크에 등록하세요.
+name: pr-title
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  pr-title:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # design: 화면·스타일 변경. Conventional Commits의 style은 "코드 포맷팅"을 뜻하므로 쓰지 않습니다.
+          # release: develop → main 릴리스 PR 전용
+          # deps-dev: Dependabot이 개발용 의존성(devDependencies 등) PR 제목에 붙이는 scope. 사람이 쓸 일은 없습니다.
+          types: |
+            feat
+            design
+            fix
+            docs
+            refactor
+            test
+            chore
+            ci
+            perf
+            revert
+            release
+          scopes: |
+            frontend
+            backend
+            ai
+            contracts
+            infra
+            ci
+            repo
+            deps
+            deps-dev
+          requireScope: false

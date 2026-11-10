@@ -1,0 +1,22 @@
+# PR에 영역(area:*)·종류(feature/design/bug/task/docs)·릴리스 라벨을 자동으로 붙입니다. 규칙: .github/labeler.yml
+# pull_request_target: 기본 브랜치의 워크플로우로 실행되어 Dependabot PR에도 쓰기 권한이 있습니다.
+# ⚠️ 이 워크플로우에서 PR 코드를 checkout하지 마세요. (pull_request_target + 외부 코드 실행은 보안 위험)
+name: pr-labeler
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
+        with:
+          sync-labels: false
