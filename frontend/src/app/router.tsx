@@ -3,7 +3,7 @@ import { PAGE_PLAN_IDS } from '@/config/pages'
 import { HomePage } from '@/features/home/HomePage'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { ErrorPage } from '@/features/pages/ErrorPage'
-import { AdminApp, ArchivePage, CampusPreview, CommunityPage, MovedTo, NotFoundPage, NowPreview, PlannedPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
+import { AdminApp, ApplyPage, ArchivePage, CampusPreview, CommunityPage, MovedTo, NotFoundPage, NowPreview, PlannedPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
 import { enableViewTransitions } from './viewTransitions'
 
 /** 다 만든 페이지. 준비 중 페이지를 실제로 만들면 여기로 옮긴다 */
@@ -16,6 +16,8 @@ const BUILT_ROUTES: RouteObject[] = [
   { path: 'about', element: <CommunityPage /> },
   { path: 'community', element: <MovedTo pathname="/about" /> },
   { path: 'recruits', element: <RecruitsPage /> },
+  // 지원서 작성 (P-RCT-03). 백엔드 전에는 예시 지원서 (features/apply/data/applyRepo.ts 의 APPLY_SAMPLE)
+  { path: 'recruits/apply', element: <ApplyPage /> },
   // 팀원 찾기: 백엔드 전에는 예시 게시판 (features/teams/data/teamsRepo.ts 의 TEAMS_SAMPLE)
   { path: 'teams', element: <TeamsPage /> },
   { path: 'teams/write', element: <TeamsWritePage mode="create" /> },

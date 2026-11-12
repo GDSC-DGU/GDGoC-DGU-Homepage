@@ -5,7 +5,7 @@
     { "source": "/projects", "destination": "/archive", "permanent": true },
     { "source": "/community", "destination": "/about", "permanent": true }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index" }],
   "headers": [
     {
       "source": "/(.*)",

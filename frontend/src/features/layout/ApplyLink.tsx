@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { APPLY_PLACE, PLACE_BY_ID, SOON_LABEL, SOON_PLACES } from '@/config/places'
 import { RECRUITING } from '@/content'
-import { recruitStatus } from '@/content/recruitingStatus'
+import { applyTarget, recruitStatus } from '@/content/recruitingStatus'
 import type { PlaceId } from '@/domain/types'
 import { useToday } from '@/hooks/useToday'
 import { daysUntil, monthDay } from '@/lib/date'
@@ -21,7 +21,7 @@ function dueLabel(deadline: string | undefined, today: string): string | null {
 /**
  * 머리말 · 폰 메뉴의 지원 행동. 모집 상태(content/recruitingStatus.ts)를 따른다.
  * 모양은 두 번째 버튼(옅은 면) 작은 크기. 지원 안내 페이지에 있으면 먹색 바탕 · 흰 글자로 '지금 여기'.
- * - 모집 중(open): '지원서 쓰기' + 마감일 (머리말은 두 번째 버튼, 폰 메뉴 시트만 먹색). 지원서 주소가 있으면 바로 지원서(새 창), 없으면 지원 안내 페이지
+ * - 모집 중(open): '지원서 쓰기' + 마감일 (머리말은 두 번째 버튼, 폰 메뉴 시트만 먹색). 지원서 주소가 있으면 바로 지원서(새 창), 사이트 안 지원서가 열려 있으면 /recruits/apply, 둘 다 아니면 지원 안내 페이지 (applyTarget)
  * - 그 밖(unscheduled · soon · ended): '지원 안내'. 상태 점(장소색 네모)을 달지 않는다
  *   ('지금 열려 있다'로 읽혔다: 2026-10 리뷰). 열렸는지 · 언제 여는지는 지원 안내 페이지가 말한다
  * where: wide = 넓은 화면 머리말 오른쪽 끝 · bar = 폰 머리말 (아주 좁은 폰에서는 숨김) · sheet = 폰 메뉴 시트 아래 폭 가득
@@ -68,17 +68,17 @@ export function ApplyLink({ where, onHover, onClick }: { where: Where; onHover?:
     </>
   )
 
-  if (open && st.applyUrl) {
+  const target = applyTarget(st)
+  if (target?.external) {
     return (
-      <a className={cls} href={st.applyUrl} target="_blank" rel="noreferrer" onClick={onClick} {...hover}>
+      <a className={cls} href={target.href} target="_blank" rel="noreferrer" onClick={onClick} {...hover}>
         {body}
-        
         <span className="visually-hidden"> ({generation}기 지원서, 새 창)</span>
       </a>
     )
   }
   return (
-    <NavLink to={place.path} className={({ isActive }) => `${cls} ${isActive ? s.applyActive : ''}`} onClick={onClick} {...hover}>
+    <NavLink to={target?.href ?? place.path} className={({ isActive }) => `${cls} ${isActive ? s.applyActive : ''}`} onClick={onClick} {...hover}>
       {body}
     </NavLink>
   )

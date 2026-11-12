@@ -1,0 +1,414 @@
+/*
+ * 지원서 작성 (/recruits/apply). 흰 면 하나, 가운데 좁은 단(760px).
+ * 묶음(기본 정보 · 질문 · 동의)은 위 1px 먹색 줄로 나눈다 (카드 · 그림자 없이, DESIGN dcamp 규칙).
+ * 입력 · 고르기 모양은 팀원 찾기 글쓰기와 같다 (높이 44, 8px 모서리, 고르면 먹색).
+ */
+.page {
+  max-width: calc(760px + var(--side) + var(--side-r));
+  padding-top: 64px;
+  padding-bottom: 120px;
+}
+
+.trail {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.trail a {
+  color: var(--ink-700);
+}
+.trail a:hover {
+  color: var(--ink-900);
+}
+
+/* ── 머리 ─────────────────────────────── */
+.head {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+.title {
+  font: var(--t-display);
+  letter-spacing: var(--ls-display);
+  color: var(--ink-900);
+  text-wrap: balance;
+}
+.title:focus {
+  outline: none;
+}
+.lead {
+  font: var(--t-lead);
+  color: var(--ink-700);
+}
+.meta {
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.star {
+  color: var(--tone-red-strong);
+}
+
+.sample {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 40px;
+  padding: 14px 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-control);
+  font: 500 14px/22px var(--font-kr);
+  color: var(--ink-700);
+}
+.sample :global(.sample-badge) {
+  flex: none;
+}
+
+/* ── 양식 ─────────────────────────────── */
+.form {
+  display: grid;
+  gap: 56px;
+}
+.block {
+  display: grid;
+  gap: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ink-900);
+}
+.blockTitle {
+  font: var(--t-h2);
+  color: var(--ink-900);
+}
+.blockSub {
+  margin-top: -16px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 20px;
+}
+
+.questions {
+  display: grid;
+  gap: 36px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.qItem {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 0 8px;
+}
+.qNo {
+  padding-top: 1px;
+  font: 600 15px/22px var(--font-num);
+  color: var(--ink-500);
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.label {
+  padding: 0;
+  font: 700 16px/24px var(--font-kr);
+  color: var(--ink-900);
+}
+.optional {
+  margin-left: 8px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background: var(--paper);
+  font: 500 16px/24px var(--font-kr);
+  color: var(--ink-900);
+  transition: border-color var(--dur-hover) var(--ease-out);
+}
+.input::placeholder {
+  color: var(--ink-500);
+}
+.input:hover {
+  border-color: var(--ink-700);
+}
+.input[aria-invalid='true'] {
+  border-color: var(--tone-red-strong);
+}
+.textarea {
+  min-height: 168px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+.counter {
+  justify-self: end;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.counter[data-over] {
+  color: var(--tone-red-strong);
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.choice {
+  position: relative;
+  cursor: pointer;
+}
+.choice input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-control);
+  background: var(--paper);
+  font: 600 15px/22px var(--font-kr);
+  color: var(--ink-700);
+  transition:
+    border-color var(--dur-hover) var(--ease-out),
+    background-color var(--dur-hover) var(--ease-out);
+}
+.choice:hover span {
+  border-color: var(--ink-700);
+}
+.choice input:checked + span {
+  border-color: var(--ink-900);
+  background: var(--ink-900);
+  color: var(--white);
+}
+.choice input[aria-invalid='true'] + span {
+  border-color: var(--tone-red-strong);
+}
+
+.input:focus-visible,
+.choice input:focus-visible + span,
+.check input:focus-visible,
+.details summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.error,
+.errorText {
+  font: 600 14px/22px var(--font-kr);
+  color: var(--tone-red-strong);
+}
+
+/* ── 동의 ─────────────────────────────── */
+.consents {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 20px;
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--field);
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font: 500 15px/24px var(--font-kr);
+  color: var(--ink-900);
+  cursor: pointer;
+}
+.check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--ink-900);
+}
+.checkAll {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--field-line);
+  font-weight: 700;
+}
+.must {
+  color: var(--ink-500);
+}
+.details {
+  margin: -4px 0 4px 30px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.details summary {
+  width: fit-content;
+  color: var(--ink-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.policy {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 16px;
+  margin-top: 10px;
+}
+.policy dt {
+  font-weight: 700;
+  color: var(--ink-900);
+}
+.policyList {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+/* ── 아래 ─────────────────────────────── */
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ink-900);
+}
+.progress {
+  font: var(--t-meta);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.formMsg {
+  flex: 1;
+  text-align: right;
+}
+.submit {
+  min-width: 132px;
+}
+
+/* ── 완료 · 기간 아님 ─────────────────── */
+.done {
+  display: grid;
+  gap: 20px;
+}
+.receipt {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 12px 0 4px;
+  padding: 24px;
+  border-radius: var(--r-card);
+  background: var(--field);
+}
+.receipt dt {
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.receipt dd {
+  margin-top: 4px;
+  font: 700 20px/30px var(--font-kr);
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+.receipt dd:global(.num) {
+  font: var(--t-num-m);
+  letter-spacing: var(--ls-num-m);
+}
+.done :global(.btn-row) {
+  margin-top: 12px;
+}
+
+.state {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 96px 16px;
+  font: var(--t-body);
+  color: var(--ink-700);
+  text-align: center;
+}
+
+/* ── 팝업 ─────────────────────────────── */
+.modal {
+  width: min(440px, calc(100% - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-float);
+}
+.modal::backdrop {
+  background: var(--ink-a48);
+}
+.modalBody {
+  display: grid;
+  gap: 12px;
+  padding: 28px 24px 24px;
+}
+.modalTitle {
+  font: 700 20px/28px var(--font-kr);
+}
+.modalDesc {
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.modalFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .modal[open] {
+    animation: pop var(--dur-open) var(--ease-out);
+  }
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding-top: 40px;
+    padding-bottom: 80px;
+  }
+  .grid2,
+  .receipt {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .qItem {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .foot {
+    flex-wrap: wrap;
+  }
+  .formMsg {
+    flex-basis: 100%;
+    order: -1;
+    text-align: left;
+  }
+  .submit {
+    flex: 1;
+  }
+}
