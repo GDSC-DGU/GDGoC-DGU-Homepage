@@ -4,7 +4,7 @@ import type { ApplicationInput, ApplyReceipt, PublicApplyForm } from './types'
 /**
  * 지원서의 '창구'. 화면은 이 인터페이스만 쓴다.
  * 지금은 예시 구현(sampleRepository.ts: 이 탭의 메모리)이고, 백엔드 API 가 생기면 같은 모양의 http 구현을 applyRepo.ts 에서 바꿔 끼운다.
- * API 이름은 packages/contracts/openapi.yaml 이 정해지면 맞춘다 (지금 이름은 자리 표시):
+ * API 이름은 백엔드 API 가 정해지면 맞춘다 (지금 이름은 자리 표시):
  *   getForm → GET /api/recruit/form (게시본만, 없으면 null)
  *   submit  → POST /api/recruit/applications
  */

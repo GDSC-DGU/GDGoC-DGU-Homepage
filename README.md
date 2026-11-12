@@ -10,7 +10,6 @@
 | `frontend/` | 웹 화면 (Vite + React + TypeScript, npm). 실행 방법은 [frontend/README.md](frontend/README.md) | FE |
 | `backend/` | API 서버 (Spring) | BE |
 | `ai/` | 지원서 채점 등 AI 기능 (FastAPI + uv) | AI |
-| `packages/contracts/` | API 계약 (`openapi.yaml`, `ai-internal.yaml`) | 공통 |
 | `infra/` | Firestore rules · indexes, Storage 설정 | 공통 |
 | `scripts/` | 가짜 시드 데이터, `deploy.sh` 등 | 공통 |
 | `RULEBOOKS/` | 작업 규칙 · 설정 문서 | 공통 |
@@ -25,7 +24,6 @@
 - 명령은 각 폴더 안에서 실행합니다. 예: `cd frontend` 다음 `npm run dev`
 - 브랜치 · PR 제목 규칙은 모든 파트 공통입니다. 브랜치는 아래에 요약했고, 전체는 [작업 규칙](RULEBOOKS/contributing.md)에 있습니다. 파트 안의 코드 규칙(폴더 구조 · 패턴)은 각 폴더 README 에 적습니다.
 - 커밋은 AI 에게 맡기지 않고 각자 합니다.
-- API 는 `packages/contracts/openapi.yaml`(AI 내부 호출은 `ai-internal.yaml`)이 기준입니다. API 를 바꿀 때는 계약부터 고칩니다.
 - 이 레포는 Public 입니다. API 키 · `.env` · 실제 지원자/회원 정보는 어디에도 올리지 않습니다.
 
 ### 브랜치

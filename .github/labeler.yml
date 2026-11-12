@@ -11,9 +11,6 @@
 "area:ai":
   - changed-files:
       - any-glob-to-any-file: "ai/**"
-"area:contracts":
-  - changed-files:
-      - any-glob-to-any-file: "packages/contracts/**"
 "area:infra":
   - changed-files:
       - any-glob-to-any-file: ["infra/**", "docker-compose.yml"]

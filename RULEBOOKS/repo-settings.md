@@ -9,9 +9,9 @@
 
 | 팀 (slug) | 화면 이름 | 멤버 | 담당 경로 | 레포 권한 |
 |---|---|---|---|---|
-| `homepage-fe` | Homepage-FE | Lead, FE 담당 | `frontend/`, `openapi.yaml` | Write |
-| `homepage-be` | Homepage-BE | BE 담당 | `backend/`, `openapi.yaml`, `ai-internal.yaml`, `infra/`, `scripts/`, `docker-compose.yml`(Lead/PM과 공동) | Write |
-| `homepage-ai` | Homepage-AI | AI 담당 | `ai/`, `ai-internal.yaml` | Write |
+| `homepage-fe` | Homepage-FE | Lead, FE 담당 | `frontend/` | Write |
+| `homepage-be` | Homepage-BE | BE 담당 | `backend/`, `infra/`, `scripts/`, `docker-compose.yml`(Lead/PM과 공동) | Write |
+| `homepage-ai` | Homepage-AI | AI 담당 | `ai/` | Write |
 | `homepage-lead-pm` | Homepage-Lead/PM | Lead, PM(인프라 · 레포 구성 담당) | `infra/`, `scripts/`, `docker-compose.yml`(BE와 공동), `.github/`, `RULEBOOKS/` | **Admin** |
 
 - 팀은 모두 **Visible**이고 Parent team이 없습니다.

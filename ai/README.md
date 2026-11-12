@@ -13,7 +13,6 @@ FastAPI(Python)로 만든 AI 서비스입니다. 지원서 채점을 맡으며 C
 ## 지킬 것
 
 - 호출하는 쪽은 backend뿐입니다. 브라우저가 직접 호출하지 않습니다.
-- 요청·응답 형식은 `packages/contracts/ai-internal.yaml`을 따릅니다.
 - 채점 루브릭과 프롬프트 본문은 레포에 올리지 않습니다. 운영 환경에서는 Secret Manager에서 읽고, 코드에는 구조만 둡니다.
 - 로컬 테스트에는 형식만 같은 가짜 예시 루브릭 `scripts/seed/rubric/rubric.local.yaml`을 씁니다.
 - AI API 키는 `.env`에만 두고 커밋하지 않습니다.

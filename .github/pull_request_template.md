@@ -4,7 +4,7 @@ PR 제목 = squash 후 develop에 남는 커밋 메시지입니다. 규칙을 �
   예시: feat(frontend): Teams 게시글 작성 기능 추가
         design(frontend): Teams 목록 카드 스타일 Figma 반영
         fix(backend): 지원서 중복 제출 검사 누락 수정
-        feat(contracts)!: 지원서 응답에 status 필드 필수화
+        feat(backend)!: 지원서 응답에 status 필드 필수화
 릴리스 PR(develop → main)은 아래 본문을 지우고 "릴리스 PR" 섹션만 채웁니다.
 -->
 
@@ -22,15 +22,8 @@ Closes #
 - [ ] frontend
 - [ ] backend
 - [ ] ai
-- [ ] contracts
 - [ ] infra
 - [ ] ci / repo 설정
-
-## API 계약 변경
-- [ ] 없음
-- [ ] `openapi.yaml` 변경 (frontend·backend 양쪽 영향)
-- [ ] `ai-internal.yaml` 변경 (backend·ai 양쪽 영향)
-- [ ] 하위 호환이 깨지는 변경 (PR 제목에 `!` 표시)
 
 ## 스크린샷 · 동작 영상
 <!-- UI 변경이 있으면 전/후. 개인정보가 보이지 않게 가립니다. -->

@@ -16,8 +16,7 @@ Spring Boot(Java)로 만든 백엔드입니다. Cloud Run에 배포하며, 데�
 - Firebase ID 토큰을 검증하고 HttpOnly 세션 쿠키를 발급합니다.
 - 모든 엔드포인트에서 권한(비회원 / General / Core / Lead)을 검사합니다.
 - 개인정보를 로그, 응답, 에러 메시지에 싣지 않습니다.
-- ai 서비스는 backend만 호출하며, 호출 형식은 `packages/contracts/ai-internal.yaml`을 따릅니다.
-- 구현은 계약(`openapi.yaml`)과 일치해야 합니다.
+- ai 서비스는 backend만 호출합니다.
 - API 키, 서비스 계정 키, 실제 지원자·회원 정보를 코드에 넣지 않습니다.
 
 ## 코드 작성 규칙
