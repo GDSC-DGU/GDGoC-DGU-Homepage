@@ -1,4 +1,4 @@
-import type { RecruitStatus } from '@/content/recruitingStatus'
+import { applyTarget, type RecruitStatus } from '@/content/recruitingStatus'
 import { ddayLabel, monthDay, weekday } from '@/lib/date'
 
 /**
@@ -9,7 +9,7 @@ import { ddayLabel, monthDay, weekday } from '@/lib/date'
  * |---|---|---|
  * | unscheduled | 5기 모집은 아직 열리지 않았습니다 | 5기 소식 받기 (인스타그램) |
  * | soon | 5기 모집은 08.20에 열립니다 (+ D-n) | 5기 소식 받기 |
- * | open | 5기 모집 중 · 09.05 마감 (+ D-n) | 지원서 쓰기 (지원서 주소가 없으면 5기 소식 받기) |
+ * | open | 5기 모집 중 · 09.05 마감 (+ D-n) | 지원서 쓰기 (갈 곳이 없으면 5기 소식 받기, applyTarget) |
  * | ended | 5기 모집이 마감됐습니다 | 5기 소식 받기 |
  *
  * 문장 안 날짜는 '09.05(일)' 처럼 요일을 괄호에 넣는다.
@@ -31,8 +31,9 @@ const md = (ymd: string, today: string) => (ymd.slice(0, 4) === today.slice(0, 4
 /** '08.20(목)'. 문장 안에서는 요일을 괄호에 넣는다 ('10.25 일까지' 가 25일로 읽히지 않게) */
 const mdw = (ymd: string, today: string) => `${md(ymd, today)}(${weekday(ymd)})`
 
-export function statusView(st: RecruitStatus, today: string, handle: string): StatusView {
+export function statusView(st: RecruitStatus, today: string, handle: string, live?: boolean): StatusView {
   const gen = st.generation
+  const canApply = Boolean(applyTarget(st, live))
   const notice = `열리면 인스타그램 ${handle}에 알립니다.`
   switch (st.state) {
     case 'soon': {
@@ -51,10 +52,10 @@ export function statusView(st: RecruitStatus, today: string, handle: string): St
         lines: [
           st.deadline ? `${mdw(st.deadline, today)}까지 지원서를 받습니다.` : '지금 지원서를 받고 있습니다.',
           // 지원서 주소를 아직 적지 않았으면 공지로 보낸다 (주소를 지어내지 않는다)
-          ...(st.applyUrl ? [] : [`지원 방법은 인스타그램 ${handle}의 모집 공지에 있습니다.`]),
+          ...(canApply ? [] : [`지원 방법은 인스타그램 ${handle}의 모집 공지에 있습니다.`]),
         ],
         dday: st.deadline ? { label: ddayLabel(st.deadline, today), what: '마감까지' } : undefined,
-        primary: st.applyUrl ? 'apply' : 'channel',
+        primary: canApply ? 'apply' : 'channel',
       }
     case 'ended':
       return {

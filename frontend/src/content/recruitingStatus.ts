@@ -1,5 +1,6 @@
 import { daysUntil, dayValue, isYmd, kstToday } from '@/lib/date'
 import recruitingJson from './recruiting.json'
+import { APPLY_FORM_LIVE } from '@/config/site'
 
 /**
  * 모집 상태를 날짜로 계산한다 (손으로 status 를 바꾸지 않아도 되게). recruitingStatus.test.ts 에 테스트.
@@ -123,4 +124,27 @@ export function recruitStatus(today: Date | string = new Date(), data: Recruitin
     lastWindow: last.label,
     lastGeneration: last.generation,
   }
+}
+
+/** 사이트 안 지원서 주소 */
+export const APPLY_PATH = '/recruits/apply'
+
+/** '지원서 쓰기' 버튼이 갈 곳. external 이면 새 창 링크(<a>), 아니면 사이트 안 이동(<Link>) */
+export interface ApplyTarget {
+  href: string
+  external: boolean
+}
+
+/**
+ * '지원서 쓰기'가 어디로 가는지 (홈 · 머리말 · 지원 안내 · 페이지 끝 띠가 같이 쓴다). 모집 중이 아니면 null.
+ *  1. recruiting.json 의 applyUrl(Google Forms 등)이 있으면 그 주소 (새 창)
+ *  2. 없고 사이트 안 지원서가 실제로 지원을 받으면(config/site.ts APPLY_FORM_LIVE) /recruits/apply
+ *  3. 둘 다 아니면 null: 버튼은 '{gen}기 소식 받기'로 남는다 (주소를 지어내지 않는다)
+ * live 는 테스트에서만 바꾼다.
+ */
+export function applyTarget(st: Pick<RecruitStatus, 'state' | 'applyUrl'>, live: boolean = APPLY_FORM_LIVE): ApplyTarget | null {
+  if (st.state !== 'open') return null
+  if (st.applyUrl) return { href: st.applyUrl, external: true }
+  if (live) return { href: APPLY_PATH, external: false }
+  return null
 }

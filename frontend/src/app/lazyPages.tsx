@@ -1,7 +1,7 @@
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react'
 import type { PagePlanId } from '@/config/pages'
 import { Navigate, useLocation } from 'react-router-dom'
-import { ADMIN_APP, CAMPUS_PREVIEW, COMMUNITY_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, TEAMS_PAGE, type PageModule } from './pageModules'
+import { ADMIN_APP, APPLY_PAGE, CAMPUS_PREVIEW, COMMUNITY_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, TEAMS_PAGE, type PageModule } from './pageModules'
 
 /**
  * 첫 화면(홈)만 처음 받는 파일에 넣고, 나머지 페이지는 들어갈 때 받는다.
@@ -32,6 +32,7 @@ function lazyPage<M, P extends object>(page: PageModule<M>, pick: (m: M) => Comp
 const Archive = lazyPage(PROJECTS_PAGE, (m) => m.ArchivePage)
 const Community = lazyPage(COMMUNITY_PAGE, (m) => m.CommunityPage)
 const Recruits = lazyPage(RECRUITS_PAGE, (m) => m.RecruitsPage)
+const Apply = lazyPage(APPLY_PAGE, (m) => m.ApplyPage)
 const TeamsList = lazyPage(TEAMS_PAGE, (m) => m.TeamsListPage)
 const TeamsPost = lazyPage(TEAMS_PAGE, (m) => m.TeamsPostPage)
 const TeamsWrite = lazyPage(TEAMS_PAGE, (m) => m.TeamsWritePage)
@@ -59,6 +60,10 @@ export function CommunityPage() {
 }
 export function RecruitsPage() {
   return <Recruits />
+}
+/** 지원서 작성 (/recruits/apply) */
+export function ApplyPage() {
+  return <Apply />
 }
 /** 팀원 찾기 목록 (/teams) */
 export function TeamsPage() {

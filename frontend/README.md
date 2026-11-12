@@ -31,7 +31,8 @@ npm run sync:events  # gdg.community.dev 행사 목록을 src/content/events.jso
 | `/` | 첫 화면: 이름 GDGoC DGU · 정식 이름 · 짧은 소개 → 캠퍼스 지도(건물을 누르면 그 자리에서 장소 미리보기) → 팀으로 만들어 공개한 서비스(큰 타일 2장 + 목록) (누르면 미리보기 맨 위에 행사 사진 세 장) → 멤버 회고(카드 아홉 장, 3 × 3) → 멤버 세미나(발표 카드 일곱 장: 최근 기수 셋 · 둘 · 둘) → 행사 사진 → 4기의 1년(가운데 세로줄 + 구름 마스코트) |
 | `/archive` | 아카이브 (예전 `/projects`, 그 주소는 여기로 옮김): 제목 + 큰 행사 사진 → 보기 탭 프로젝트 · 세미나. 프로젝트 = 기수 탭 → 전시실(대표 작품 크게 + 나머지 목록, 누르면 자세히 보기 창, `?p=<id>` 로 공유) → 4기 G-Sprint 띠. 세미나(`?view=seminars`) = 기수 탭 · 찾기 → 날짜별 묶음(날짜 · 그날 세션 이름 · 그날 사진 | 발표 카드) |
 | `/about` | 소개 (예전 `/community`, 그 주소는 여기로 옮김): 제목 + 큰 행사 사진 → 우리는(1기부터 지금 기수까지 · 정기 세션 · G-Sprint · 연합 행사 · 그룹 멤버) → 다가오는 일정(매주 화요일 정기 세션 포함, 달력으로 보기) → 기수별 기록(사진이 있는 기수는 사진) |
-| `/recruits` | 지원하기: 제목 + 큰 행사 사진(모집 상태 · 5기 소식 받기 · 친구에게 알려 주기) → 지원 자격 → 들어오면 이런 한 해(달별 일정) → 네 파트(지난 프로젝트 로고) → 자주 묻는 질문 |
+| `/recruits` | 지원하기: 머리(모집 상태 · 기간 · 대상 · 방법, 주 버튼) → 주요 활동(검정 띠) → 파트 판마다 '{파트} 지원하기' → 모집 과정 → 자주 묻는 질문 → 아래 고정 띠. 모집 중이 아닐 때 '지원하기'는 안내 팝업 |
+| `/recruits/apply` | 지원서 작성: 기본 정보(이름 · 학번 · 학과 · 이메일) → 질문(관리자 지원폼과 같은 질문) → 동의 둘 → 제출 확인 → 접수 완료. 쓰던 답은 브라우저에 임시 보관. `?part=frontend` 면 지원 파트를 미리 고름. 백엔드 전에는 예시(`config/site.ts` 의 `APPLY_FORM_LIVE`) |
 | `/teams` | 제목 + 큰 행사 사진 → 팀원 찾기는 준비하고 있습니다(열리면 생길 것 세 줄) |
 | `/admin` | 준비 중 (운영진 로그인 자리) |
 
@@ -88,6 +89,7 @@ docs/WORKFLOW.md          큰 변경의 순서 (스펙 → 일감 → 만들기 
 | 프로젝트 그림 추가 | 팀 저장소 그림을 webp 로 줄여 `public/project-images/` 에 두고 `projects.json` 의 `cover` · `images` 에 적기 ([CONTENT.md](docs/CONTENT.md)) |
 | 팀이 확인한 그림만 보이게 | `src/features/pages/projects/exhibit.ts` 의 `SHOW_UNCLEARED_IMAGES` 를 `false` 로 |
 | 5기 모집 일정이 정해지면 | `src/content/recruiting.json` 의 `current` |
+| 사이트 안 지원서로 실제 지원 받기 | 지원서 API 를 붙이고(`features/apply/data/applyRepo.ts`) `config/site.ts` 의 `APPLY_FORM_LIVE` 를 `true` 로. `applyUrl` 을 적으면 그 주소(Google Forms 등)가 먼저 |
 | 멤버 수 · 연락처 · 데모데이 | `src/content/chapter.json` |
 | 장소 이름 · 설명 · 색 | `src/config/places.ts` |
 | 소개 문구 · 링크 | `src/config/site.ts` (null 이면 화면에서 숨김) |
