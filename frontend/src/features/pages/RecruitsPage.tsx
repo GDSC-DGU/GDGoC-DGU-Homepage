@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
-import { SHOW_PLAN, SITE, SPRINT } from '@/config/site'
+import { DEV_SWITCH, SITE, SPRINT } from '@/config/site'
 import { CHAPTER, FAQS, PUBLIC_PROJECTS, RECRUITING, SEMINARS } from '@/content'
 import { GLOSSARY } from '@/content/glossary'
 import { BAND } from '@/content/story'
@@ -108,7 +108,7 @@ function NotifyLink({ st }: { st: RecruitStatus }) {
  *  3. 지원 안내(대상 · 방법. 기간 · 지난 일정은 '모집 과정'과 겹쳐 뺐다)
  *  4. 인재상(자유 · 열정 · 끈기, 검정 면) → 파트(옅은 회색) → 주요 활동(검정 띠) → 모집 과정(옅은 회색) → 자주 묻는 질문 → 아래 고정 띠
  *     먹색 면이 둘 연달아 오지 않게 이 순서로 둔다 (DESIGN 2장).
- * 개발 화면(SHOW_PLAN)에서는 왼쪽 아래 '개발' 버튼으로 모집 중 ↔ 모집 기간 아님을 오간다 (?preview=, recruits/view.ts).
+ * 개발 화면(DEV_SWITCH)에서는 왼쪽 아래 '개발' 버튼으로 모집 중 ↔ 모집 기간 아님을 오간다 (?preview=, recruits/view.ts).
  * 페이지 끝 JoinStrip 은 넣지 않는다 (이 페이지 자체가 같은 내용). 연락처는 꼬리말과 '문의' 질문에 있다.
  */
 export function RecruitsPage() {
@@ -117,7 +117,7 @@ export function RecruitsPage() {
   const [params] = useSearchParams()
   const st = recruitStatus(today)
   const view = statusView(st, today, SITE.links.instagramHandle)
-  const preview = readPreview(params.get('preview'), SHOW_PLAN)
+  const preview = readPreview(params.get('preview'), DEV_SWITCH)
   const mode = applyView(st, preview)
   const external = mode === 'closed' && applyTarget(st)?.external
   // 지금 활동 중인 기수 = 가장 최근에 모집한 기수 (recruiting.json history)
@@ -230,7 +230,7 @@ export function RecruitsPage() {
         {mode === 'closed' && !external ? <NotifyLink st={st} /> : <ApplyButton st={st} mode={mode} preview={preview} />}
       </StickyCta>
 
-      {SHOW_PLAN && <DevSwitch mode={mode} />}
+      {DEV_SWITCH && <DevSwitch mode={mode} />}
     </>
   )
 }

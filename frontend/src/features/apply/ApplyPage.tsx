@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useBlocker, useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
-import { SHOW_PLAN, SITE } from '@/config/site'
+import { DEV_SWITCH, SITE } from '@/config/site'
 import { CHAPTER, RECRUITING } from '@/content'
 import { recruitStatus } from '@/content/recruitingStatus'
 import { Crumbs } from '@/features/dcamp/Crumbs'
@@ -31,20 +31,20 @@ const PLACEHOLDER: Record<string, string> = { [FIXED_ID.studentId]: '숫자 10�
  * - 쓰던 답은 이 브라우저에 기수별로 임시 보관한다 (새로고침 · 실수로 닫아도 남게). 제출하면 지운다. 쓰다가 다른 페이지로 가려 하면 한 번 묻는다.
  * - ?part=frontend 로 오면 지원 파트를 미리 골라 둔다.
  * - 모집 중이 아니면(recruits/view.ts) 양식 대신 '지금은 지원 기간이 아닙니다'. 주소를 직접 열어도 지원서를 쓸 수 없게.
- * - 개발 화면(SHOW_PLAN)에서는 왼쪽 아래 '개발' 버튼으로 모집 중 ↔ 모집 기간 아님을 오간다 (?preview=). 예시(APPLY_SAMPLE)면 위에 '예시' 안내.
+ * - 개발 화면(DEV_SWITCH)에서는 왼쪽 아래 '개발' 버튼으로 모집 중 ↔ 모집 기간 아님을 오간다 (?preview=). 예시(APPLY_SAMPLE)면 위에 '예시' 안내.
  */
 export function ApplyPage() {
   const today = useToday()
   const [params] = useSearchParams()
   const st = recruitStatus(today)
-  const preview = readPreview(params.get('preview'), SHOW_PLAN)
+  const preview = readPreview(params.get('preview'), DEV_SWITCH)
   const mode = applyView(st, preview)
   usePageTitle(`${st.generation}기 지원서`, PLACE_BY_ID.recruits.label)
   return (
     <div className={`container ${s.page}`}>
       <Crumbs trail={[PLACE_BY_ID.recruits.label, '지원서']} />
       {mode === 'form' ? <ApplyBody /> : <Closed />}
-      {SHOW_PLAN && <DevSwitch mode={mode} />}
+      {DEV_SWITCH && <DevSwitch mode={mode} />}
     </div>
   )
 }

@@ -64,6 +64,12 @@ export const SPRINT = {
 export const SHOW_PLAN = import.meta.env.DEV || import.meta.env.VITE_SHOW_PLAN === 'true'
 
 /**
+ * 지원하기 · 지원서의 '개발' 버튼 (모집 중 ↔ 모집 기간 아님 화면 바꿔 보기, ?preview=).
+ * npm run dev 와 Vercel PR 미리보기에서만 보인다 (실제 배포 · staging 에서는 숨김). 팀 검토용.
+ */
+export const DEV_SWITCH = import.meta.env.DEV || import.meta.env.VITE_DEV_SWITCH === 'true'
+
+/**
  * 프로토타입 보기: 팀원 찾기 게시판을 운영 중인 것처럼 보여 준다 (4기 Organizer 결정 2026-11: 팀원에게 보여 줄 프로토타입).
  * 켜면 '예시 화면' 안내 · 메뉴의 '준비 중' 표시 · 머리의 공사 중 간판이 빠지고, 지도 미리보기에 최근 글이 나온다.
  * 기본으로 켜져 있다 (Vercel 배포 포함, 4기 Organizer 결정 2026-11-03). 끄려면 빌드 환경 변수 VITE_PROTOTYPE=false

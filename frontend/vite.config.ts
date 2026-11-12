@@ -8,6 +8,10 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react()],
+    // Vercel PR 미리보기 빌드인지 (Vercel 이 빌드할 때 VERCEL_ENV=preview 를 넣어 준다). 지원하기 '개발' 버튼을 미리보기에서도 보이게 (config/site.ts DEV_SWITCH)
+    define: {
+      'import.meta.env.VITE_DEV_SWITCH': JSON.stringify(process.env.VERCEL_ENV === 'preview' ? 'true' : env.VITE_DEV_SWITCH ?? ''),
+    },
     // 미리보기용으로 하위 경로에 올릴 때는 VITE_BASE=./ 로 빌드
     base: env.VITE_BASE ?? '/',
     resolve: {
