@@ -1,0 +1,226 @@
+/*
+ * 인재상: 검정 면 (머리말이 검정 띠로 바뀐다), 가운데 큰 흰 문장 → 세 카드.
+ * 카드: 한 단계 밝은 검정(--band-raise 계열) + 1px 선, 위에 주황 선 그림(--brand: 검정 위 주황), 번호 · 이름 · 한 줄.
+ */
+.section {
+  background: var(--band-bg);
+  color: var(--band-ink);
+}
+.inner {
+  padding-top: 140px;
+  padding-bottom: 140px;
+  text-align: center;
+}
+.title {
+  font: var(--t-section);
+  letter-spacing: var(--ls-section);
+  color: var(--white);
+  text-wrap: balance;
+}
+.list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 80px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 10px;
+  padding: 48px 32px 44px;
+  border: 1px solid var(--band-line);
+  border-radius: var(--r-card);
+  background: var(--band-card);
+  transition:
+    transform 0.6s var(--ease-soft),
+    border-color 0.6s var(--ease-soft);
+}
+/* 마우스를 올리면: 2px 떠오르고 테두리가 은은한 주황, 아이콘 바깥 점선 원이 천천히 돈다 */
+.item:hover {
+  transform: translateY(var(--lift));
+  border-color: var(--brand-a45);
+}
+.no {
+  margin-top: 20px;
+  font: 600 14px/20px var(--font-num);
+  letter-spacing: 0.04em;
+  color: var(--brand);
+}
+.name {
+  font: 700 30px/40px var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+.desc {
+  max-width: 17em;
+  font: 400 16px/26px var(--font-kr);
+  color: var(--band-ink-2);
+}
+
+/* ── 주황 선 그림 ─────────────────────── */
+.icon {
+  width: 132px;
+  height: 132px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon g,
+.icon circle {
+  transform-box: fill-box;
+}
+.ring {
+  stroke: var(--band-line);
+  stroke-width: 1;
+}
+.ringInner {
+  stroke: var(--band-line);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  transform-origin: 50% 50%;
+  transition: stroke 0.6s var(--ease-soft);
+}
+.item:hover .ringInner {
+  stroke: var(--brand-a45);
+}
+.faint {
+  stroke-width: 1.4;
+  opacity: 0.45;
+}
+.cloud,
+.cloud2 {
+  stroke-width: 1.4;
+  opacity: 0.6;
+}
+.dot,
+.spark,
+.step {
+  fill: var(--brand);
+  stroke: none;
+}
+
+/* ── 움직임: transform · opacity 만, 작게 · 느리게. 동작 줄이기면 멈춘 그림 ── */
+@media (prefers-reduced-motion: no-preference) {
+  .item:hover .ringInner {
+    animation: spin 12s linear infinite;
+  }
+  .plane {
+    animation: drift 4.2s var(--ease-in-out) infinite;
+  }
+  .cloud {
+    animation: float 6s var(--ease-in-out) infinite;
+  }
+  .cloud2 {
+    animation: float 7s var(--ease-in-out) infinite reverse;
+  }
+  .dot {
+    animation: blink 2.4s var(--ease-in-out) infinite;
+  }
+  .flame {
+    transform-origin: 50% 100%;
+    animation: flicker 2.4s var(--ease-in-out) infinite;
+  }
+  .flameInner {
+    transform-origin: 50% 100%;
+    animation: flicker 1.7s var(--ease-in-out) infinite reverse;
+  }
+  .spark {
+    animation: rise 2.1s var(--ease-out) infinite;
+  }
+  .flag {
+    transform-origin: 0% 50%;
+    animation: wave 2.8s var(--ease-in-out) infinite;
+  }
+  .step {
+    animation: blink 2.6s var(--ease-in-out) infinite;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(4px, -5px) rotate(-3deg);
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+@keyframes flicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.96, 1.06);
+  }
+}
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleX(1) skewY(0deg);
+  }
+  50% {
+    transform: scaleX(0.9) skewY(-6deg);
+  }
+}
+
+@media (max-width: 1023px) {
+  .item {
+    padding: 40px 24px 36px;
+  }
+}
+@media (max-width: 767px) {
+  .inner {
+    padding-top: 96px;
+    padding-bottom: 96px;
+  }
+  .list {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 48px;
+  }
+  .icon {
+    width: 112px;
+    height: 112px;
+  }
+}

@@ -126,7 +126,7 @@ export function recruitStatus(today: Date | string = new Date(), data: Recruitin
   }
 }
 
-/** 사이트 안 지원서 주소 */
+/** 사이트 안 지원서 페이지 */
 export const APPLY_PATH = '/recruits/apply'
 
 /** '지원서 쓰기' 버튼이 갈 곳. external 이면 새 창 링크(<a>), 아니면 사이트 안 이동(<Link>) */

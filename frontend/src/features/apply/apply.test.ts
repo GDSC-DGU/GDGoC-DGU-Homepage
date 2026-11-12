@@ -3,6 +3,7 @@ import { applyTarget, APPLY_PATH, recruitStatus, type RecruitingCurrent } from '
 import { FIXED_QUESTIONS } from '@/features/admin/data/recruit/seed'
 import { joinPrimary } from '@/features/common/joinData'
 import { statusView } from '@/features/pages/recruits/status'
+import { applyView, readPreview } from '@/features/pages/recruits/view'
 import { ApplyError } from './data/repository'
 import {
   answerError,
@@ -161,5 +162,25 @@ describe("'지원서 쓰기'가 갈 곳 (applyTarget)", () => {
     expect(joinPrimary(open, false)).toMatchObject({ kind: 'notify' })
     expect(statusView(open, '2027-03-05', '@gdg', true).primary).toBe('apply')
     expect(statusView(open, '2027-03-05', '@gdg', false).primary).toBe('channel')
+  })
+})
+
+describe('지원하기: 모집 중(지원하기 → 지원서 페이지) 또는 모집 기간 아님(지원하기 꺼짐)', () => {
+  const src = (cur: Partial<RecruitingCurrent>) => ({ current: { generation: 5, channel: 'https://www.instagram.com/gdg.donggukuniv/', ...cur }, history: [] })
+  const open = recruitStatus('2027-03-05', src({ opensAt: '2027-03-01', deadline: '2027-03-10' }))
+  const openUrl = recruitStatus('2027-03-05', src({ opensAt: '2027-03-01', deadline: '2027-03-10', applyUrl: 'https://forms.gle/x' }))
+  const closed = recruitStatus('2027-03-05', src({}))
+  it('모집 중이고 사이트 지원서가 열려 있을 때만 지원서', () => {
+    expect(applyView(open, null, true)).toBe('form')
+    expect(applyView(open, null, false)).toBe('closed')
+    expect(applyView(openUrl, null, true)).toBe('closed')
+    expect(applyView(closed, null, true)).toBe('closed')
+  })
+  it('개발 화면에서만 ?preview= 로 두 화면을 바꿔 본다', () => {
+    expect(readPreview('open', true)).toBe('open')
+    expect(readPreview('open', false)).toBeNull()
+    expect(readPreview('zz', true)).toBeNull()
+    expect(applyView(closed, 'open', false)).toBe('form')
+    expect(applyView(open, 'closed', true)).toBe('closed')
   })
 })

@@ -28,7 +28,7 @@ export const PROJECTS_PAGE = pageModule(() => import('@/features/pages/ArchivePa
 export const COMMUNITY_PAGE = pageModule(() => import('@/features/pages/CommunityPage'))
 export const RECRUITS_PAGE = pageModule(() => import('@/features/pages/RecruitsPage'))
 export const PLANNED_PAGE = pageModule(() => import('@/features/pages/PlannedPage'))
-/** 지원서 작성 (/recruits/apply) */
+/** 지원서 페이지 (/recruits/apply) */
 export const APPLY_PAGE = pageModule(() => import('@/features/apply'))
 /** 팀원 찾기: 목록 · 글 · 쓰기 한 덩어리 */
 export const TEAMS_PAGE = pageModule(() => import('@/features/teams'))

@@ -1,8 +1,13 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useBlocker, useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
-import { SITE } from '@/config/site'
+import { SHOW_PLAN, SITE } from '@/config/site'
 import { CHAPTER, RECRUITING } from '@/content'
+import { recruitStatus } from '@/content/recruitingStatus'
+import { Crumbs } from '@/features/dcamp/Crumbs'
+import { DevSwitch } from '@/features/pages/recruits/DevSwitch'
+import { statusView } from '@/features/pages/recruits/status'
+import { applyView, readPreview } from '@/features/pages/recruits/view'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useToday } from '@/hooks/useToday'
 import { monthDay, weekday } from '@/lib/date'
@@ -20,23 +25,38 @@ const fullDay = (ymd: string) => `${ymd.slice(0, 4)}.${monthDay(ymd)}(${weekday(
 const PLACEHOLDER: Record<string, string> = { [FIXED_ID.studentId]: '숫자 10자리', [FIXED_ID.email]: 'name@example.com', [FIXED_ID.name]: '홍길동', [FIXED_ID.department]: '컴퓨터공학전공' }
 
 /**
- * 지원서 작성 (/recruits/apply, P-RCT-03).
+ * 지원서 페이지 (/recruits/apply, P-RCT-03). 2026-11-12: 지원하기(/recruits) 첫 화면의 '지원하기'를 누르면 이 페이지로 온다.
  * 운영진이 게시한 지원폼(관리자 /admin/recruit/form)의 질문을 그대로 그린다: 단답 · 장문 · 객관식, 필수는 *.
- * 위 '기본 정보'(고정 질문 넷) → '질문'(번호) → 동의 둘 → [제출] → 확인 팝업 → 접수 완료.
- * - 쓰던 답은 이 브라우저에 기수별로 임시 보관한다 (새로고침 · 실수로 닫아도 남게). 제출하면 지운다.
- * - 지원 안내의 파트 카드에서 오면(?part=frontend) 지원 파트를 미리 골라 둔다.
- * - 지원 기간이 아니면 양식 대신 안내를 보여 준다. 예시(APPLY_SAMPLE)일 때는 디자인 확인을 위해 양식을 그대로 보인다.
+ * 지금 위치 → '{gen}기 지원서' → 기본 정보(고정 질문 넷) → 질문(번호) → 동의 둘 → [제출] → 확인 팝업 → 접수 완료(같은 페이지).
+ * - 쓰던 답은 이 브라우저에 기수별로 임시 보관한다 (새로고침 · 실수로 닫아도 남게). 제출하면 지운다. 쓰다가 다른 페이지로 가려 하면 한 번 묻는다.
+ * - ?part=frontend 로 오면 지원 파트를 미리 골라 둔다.
+ * - 모집 중이 아니면(recruits/view.ts) 양식 대신 '지금은 지원 기간이 아닙니다'. 주소를 직접 열어도 지원서를 쓸 수 없게.
+ * - 개발 화면(SHOW_PLAN)에서는 왼쪽 아래 '개발' 버튼으로 모집 중 ↔ 모집 기간 아님을 오간다 (?preview=). 예시(APPLY_SAMPLE)면 위에 '예시' 안내.
  */
 export function ApplyPage() {
+  const today = useToday()
+  const [params] = useSearchParams()
+  const st = recruitStatus(today)
+  const preview = readPreview(params.get('preview'), SHOW_PLAN)
+  const mode = applyView(st, preview)
+  usePageTitle(`${st.generation}기 지원서`, PLACE_BY_ID.recruits.label)
+  return (
+    <div className={`container ${s.page}`}>
+      <Crumbs trail={[PLACE_BY_ID.recruits.label, '지원서']} />
+      {mode === 'form' ? <ApplyBody /> : <Closed />}
+      {SHOW_PLAN && <DevSwitch mode={mode} />}
+    </div>
+  )
+}
+
+function ApplyBody() {
   const form = useApplyForm()
   const generation = form.data?.generation ?? RECRUITING.current.generation
-  usePageTitle(`${generation}기 지원서`, PLACE_BY_ID.recruits.label)
   const [receipt, setReceipt] = useState<ApplyReceipt | null>(null)
 
-  let body: ReactNode
-  if (form.isPending) body = <p className={s.state}>지원서를 불러오는 중입니다.</p>
-  else if (form.isError)
-    body = (
+  if (form.isPending) return <p className={s.state}>지원서를 불러오는 중입니다.</p>
+  if (form.isError)
+    return (
       <div className={s.state}>
         <p>지원서를 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>
         <button type="button" className="btn-secondary btn-sm" onClick={() => void form.refetch()}>
@@ -44,28 +64,36 @@ export function ApplyPage() {
         </button>
       </div>
     )
-  else if (receipt) body = <Done receipt={receipt} generation={generation} />
-  else if (!form.data) body = <NotOpen generation={generation} why="unset" />
-  else body = <Gate form={form.data} onDone={setReceipt} />
-
-  return (
-    <div className={`container ${s.page}`}>
-      <nav className={s.trail} aria-label="지금 위치">
-        <Link to="/recruits">{PLACE_BY_ID.recruits.label}</Link>
-        <span aria-hidden="true">›</span>
-        <span aria-current="page">지원서</span>
-      </nav>
-      {body}
-    </div>
-  )
+  if (receipt) return <Done receipt={receipt} generation={generation} />
+  if (!form.data) return <p className={s.state}>지원서를 준비하고 있습니다. 모집 소식은 인스타그램 {SITE.links.instagramHandle}에 올립니다.</p>
+  return <ApplyForm form={form.data} onDone={setReceipt} />
 }
 
-/** 지원 기간이면 양식, 아니면 안내 (예시면 늘 양식) */
-function Gate({ form, onDone }: { form: PublicApplyForm; onDone: (r: ApplyReceipt) => void }) {
+/** 모집 중이 아닐 때 (주소를 직접 열었을 때) */
+function Closed() {
   const today = useToday()
-  const period = periodState(form, today)
-  if (period !== 'open' && !APPLY_SAMPLE) return <NotOpen generation={form.generation} why={period} startDate={form.startDate} />
-  return <ApplyForm form={form} period={period} onDone={onDone} />
+  const st = recruitStatus(today)
+  const view = statusView(st, today, SITE.links.instagramHandle)
+  return (
+    <section className={s.done} aria-labelledby="apply-closed">
+      <h1 id="apply-closed" className={s.title}>
+        지금은 지원 기간이 아닙니다
+      </h1>
+      <div className={s.lead}>
+        {[view.title, ...view.lines].map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
+      <div className="btn-row">
+        <a className="btn-primary" href={st.channelUrl} target="_blank" rel="noreferrer">
+          {st.generation}기 소식 받기<span className="visually-hidden"> (인스타그램, 새 창)</span>
+        </a>
+        <Link to="/recruits" className="btn-secondary">
+          지원 안내 보기
+        </Link>
+      </div>
+    </section>
+  )
 }
 
 function Head({ form }: { form: PublicApplyForm }) {
@@ -92,7 +120,9 @@ function Head({ form }: { form: PublicApplyForm }) {
   )
 }
 
-function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: ReturnType<typeof periodState>; onDone: (r: ApplyReceipt) => void }) {
+function ApplyForm({ form, onDone }: { form: PublicApplyForm; onDone: (r: ApplyReceipt) => void }) {
+  const today = useToday()
+  const period = periodState(form, today)
   const [params] = useSearchParams()
   const submit = useSubmitApplication()
   const formRef = useRef<HTMLFormElement>(null)
@@ -422,33 +452,9 @@ function Done({ receipt, generation }: { receipt: ApplyReceipt; generation: numb
         고칠 내용이 있으면 <a href={`mailto:${CHAPTER.email}`}>{CHAPTER.email}</a>로 알려 주세요.
       </p>
       <div className="btn-row">
-        <Link to="/" className="btn-primary">
-          홈으로
-        </Link>
-        <a className="btn-secondary" href={SITE.links.instagram ?? RECRUITING.current.channel} target="_blank" rel="noreferrer">
+        <a className="btn-primary" href={SITE.links.instagram ?? RECRUITING.current.channel} target="_blank" rel="noreferrer">
           인스타그램 보기<span className="visually-hidden"> (새 창)</span>
         </a>
-      </div>
-    </section>
-  )
-}
-
-/** 지원 기간이 아닐 때 (예시가 아닐 때만) */
-function NotOpen({ generation, why, startDate }: { generation: number; why: ReturnType<typeof periodState>; startDate?: string | null }) {
-  const title = why === 'after' ? `${generation}기 지원이 마감됐습니다` : why === 'before' && startDate ? `${generation}기 지원은 ${monthDay(startDate)}에 열립니다` : '지금은 지원 기간이 아닙니다'
-  return (
-    <section className={s.done} aria-labelledby="apply-closed">
-      <h1 id="apply-closed" className={s.title}>
-        {title}
-      </h1>
-      <p className={s.lead}>모집 일정과 결과는 인스타그램 {SITE.links.instagramHandle}에 가장 먼저 올립니다.</p>
-      <div className="btn-row">
-        <a className="btn-primary" href={RECRUITING.current.channel} target="_blank" rel="noreferrer">
-          {generation}기 소식 받기<span className="visually-hidden"> (인스타그램, 새 창)</span>
-        </a>
-        <Link to="/recruits" className="btn-secondary">
-          지원 안내 보기
-        </Link>
       </div>
     </section>
   )

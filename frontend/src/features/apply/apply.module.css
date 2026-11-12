@@ -1,26 +1,15 @@
 /*
- * 지원서 작성 (/recruits/apply). 흰 면 하나, 가운데 좁은 단(760px).
+ * 지원서 페이지 (/recruits/apply). 흰 면 하나, 가운데 좁은 단(760px).
  * 묶음(기본 정보 · 질문 · 동의)은 위 1px 먹색 줄로 나눈다 (카드 · 그림자 없이, DESIGN dcamp 규칙).
  * 입력 · 고르기 모양은 팀원 찾기 글쓰기와 같다 (높이 44, 8px 모서리, 고르면 먹색).
  */
 .page {
   max-width: calc(760px + var(--side) + var(--side-r));
-  padding-top: 64px;
+  padding-top: 48px;
   padding-bottom: 120px;
 }
-
-.trail {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  font: var(--t-meta);
-  color: var(--ink-500);
-}
-.trail a {
-  color: var(--ink-700);
-}
-.trail a:hover {
-  color: var(--ink-900);
+.page > nav:first-child {
+  margin-bottom: 32px;
 }
 
 /* ── 머리 ─────────────────────────────── */
@@ -389,7 +378,7 @@
 
 @media (max-width: 767px) {
   .page {
-    padding-top: 40px;
+    padding-top: 32px;
     padding-bottom: 80px;
   }
   .grid2,

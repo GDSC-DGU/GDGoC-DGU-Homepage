@@ -47,10 +47,20 @@ export function ProgramHero({
         <h1 className={s.title}>{title}</h1>
         {lead && <div className={s.lead}>{lead}</div>}
         {actions && <div className={s.actions}>{actions}</div>}
-        <ul className={s.cards}>
+        <InfoCards cards={cards} />
+      </div>
+    </header>
+  )
+}
+
+/** 따뜻한 회색 정보 카드 (제목 · 값 · • 메모, 오른쪽 아래 선 그림). 머리 밖에서도 쓴다 (지원하기: 지원서 아래 '지원 안내') */
+export function InfoCards({ cards, headingLevel = 2 }: { cards: readonly InfoCard[]; headingLevel?: 2 | 3 }) {
+  const H = headingLevel === 3 ? 'h3' : 'h2'
+  return (
+        <ul className={s.cards} data-count={cards.length}>
           {cards.map((c) => (
             <li key={c.id} className={s.card}>
-              <h2 className={s.cardTitle}>{c.title}</h2>
+              <H className={s.cardTitle}>{c.title}</H>
               <p className={s.cardValue}>{c.value}</p>
               {c.notes && c.notes.length > 0 && (
                 <ul className={s.notes}>
@@ -63,7 +73,5 @@ export function ProgramHero({
             </li>
           ))}
         </ul>
-      </div>
-    </header>
   )
 }

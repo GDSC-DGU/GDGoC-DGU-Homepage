@@ -1,22 +1,24 @@
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
-import { SITE, SPRINT } from '@/config/site'
+import { SHOW_PLAN, SITE, SPRINT } from '@/config/site'
 import { CHAPTER, FAQS, PUBLIC_PROJECTS, RECRUITING, SEMINARS } from '@/content'
 import { GLOSSARY } from '@/content/glossary'
 import { BAND } from '@/content/story'
-import { applyTarget, recruitStatus, type RecruitStatus } from '@/content/recruitingStatus'
+import { APPLY_PATH, applyTarget, recruitStatus, type RecruitStatus } from '@/content/recruitingStatus'
 import { StorySection } from '@/features/common'
 import { DarkProgram, type DarkCard, type GlassStat } from '@/features/dcamp/DarkProgram'
 import { Process, type ProcessStep } from '@/features/dcamp/Process'
-import { ProgramHero, type InfoCard } from '@/features/dcamp/ProgramHero'
+import { InfoCards, type InfoCard } from '@/features/dcamp/ProgramHero'
 import { StickyCta } from '@/features/dcamp/StickyCta'
 import { useToday } from '@/hooks/useToday'
 import { useHashScroll } from './community/useHashScroll'
 import { Section, StateLine } from './PageParts'
-import { PartApply } from './recruits/ApplyAction'
+import { RecruitHero } from './recruits/RecruitHero'
+import { DevSwitch } from './recruits/DevSwitch'
+import { Values } from './recruits/Values'
+import { applyView, readPreview, type Preview } from './recruits/view'
 import { FaqTabs } from './recruits/FaqTabs'
 import { Parts } from './recruits/Intro'
-import { ShareAction } from './recruits/ShareAction'
 import { statusView } from './recruits/status'
 import s from './pages.module.css'
 import r from './recruits.module.css'
@@ -61,46 +63,37 @@ const STEPS: ProcessStep[] = LAST_STEPS.map((st) => ({ id: st.id, title: st.labe
 const OPEN_FAQ = ['when-recruit']
 
 /**
- * 머리 행동: 주 버튼 하나 + 두 번째 버튼 '친구에게 알려 주기'.
- * 버튼 이름은 사이트 전체에서 '5기 소식 받기'(인스타그램) · '지원서 쓰기'(모집 중) · '친구에게 알려 주기' 세 가지만 쓴다.
- * 소식 받기는 이 페이지에서 여기 한 번 (꼬리말에도 같은 이름의 링크가 있다). 폰에서는 두 버튼이 한 줄 가득.
+ * '지원하기' 버튼 (첫 화면 · 아래 고정 띠가 같이 쓴다).
+ *  - form: 지원서 페이지(/recruits/apply)로 간다 (2026-11-12: 별도 페이지가 가장 깔끔). 개발 화면의 '모집 중' 보기면 그 상태를 이어 간다
+ *  - 모집 중인데 바깥 지원서(applyUrl)면 그 주소 (새 창)
+ *  - 그 밖(모집 전 · 마감 · 지원서 API 전): 꺼진 버튼. 이유는 첫 화면 상태 한 줄과 버튼 아래 한 줄이 말한다
  */
-function StatusActions({ st }: { st: RecruitStatus }) {
-  const handle = SITE.links.instagramHandle
-  return (
-    <span className={`btn-row ${r.actions}`}>
-      <PrimaryAction st={st} />
-      <ShareAction
-        className="btn-secondary"
-        title={`${SITE.shortName} 지원 안내`}
-        text={
-          st.state === 'open'
-            ? `${SITE.shortName} ${st.generation}기 모집 중입니다.`
-            : `${SITE.shortName} ${st.generation}기 모집 소식은 인스타그램 ${handle}에 올라옵니다.`
-        }
-      />
-    </span>
-  )
-}
-
-/** 주 버튼: 모집 중이고 갈 지원서가 있으면 '지원서 쓰기'(applyTarget), 아니면 '{gen}기 소식 받기' */
-function PrimaryAction({ st }: { st: RecruitStatus }) {
+function ApplyButton({ st, mode, preview }: { st: RecruitStatus; mode: 'form' | 'closed'; preview: Preview }) {
   const target = applyTarget(st)
+  if (mode === 'form')
+    return (
+      <Link className="btn-primary" to={preview === 'open' ? `${APPLY_PATH}?preview=open` : APPLY_PATH}>
+        지원하기
+      </Link>
+    )
   if (target?.external)
     return (
       <a className="btn-primary" href={target.href} target="_blank" rel="noreferrer">
-        지원서 쓰기
+        지원하기
         <span className="visually-hidden"> ({st.generation}기 지원서, 새 창)</span>
       </a>
     )
-  if (target)
-    return (
-      <Link className="btn-primary" to={target.href}>
-        지원서 쓰기
-      </Link>
-    )
   return (
-    <a className="btn-primary" href={st.channelUrl} target="_blank" rel="noreferrer">
+    <button type="button" className="btn-primary" disabled aria-describedby="apply-closed-why">
+      지원하기
+    </button>
+  )
+}
+
+/** '{gen}기 소식 받기' (인스타그램, 새 창): 모집 기간이 아닐 때 첫 화면의 두 번째 버튼 */
+function NotifyLink({ st }: { st: RecruitStatus }) {
+  return (
+    <a className="btn-secondary" href={st.channelUrl} target="_blank" rel="noreferrer">
       {st.generation}기 소식 받기
       <span className="visually-hidden"> (인스타그램 {SITE.links.instagramHandle}, 새 창)</span>
     </a>
@@ -108,34 +101,31 @@ function PrimaryAction({ st }: { st: RecruitStatus }) {
 }
 
 /**
- * 지원 안내 (모집 랜딩, 시안 E).
- * 2026-11-12 정리 (BOAZ 리크루팅처럼 짧게): 멤버 회고(홈에 있음) · 달별 일정(소개에 있음)을 빼고,
- * 파트 판마다 '{파트} 지원하기'를 붙였다. 순서: 머리(모집 상태 · 기간 · 대상 · 방법) → 주요 활동 → 파트 · 지원하기 → 모집 과정 → 자주 묻는 질문.
- * 모집 상태(날짜로 계산: content/recruitingStatus.ts) + 주 버튼 · 두 번째 버튼 → 옅은 회색 '지원 자격'(주장 + 흰 판 셋)
- * → 들어오면 이런 한 해(참고, 달별 일정 하나) → '네 파트'(2 × 2 판 + 지난 프로젝트 아이콘) → 자주 묻는 질문(참고) + 출처 한 줄.
- * 면: 흰(머리) → 옅은 회색 → 흰 → 흰 → 흰 → 먹색 꼬리말. 페이지 끝 JoinStrip 은 넣지 않는다 (이 페이지 자체가 같은 내용).
- * 각주는 두 개까지(한 해의 계획 일정 · 파트 예의 기준), 출처 주소는 맨 끝 한 줄에만.
- * 연락처는 꼬리말과 '문의' 질문에 있어 따로 섹션을 두지 않는다.
+ * 지원하기 (/recruits). 2026-11-12 개편 (BOAZ 리크루팅 참고):
+ *  1. 첫 화면(화면 꽉 채움): 검정 + 주황 빛, 큰 한 문장 → 짧은 소개 → 모집 상태 한 줄 → '지원하기'
+ *     모집 중이면 '지원하기'가 지원서 페이지(/recruits/apply, features/apply)로 가고, 아니면 꺼진 버튼 + '{gen}기 소식 받기'
+ *  2. (번호 비움: 지원서는 이 페이지에 두지 않는다)
+ *  3. 지원 안내(대상 · 방법. 기간 · 지난 일정은 '모집 과정'과 겹쳐 뺐다)
+ *  4. 인재상(자유 · 열정 · 끈기, 검정 면) → 파트(옅은 회색) → 주요 활동(검정 띠) → 모집 과정(옅은 회색) → 자주 묻는 질문 → 아래 고정 띠
+ *     먹색 면이 둘 연달아 오지 않게 이 순서로 둔다 (DESIGN 2장).
+ * 개발 화면(SHOW_PLAN)에서는 왼쪽 아래 '개발' 버튼으로 모집 중 ↔ 모집 기간 아님을 오간다 (?preview=, recruits/view.ts).
+ * 페이지 끝 JoinStrip 은 넣지 않는다 (이 페이지 자체가 같은 내용). 연락처는 꼬리말과 '문의' 질문에 있다.
  */
 export function RecruitsPage() {
   usePageTitle(PLACE_BY_ID.recruits.label)
   const today = useToday()
+  const [params] = useSearchParams()
   const st = recruitStatus(today)
   const view = statusView(st, today, SITE.links.instagramHandle)
-  const isOpen2 = st.state === 'open'
+  const preview = readPreview(params.get('preview'), SHOW_PLAN)
+  const mode = applyView(st, preview)
+  const external = mode === 'closed' && applyTarget(st)?.external
   // 지금 활동 중인 기수 = 가장 최근에 모집한 기수 (recruiting.json history)
   const semesterGen = LAST?.generation ?? st.generation - 1
   useHashScroll(true)
 
   const who = faqA('who')
   const cards: InfoCard[] = [
-    {
-      id: 'period',
-      icon: 'calendar',
-      title: '모집 기간',
-      value: isOpen2 && st.opensAt && st.deadline ? <span className="num">{span(st.opensAt, st.deadline)}</span> : `${st.generation}기 일정은 정해지면 인스타그램 ${SITE.links.instagramHandle}에 공지합니다.`,
-      notes: !isOpen2 && LAST ? LAST_STEPS.filter((x) => x.end).map((x) => <>지난 {LAST.generation}기 {x.label}: <span className="num">{span(x.start, x.end)}</span></>) : undefined,
-    },
     {
       id: 'who',
       icon: 'person',
@@ -146,48 +136,71 @@ export function RecruitsPage() {
     { id: 'how', icon: 'doc', title: '지원 방법', value: faqA('how-to-apply') ?? '모집 공지에서 알려 드립니다.' },
   ]
 
+  // 첫 화면 상태 한 줄: '5기 모집 중 · 03.10 마감 · D-5' / '5기 모집은 아직 열리지 않았습니다'
+  const heroStatus =
+    preview === 'open' ? (
+      `${st.generation}기 모집 중 (개발 화면 예시)`
+    ) : (
+      <>
+        {view.title}
+        {view.titleSub && ` · ${view.titleSub}`}
+        {view.dday && (
+          <>
+            {' · '}
+            <span className="num">{view.dday.label}</span>
+          </>
+        )}
+      </>
+    )
+  const closedWhy =
+    st.state === 'soon' && st.opensAt
+      ? `모집이 열리는 날 버튼이 켜집니다. 인스타그램 ${SITE.links.instagramHandle}에도 알립니다.`
+      : st.state === 'ended'
+        ? `${st.generation}기 지원은 마감됐습니다. 다음 모집 소식은 인스타그램 ${SITE.links.instagramHandle}에 올립니다.`
+        : `모집이 열리면 버튼이 켜집니다. 일정은 인스타그램 ${SITE.links.instagramHandle}에 가장 먼저 알립니다.`
+
   return (
     <>
-      <ProgramHero
+      <RecruitHero
         trail={[PLACE_BY_ID.recruits.label]}
-        title={
-          view.titleSub ? (
-            <>
-              {view.title}
-              <br />
-              <span className={r.titleSub}>{view.titleSub}</span>
-            </>
-          ) : (
-            view.title
-          )
-        }
-        lead={
+        title={`같이 만들고 배울 ${st.generation}기를 찾습니다`}
+        intro={['GDGoC DGU는 동국대학교 개발자 커뮤니티입니다.', '매주 화요일 파트별로 모이고, 한 학기 동안 팀을 짜서 서비스를 만듭니다.']}
+        status={heroStatus}
+        action={
           <>
-            {view.dday && (
-              <span className={r.dday}>
-                <span className="visually-hidden">{view.dday.what} </span>
-                <span className="num">{view.dday.label}</span>
-              </span>
+            <span className="btn-row">
+              <ApplyButton st={st} mode={mode} preview={preview} />
+              {mode === 'closed' && !external && <NotifyLink st={st} />}
+            </span>
+            {mode === 'closed' && !external && (
+              <p id="apply-closed-why" className={r.closedWhy}>
+                {closedWhy}
+              </p>
             )}
-            {view.lines.map((line) => (
-              <span key={line} className={r.leadLine}>
-                {line}
-              </span>
-            ))}
           </>
         }
-        actions={<StatusActions st={st} />}
-        cards={cards}
       />
 
-      <DarkProgram id="activities" title={<>{semesterGen}기는 {BAND.lines[0]}<br />{BAND.lines[1]}</>} stats={STATS} cardsTitle="주요 활동" cards={ACTIVITIES} />
+      <section id="guide" className={r.guide} aria-labelledby="guide-title">
+        <div className="container">
+          <h2 id="guide-title" className={r.guideTitle}>
+            지원 안내
+          </h2>
+          <InfoCards cards={cards} headingLevel={3} />
+        </div>
+      </section>
+
+      <Values generation={st.generation} name={SITE.shortName} />
+
       <div className={`container ${s.page}`}>
         {FAQS.some((f) => f.id === 'parts') && (
-          <StorySection id="parts" tone="field" className={r.flush} title="파트를 골라 지원합니다" sub="파트마다 같은 문제를 각자 풀고 비교합니다. 파트 세션은 코어 멤버가 이끕니다.">
-            <Parts action={(part) => <PartApply st={st} partId={part.id} partName={part.name} />} />
+          <StorySection id="parts" tone="field" className={r.flush} title="파트마다 같은 문제를 각자 풀고 비교합니다" sub="파트 세션은 코어 멤버가 이끕니다.">
+            <Parts />
           </StorySection>
         )}
       </div>
+
+      <DarkProgram id="activities" title={<>{semesterGen}기는 {BAND.lines[0]}<br />{BAND.lines[1]}</>} stats={STATS} cardsTitle="주요 활동" cards={ACTIVITIES} />
 
       {STEPS.length > 0 && (
         <Process
@@ -214,8 +227,10 @@ export function RecruitsPage() {
           </>
         }
       >
-        <PrimaryAction st={st} />
+        {mode === 'closed' && !external ? <NotifyLink st={st} /> : <ApplyButton st={st} mode={mode} preview={preview} />}
       </StickyCta>
+
+      {SHOW_PLAN && <DevSwitch mode={mode} />}
     </>
   )
 }

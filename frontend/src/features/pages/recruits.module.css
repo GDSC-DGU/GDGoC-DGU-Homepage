@@ -61,3 +61,30 @@
 .titleSub {
   color: var(--ink-700);
 }
+
+/* 지원 안내 (대상 · 방법): 흰 면, 제목은 왼쪽 정렬로 카드 왼쪽 끝과 맞춘다. 아래 검정 인재상과 붙지 않게 여백 */
+.guide {
+  padding-top: 120px;
+  padding-bottom: 120px;
+  background: var(--paper);
+}
+.guideTitle {
+  font: var(--t-section);
+  letter-spacing: var(--ls-section);
+  color: var(--ink-900);
+}
+.guide :global(.container) > ul {
+  margin-top: 48px;
+}
+@media (max-width: 767px) {
+  .guide {
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+}
+
+/* 첫 화면: 지원하기가 꺼져 있을 때 이유 한 줄 */
+.closedWhy {
+  font: var(--t-meta);
+  color: var(--band-ink-3);
+}
