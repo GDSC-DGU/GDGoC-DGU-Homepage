@@ -39,7 +39,6 @@ jobs:
             frontend
             backend
             ai
-            contracts
             infra
             ci
             repo

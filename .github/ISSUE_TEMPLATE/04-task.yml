@@ -26,7 +26,6 @@ body:
         - frontend
         - backend
         - ai
-        - contracts
         - infra
         - ci
     validations:

@@ -14,9 +14,6 @@
 # /backend/                             @GDSC-DGU/homepage-be
 # /ai/                                  @GDSC-DGU/homepage-ai
 
-# /packages/contracts/openapi.yaml      @GDSC-DGU/homepage-fe @GDSC-DGU/homepage-be
-# /packages/contracts/ai-internal.yaml  @GDSC-DGU/homepage-be @GDSC-DGU/homepage-ai
-
 # /infra/                               @GDSC-DGU/homepage-lead-pm @GDSC-DGU/homepage-be
 # /scripts/                             @GDSC-DGU/homepage-lead-pm @GDSC-DGU/homepage-be
 # /docker-compose.yml                   @GDSC-DGU/homepage-lead-pm @GDSC-DGU/homepage-be

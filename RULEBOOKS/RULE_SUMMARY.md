@@ -58,7 +58,7 @@ GDGoC DGU 홈페이지 레포의 모든 규칙을 한 페이지로 모았습니�
 > [!IMPORTANT]
 > 형식 `<type>(<scope>): <요약>` — CI가 검사합니다 (강제). 예: `feat(frontend): Teams 게시글 작성 기능 추가`
 > type: `feat` `design` `fix` `refactor` `test` `docs` `chore` `ci` `perf` `revert` (`release`는 릴리스 PR 전용)
-> scope: `frontend` `backend` `ai` `contracts` `infra` `ci` `repo` `deps` 중 하나(생략 가능). 하위 호환이 깨지면 `type(scope)!:`
+> scope: `frontend` `backend` `ai` `infra` `ci` `repo` `deps` 중 하나(생략 가능). 하위 호환이 깨지면 `type(scope)!:`
 > 작업 브랜치 안의 커밋 메시지는 자유입니다.
 
 📖 자세히: [작업 규칙 › 3. 커밋 · PR 제목 규칙](./contributing.md#3-커밋--pr-제목-규칙)
@@ -67,7 +67,7 @@ GDGoC DGU 홈페이지 레포의 모든 규칙을 한 페이지로 모았습니�
 
 > [!TIP]
 > - **시작 전**: (선택) 이슈 생성 → 이슈가 있으면 본인을 Assignee로 → 최신 `develop`에서 브랜치
-> - **작업 중**: PR은 400줄 이하로 작게, 일찍 Draft PR, API 변경은 계약(`openapi.yaml`)부터. 리뷰가 시작된 뒤에는 force push 대신 "Update branch"
+> - **작업 중**: PR은 400줄 이하로 작게, 일찍 Draft PR. 리뷰가 시작된 뒤에는 force push 대신 "Update branch"
 > - **PR**: 템플릿 작성, 이슈가 있으면 `Closes #이슈번호`, `pr-title` · 파트별 CI 실패는 머지 전에 수정
 > - **backend · ai**: PR 전에 controller/router에 업무 로직 · DB 접근이 없는지 확인 (controller/router → service → repository 한 방향)
 > - **머지 후**: 같은 브랜치를 다시 쓰지 않습니다. 새 작업은 최신 `develop`에서 새 브랜치로
