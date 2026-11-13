@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: backend
+  profiles:
+    default: local   # 프로필을 따로 지정하지 않으면 local
+  web:
+    resources:
+      add-mappings: false   # 없는 주소가 기본 정적 처리기가 아닌 GlobalExceptionHandler로 가게 함
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+server:
+  port: ${PORT:8080}   # Cloud Run이 PORT를 넘겨준다
+  shutdown: graceful

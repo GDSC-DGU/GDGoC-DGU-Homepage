@@ -1,0 +1,7 @@
+# prod: Cloud Run gdgoc-dgu-prod (운영) 에서 쓰는 프로필
+server:
+  forward-headers-strategy: framework   # 프록시(Cloud Run) 뒤에서 원래 요청 주소 · https 인식
+
+logging:
+  level:
+    com.gdgocdgu.homepage: INFO
