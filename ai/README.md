@@ -35,6 +35,36 @@ def grade(req: GradingRequest) -> GradingResult:
 
 코드 구조 확인 항목: [작업 규칙 › 4-5. backend · ai 코드 구조 확인](../RULEBOOKS/contributing.md#4-5-backend--ai-코드-구조-확인)
 
+## 로컬 실행
+
+`ai/` 폴더에서 실행합니다.
+
+```bash
+uv sync                                          # 의존성 설치
+uv run uvicorn app.main:app --reload --port 8000 # 서버 실행
+uv run pytest                                    # 테스트
+uv run ruff check .                              # 린트
+docker build -t gdgoc-ai ai                      # 이미지 빌드 (레포 루트에서)
+```
+
+- `APP_ENV`가 `local`일 때만 `/docs`가 열립니다. 기본값은 `local`입니다.
+- 채점 모델은 가짜 클라이언트(`GRADING_CLIENT=fake`)만 연결되어 있습니다.
+
+## 폴더 구조
+
+```
+ai/
+├─ app/
+│  ├─ main.py          앱 생성, router · 예외 처리기 등록
+│  ├─ config.py        환경변수 설정
+│  ├─ common/          공통 응답 · 에러 코드 · 예외 처리기
+│  ├─ health/          GET /health
+│  └─ grading/         POST /grading (router · service · schemas · client · dependencies)
+├─ tests/
+├─ Dockerfile
+└─ pyproject.toml · uv.lock
+```
+
 ## 관련 문서
 
 - [작업 규칙](../RULEBOOKS/contributing.md)
