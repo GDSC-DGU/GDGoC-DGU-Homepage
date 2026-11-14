@@ -1,0 +1,6 @@
+plugins {
+	// 설치된 JDK와 무관하게 필요한 JDK를 자동으로 받는다
+	id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+rootProject.name = 'backend'
