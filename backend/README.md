@@ -55,8 +55,8 @@ Spring Boot(Java)로 만든 백엔드입니다. Cloud Run에 배포하며, 데�
 
 ```java
 @GetMapping("/teams/posts")
-TeamPostPage list(@RequestParam int page, @RequestParam int size) {
-    return teamPostService.list(page, size);
+ApiResponse<TeamPostPage> list(@RequestParam int page, @RequestParam int size) {
+    return ApiResponse.ok(teamPostService.list(page, size));
 }
 ```
 

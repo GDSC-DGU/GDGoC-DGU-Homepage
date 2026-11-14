@@ -1,6 +1,6 @@
 package com.gdgocdgu.homepage.health;
 
-import com.gdgocdgu.homepage.common.response.ApiSuccess;
+import com.gdgocdgu.homepage.common.response.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class HealthController {
 
     @GetMapping
-    public HealthResponse health() {
-        return new HealthResponse("UP");
+    public ApiResponse<HealthResponse> health() {
+        return ApiResponse.ok(new HealthResponse("UP"));
     }
 
-    public record HealthResponse(String status) implements ApiSuccess {
+    public record HealthResponse(String status) {
     }
 }

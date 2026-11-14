@@ -2,7 +2,6 @@ package com.gdgocdgu.homepage.health;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
@@ -19,13 +18,10 @@ class HealthControllerTest {
     MockMvc mockMvc;
 
     @Test
-    void health는_success_true와_status_UP만_평평하게_반환한다() throws Exception {
+    void health는_success_true와_data_안의_status_UP을_반환한다() throws Exception {
+        // success, data 두 필드뿐이고 이 순서인지 문자열 그대로 비교한다.
         mockMvc.perform(get("/api/v1/health"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.status").value("UP"))
-                .andExpect(jsonPath("$.length()").value(2))
-                // success가 첫 필드여야 한다
-                .andExpect(content().string("{\"success\":true,\"status\":\"UP\"}"));
+                .andExpect(content().string("{\"success\":true,\"data\":{\"status\":\"UP\"}}"));
     }
 }
