@@ -14,16 +14,20 @@ import java.util.Optional;
 
 public final class GoogleTokenVerifier {
 
+    private static final GsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+
     private final GoogleIdTokenVerifier verifier;
 
     public GoogleTokenVerifier(String webClientId) {
         if (webClientId == null || webClientId.isBlank()) {
-            throw new IllegalArgumentException("Google 웹 클라이언트 ID를 설정해야 합니다.");
+            // Google 설정이 없어도 서버와 토큰 형식 검사는 동작한다.
+            this.verifier = null;
+            return;
         }
 
         // 프론트에서 사용하는 웹 클라이언트 ID를 지정해야 우리 앱에 발급된 토큰만 받는다.
         // 검증기를 재사용하면 Google에서 받은 공개 키를 캐시에 보관할 수 있다.
-        this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
+        this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JSON_FACTORY)
                 .setAudience(Collections.singletonList(webClientId))
                 .build();
     }
@@ -41,7 +45,7 @@ public final class GoogleTokenVerifier {
         GoogleIdToken token;
         try {
             // 토큰 문자열에서 필드를 읽는 단계다. 서명을 확인하기 전에는 이 값을 신뢰하지 않는다.
-            token = GoogleIdToken.parse(verifier.getJsonFactory(), idToken);
+            token = GoogleIdToken.parse(JSON_FACTORY, idToken);
         } catch (IllegalArgumentException | IOException invalidToken) {
             return Optional.empty();
         }
@@ -52,6 +56,11 @@ public final class GoogleTokenVerifier {
         if (!(audience instanceof String || audience instanceof List<?>)
                 || payload.getExpirationTimeSeconds() == null || payload.getIssuedAtTimeSeconds() == null) {
             return Optional.empty();
+        }
+
+        // 실제 서명과 발급 대상을 검증할 때는 우리 앱의 웹 클라이언트 ID가 필요하다.
+        if (verifier == null) {
+            throw new IllegalStateException("Google 로그인에 필요한 GOOGLE_CLIENT_ID가 설정되지 않았습니다.");
         }
 
         try {
