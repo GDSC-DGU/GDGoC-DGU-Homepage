@@ -69,6 +69,9 @@ docker build -t gdgoc-ai ai                      # 이미지 빌드 (레포 루�
 | `GEMINI_THINKING_LEVEL` | `medium` | `low` · `medium` · `high` |
 | `GEMINI_TIMEOUT_SECONDS` | `90` | 모델 호출 제한 시간 (0 초과 600 이하) |
 | `GRADING_PROMPT_PATH` | - | 채점 지시문 YAML 경로 (`gemini`일 때 필수, `ai/` 기준) |
+| `LOG_DIR` | `logs` | 로컬 로그 폴더 (`local`에서만 사용, `ai/` 기준) |
+
+`local`로 실행하면 서버 로그를 `ai/logs/ai-local.log`에도 남깁니다. 요청 내용 없이 호출 메타데이터만 담기며, 매일 새 파일로 넘어가고 14일치만 보관합니다. dev · prod에서는 파일을 만들지 않습니다.
 
 ## 폴더 구조
 

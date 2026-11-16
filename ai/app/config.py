@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     gemini_thinking_level: Literal["low", "medium", "high"] = "medium"
     gemini_timeout_seconds: float = Field(default=90, gt=0, le=600)
     grading_prompt_path: Path | None = None
+    # local에서만 쓴다. 상대 경로는 실행 위치(ai/) 기준
+    log_dir: Path = Path("logs")
 
     @model_validator(mode="after")
     def _check_combination(self) -> Self:
