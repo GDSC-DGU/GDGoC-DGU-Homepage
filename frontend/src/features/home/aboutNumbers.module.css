@@ -2,6 +2,9 @@
 .section {
   --story-pad: 128px;
 }
+.logos {
+  overflow: hidden;
+}
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);

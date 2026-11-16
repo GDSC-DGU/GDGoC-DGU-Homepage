@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { PHOTOS, PUBLIC_PROJECTS } from '@/content'
 import { HOME_ACTIVITIES, HOME_SLIDES } from '@/content/home'
 import type { Project, ScheduleEvent } from '@/domain/types'
-import { nextHighlight, railProjects, recruitSlideText } from './landing'
+import { carouselFaces, cylinder, nextHighlight, railProjects, recruitSlideText, wrapIndex } from './landing'
+import { countAt } from './useReveal'
 
 const ev = (id: string, date: string, kind: ScheduleEvent['kind'], extra: Partial<ScheduleEvent> = {}): ScheduleEvent => ({ id, date, title: id, kind, place: 'community', ...extra })
 
@@ -52,5 +53,34 @@ describe('홈 사진', () => {
   it('한 사진을 두 번 쓰지 않는다', () => {
     const used = [HOME_SLIDES.community.photo, HOME_SLIDES.next.photo, HOME_SLIDES.recruit.photo, ...HOME_ACTIVITIES.cards.flatMap((c): string[] => ('photo' in c && c.photo ? [c.photo] : []))]
     expect(new Set(used).size).toBe(used.length)
+  })
+})
+
+describe('첫 화면 3D 원통', () => {
+  it('3장이면 6면으로 되풀이하고, 6장 이상이면 그대로', () => {
+    expect(carouselFaces(3)).toEqual([0, 1, 2, 0, 1, 2])
+    expect(carouselFaces(7)).toHaveLength(7)
+    expect(carouselFaces(1)).toEqual([0])
+    expect(carouselFaces(0)).toEqual([])
+  })
+  it('6면이면 면 사이 60도, 가운데까지 폭 × √3 / 2', () => {
+    const { theta, apothem } = cylinder(1000, 6)
+    expect(theta).toBeCloseTo(Math.PI / 3)
+    expect(apothem).toBeCloseTo((1000 * Math.sqrt(3)) / 2)
+  })
+  it('번호는 앞뒤로 돌아간다', () => {
+    expect(wrapIndex(-1, 6)).toBe(5)
+    expect(wrapIndex(7, 6)).toBe(1)
+  })
+})
+
+describe('숫자 올라가기', () => {
+  it('0 에서 시작해 끝에서 정확히 목표 숫자', () => {
+    expect(countAt(244, 0)).toBe(0)
+    expect(countAt(244, 1)).toBe(244)
+    expect(countAt(244, 2)).toBe(244)
+  })
+  it('easeOutQuart: 절반 시간에 이미 9할 넘게 올라간다', () => {
+    expect(countAt(100, 0.5)).toBeGreaterThanOrEqual(93)
   })
 })

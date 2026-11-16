@@ -13,6 +13,16 @@
   background: transparent;
   /* 페이지를 옮길 때 머리말은 그대로 두고 본문만 바뀌게 (global.css 페이지 전환) */
   view-transition-name: site-header;
+  transition: transform var(--dur-long) var(--ease-out);
+}
+/* 내리면 숨는다 (슈어소프트테크, 4기 Organizer 2026-11-16). 노치 영역 띠까지 같이 올라간다 */
+.header[data-hidden] {
+  transform: translate3d(0, calc(-100% - env(safe-area-inset-top, 0px)), 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: none;
+  }
 }
 /* 노치 영역(폰 상태 표시줄 아래)으로 본문이 비치지 않게 */
 .header::before {

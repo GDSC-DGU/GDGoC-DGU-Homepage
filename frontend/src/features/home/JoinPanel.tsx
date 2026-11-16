@@ -4,6 +4,7 @@ import { HOME_JOIN } from '@/content/home'
 import { applyTarget, recruitStatus } from '@/content/recruitingStatus'
 import { useToday } from '@/hooks/useToday'
 import { fill } from './homeData'
+import { aos } from './useReveal'
 import s from './joinPanel.module.css'
 
 /**
@@ -18,11 +19,11 @@ export function JoinPanel() {
     <section className={s.section} aria-labelledby="join-title">
       <div className="container">
         <div className={`on-dark ${s.panel}`}>
-          <h2 id="join-title" className={s.title}>
+          <h2 id="join-title" className={s.title} {...aos(250)}>
             {HOME_JOIN.title}
           </h2>
-          <p className={s.sub}>{fill(HOME_JOIN.sub, { next: st.generation, handle: SITE.links.instagramHandle })}</p>
-          <div className={s.actions}>
+          <p className={s.sub} {...aos(300)}>{fill(HOME_JOIN.sub, { next: st.generation, handle: SITE.links.instagramHandle })}</p>
+          <div className={s.actions} {...aos(350)}>
             {apply ? (
               apply.external ? (
                 <a className="btn-primary" href={apply.href} target="_blank" rel="noreferrer">

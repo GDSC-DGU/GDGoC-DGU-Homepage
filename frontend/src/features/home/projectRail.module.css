@@ -8,7 +8,7 @@
 
 .track {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   margin: 0;
   padding: 4px 0 12px;
   list-style: none;
@@ -25,7 +25,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 0 0 calc((100% - 60px) / 4);
+  /* 슈어소프트테크: 한 번에 4장 · 간격 30 (980 이하 2장 · 20, 680 이하 1.2장 · 15) */
+  flex: 0 0 calc((100% - 90px) / 4);
   min-width: 0;
   overflow: hidden;
   border-radius: 16px;
@@ -128,10 +129,11 @@
 .bar {
   position: relative;
   flex: 1;
-  height: 2px;
+  height: 3px;
   margin-right: 16px;
   overflow: hidden;
-  background: var(--field-line);
+  border-radius: 3px;
+  background: var(--ink-a10);
 }
 .barFill {
   position: absolute;
@@ -139,7 +141,7 @@
   background: var(--ink-900);
   transform: scaleX(var(--p, 0));
   transform-origin: left;
-  transition: transform var(--dur-short) var(--ease-out);
+  transition: transform var(--dur-bar) var(--ease-reveal);
 }
 .arrow {
   display: grid;
@@ -170,31 +172,30 @@
   }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 980px) {
+  .track {
+    gap: 20px;
+  }
   .item {
-    flex-basis: calc((100% - 40px) / 3);
+    flex-basis: calc((100% - 20px) / 2);
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 680px) {
   .section {
     --story-pad: 72px;
   }
   .track {
-    gap: 12px;
+    gap: 15px;
   }
   .item {
-    flex-basis: 68%;
+    flex-basis: calc((100% - 15px) / 1.2);
   }
   .controls {
     margin-top: 20px;
   }
-  /* 폰은 밀어서 넘긴다: 막대만 */
-  .arrow {
-    display: none;
-  }
   .bar {
-    margin-right: 0;
+    margin-right: 8px;
   }
 }
 

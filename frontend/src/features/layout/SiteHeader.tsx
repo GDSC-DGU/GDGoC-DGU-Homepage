@@ -21,6 +21,36 @@ function useScrolled(): boolean {
 }
 
 /**
+ * 내리면 머리말을 숨기고, 올리면 다시 보인다 (4기 Organizer 2026-11-16: 슈어소프트테크 머리말 그대로).
+ * - 맨 위 근처(머리말 높이 이내)에서는 늘 보인다. 5px 안쪽으로 조금 움직인 것은 무시한다.
+ * - 페이지 바닥에 닿아 튕기는 동안에는 바꾸지 않는다. keep 이면(메뉴 · 검색 창이 열림, 초점이 머리말 안) 숨기지 않는다.
+ */
+function useHideOnScroll(keep: boolean): boolean {
+  const [hidden, setHidden] = useState(false)
+  useEffect(() => {
+    if (keep) return
+    let last = window.scrollY
+    const DELTA = 5
+    const TOP = 80
+    const on = () => {
+      const y = window.scrollY
+      if (y <= TOP) {
+        setHidden(false)
+        last = y
+        return
+      }
+      if (Math.abs(y - last) <= DELTA) return
+      if (y > last) setHidden(true)
+      else if (y + window.innerHeight < document.documentElement.scrollHeight) setHidden(false)
+      last = y
+    }
+    window.addEventListener('scroll', on, { passive: true })
+    return () => window.removeEventListener('scroll', on)
+  }, [keep])
+  return hidden && !keep
+}
+
+/**
  * 머리말 아래에 검정 섹션(data-band='dark')이 깔려 있으면 머리말도 검정 띠로 (dcamp: 검정 머리 위 검정 머리말).
  * 스크롤 · 크기 변경 · 본문이 바뀔 때 다시 잰다 (한 프레임에 한 번).
  */
@@ -80,6 +110,8 @@ export function SiteHeader() {
   const [menuAt, setMenuAt] = useState<string | null>(null)
   const searchOpen = searchAt === here
   const menuOpen = menuAt === here
+  const [focusIn, setFocusIn] = useState(false)
+  const hidden = useHideOnScroll(searchOpen || menuOpen || focusIn)
   useEffect(() => {
     hereRef.current = here
   }, [here])
@@ -103,7 +135,17 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className={s.header} data-site-header="" data-scrolled={scrolled || undefined} data-on-dark={onDark || undefined}>
+      <header
+        className={s.header}
+        data-site-header=""
+        data-scrolled={scrolled || undefined}
+        data-on-dark={onDark || undefined}
+        data-hidden={hidden || undefined}
+        onFocus={() => setFocusIn(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusIn(false)
+        }}
+      >
         <div className={`container ${s.bar} ${onDark ? 'on-dark' : ''}`}>
           {/* 로고만 보이고, 읽히는 이름은 'GDGoC DGU 홈' (public/brand: 4기 Organizer 가 준 GDG DGU 로고) */}
           <Link className={s.brand} to="/">
