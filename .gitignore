@@ -84,6 +84,8 @@ __pycache__/
 *.egg-info/
 .coverage
 htmlcov/
+# 로컬 실행 로그 (Gemini 호출 메타데이터)
+ai/logs/
 
 # ── 에디터 · OS ──
 .idea/

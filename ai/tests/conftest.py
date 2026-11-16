@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -9,10 +10,12 @@ from app.main import create_app
 
 
 @pytest.fixture(autouse=True)
-def _isolated_settings(monkeypatch: pytest.MonkeyPatch):
+def _isolated_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     """개발자의 실제 .env와 환경변수가 테스트에 섞이지 않게 한다."""
     monkeypatch.setenv("APP_ENV", "local")
     monkeypatch.setenv("GRADING_CLIENT", "fake")
+    # lifespan이 도는 테스트가 실제 ai/logs/에 쓰지 않게 한다
+    monkeypatch.setenv("LOG_DIR", str(tmp_path / "logs"))
     get_settings.cache_clear()
     get_grading_client.cache_clear()
     yield
