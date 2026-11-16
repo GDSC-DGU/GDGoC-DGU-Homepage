@@ -43,10 +43,10 @@
 
 | 기능 | 로컬에서 | 운영과 다른 점 |
 |---|---|---|
-| 구글 로그인 | Auth 에뮬레이터의 가짜 계정 선택 창 | 시드의 Lead · Core · General 계정으로 권한을 바꿔 테스트 |
-| 세션 쿠키 | backend가 Admin SDK로 에뮬레이터 토큰 검증 후 발급 | 로컬 프로필은 `Secure=false` (http에서 동작) |
+| 구글 로그인 | Auth 에뮬레이터의 가짜 계정 선택 창 | 시드의 운영진(Lead · Core) · 회원(General) 계정으로 권한을 바꿔 테스트 |
+| 로그인 토큰 (JWT) | backend가 Admin SDK로 에뮬레이터 토큰 검증 후 access token은 응답 본문으로, refresh token은 HttpOnly 쿠키로 발급. frontend는 access token을 `Authorization` 헤더에 붙임 | 로컬 프로필은 refresh token 쿠키를 `Secure=false`로 (http에서 동작) |
 | DB | Firestore 에뮬레이터 | 컨테이너를 내리면 사라짐. 유지하려면 `.emulator-data/`로 export |
-| PDF 첨부 | Storage 에뮬레이터 | 서명 URL 대신 backend 경유 업로드 (로컬 프로필) |
+| 게시글 첨부 파일 | Storage 에뮬레이터 | 서명 URL 대신 backend 경유 업로드 (로컬 프로필) |
 | 메일 발송 | Mailpit | 실제로 나가지 않음 |
 | AI 채점 · 챗봇 | 실제 AI API | 개인 키 사용. 루브릭은 가짜 예시 |
 | 비동기 채점 (Cloud Tasks) | 즉시 실행으로 대체 | 대기열 없음 |
