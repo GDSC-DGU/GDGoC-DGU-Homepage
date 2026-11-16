@@ -36,6 +36,25 @@ export const HOME_SLIDES = {
   },
 } as const
 
+/** 첫 화면 슬라이드 버튼 (읽기 프로그램용 이름) */
+export const HOME_CAROUSEL = {
+  label: 'GDGoC DGU 소식',
+  prev: '이전 슬라이드',
+  next: '다음 슬라이드',
+  pause: '슬라이드 넘기기 멈춤',
+  play: '슬라이드 넘기기 다시 시작',
+} as const
+
+/** 첫 화면 아래 한 줄 (슈어소프트테크 'What's new'): 다가오는 일정이 4초마다 위로 넘어간다 */
+export const HOME_TICKER = {
+  label: '다가오는 일정',
+  limit: 6,
+  prev: '이전 일정',
+  next: '다음 일정',
+  pause: '일정 넘기기 멈춤',
+  play: '일정 넘기기 다시 시작',
+} as const
+
 export type ActivityTone = 'photo' | 'dark' | 'gen'
 
 export interface Activity {
@@ -108,6 +127,10 @@ export const HOME_PROJECTS = {
   more: '전체 보기',
   prev: '이전 프로젝트',
   next: '다음 프로젝트',
+  pause: '프로젝트 넘기기 멈춤',
+  play: '프로젝트 넘기기 다시 시작',
+  /** 소개 섹션 아래 로고 흐름 (슈어소프트테크 파트너 로고 자리): 로고 표지가 있는 프로젝트만 */
+  logosLabel: '로고가 있는 팀 프로젝트',
 } as const
 
 /** 4 소개 한 문단 + 숫자 셋 */

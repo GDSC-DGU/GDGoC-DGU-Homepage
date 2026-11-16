@@ -132,6 +132,19 @@
   --dur-short-exit: 150ms;
   --dur-long-exit: 280ms;
   --stagger: 40ms; /* 순차 등장 간격 (다 합쳐 500ms 이하) */
+  /*
+   * 홈 움직임 (4기 Organizer 2026-11-16: 슈어소프트테크 홈 움직임을 그대로). 값은 그 사이트의 AOS · Swiper · 스크립트 값.
+   * 떠오르기: 100px 아래 · 투명 → 제자리, 0.7초 ease (AOS fade-up). 첫 화면 글자: 40px 아래에서 0.6초 (visualTitleFadeUp).
+   */
+  --dur-reveal: 700ms;
+  --ease-reveal: ease;
+  --reveal-shift: 100px;
+  --dur-hero-in: 600ms;
+  --hero-in-shift: 40px;
+  --dur-carousel: 500ms; /* 3D 원통 한 칸 돌기 */
+  --dur-ticker: 500ms; /* 다가오는 일정 한 줄 넘김 */
+  --dur-rail: 600ms; /* 프로젝트 줄 한 칸 넘김 */
+  --dur-bar: 400ms; /* 진행 막대 */
   /* 줄 · 띠 전체가 링크일 때 오른쪽 끝 칸의 꺾쇠 (mask 로 그려 글자색을 따른다. 글자 화살표 대신, hallmark 30a · 63) */
   --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 3l5 5-5 5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 

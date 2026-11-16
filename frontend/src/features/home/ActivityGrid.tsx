@@ -1,12 +1,11 @@
-import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { PHOTOS, SEMINARS } from '@/content'
 import { HOME_ACTIVITIES, type Activity } from '@/content/home'
 import type { EventPhoto } from '@/domain/types'
-import { StorySection } from '@/features/common'
+import { StoryHead } from '@/features/common'
 import { assetUrl } from '@/features/pages/projects/exhibit'
-import { useStaggerReveal } from '@/hooks/useStaggerReveal'
 import { fill } from './homeData'
+import { aos } from './useReveal'
 import s from './activityGrid.module.css'
 
 const srcOf = (p: EventPhoto) => (p.src.startsWith('https://') ? p.src : assetUrl(p.src))
@@ -66,18 +65,21 @@ function Card({ a }: { a: Activity }) {
 /**
  * 2 하는 일 (슈어소프트테크 'Solution & Service' 큰 카드 격자). 넓은 화면: 첫 줄 한 장 + 넓은 한 장, 둘째 줄 세 장. 폰: 한 줄에 한 장.
  * 사진이 있는 활동은 사진 위에 글자(아래를 먹색으로 어둡게), 없는 활동은 먹색 · 주황 면 + 선 그림.
- * 홈의 순차 등장은 여기 한 곳 (움직임 9가지).
+ * 떠오르기(슈어소프트테크 AOS): 머리 250ms → 카드 묶음 300ms.
  */
 export function ActivityGrid() {
-  const listRef = useRef<HTMLUListElement>(null)
-  useStaggerReveal(listRef)
   return (
-    <StorySection id="activities" title={HOME_ACTIVITIES.title} sub={HOME_ACTIVITIES.sub}>
-      <ul ref={listRef} className={s.grid}>
-        {HOME_ACTIVITIES.cards.map((a) => (
-          <Card key={a.id} a={a} />
-        ))}
-      </ul>
-    </StorySection>
+    <section id="activities" className="story paper" aria-labelledby="activities-title">
+      <div className="container">
+        <div {...aos(250)}>
+          <StoryHead titleId="activities-title" title={HOME_ACTIVITIES.title} sub={HOME_ACTIVITIES.sub} />
+        </div>
+        <ul className={s.grid} {...aos(300)}>
+          {HOME_ACTIVITIES.cards.map((a) => (
+            <Card key={a.id} a={a} />
+          ))}
+        </ul>
+      </div>
+    </section>
   )
 }

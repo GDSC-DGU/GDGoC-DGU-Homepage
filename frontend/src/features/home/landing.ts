@@ -1,7 +1,8 @@
 import type { RecruitStatus } from '@/content/recruitingStatus'
 import { HOME_SLIDES } from '@/content/home'
-import type { Project, ScheduleEvent } from '@/domain/types'
-import { exhibitRank, isWorkImage, projectGallery } from '@/features/pages/projects/exhibit'
+import { isPublicProject } from '@/content'
+import type { Project, ProjectImage, ScheduleEvent } from '@/domain/types'
+import { exhibitRank, isShownImage, isWorkImage, projectGallery } from '@/features/pages/projects/exhibit'
 import { fill } from './homeData'
 
 /** 'YYYY-MM-DD' → 'YYYY.MM.DD' */
@@ -44,4 +45,35 @@ export function railProjects(list: readonly Project[], limit: number): Project[]
     .filter((p) => p.status === 'done')
     .sort((a, b) => exhibitRank(a) - exhibitRank(b) || recent(a, b))
     .slice(0, limit)
+}
+
+/* ── 첫 화면 3D 원통 슬라이드 (슈어소프트테크 첫 화면) ── */
+
+/** 원통의 면 수가 이보다 적으면 앞 장을 되풀이해 채운다 (면이 적으면 옆 장이 너무 꺾인다) */
+export const CAROUSEL_MIN_FACES = 6
+
+/** 면마다 몇 번째 원래 장인지: 3장이면 [0, 1, 2, 0, 1, 2] */
+export function carouselFaces(count: number, min = CAROUSEL_MIN_FACES): number[] {
+  if (count <= 0) return []
+  const n = Math.max(count, count > 1 ? min : 1)
+  return Array.from({ length: n }, (_, i) => i % count)
+}
+
+/** 면 한 장의 폭이 width 일 때 원통: 면 사이 각(theta, 라디안)과 원통 가운데까지 거리(apothem) */
+export function cylinder(width: number, n: number): { theta: number; apothem: number } {
+  if (n < 2) return { theta: 0, apothem: 0 }
+  const theta = (Math.PI * 2) / n
+  return { theta, apothem: width / (2 * Math.tan(Math.PI / n)) }
+}
+
+/** 음수 · n 넘는 번호를 0 ~ n-1 로 */
+export const wrapIndex = (i: number, n: number) => (n > 0 ? ((i % n) + n) % n : 0)
+
+/* ── 소개 아래 로고 흐름 ── */
+
+export type LogoProject = Project & { cover: ProjectImage }
+
+/** 로고 표지가 있는 공개 프로젝트 (화면 캡처 · 소개 그림 표지는 프로젝트 줄에서 이미 보인다) */
+export function logoProjects(list: readonly Project[]): LogoProject[] {
+  return list.filter((p): p is LogoProject => isPublicProject(p) && p.cover?.kind === 'logo' && isShownImage(p.cover))
 }

@@ -653,3 +653,28 @@ html[data-vt='sheet-close']::view-transition-new(sheet-box) {
     transform: none;
   }
 }
+
+/*
+ * ── 떠오르기 (홈, 4기 Organizer 2026-11-16: 슈어소프트테크의 AOS fade-up 그대로) ──
+ * 스크립트(features/home/useReveal.ts)가 main 에 data-reveal-on 을 단 뒤에만 숨긴다: 스크립트가 없거나 '동작 줄이기'면 처음부터 보인다.
+ * 칸마다 늦출 시간은 style 의 --reveal-delay (200 · 250 · 300 …ms). 한 번 나타나면 그대로 둔다.
+ */
+[data-reveal-on] [data-aos] {
+  opacity: 0;
+  transform: translate3d(0, var(--reveal-shift), 0);
+  transition:
+    opacity var(--dur-reveal) var(--ease-reveal),
+    transform var(--dur-reveal) var(--ease-reveal);
+}
+[data-reveal-on] [data-aos].aos-animate {
+  opacity: 1;
+  transform: none;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal-on] [data-aos] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
