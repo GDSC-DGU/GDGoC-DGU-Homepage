@@ -46,8 +46,9 @@ GEMINI.md
 # ── 결정 · 이유 · 예정 메모 (로컬 전용. 확정 규칙은 RULEBOOKS/에) ──
 PLANS/
 
-# ── 실제 채점 루브릭 (형식만 같은 가짜 예시 rubric.local.yaml만 커밋) ──
+# ── 실제 채점 루브릭 · 지시문 (형식만 같은 가짜 예시 *.local.yaml만 커밋) ──
 scripts/seed/rubric/*.private.yaml
+scripts/seed/prompts/*.private.yaml
 
 # ── Firebase 에뮬레이터 · Vercel ──
 .emulator-data/

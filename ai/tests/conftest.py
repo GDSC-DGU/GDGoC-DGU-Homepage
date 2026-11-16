@@ -3,7 +3,21 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
+from app.config import get_settings
+from app.grading.dependencies import get_grading_client
 from app.main import create_app
+
+
+@pytest.fixture(autouse=True)
+def _isolated_settings(monkeypatch: pytest.MonkeyPatch):
+    """개발자의 실제 .env와 환경변수가 테스트에 섞이지 않게 한다."""
+    monkeypatch.setenv("APP_ENV", "local")
+    monkeypatch.setenv("GRADING_CLIENT", "fake")
+    get_settings.cache_clear()
+    get_grading_client.cache_clear()
+    yield
+    get_settings.cache_clear()
+    get_grading_client.cache_clear()
 
 
 @pytest.fixture
