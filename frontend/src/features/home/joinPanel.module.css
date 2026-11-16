@@ -1,0 +1,54 @@
+/* 5 지원 띠 (슈어소프트테크 'Contact'): 틀 안 둥근 먹색 판, 위쪽 가운데에 주황 빛이 번진다 */
+.section {
+  padding-bottom: 120px;
+}
+.panel {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding: 88px 32px;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    radial-gradient(60% 90% at 50% 0%, color-mix(in srgb, var(--gen) 34%, transparent) 0%, color-mix(in srgb, var(--gen) 0%, transparent) 70%),
+    var(--band-bg);
+  text-align: center;
+}
+.title {
+  margin: 0;
+  font: var(--t-display);
+  letter-spacing: var(--ls-display);
+  color: var(--ink-900);
+  text-wrap: balance;
+}
+.sub {
+  max-width: 36rem;
+  margin: 0;
+  font: var(--t-lead);
+  color: var(--ink-700);
+  text-wrap: pretty;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 767px) {
+  .section {
+    padding-bottom: 72px;
+  }
+  .panel {
+    padding: 56px 20px;
+    border-radius: 20px;
+  }
+  .title {
+    font: 700 28px/38px var(--font-kr);
+  }
+  .sub {
+    font: 400 16px/26px var(--font-kr);
+  }
+}

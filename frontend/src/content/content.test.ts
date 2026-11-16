@@ -4,6 +4,7 @@ import { KIND_LABEL } from '@/config/kinds'
 import { PAGE_PLANS } from '@/config/pages'
 import { ABOUT_FACTS, RECRUIT_FACTS, SITE, SPRINT } from '@/config/site'
 import { ARCHIVE, PREVIEWS, SCHEDULE, TEAMS_STATUS } from '@/data/mock/fixtures'
+import { HOME_ABOUT, HOME_ACTIVITIES, HOME_JOIN, HOME_PROJECTS, HOME_SLIDES } from './home'
 import { CHAPTER, CONTENT_ISSUES, CONTENT_UPDATED_AT, EVENTS, FAQS, GENERATIONS, isPublicProject, PROJECTS, projectsBasis, PUBLIC_PROJECTS, RECRUITING } from '.'
 import chapterJson from './chapter.json'
 import eventsJson from './events.json'
@@ -20,7 +21,9 @@ const EVENT_PAGE = 'https://gdg.community.dev/events/details/'
 /** 화면에 나오지 않는 값: id · 날짜 필드 · 주소 · 종류 이름 · 게시된 영어 원제목 · 기술 이름 · 검색 키워드 · 와이어프레임 번호 */
 const NOT_SHOWN = new Set(['id', 'date', 'endDate', 'start', 'end', 'updatedAt', 'asOf', 'demoDay', 'url', 'repo', 'channel', 'chapterPage', 'github', 'email', 'emailSource', 'nameEn', 'originalTitle', 'stack', 'kind', 'place', 'status', 'keywords', 'wireframe',
   // 프로젝트의 GitHub 숫자 · 그림 경로 (언어 이름은 기술 이름처럼 그대로 보여 준다)
-  'firstCommit', 'lastCommit', 'statsAsOf', 'languages', 'src'])
+  'firstCommit', 'lastCommit', 'statsAsOf', 'languages', 'src',
+  // 홈 문구(content/home.ts)의 사진 id · 이동 주소 · 카드 면
+  'photo', 'to', 'tone', 'icon'])
 
 /** public/project-images 에 실제로 있는 그림 파일 ('/public/project-images/x.webp') */
 const PUBLIC_IMAGES = new Set(Object.keys(import.meta.glob('/public/project-images/*')))
@@ -56,6 +59,7 @@ const SHOWN: Shown[] = [
   ...shownStrings(PAGE_PLANS, 'config/pages.ts'),
   ...shownStrings(KIND_LABEL, 'config/kinds.ts'),
   ...shownStrings({ SCHEDULE, PREVIEWS, ARCHIVE }, 'data/mock/fixtures.ts'),
+  ...shownStrings({ HOME_SLIDES, HOME_ACTIVITIES, HOME_PROJECTS, HOME_ABOUT, HOME_JOIN }, 'content/home.ts'),
 ]
 
 /** 영어 · 숫자 · 닫는 괄호 뒤에 띄어 쓴 조사 ('G-Sprint 는', 'TTS 로', 'AI 가') */

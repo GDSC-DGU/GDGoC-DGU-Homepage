@@ -1,0 +1,207 @@
+/*
+ * 3 팀 프로젝트 (슈어소프트테크 'Promotion Center'): 옅은 회색 면 위 흰 카드가 옆으로 늘어선다.
+ * 넓은 화면은 한 번에 네 장, 폰은 한 장 반. 줄은 틀(.container) 안에서 넘긴다 (페이지 가로 넘침 없음).
+ */
+.section {
+  --story-pad: 112px;
+}
+
+.track {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 4px 0 12px;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 calc((100% - 60px) / 4);
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--white);
+  scroll-snap-align: start;
+  transition: transform var(--dur-lift) var(--ease-out);
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--subtle);
+}
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-media) var(--ease-out);
+}
+/* 로고 표지는 자르지 않고 가운데에 작게 */
+.media[data-fit='logo'] {
+  display: grid;
+  place-items: center;
+}
+.media[data-fit='logo'] .img {
+  width: 34%;
+  height: auto;
+  max-height: 60%;
+  object-fit: contain;
+}
+.mono {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font: 700 32px/1 var(--font-num);
+  letter-spacing: -0.02em;
+  color: var(--ink-500);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 20px 22px;
+}
+.program {
+  margin: 0;
+  font: var(--t-meta);
+  color: var(--gen-text);
+}
+.name {
+  margin: 0;
+  font: 700 19px/28px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-900);
+}
+.link {
+  color: inherit;
+  text-decoration: none;
+}
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.link:focus-visible {
+  outline: none;
+}
+.item:has(.link:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.summary {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.year {
+  margin: auto 0 0;
+  padding-top: 10px;
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+
+/* 줄 아래: 넘긴 만큼 막대 + 이전 · 다음 */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+}
+.bar {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  margin-right: 16px;
+  overflow: hidden;
+  background: var(--field-line);
+}
+.barFill {
+  position: absolute;
+  inset: 0;
+  background: var(--ink-900);
+  transform: scaleX(var(--p, 0));
+  transform-origin: left;
+  transition: transform var(--dur-short) var(--ease-out);
+}
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--white);
+  color: var(--ink-900);
+  box-shadow: inset 0 0 0 1px var(--line);
+  cursor: pointer;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.arrow:active {
+  transform: scale(var(--press));
+}
+
+@media (hover: hover) {
+  .item:hover {
+    transform: translateY(var(--lift));
+  }
+  .item:hover .media[data-fit='cover'] .img {
+    transform: scale(var(--media-zoom));
+  }
+  .arrow:hover {
+    box-shadow: inset 0 0 0 1px var(--ink-500);
+  }
+}
+
+@media (max-width: 1023px) {
+  .item {
+    flex-basis: calc((100% - 40px) / 3);
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    --story-pad: 72px;
+  }
+  .track {
+    gap: 12px;
+  }
+  .item {
+    flex-basis: 68%;
+  }
+  .controls {
+    margin-top: 20px;
+  }
+  /* 폰은 밀어서 넘긴다: 막대만 */
+  .arrow {
+    display: none;
+  }
+  .bar {
+    margin-right: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .img,
+  .barFill {
+    transition: none;
+  }
+}
