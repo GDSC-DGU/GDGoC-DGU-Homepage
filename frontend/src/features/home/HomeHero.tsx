@@ -1,5 +1,4 @@
 import { Fragment, useCallback, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { EVENTS, GENERATIONS, PHOTOS } from '@/content'
 import { HOME_CAROUSEL, HOME_SLIDES } from '@/content/home'
 import { recruitStatus } from '@/content/recruitingStatus'
@@ -11,6 +10,7 @@ import { assetUrl } from '@/features/pages/projects/exhibit'
 import { useToday } from '@/hooks/useToday'
 import { fill } from './homeData'
 import { carouselFaces, cylinder, dotDate, nextHighlight, recruitSlideText, wrapIndex } from './landing'
+import { MoreLink } from './HomeHead'
 import { LogoWordmark } from './LogoWordmark'
 import { NextTicker } from './NextTicker'
 import { Chevron, PlayPause } from './SlideControls'
@@ -19,6 +19,7 @@ import s from './homeHero.module.css'
 
 interface Slide {
   id: string
+  cate: string
   photo: EventPhoto
   title: string
   body: string
@@ -45,9 +46,9 @@ function useSlides(): Slide[] {
     const recruit = recruitSlideText(recruitStatus(today))
     const c = HOME_SLIDES
     const list: (Omit<Slide, 'photo'> & { photoId: string })[] = [
-      { id: 'community', photoId: c.community.photo, title: fill(c.community.title, { gen: current?.n ?? '' }), body: fill(c.community.body, { start }), action: c.community.action, to: c.community.to },
-      ...(next ? [{ id: 'next', photoId: c.next.photo, title: next.title, body: fill(c.next.body, { date: dotDate(next.date) }), action: c.next.action, to: c.next.to }] : []),
-      { id: 'recruit', photoId: c.recruit.photo, ...recruit, action: c.recruit.action, to: c.recruit.to },
+      { id: 'community', cate: c.community.cate, photoId: c.community.photo, title: fill(c.community.title, { gen: current?.n ?? '' }), body: fill(c.community.body, { start }), action: c.community.action, to: c.community.to },
+      ...(next ? [{ id: 'next', cate: c.next.cate, photoId: c.next.photo, title: next.title, body: fill(c.next.body, { date: dotDate(next.date) }), action: c.next.action, to: c.next.to }] : []),
+      { id: 'recruit', cate: c.recruit.cate, photoId: c.recruit.photo, ...recruit, action: c.recruit.action, to: c.recruit.to },
     ]
     // 사진이 없는(공개 동의 기록이 빠진) 슬라이드는 싣지 않는다
     return list.flatMap(({ photoId, ...rest }) => {
@@ -162,11 +163,16 @@ export function HomeHero() {
                     <div className={s.card}>
                       <img className={s.img} src={srcOf(sl.photo)} alt={clone ? '' : sl.photo.alt} width={sl.photo.width} height={sl.photo.height} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
                       <div className={`on-dark ${s.text}`}>
+                        <p className={s.cate} lang="en">
+                          {sl.cate}
+                        </p>
                         <h2 className={s.slideTitle}>{sl.title}</h2>
                         <p className={s.slideBody}>{sl.body}</p>
-                        <Link className={`btn-primary btn-sm ${s.slideAction}`} to={sl.to} tabIndex={on ? undefined : -1}>
-                          {sl.action}
-                        </Link>
+                        <div className={s.slideAction}>
+                          <MoreLink to={sl.to} tone="dark" tabIndex={on ? undefined : -1}>
+                            {sl.action}
+                          </MoreLink>
+                        </div>
                       </div>
                     </div>
                   </div>

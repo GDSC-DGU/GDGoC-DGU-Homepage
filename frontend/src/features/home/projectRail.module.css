@@ -1,45 +1,36 @@
 /*
- * 3 팀 프로젝트 (슈어소프트테크 'Promotion Center'): 옅은 회색 면 위 흰 카드가 옆으로 늘어선다.
- * 넓은 화면은 한 번에 네 장, 폰은 한 장 반. 줄은 틀(.container) 안에서 넘긴다 (페이지 가로 넘침 없음).
+ * 3 팀 프로젝트 (슈어소프트테크 'Promotion Center'): 아주 옅은 회색 면, 위아래 200 (폰 90).
+ * 카드: 흰 판 · 모서리 20 · 높이 440 (폰 366), 위 그림 → 프로그램 → 이름 → 한 줄 → 해. 줄 간격 · 장 수는 Swiper 설정.
  */
 .section {
-  --story-pad: 112px;
+  padding-block: 200px;
+  background: var(--subtle);
+  overflow: hidden;
 }
-
-.track {
-  display: flex;
-  gap: 30px;
-  margin: 0;
-  padding: 4px 0 12px;
-  list-style: none;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+/* 카드가 떠오를 자리 (Swiper 는 overflow: hidden) */
+.swiper {
+  padding-top: 4px;
 }
-.track::-webkit-scrollbar {
-  display: none;
+.slide {
+  height: auto;
 }
 
 .item {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* 슈어소프트테크: 한 번에 4장 · 간격 30 (980 이하 2장 · 20, 680 이하 1.2장 · 15) */
-  flex: 0 0 calc((100% - 90px) / 4);
-  min-width: 0;
+  height: 440px;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 20px;
   background: var(--white);
-  scroll-snap-align: start;
   transition: transform var(--dur-lift) var(--ease-out);
 }
-
 .media {
   position: relative;
-  aspect-ratio: 16 / 10;
+  flex-shrink: 0;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
-  background: var(--subtle);
+  background: var(--field);
 }
 .img {
   width: 100%;
@@ -72,18 +63,23 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 6px;
-  padding: 20px 20px 22px;
+  gap: 8px;
+  padding: 24px 25px 26px;
 }
+/* 슈어소프트테크 '회사소식' 표: 작은 색 알약 */
 .program {
+  align-self: flex-start;
   margin: 0;
-  font: var(--t-meta);
+  padding: 2px 10px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--gen) 10%, transparent);
+  font: 600 13px/20px var(--font-kr);
   color: var(--gen-text);
 }
 .name {
-  margin: 0;
-  font: 700 19px/28px var(--font-kr);
-  letter-spacing: -0.01em;
+  margin: 4px 0 0;
+  font: 700 20px/30px var(--font-kr);
+  letter-spacing: -0.6px;
   color: var(--ink-900);
 }
 .link {
@@ -101,36 +97,36 @@
 }
 .item:has(.link:focus-visible) {
   outline: 2px solid var(--focus);
-  outline-offset: 3px;
+  outline-offset: -2px;
 }
 .summary {
   display: -webkit-box;
   margin: 0;
   overflow: hidden;
-  font: 400 15px/24px var(--font-kr);
+  font: 400 16px/26px var(--font-kr);
   color: var(--ink-700);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 .year {
   margin: auto 0 0;
-  padding-top: 10px;
-  font: var(--t-meta);
+  font: 500 15px/22px var(--font-num);
   color: var(--ink-500);
 }
 
-/* 줄 아래: 넘긴 만큼 막대 + 이전 · 다음 */
+/* 줄 아래: 진행 막대(3px) · 멈춤 · 이전 · 다음 · View More */
 .controls {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 28px;
+  gap: 10px;
+  margin-top: 50px;
 }
 .bar {
   position: relative;
   flex: 1;
+  min-width: 0;
   height: 3px;
-  margin-right: 16px;
+  margin-right: 20px;
   overflow: hidden;
   border-radius: 3px;
   background: var(--ink-a10);
@@ -138,6 +134,7 @@
 .barFill {
   position: absolute;
   inset: 0;
+  border-radius: 3px;
   background: var(--ink-900);
   transform: scaleX(var(--p, 0));
   transform-origin: left;
@@ -145,6 +142,7 @@
 }
 .arrow {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
   width: 44px;
   height: 44px;
@@ -159,6 +157,10 @@
 .arrow:active {
   transform: scale(var(--press));
 }
+.more {
+  flex-shrink: 0;
+  margin-left: 20px;
+}
 
 @media (hover: hover) {
   .item:hover {
@@ -172,30 +174,34 @@
   }
 }
 
-@media (max-width: 980px) {
-  .track {
-    gap: 20px;
-  }
-  .item {
-    flex-basis: calc((100% - 20px) / 2);
-  }
-}
-
 @media (max-width: 680px) {
   .section {
-    --story-pad: 72px;
-  }
-  .track {
-    gap: 15px;
+    padding-block: 90px;
   }
   .item {
-    flex-basis: calc((100% - 15px) / 1.2);
+    height: 366px;
+  }
+  .body {
+    padding: 18px 20px 20px;
+  }
+  .name {
+    font-size: 17px;
+    line-height: 26px;
+  }
+  .summary {
+    font-size: 14px;
+    line-height: 22px;
   }
   .controls {
-    margin-top: 20px;
+    flex-wrap: wrap;
+    margin-top: 30px;
   }
   .bar {
-    margin-right: 8px;
+    flex-basis: 100%;
+    margin: 0 0 12px;
+  }
+  .more {
+    margin-left: auto;
   }
 }
 

@@ -62,10 +62,10 @@ node <hallmark>/skills/hallmark/scripts/sloplint.mjs src --tier floor
 ```
 
 관리자 화면(`features/admin`), 지도(`features/campus` · `world3d`), 들여온 코드(`vendor`)는 이 검사에서 뺍니다.
-결과에서 보지 않는 것: 규칙 20(모든 CSS 첫 줄의 Hallmark 도장, 이 저장소는 쓰지 않음)과 알고 둔 예외 세 가지 — 순차 등장의 `data-reveal='wait'`, 홈 떠오르기의 `[data-reveal-on] [data-aos]`(둘 다 스크립트가 붙일 때만 숨김), 검색 창의 Enter 안내(고른 줄에만 보임). 이것들 말고 FAIL 이 나오면 고칩니다.
+결과에서 보지 않는 것: 규칙 20(모든 CSS 첫 줄의 Hallmark 도장, 이 저장소는 쓰지 않음)과 알고 둔 예외 두 가지 — 순차 등장의 `data-reveal='wait'`(스크립트가 붙일 때만 숨김), 검색 창의 Enter 안내(고른 줄에만 보임). 이 셋 말고 FAIL 이 나오면 고칩니다. (홈 떠오르기는 AOS 의 CSS 라 `node_modules` 에 있어 검사 밖입니다.)
 
 새 움직임은 [GLOSSARY.md 의 '움직임 9가지' 표](GLOSSARY.md#디자인--움직임) 가운데 하나로 이름을 붙이고, 표에 자리를 더합니다. 튕김(스프링 · 바운스)은 표에 적힌 세 자리 말고는 쓰지 않습니다.
-홈은 예외입니다: 4기 Organizer 2026-11-16 결정으로 슈어소프트테크 홈의 움직임을 그대로 씁니다 (GLOSSARY.md '홈 움직임' 표). 홈 sloplint 에서 3D 원통의 `filter` 전환이 걸리면 이 결정에 따른 것으로 둡니다.
+홈은 예외입니다: 4기 Organizer 2026-11-16 결정으로 슈어소프트테크 홈의 화면 구성 · 움직임을 그대로 씁니다 (GLOSSARY.md '홈 움직임' · '사이트 틀'). 홈의 영문 이름표 · 'View More →' 화살표 · 3D 원통의 `filter` 전환 · AOS 로 숨긴 칸은 이 결정에 따른 것으로 둡니다.
 
 ### 화면 검사
 

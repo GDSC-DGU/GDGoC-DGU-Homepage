@@ -62,6 +62,7 @@
   --shadow-float: 0 12px 32px rgba(17, 17, 17, 0.12);
   /* 카드에 마우스를 올렸을 때 (넓고 옅게) */
   --shadow-lift: 0 18px 40px -12px rgba(17, 17, 17, 0.16);
+  --shadow-header: 0 10px 50px rgba(17, 17, 17, 0.15); /* 슈어소프트테크 머리말 */
 
   /* 글꼴: 한글 문장은 Pretendard, 숫자 덩어리 · 영문 워드마크만 Google Sans Flex */
   --font-kr: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -109,10 +110,13 @@
   --head-gap: 56px; /* 섹션 머리 → 내용 */
 
   /* 격자 */
-  --max: 1140px;
+  /* 본문 틀 (4기 Organizer 2026-11-16: 슈어소프트테크와 같게) — 화면 폭의 90%, 가장 넓을 때 1590. 좌우 여백은 5% (폰 20) */
+  --max: 1590px;
   --gutter: 24px;
-  --side: max(40px, env(safe-area-inset-left, 0px));
-  --side-r: max(40px, env(safe-area-inset-right, 0px));
+  --side: max(20px, 5vw, env(safe-area-inset-left, 0px));
+  --side-r: max(20px, 5vw, env(safe-area-inset-right, 0px));
+  /* 머리말 높이 (슈어소프트테크 90, 폰 70) */
+  --header-h: 90px;
 
   /*
    * 움직임 9가지 (4기 Organizer 2026-11-06 · hallmark craft § 5 · impeccable craft floor).
@@ -133,18 +137,16 @@
   --dur-long-exit: 280ms;
   --stagger: 40ms; /* 순차 등장 간격 (다 합쳐 500ms 이하) */
   /*
-   * 홈 움직임 (4기 Organizer 2026-11-16: 슈어소프트테크 홈 움직임을 그대로). 값은 그 사이트의 AOS · Swiper · 스크립트 값.
-   * 떠오르기: 100px 아래 · 투명 → 제자리, 0.7초 ease (AOS fade-up). 첫 화면 글자: 40px 아래에서 0.6초 (visualTitleFadeUp).
+   * 홈 움직임 (4기 Organizer 2026-11-16: 슈어소프트테크 홈 움직임을 그대로). 값은 그 사이트의 CSS · 스크립트 값.
+   * 섹션 떠오르기 · 슬라이드 넘김은 AOS · Swiper 가 맡는다 (값은 각 부품의 data-aos-* · Swiper 설정).
+   * 첫 화면 글자: 40px 아래에서 0.6초 (visualTitleFadeUp).
    */
-  --dur-reveal: 700ms;
   --ease-reveal: ease;
-  --reveal-shift: 100px;
   --dur-hero-in: 600ms;
   --hero-in-shift: 40px;
   --dur-carousel: 500ms; /* 3D 원통 한 칸 돌기 */
-  --dur-ticker: 500ms; /* 다가오는 일정 한 줄 넘김 */
-  --dur-rail: 600ms; /* 프로젝트 줄 한 칸 넘김 */
   --dur-bar: 400ms; /* 진행 막대 */
+  --dur-header: 400ms; /* 머리말 숨김 · 흰 바탕 */
   /* 줄 · 띠 전체가 링크일 때 오른쪽 끝 칸의 꺾쇠 (mask 로 그려 글자색을 따른다. 글자 화살표 대신, hallmark 30a · 63) */
   --icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 3l5 5-5 5' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 
@@ -213,8 +215,7 @@
     --gap-section-near: 64px;
     --story-pad: 72px;
     --head-gap: 28px;
-    --side: max(20px, env(safe-area-inset-left, 0px));
-    --side-r: max(20px, env(safe-area-inset-right, 0px));
+    --header-h: 70px;
   }
 }
 
