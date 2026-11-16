@@ -38,7 +38,7 @@ Spring Boot(Java)로 만든 백엔드입니다. Cloud Run에 배포하며, 데�
 ## 지킬 것
 
 - Firestore와 Cloud Storage에 쓰는 일은 backend만 합니다.
-- Firebase ID 토큰을 검증하고 JWT(access token · refresh token)를 HttpOnly 쿠키로 발급합니다.
+- 프론트엔드가 전달한 Google ID 토큰을 Spring Boot에서 직접 검증합니다. 검증한 Google 계정에 연결된 활성 회원을 확인한 뒤 서비스 로그인 세션을 발급합니다.
 - 모든 엔드포인트에서 권한(비회원 / 회원 / 운영진)을 검사합니다. 운영진은 역할이 Lead 또는 Core인 사용자이고, 둘의 권한은 같습니다.
 - 개인정보를 로그, 응답, 에러 메시지에 싣지 않습니다.
 - ai 서비스는 backend만 호출합니다.
