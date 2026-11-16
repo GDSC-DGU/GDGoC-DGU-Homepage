@@ -21,6 +21,13 @@ Spring Boot(Java)로 만든 백엔드입니다. Cloud Run에 배포하며, 데�
 
 확인 주소: http://localhost:8080/api/v1/health
 
+Google 로그인 API를 실행하려면 프론트에서 사용하는 Google OAuth 웹 클라이언트 ID를 `GOOGLE_CLIENT_ID` 환경변수에 설정합니다. `backend/`의 PowerShell에서 아래처럼 서버를 실행할 수 있습니다.
+
+```powershell
+$env:GOOGLE_CLIENT_ID = '여기에 Google OAuth 웹 클라이언트 ID 입력'
+.\gradlew.bat bootRun
+```
+
 ### 필요한 것
 
 - **Java 17 이상**이 PC에 하나 설치되어 있어야 합니다. `./gradlew` 자체를 실행하는 데 씁니다.

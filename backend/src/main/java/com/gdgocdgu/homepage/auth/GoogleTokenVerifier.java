@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.SignatureException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public final class GoogleTokenVerifier {
@@ -46,8 +47,10 @@ public final class GoogleTokenVerifier {
         }
 
         GoogleIdToken.Payload payload = token.getPayload();
-        // Google 라이브러리가 시간 값을 비교하기 전에 필수 시간이 모두 들어 있는지 확인한다.
-        if (payload.getExpirationTimeSeconds() == null || payload.getIssuedAtTimeSeconds() == null) {
+        // 라이브러리에 넘기기 전에 발급 대상의 형식과 필수 시간 값의 존재를 확인한다.
+        Object audience = payload.getAudience();
+        if (!(audience instanceof String || audience instanceof List<?>)
+                || payload.getExpirationTimeSeconds() == null || payload.getIssuedAtTimeSeconds() == null) {
             return Optional.empty();
         }
 
