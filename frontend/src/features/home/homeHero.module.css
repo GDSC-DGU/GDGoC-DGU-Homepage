@@ -1,0 +1,256 @@
+/*
+ * 첫 화면 (4기 Organizer 2026-11-16, 슈어소프트테크 첫 화면 구성): 가운데 큰 이름 → 한 줄 → 사진 슬라이드.
+ * 바탕은 위가 옅은 회색에서 흰으로 (섹션 면이 아니라 첫 화면만의 빛).
+ * 슬라이드: 가운데 한 장이 크고 양옆 장이 조금 보인다. 옆 장은 작고 옅게 (transform · opacity 만 움직인다).
+ */
+.hero {
+  position: relative;
+  padding-bottom: 72px;
+  background: linear-gradient(180deg, var(--field) 0%, var(--paper) 62%);
+}
+
+.top {
+  padding-top: 72px;
+  padding-bottom: 48px;
+  text-align: center;
+}
+.title {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+.wordmark {
+  font: var(--t-hero);
+  letter-spacing: var(--ls-hero);
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+.lead {
+  max-width: 44rem;
+  margin: 20px auto 0;
+  font: 500 22px/34px var(--font-kr);
+  letter-spacing: -0.01em;
+  color: var(--ink-700);
+  text-wrap: balance;
+}
+.leadLine {
+  display: inline;
+}
+
+/* ── 슬라이드 ── */
+.carousel {
+  --slide-w: min(920px, calc(100vw - 200px));
+  position: relative;
+}
+.track {
+  display: flex;
+  gap: 24px;
+  margin: 0;
+  /* 첫 장 · 끝 장도 가운데에 오도록 양쪽을 비운다 */
+  padding: 8px calc((100% - var(--slide-w)) / 2);
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.track::-webkit-scrollbar {
+  display: none;
+}
+.slide {
+  flex: 0 0 var(--slide-w);
+  scroll-snap-align: center;
+}
+.card {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--field);
+  transform: scale(0.94);
+  opacity: 0.5;
+  transition:
+    transform var(--dur-long) var(--ease-out),
+    opacity var(--dur-long) var(--ease-out);
+}
+.slide[data-active] .card {
+  transform: none;
+  opacity: 1;
+}
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* 글자가 사진 위에서도 읽히게 아래쪽만 먹색으로 어둡게 */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--band-bg) 88%, transparent) 0%, color-mix(in srgb, var(--band-bg) 64%, transparent) 38%, color-mix(in srgb, var(--band-bg) 0%, transparent) 72%);
+  pointer-events: none;
+}
+.text {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  bottom: 44px;
+  z-index: 1;
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+.slideTitle {
+  margin: 0;
+  font: 700 40px/52px var(--font-kr);
+  letter-spacing: -0.02em;
+  color: var(--ink-900);
+  text-wrap: balance;
+}
+.slideBody {
+  max-width: 34rem;
+  margin: 0;
+  font: 400 18px/28px var(--font-kr);
+  color: var(--ink-700);
+  text-wrap: pretty;
+}
+.slideAction {
+  margin-top: 8px;
+}
+
+/* 양쪽 둥근 버튼: 가운데 장의 바깥 가장자리에 걸친다 */
+.arrow {
+  position: absolute;
+  top: calc(50% - 28px);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--white);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.arrow:active {
+  transform: scale(var(--press));
+}
+.prev {
+  left: calc((100% - var(--slide-w)) / 2 - 24px);
+}
+.next {
+  right: calc((100% - var(--slide-w)) / 2 - 24px);
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 20px;
+}
+/* 점은 8px, 누르는 자리는 24 × 24 */
+.dot {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.dot::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--line-strong);
+  transition: transform var(--dur-short) var(--ease-out);
+}
+.dot[aria-current]::before {
+  background: var(--ink-900);
+  transform: scaleX(1.6);
+}
+
+@media (hover: hover) {
+  .arrow:hover {
+    box-shadow: var(--shadow-lift);
+  }
+  .slide[data-active] .img {
+    transition: transform var(--dur-media) var(--ease-out);
+  }
+  .slide[data-active] .card:hover .img {
+    transform: scale(var(--media-zoom));
+  }
+}
+
+@media (max-width: 1023px) {
+  .carousel {
+    --slide-w: calc(100vw - 120px);
+  }
+  .slideTitle {
+    font: 700 32px/42px var(--font-kr);
+  }
+}
+
+@media (max-width: 767px) {
+  .hero {
+    padding-bottom: 48px;
+  }
+  .top {
+    padding-top: 48px;
+    padding-bottom: 32px;
+  }
+  /* 꺾쇠까지 390 폭 안에 들어오게 (예전 첫 화면과 같은 크기) */
+  .wordmark {
+    font-size: 44px;
+  }
+  .lead {
+    margin-top: 14px;
+    font: 500 17px/27px var(--font-kr);
+  }
+  .leadLine {
+    display: block;
+  }
+  .carousel {
+    --slide-w: calc(100vw - 48px);
+  }
+  .track {
+    gap: 12px;
+  }
+  .card {
+    aspect-ratio: 4 / 5;
+    border-radius: 20px;
+  }
+  .text {
+    left: 20px;
+    right: 20px;
+    bottom: 24px;
+    gap: 8px;
+  }
+  .slideTitle {
+    font: 700 26px/36px var(--font-kr);
+  }
+  .slideBody {
+    font: 400 16px/26px var(--font-kr);
+  }
+  /* 폰은 밀어서 넘긴다: 양쪽 버튼은 숨기고 점만 */
+  .arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .dot::before {
+    transition: none;
+  }
+}

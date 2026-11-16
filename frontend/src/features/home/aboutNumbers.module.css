@@ -1,0 +1,113 @@
+/* 4 소개 한 문단 + 숫자 셋 (슈어소프트테크 'About'): 왼쪽 글 5칸 | 오른쪽 숫자 셋 7칸 */
+.section {
+  --story-pad: 128px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: 64px;
+}
+.text {
+  display: grid;
+  justify-items: start;
+  gap: 20px;
+  min-width: 0;
+}
+.title {
+  margin: 0;
+  font: var(--t-section);
+  letter-spacing: var(--ls-section);
+  color: var(--ink-900);
+  text-wrap: balance;
+}
+.body {
+  max-width: 30rem;
+  margin: 0 0 8px;
+  font: var(--t-body);
+  color: var(--ink-700);
+  text-wrap: pretty;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stat {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+}
+.art {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px;
+  fill: none;
+  stroke: var(--ink-900);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dot {
+  fill: var(--gen);
+  stroke: none;
+}
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 0;
+  font: 700 64px/1 var(--font-num);
+  letter-spacing: var(--ls-num);
+  color: var(--ink-900);
+}
+.unit {
+  font: 600 22px/1 var(--font-kr);
+  letter-spacing: 0;
+}
+.label {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font: 600 16px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.note {
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 56px;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    --story-pad: 72px;
+  }
+  .stats {
+    gap: 12px;
+  }
+  .art {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 4px;
+  }
+  .value {
+    font: 700 40px/1 var(--font-num);
+  }
+  .unit {
+    font: 600 16px/1 var(--font-kr);
+  }
+  .label {
+    font: 600 14px/20px var(--font-kr);
+  }
+}
