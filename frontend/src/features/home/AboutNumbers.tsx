@@ -1,8 +1,10 @@
 import { useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { SITE } from '@/config/site'
 import { CHAPTER, GENERATIONS, SEMINARS } from '@/content'
 import { HOME_ABOUT } from '@/content/home'
+import { MoreLink } from './HomeHead'
 import { fill } from './homeData'
+import { LogoWordmark } from './LogoWordmark'
 import { LogoMarquee } from './LogoMarquee'
 import { aos, useCountUp } from './useReveal'
 import s from './aboutNumbers.module.css'
@@ -80,9 +82,9 @@ function StatItem({ x, index }: { x: Stat; index: number }) {
 }
 
 /**
- * 4 소개 한 문단 + 숫자 셋 (슈어소프트테크 'About'): 왼쪽 제목 · 문단 · '소개 보기' | 오른쪽 선 그림 + 큰 숫자 + 이름, 아래 로고 흐름.
+ * 4 소개 (슈어소프트테크 'About'): 왼쪽 이름표 · 로고 · 한 문장 · 문단 · View More | 오른쪽 선 그림 + 큰 숫자 + 이름, 아래 로고 흐름 두 줄.
  * 숫자는 저장소 자료에서 센다: 세미나 수(seminars.json) · 지금 기수(generations.json) · 챕터 페이지 가입자(chapter.json, 기준일과 함께).
- * 떠오르기 늦춤은 그 사이트 값: 제목 250 · 문단 300 · 버튼 400 · 숫자 500 · 로고 500.
+ * 떠오르기 늦춤은 그 사이트 값: 이름표 200 · 로고 250 · 문장 300 · 문단 350 · 버튼 400 · 숫자 500 · 로고 흐름 500.
  */
 export function AboutNumbers() {
   const gens = [...GENERATIONS].sort((a, b) => a.n - b.n)
@@ -94,19 +96,23 @@ export function AboutNumbers() {
     ...(CHAPTER.members ? [{ id: 'members', art: 'network' as const, value: CHAPTER.members.value, unit: '명', label: HOME_ABOUT.stats.members, note: `${CHAPTER.members.asOf.replaceAll('-', '.')} 기준` }] : []),
   ]
   return (
-    <section className={`story paper ${s.section}`} aria-labelledby="about-title">
+    <section className={s.section} aria-labelledby="about-title">
       <div className={`container ${s.grid}`}>
         <div className={s.text}>
-          <h2 id="about-title" className={s.title} {...aos(250)}>
+          <p className={s.eng} lang="en" {...aos(200)}>
+            {HOME_ABOUT.eng}
+          </p>
+          <div className={s.logo} {...aos(250)}>
+            <LogoWordmark name={SITE.shortName} className={s.wordmark} />
+          </div>
+          <h2 id="about-title" className={s.title} {...aos(300)}>
             {fill(HOME_ABOUT.title, { start })}
           </h2>
-          <p className={s.body} {...aos(300)}>
+          <p className={s.body} {...aos(350)}>
             {HOME_ABOUT.body}
           </p>
-          <div {...aos(400)}>
-            <Link className="btn-secondary" to="/about">
-              {HOME_ABOUT.action}
-            </Link>
+          <div className={s.btn} {...aos(400)}>
+            <MoreLink to="/about">{HOME_ABOUT.action}</MoreLink>
           </div>
         </div>
         <ul className={s.stats} {...aos(500)}>

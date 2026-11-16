@@ -3,11 +3,15 @@
  * 넓은 화면 3칸: [정기 세션][G-Sprint ── 넓게] / [세미나][Solution Challenge][연합 행사]
  * 사진 카드는 사진 위 글자(아래를 먹색으로), 사진 없는 카드는 먹색 · 주황 면 + 선 그림. 마우스를 올리면 카드 2px · 사진 1.03 (taste-skill).
  */
+/* 슈어소프트테크 섹션: 위아래 200 (폰 90) */
+.section {
+  padding-block: 200px;
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: 300px;
-  gap: 20px;
+  grid-auto-rows: 350px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -19,8 +23,9 @@
 .item {
   position: relative;
   display: flex;
+  height: 100%;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: 20px;
   background: var(--band-bg);
   isolation: isolate;
   transition: transform var(--dur-lift) var(--ease-out);
@@ -54,7 +59,24 @@
   gap: 10px;
   width: 100%;
   min-width: 0;
-  padding: 32px;
+  padding: 50px 40px;
+}
+/* 오른쪽 위 화살표 */
+.corner {
+  position: absolute;
+  top: 36px;
+  right: 36px;
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: var(--band-ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-short) var(--ease-out);
+}
+.item[data-tone='gen'] .corner {
+  stroke: var(--on-gen);
 }
 .icon {
   width: 44px;
@@ -76,7 +98,7 @@
 
 .name {
   margin: 0;
-  font: 700 26px/34px var(--font-kr);
+  font: 700 28px/38px var(--font-kr);
   letter-spacing: -0.015em;
   color: var(--ink-900);
 }
@@ -106,7 +128,7 @@
 .text {
   max-width: 32rem;
   margin: 0;
-  font: 400 16px/26px var(--font-kr);
+  font: 400 18px/30px var(--font-kr);
   color: var(--ink-700);
   text-wrap: pretty;
 }
@@ -120,10 +142,10 @@
   list-style: none;
 }
 .tag {
-  padding: 4px 10px;
-  border-radius: var(--r-tag);
-  background: color-mix(in srgb, var(--band-ink) 16%, transparent);
-  font: var(--t-meta);
+  padding: 6px 14px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--band-bg) 45%, transparent);
+  font: 600 14px/20px var(--font-kr);
   color: var(--ink-900);
 }
 
@@ -134,12 +156,15 @@
   .item:hover .img {
     transform: scale(var(--media-zoom));
   }
+  .item:hover .corner {
+    transform: translateX(4px);
+  }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 980px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: 280px;
+    grid-auto-rows: 300px;
   }
   .item[data-id='sprint'] {
     grid-column: auto;
@@ -149,30 +174,39 @@
   }
 }
 
-@media (max-width: 767px) {
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
-    grid-auto-rows: auto;
-    gap: 12px;
-  }
-  .item[data-id='sessions'] {
-    grid-column: auto;
+@media (max-width: 680px) {
+  .section {
+    padding-block: 90px;
   }
   .item {
-    min-height: 240px;
-    border-radius: 20px;
-  }
-  .item[data-tone='photo'] {
-    min-height: 300px;
+    height: 208px;
   }
   .body {
-    padding: 24px;
+    gap: 6px;
+    padding: 25px;
+  }
+  .corner {
+    top: 22px;
+    right: 22px;
+    width: 24px;
+    height: 24px;
+  }
+  .icon {
+    width: 36px;
+    height: 36px;
   }
   .name {
-    font: 700 22px/30px var(--font-kr);
+    font: 700 20px/28px var(--font-kr);
   }
   .text {
-    font: 400 15px/24px var(--font-kr);
+    font: 400 14px/22px var(--font-kr);
+  }
+  .tags {
+    margin-top: 2px;
+  }
+  .tag {
+    padding: 4px 10px;
+    font-size: 12px;
   }
 }
 

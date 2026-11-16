@@ -1,58 +1,77 @@
-/* 4 소개 한 문단 + 숫자 셋 (슈어소프트테크 'About'): 왼쪽 글 5칸 | 오른쪽 숫자 셋 7칸 */
+/*
+ * 4 소개 (슈어소프트테크 'About'): 위아래 200 (폰 90). 왼쪽 글 | 오른쪽 숫자 셋 (가장 넓을 때 730).
+ * 글: 이름표 → 로고(400 폭) → 한 문장 20 · 600 → 문단 18 → View More. 숫자: 그림 70 · 60px 굵은 숫자 · 이름 20.
+ */
 .section {
-  --story-pad: 128px;
+  padding-block: 200px;
 }
 .logos {
   overflow: hidden;
 }
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 730px);
   align-items: center;
-  gap: 64px;
+  justify-content: space-between;
+  gap: 80px;
 }
 .text {
   display: grid;
   justify-items: start;
-  gap: 20px;
   min-width: 0;
 }
-.title {
-  margin: 0;
-  font: var(--t-section);
-  letter-spacing: var(--ls-section);
+.eng {
+  composes: eng from './homeHead.module.css';
+}
+.logo {
+  margin-top: 24px;
+}
+.wordmark {
+  font: 700 56px/1 var(--font-num);
+  letter-spacing: var(--ls-hero);
   color: var(--ink-900);
-  text-wrap: balance;
+  white-space: nowrap;
+}
+.title {
+  margin: 50px 0 0;
+  font: 600 20px/34px var(--font-kr);
+  letter-spacing: -0.6px;
+  color: var(--ink-900);
 }
 .body {
-  max-width: 30rem;
-  margin: 0 0 8px;
-  font: var(--t-body);
+  max-width: 40rem;
+  margin: 10px 0 0;
+  font: 400 18px/32px var(--font-kr);
+  letter-spacing: -0.54px;
   color: var(--ink-700);
   text-wrap: pretty;
 }
+.btn {
+  margin-top: 40px;
+}
 
 .stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .stat {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
   text-align: center;
 }
 .art {
-  width: 56px;
-  height: 56px;
-  margin-bottom: 8px;
+  width: 70px;
+  height: 70px;
   fill: none;
   stroke: var(--ink-900);
-  stroke-width: 1.8;
+  stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -65,52 +84,74 @@
   align-items: baseline;
   gap: 4px;
   margin: 0;
-  font: 700 64px/1 var(--font-num);
-  letter-spacing: var(--ls-num);
-  color: var(--ink-900);
+  font: 800 60px/72px var(--font-num);
+  font-variant-numeric: tabular-nums;
+  color: var(--gen-text);
 }
 .unit {
   font: 600 22px/1 var(--font-kr);
-  letter-spacing: 0;
+  color: var(--ink-900);
 }
 .label {
   display: grid;
   gap: 2px;
   margin: 0;
-  font: 600 16px/24px var(--font-kr);
-  color: var(--ink-700);
+  font: 400 20px/30px var(--font-kr);
+  color: var(--ink-900);
 }
 .note {
   font: var(--t-meta);
   color: var(--ink-500);
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1300px) {
   .grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 56px;
+    gap: 70px;
+  }
+  .stats {
+    max-width: 730px;
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 680px) {
   .section {
-    --story-pad: 72px;
+    padding-block: 90px;
+  }
+  .logo {
+    margin-top: 16px;
+  }
+  .wordmark {
+    font-size: 34px;
+  }
+  .title {
+    margin-top: 30px;
+    font: 600 15px/25px var(--font-kr);
+  }
+  .body {
+    font: 400 14px/25px var(--font-kr);
+  }
+  .btn {
+    margin-top: 24px;
+  }
+  .grid {
+    gap: 50px;
   }
   .stats {
-    gap: 12px;
+    gap: 10px;
   }
   .art {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 4px;
+    width: 44px;
+    height: 44px;
   }
   .value {
-    font: 700 40px/1 var(--font-num);
+    font-size: 35px;
+    line-height: 42px;
   }
   .unit {
-    font: 600 16px/1 var(--font-kr);
+    font-size: 15px;
   }
   .label {
-    font: 600 14px/20px var(--font-kr);
+    font: 400 14px/20px var(--font-kr);
   }
 }

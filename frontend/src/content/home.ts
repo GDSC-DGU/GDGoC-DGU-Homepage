@@ -8,6 +8,7 @@
 /** 첫 화면 사진 슬라이드. photo 는 content/photos.json 의 id (공개 동의가 있는 사진만) */
 export const HOME_SLIDES = {
   community: {
+    cate: 'About us',
     photo: '2024-05-16-open-seminar-group',
     title: '1기부터 {gen}기까지 이어 온 챕터',
     body: '{start}년 GDSC DGU로 시작해 해마다 9월에 새 기수를 엽니다.',
@@ -16,12 +17,14 @@ export const HOME_SLIDES = {
   },
   /** 다음 행사 (events.json 에서 G-Sprint · 행사 중 가장 가까운 것). 없으면 이 슬라이드는 빠진다 */
   next: {
+    cate: 'Upcoming',
     photo: '2023-12-22-closing-room',
     body: '{date}에 열립니다. 다른 일정은 소개 페이지에 모아 두었습니다.',
     action: '일정 보기',
     to: '/about#upcoming',
   },
   recruit: {
+    cate: 'Recruit',
     photo: '2023-09-15-welcome-group',
     title: '{next}기 모집',
     titleOpen: '{next}기 지원을 받고 있습니다',
@@ -72,6 +75,8 @@ export interface Activity {
 
 /** 2 하는 일: 큰 카드 다섯 장 (넓은 화면은 첫 줄 한 장 + 넓은 한 장, 둘째 줄 세 장) */
 export const HOME_ACTIVITIES = {
+  /** 제목 위 영문 이름표 (슈어소프트테크 '• Solution & Service •' 자리) */
+  eng: 'What We Do',
   title: '매주 모이고, 한 학기에 서비스 하나를 만듭니다',
   sub: '파트별 실습부터 팀 프로젝트, 멤버 발표, 다른 학교와 여는 행사까지 한 해 동안 이어집니다.',
   cards: [
@@ -122,6 +127,7 @@ export const HOME_ACTIVITIES = {
 
 /** 3 팀 프로젝트: 제목 · 한 줄은 PROJECTS_STORY (content/story.ts) 를 그대로 쓴다 */
 export const HOME_PROJECTS = {
+  eng: 'Projects',
   /** 넘기는 줄에 거는 수 (전부는 /archive) */
   limit: 12,
   more: '전체 보기',
@@ -135,6 +141,7 @@ export const HOME_PROJECTS = {
 
 /** 4 소개 한 문단 + 숫자 셋 */
 export const HOME_ABOUT = {
+  eng: 'About GDGoC DGU',
   title: '{start}년부터 이어 온 동국대학교 개발자 커뮤니티',
   body: 'Google Developer Groups on Campus는 Google 개발자 기술에 관심 있는 대학생 커뮤니티입니다. GDGoC DGU는 그 동국대학교 챕터로, 전공과 학년에 상관없이 함께 배우고 만듭니다.',
   action: '소개 보기',
@@ -147,6 +154,7 @@ export const HOME_ABOUT = {
 
 /** 5 지원 띠 */
 export const HOME_JOIN = {
+  eng: 'Join us',
   title: 'GDGoC DGU와 함께 시작해 보세요',
   sub: '{next}기 모집과 행사 소식은 인스타그램 {handle}에 가장 먼저 올라옵니다.',
   apply: '지원서 쓰기',

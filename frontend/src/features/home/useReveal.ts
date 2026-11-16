@@ -1,50 +1,23 @@
-import { useEffect, useLayoutEffect, useState, type CSSProperties, type RefObject } from 'react'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import { useEffect, useLayoutEffect, useState, type RefObject } from 'react'
 
 /**
- * 떠오르기 (슈어소프트테크 AOS fade-up, 4기 Organizer 2026-11-16) 를 붙이는 속성.
- * <h2 {...aos(250)}> 처럼 쓴다. 늦출 시간(ms)은 그 사이트 값: 제목 250 · 내용 300 · 그다음 350 · 400 · 500.
+ * 떠오르기 (슈어소프트테크와 같이 AOS fade-up, 4기 Organizer 2026-11-16) 를 붙이는 속성.
+ * <h2 {...aos(250)}> 처럼 쓴다. 그 사이트 값: 0.7초, 한 번만, 늦춤은 제목 250 · 내용 300 · 그다음 350 · 400 · 500ms.
  */
-export function aos(delay: number): { 'data-aos': ''; style: CSSProperties } {
-  return { 'data-aos': '', style: { ['--reveal-delay' as string]: `${delay}ms` } }
+export function aos(delay: number) {
+  return { 'data-aos': 'fade-up', 'data-aos-duration': '700', 'data-aos-delay': String(delay), 'data-aos-once': 'true' } as const
 }
 
-/** AOS 기본값: 요소 윗변이 화면 아래에서 120px 올라왔을 때 나타난다 */
-export const REVEAL_OFFSET = 120
-
 /**
- * 홈 전체에 떠오르기를 켠다 (HomePage 에서 한 번). main 에 data-reveal-on 을 달아 [data-aos] 를 숨기고,
- * 화면에 들어오는 대로 .aos-animate 를 붙인다. 한 번 나타나면 떼지 않는다 (AOS once).
- * '동작 줄이기' · IntersectionObserver 없음이면 아무것도 하지 않는다 (처음부터 보인다).
- * 그리기 전에(useLayoutEffect) 숨겨서, 처음 화면 안에 있는 것도 깜빡이지 않고 떠오른다.
+ * 홈에서 AOS 를 켠다 (HomePage 에서 한 번). 그 사이트처럼 기본값(화면 아래 120px, ease)으로 init → refresh.
+ * '동작 줄이기'면 AOS 가 data-aos 를 지워 처음부터 보이게 한다 (disable).
  */
 export function useReveal() {
-  useLayoutEffect(() => {
-    const main = document.getElementById('main')
-    if (!main) return
-    if (typeof IntersectionObserver === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    main.dataset.revealOn = ''
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (!e.isIntersecting) continue
-          e.target.classList.add('aos-animate')
-          io.unobserve(e.target)
-        }
-      },
-      { rootMargin: `0px 0px -${REVEAL_OFFSET}px 0px` },
-    )
-    const watch = () => {
-      for (const el of main.querySelectorAll('[data-aos]:not(.aos-animate)')) io.observe(el)
-    }
-    watch()
-    // 데이터가 늦게 와서 섹션이 나중에 생겨도 잡는다
-    const mo = new MutationObserver(watch)
-    mo.observe(main, { childList: true, subtree: true })
-    return () => {
-      io.disconnect()
-      mo.disconnect()
-      delete main.dataset.revealOn
-    }
+  useEffect(() => {
+    AOS.init({ disable: () => window.matchMedia('(prefers-reduced-motion: reduce)').matches })
+    AOS.refresh()
   }, [])
 }
 

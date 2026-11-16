@@ -18,16 +18,8 @@
   flex: 1;
   min-width: 0;
   height: 32px;
-  overflow: hidden;
-}
-.track {
   margin: 0;
-  padding: 0;
-  list-style: none;
-  transition: transform var(--dur-ticker) var(--ease-reveal);
-}
-.track[data-instant] {
-  transition: none;
+  overflow: hidden;
 }
 .item {
   display: flex;
@@ -123,8 +115,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .track {
-    transition: none;
-  }
-}

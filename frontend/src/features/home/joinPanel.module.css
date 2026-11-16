@@ -1,32 +1,28 @@
-/* 5 지원 띠 (슈어소프트테크 'Contact'): 틀 안 둥근 먹색 판, 위쪽 가운데에 주황 빛이 번진다 */
+/* 5 지원 띠 (슈어소프트테크 'Contact'): 양옆 3% · 모서리 30 (폰 20) · 위아래 160 (폰 90), 먹색 위 주황 빛 */
 .section {
-  padding-bottom: 120px;
+  padding: 0 3vw 160px;
 }
 .panel {
-  position: relative;
   display: grid;
   justify-items: center;
-  gap: 16px;
-  padding: 88px 32px;
+  padding: 160px max(20px, 5vw);
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 30px;
   background:
     radial-gradient(60% 90% at 50% 0%, color-mix(in srgb, var(--gen) 34%, transparent) 0%, color-mix(in srgb, var(--gen) 0%, transparent) 70%),
     var(--band-bg);
   text-align: center;
 }
-.title {
-  margin: 0;
-  font: var(--t-display);
-  letter-spacing: var(--ls-display);
-  color: var(--ink-900);
-  text-wrap: balance;
+/* 머리(이름표 + 제목) 아래 여백은 한 줄이 받는다 */
+.panel > header {
+  margin-bottom: 0;
 }
 .sub {
-  max-width: 36rem;
-  margin: 0;
-  font: var(--t-lead);
-  color: var(--ink-700);
+  max-width: 40rem;
+  margin: 15px 0 0;
+  font: 400 18px/32px var(--font-kr);
+  letter-spacing: -0.54px;
+  color: color-mix(in srgb, var(--band-ink) 70%, transparent);
   text-wrap: pretty;
 }
 .actions {
@@ -34,21 +30,22 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 50px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 680px) {
   .section {
-    padding-bottom: 72px;
+    padding: 0 3vw 90px;
   }
   .panel {
-    padding: 56px 20px;
+    padding: 90px 20px;
     border-radius: 20px;
   }
-  .title {
-    font: 700 28px/38px var(--font-kr);
-  }
   .sub {
-    font: 400 16px/26px var(--font-kr);
+    margin-top: 10px;
+    font: 400 14px/25px var(--font-kr);
+  }
+  .actions {
+    margin-top: 30px;
   }
 }
