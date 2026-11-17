@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gdghomepage.vercel.app/sitemap.xml
+Sitemap: https://gdgoc-dgu.com/sitemap.xml

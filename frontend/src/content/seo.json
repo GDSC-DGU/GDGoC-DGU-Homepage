@@ -1,6 +1,6 @@
 {
   "note": "주소별 검색 · 공유 문구. 빌드 뒤 scripts/route-html.mjs 가 dist/index.html 을 바탕으로 주소마다 <주소>.html 을 만든다 (title · description · og · canonical). title 은 화면의 usePageTitle 과 같아야 한다 (seo.test.ts). 주소를 더하면 public/sitemap.xml 에도 더한다.",
-  "origin": "https://gdghomepage.vercel.app",
+  "origin": "https://gdgoc-dgu.com",
   "routes": [
     {
       "path": "/",
