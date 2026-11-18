@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
 import { SITE } from '@/config/site'
 import { CHAPTER } from '@/content'
 import { BRAND_PATHS } from './brandPaths'
@@ -42,7 +41,7 @@ const CHANNELS: Channel[] = (
 /**
  * 꼬리말 (4기 Figma 시안 2026-11): 옅은 회색 띠.
  * 왼쪽 이름 · 주소 · 저작권 | 오른쪽 '채널 바로가기' 아이콘 줄 (메일 · 인스타그램 · GitHub · 유튜브 · 디스코드).
- * 운영진 로그인은 오른쪽 아래 구석에 숨겨 두고, 키보드로 닿거나 마우스를 올리면 보인다.
+ * 관리자 로그인 링크는 두지 않는다 (F-COM-002: 머리말에서 로그인한 뒤 '관리자 페이지' 버튼).
  */
 export function SiteFooter() {
   return (
@@ -77,10 +76,6 @@ export function SiteFooter() {
           </ul>
         </nav>
 
-        {/* 관리자 화면 (예시 화면 · 예시 데이터). 평소에는 보이지 않고, 초점이 오거나 마우스를 올리면 보인다 */}
-        <Link className={s.admin} to="/admin/login">
-          운영진 로그인
-        </Link>
       </div>
     </footer>
   )

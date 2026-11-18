@@ -252,12 +252,142 @@
   }
 }
 
+/*
+ * 로그인 자리 (F-COM-001): 검색 · 전체 메뉴 그림 왼쪽.
+ * 로그인 전 [로그인] 글자 버튼 (메뉴 아래 칸과 같은 15 · 600). 로그인하면 이름 버튼 하나(1440 미만은 사람 그림만)를 누르면
+ * 흰 판이 펼쳐진다: 이름 · 관리 유형 · (관리자 페이지) · 로그아웃. 가운데 메뉴가 벌어져도 겹치지 않는 폭.
+ */
+.account,
+.accountToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0 -10px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  font: var(--t-ui);
+  color: var(--ink-900);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.account:active,
+.accountToggle:active {
+  transform: scale(var(--press));
+}
+.accountMenu {
+  position: relative;
+}
+.accountIcon {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.accountToggleName {
+  max-width: 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.accountCaret {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-hover) var(--ease);
+}
+.accountToggle[aria-expanded='true'] .accountCaret {
+  transform: rotate(180deg);
+}
+.accountPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -10px;
+  display: grid;
+  min-width: 200px;
+  padding: 8px;
+  border-radius: var(--r-card);
+  background: var(--white);
+  box-shadow: var(--shadow-float), 0 0 0 1px var(--line);
+}
+.accountPanel[hidden] {
+  display: none;
+}
+.accountPanelName {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 6px;
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid var(--line);
+  font: 600 16px/24px var(--font-kr);
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+.accountPanelRole {
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.accountPanelItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-900);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.accountPanelItem:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+@media (hover: hover) {
+  .account:hover {
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+  }
+  .accountPanelItem:not(:disabled):hover {
+    background: var(--subtle);
+  }
+}
+/* 1440 미만: 이름 · 화살표는 숨기고 사람 그림만 (가운데 메뉴가 벌어질 자리를 비운다) */
+@media (max-width: 1439px) {
+  .accountToggleName,
+  .accountCaret {
+    display: none;
+  }
+}
+@media (min-width: 1440px) {
+  .accountIcon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
 @media (max-width: 767px) {
   .brandLogo {
     height: 24px;
   }
   .tools {
     gap: 26px;
+  }
+  .accountIcon {
+    width: 22px;
+    height: 22px;
   }
   .iconBtn svg {
     width: 22px;
@@ -584,28 +714,6 @@
     background: var(--line);
     color: var(--ink-900);
   }
-}
-
-/* 운영진 로그인: 오른쪽 아래 구석. 평소 보이지 않고, 키보드 초점이 오거나 마우스를 올리면 보인다 */
-.admin {
-  position: absolute;
-  right: var(--side-r);
-  bottom: -40px;
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 0 4px;
-  font: 500 13px/20px var(--font-kr);
-  color: var(--ink-700);
-  text-decoration: none;
-  opacity: 0;
-  transition: opacity var(--dur-hover) var(--ease);
-}
-.admin:hover,
-.admin:focus-visible {
-  opacity: 1;
-  text-decoration-line: underline;
-  text-underline-offset: 3px;
 }
 
 @media (max-width: 767px) {
