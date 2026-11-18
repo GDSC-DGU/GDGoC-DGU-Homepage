@@ -11,19 +11,30 @@ public class AuthService {
 
     private final GoogleTokenVerifier googleTokenVerifier;
     private final LoginMemberRepository loginMemberRepository;
+    private final LoginSessionIssuer sessionIssuer;
 
-    public AuthService(GoogleTokenVerifier googleTokenVerifier, LoginMemberRepository loginMemberRepository) {
+    public AuthService(GoogleTokenVerifier googleTokenVerifier, LoginMemberRepository loginMemberRepository,
+                       LoginSessionIssuer sessionIssuer) {
         this.googleTokenVerifier = googleTokenVerifier;
         this.loginMemberRepository = loginMemberRepository;
+        this.sessionIssuer = sessionIssuer;
     }
 
-    public void verifyLoginMember(String idToken) {
+    LoginSession loginWithGoogle(String idToken) {
         String googleSubject = verifyGoogleToken(idToken);
-        boolean active = loginMemberRepository.findActiveStatusByGoogleSubject(googleSubject)
+        return loginMemberRepository.createSessionForGoogleSubject(googleSubject, this::issueForActiveMember)
                 .orElseThrow(() -> new ApiException(AuthErrorCode.GOOGLE_ACCOUNT_NOT_LINKED));
-        if (!active) {
+    }
+
+    private LoginSession issueForActiveMember(LoginMember member) {
+        if (!member.active()) {
             throw new ApiException(AuthErrorCode.USER_INACTIVE);
         }
+        if (member.name() == null || member.name().isBlank()
+                || (!"ADMIN".equals(member.role()) && !"GENERAL".equals(member.role()))) {
+            throw new IllegalStateException("Firestore 회원의 이름 또는 관리 유형을 읽을 수 없습니다.");
+        }
+        return sessionIssuer.issue(member);
     }
 
     private String verifyGoogleToken(String idToken) {

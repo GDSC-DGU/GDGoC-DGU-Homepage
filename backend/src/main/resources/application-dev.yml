@@ -1,4 +1,8 @@
 # dev: Cloud Run gdgoc-dgu-dev (staging) 에서 쓰는 프로필
+app:
+  auth:
+    allowed-origins: "${AUTH_ALLOWED_ORIGINS:https://dev.gdgoc-dgu.com}"
+
 server:
   forward-headers-strategy: framework   # 프록시(Cloud Run) 뒤에서 원래 요청 주소 · https 인식
 
