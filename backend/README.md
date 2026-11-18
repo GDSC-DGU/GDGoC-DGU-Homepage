@@ -34,7 +34,7 @@ npx firebase-tools@15.36.0 emulators:start --only firestore --project demo-gdgoc
 - 데이터 확인 화면: http://localhost:4000/firestore
 - 에뮬레이터를 끄면 데이터가 사라집니다.
 - 다른 주소의 에뮬레이터를 쓰려면 환경변수 `FIRESTORE_EMULATOR_HOST`(예: `localhost:8180`)를 지정합니다.
-- `FirestoreEmulatorConnectionTest`는 에뮬레이터가 켜져 있을 때만 실행되고, 꺼져 있으면 건너뜁니다.
+- `FirestoreEmulatorConnectionTest`는 에뮬레이터가 켜져 있을 때만 실행되고, 꺼져 있으면 건너뜁니다. CI(`ci-backend.yml`)는 에뮬레이터를 띄운 채 테스트하므로 항상 실행됩니다.
 
 dev · prod 프로필은 Cloud Run 서비스 계정(ADC)으로 각 GCP 프로젝트(dev: `dev-gdgoc-dgu-homepage`, prod: `gdgoc-dgu-homepage`)의 Firestore에 연결합니다. 서비스 계정 키 파일은 쓰지 않습니다.
 
