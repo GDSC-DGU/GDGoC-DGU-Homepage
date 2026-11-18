@@ -5665,6 +5665,7 @@ paths:
                           type: string
                 privacyConsent:
                   type: boolean
+                  description: 개인정보 수집 · 이용 동의. 지원서 답변의 AI 채점 활용 동의를 포함합니다. `true`여야 제출됩니다.
                 formVersion:
                   type: integer
             example:
@@ -7608,17 +7609,22 @@ paths:
                 startAt:
                   type: string
                   format: date-time
+                  description: 10분 단위만 허용 (예 `14:00`, `14:10`)
                 durationMin:
                   type: integer
+                  default: 30
+                  description: 면접 시간(분). 생략하면 30
                 location:
                   type: string
                 interviewers:
                   type: array
+                  minItems: 1
+                  description: 면접관 userId. 활성 운영진(`ADMIN`)만, 1명 이상
                   items:
                     type: string
             example:
               startAt: '2027-03-10T14:00:00+09:00'
-              durationMin: 20
+              durationMin: 30
               location: 신공학관 3층
               interviewers:
                 - usr_001
@@ -7629,6 +7635,10 @@ paths:
 
         **상세 규칙**
 
+        - `durationMin`을 생략하면 30분으로 봅니다.
+        - `startAt`은 10분 단위만 허용합니다. 아니면 `VALIDATION_FAILED`.
+        - `interviewers`는 활성 운영진(`ADMIN`)만, 1명 이상이어야 합니다. 아니면 `VALIDATION_FAILED`.
+        - 겹침 검사: `startAt`부터 `startAt + durationMin`까지를 면접 시간으로 보고, 같은 면접관의 다른 면접 시간과 겹치면 `SLOT_CONFLICT`.
         - 서류 합격 메일을 이미 보낸 지원자의 일정을 바꾸면 `noticeRequired: true`를 돌려줍니다. 변경 안내는 운영진이 따로 합니다.
       parameters:
         - name: aid
@@ -7669,6 +7679,18 @@ paths:
                   aid: a_7f3c
                   interviewAt: '2027-03-10T14:00:00+09:00'
                   noticeRequired: false
+        '400':
+          description: 10분 단위가 아닌 시작 시각 · 면접관 없음 · 활성 운영진이 아닌 면접관
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                VALIDATION_FAILED:
+                  value:
+                    success: false
+                    code: VALIDATION_FAILED
+                    message: 입력 값을 확인해주세요.
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -7901,6 +7923,7 @@ paths:
         - 제외: 결과 미정, 서류 합격인데 면접 일정 없음, 이미 발송 성공, 삭제됨.
         - `FINAL` 발송 조건은 **회원 등록 여부**(RCT-027의 `CREATED` · `ALREADY_MEMBER`)입니다. 초대 메일 성공 여부는 보지 않습니다.
         - 발송 당시 템플릿 버전을 작업에 고정합니다.
+        - (선택) 일일 발송 한도: 미리보기에서 발송 대상 수가 Gmail 일일 한도(약 500명)를 넘으면 `quotaWarning`을 넣습니다. 지금 규모(약 120명)에서는 거의 걸리지 않습니다.
       parameters:
         - name: rid
           in: path
@@ -7959,6 +7982,17 @@ paths:
                               type: string
                             body:
                               type: string
+                      quotaWarning:
+                        type: object
+                        nullable: true
+                        description: (선택) 발송 대상이 일일 한도를 넘을 때만. 아니면 `null` 또는 생략
+                        properties:
+                          total:
+                            type: integer
+                            description: 발송 대상 수
+                          dailyLimit:
+                            type: integer
+                            description: 일일 발송 한도
               example:
                 success: true
                 data:
@@ -8090,6 +8124,7 @@ paths:
                               type: string
                             error:
                               type: string
+                              description: '실패 사유. `MAIL_AUTH_FAILED`면 Gmail 계정 재연결이 필요합니다(RCT-029).'
               example:
                 success: true
                 data:
@@ -8459,8 +8494,11 @@ paths:
         **상세 규칙**
 
         - 호출 주체: Cloud Tasks 큐 `mail`, 서비스 계정 OIDC 토큰.
+        - 발송 방식: 동아리 Gmail 계정으로 Gmail API를 씁니다(OAuth, `gmail.send` 권한). 발신 · 회신 주소는 동아리 대표 이메일입니다.
+        - 발송 속도: `mail` 큐에 속도 제한(초당 발송 수 · 동시 실행 수)을 둡니다.
         - 이미 `SENT`면 `SKIPPED`. 발송 성공 시 그 전형의 `resultFixed = true`(RCT-019 표 참고).
         - 주소 오류 같은 영구 실패는 `FAILED`로 기록하고 200을 돌려 재시도하지 않습니다.
+        - 인증 오류(토큰 만료 · 권한 해제)도 재시도하지 않고 `FAILED`로 기록합니다. 실패 사유는 `MAIL_AUTH_FAILED`로 따로 두고, RCT-025에서 운영진에게 Gmail 계정 재연결이 필요하다고 알립니다.
       security:
         - serviceAccount: []
       responses:
@@ -8486,6 +8524,10 @@ paths:
                         enum:
                           - SENT
                           - SKIPPED
+                          - FAILED
+                      error:
+                        type: string
+                        description: '`FAILED`일 때만. 예 `INVALID_EMAIL`, `MAIL_AUTH_FAILED`'
               example:
                 success: true
                 data:
