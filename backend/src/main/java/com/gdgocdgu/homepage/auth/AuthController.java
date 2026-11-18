@@ -21,12 +21,13 @@ public class AuthController {
 
     @PostMapping("/google")
     public ResponseEntity<Void> loginWithGoogle(@Valid @RequestBody GoogleLoginRequest request) {
-        authService.verifyGoogleToken(request.idToken());
+        authService.verifyLoginMember(request.idToken());
 
-        // 다음 단계에서 검증한 Google 계정 ID로 회원을 조회하고 로그인 세션을 발급한다.
+        // 활성 회원까지 확인했다. 세션 발급 전까지는 501을 반환한다.
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
+    // idToken이 없거나 비어 있으면 요청 검증 단계에서 400을 반환한다.
     public record GoogleLoginRequest(@NotBlank String idToken) {
     }
 }

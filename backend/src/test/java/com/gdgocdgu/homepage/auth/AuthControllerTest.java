@@ -15,6 +15,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+// Google 클라이언트 ID가 없는 상태로 테스트한다.
 @SpringBootTest(properties = "GOOGLE_CLIENT_ID=")
 @AutoConfigureMockMvc
 class AuthControllerTest {
@@ -44,7 +45,6 @@ class AuthControllerTest {
 
     @Test
     void 발급_대상을_숫자로_보낸_토큰이면_401을_반환한다() throws Exception {
-        // 발급 대상의 형식이 틀린 토큰은 공개 키 조회 전에 거절해야 한다.
         mockMvc.perform(post("/api/v1/auth/google")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tokenRequestWithAudience("123")))
@@ -61,6 +61,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"));
     }
 
+    // 발급 대상(aud)을 바꿔 넣을 수 있는 가짜 토큰을 만든다.
     private static String tokenRequestWithAudience(String audienceJson) {
         long now = Instant.now().getEpochSecond();
         String payload = """

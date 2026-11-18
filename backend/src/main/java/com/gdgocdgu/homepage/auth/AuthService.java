@@ -1,7 +1,6 @@
 package com.gdgocdgu.homepage.auth;
 
 import com.gdgocdgu.homepage.common.error.ApiException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -11,18 +10,29 @@ import java.security.GeneralSecurityException;
 public class AuthService {
 
     private final GoogleTokenVerifier googleTokenVerifier;
+    private final LoginMemberRepository loginMemberRepository;
 
-    public AuthService(@Value("${GOOGLE_CLIENT_ID:}") String googleClientId) {
-        this.googleTokenVerifier = new GoogleTokenVerifier(googleClientId);
+    public AuthService(GoogleTokenVerifier googleTokenVerifier, LoginMemberRepository loginMemberRepository) {
+        this.googleTokenVerifier = googleTokenVerifier;
+        this.loginMemberRepository = loginMemberRepository;
     }
 
-    public String verifyGoogleToken(String idToken) {
+    public void verifyLoginMember(String idToken) {
+        String googleSubject = verifyGoogleToken(idToken);
+        boolean active = loginMemberRepository.findActiveStatusByGoogleSubject(googleSubject)
+                .orElseThrow(() -> new ApiException(AuthErrorCode.GOOGLE_ACCOUNT_NOT_LINKED));
+        if (!active) {
+            throw new ApiException(AuthErrorCode.USER_INACTIVE);
+        }
+    }
+
+    private String verifyGoogleToken(String idToken) {
         try {
-            // 검증 결과가 비어 있으면 공통 예외 처리기를 통해 401 응답을 보낸다.
+            // 검증 결과가 비어 있으면 토큰 오류(401)로 처리한다.
             return googleTokenVerifier.verify(idToken)
                     .orElseThrow(() -> new ApiException(AuthErrorCode.INVALID_GOOGLE_TOKEN));
         } catch (IOException | GeneralSecurityException e) {
-            // 공개 키 조회 등 검증 과정의 장애는 사용자 토큰 오류와 구분한다.
+            // 공개 키 조회 실패 등은 서버 오류(500)로 처리한다.
             throw new IllegalStateException("Google ID 토큰 검증을 완료할 수 없습니다.", e);
         }
     }
