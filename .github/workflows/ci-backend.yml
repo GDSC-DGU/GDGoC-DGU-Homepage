@@ -1,0 +1,46 @@
+# backend/ 변경 시 빌드 · 테스트를 검사합니다. (Homepage-BE가 작성 · 관리)
+# - Firestore 에뮬레이터를 띄운 채로 ./gradlew test 를 실행합니다. 테스트가 끝나면 에뮬레이터도 내려갑니다.
+# - 파트별 CI는 필수 체크에 넣지 않습니다. (RULEBOOKS/repo-settings.md 3번)
+# - Java 버전은 backend/build.gradle 의 toolchain과, firebase-tools 버전은 backend/README.md 의 실행 명령과 같게 유지하세요.
+name: ci-backend
+
+on:
+  pull_request:
+    branches: [develop, main]
+    paths: ["backend/**", "infra/firebase/**", ".github/workflows/ci-backend.yml"]
+  push:
+    branches: [develop]
+    paths: ["backend/**", "infra/firebase/**", ".github/workflows/ci-backend.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # build.gradle 의 toolchain(Java 25)과 맞출 것. Firestore 에뮬레이터도 이 Java로 실행됩니다.
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: gradle
+          cache-dependency-path: |
+            backend/*.gradle*
+            backend/gradle/wrapper/gradle-wrapper.properties
+      # backend/README.md 의 에뮬레이터 실행 명령과 같은 버전을 쓸 것
+      - name: test (Firestore emulator)
+        working-directory: infra/firebase
+        run: >-
+          npx --yes firebase-tools@15.36.0 emulators:exec
+          --only firestore --project demo-gdgoc
+          "cd ../../backend && ./gradlew test --no-daemon --console=plain"
