@@ -30,7 +30,7 @@ $env:GOOGLE_CLIENT_ID = '여기에 Google OAuth 웹 클라이언트 ID 입력'
 
 ### Google 로그인 회원 조회 확인
 
-- [로그인용 Firestore 회원 문서](docs/firestore-users.md)에서 컬렉션, 필드 타입, 테스트 데이터 예시를 확인할 수 있습니다.
+- [Firestore 데이터 모델의 AUTH-OPS 섹션](docs/firestore-data-model.md#auth-ops)에서 회원 컬렉션과 필드 타입을 확인할 수 있습니다.
 - 로컬 Firestore를 쓸 때는 `FIRESTORE_EMULATOR_HOST`에 에뮬레이터 주소(예: `localhost:8180`)를, `GOOGLE_CLOUD_PROJECT`에 에뮬레이터의 프로젝트 ID를 설정합니다.
 - `AUTH_USERS_COLLECTION`, `AUTH_GOOGLE_SUB_FIELD`, `AUTH_USER_ACTIVE_FIELD`는 회원 컬렉션, Google 계정 ID(`sub`) 필드, 활성 여부 필드 이름입니다. 활성 여부 필드는 Firestore의 Boolean 값(`true` 또는 `false`)이어야 합니다.
 - 실제 Google 토큰과 Firestore 없이 회원 조회 분기를 확인하려면 `backend/`의 PowerShell에서 `./gradlew.bat test --tests "*AuthMemberLookupTest"`를 실행합니다.
