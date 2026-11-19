@@ -7,6 +7,8 @@ class ErrorCode(Enum):
     VALIDATION_FAILED = (422, "요청 형식이 올바르지 않습니다.")
     NOT_FOUND = (404, "요청한 대상을 찾을 수 없습니다.")
     METHOD_NOT_ALLOWED = (405, "지원하지 않는 요청 방식입니다.")
+    MODEL_UNAVAILABLE = (503, "AI 모델을 일시적으로 사용할 수 없습니다.")
+    MODEL_REQUEST_REJECTED = (500, "AI 모델이 요청을 거부했습니다.")
     MODEL_OUTPUT_INVALID = (502, "채점 결과 형식이 올바르지 않습니다.")
     INTERNAL_ERROR = (500, "서버 오류가 발생했습니다.")
 

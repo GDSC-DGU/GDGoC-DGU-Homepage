@@ -1,0 +1,46 @@
+# ai/ 변경 시 린트 · 테스트 · Docker 이미지 빌드를 검사합니다. (Homepage-AI가 작성 · 관리)
+# - ruff check / ruff format --check / pytest 를 uv 로 실행하고, 이미지는 빌드만 합니다 (push · 로그인 없음).
+# - 파트별 CI는 필수 체크에 넣지 않습니다. (RULEBOOKS/repo-settings.md 3번)
+# - uv 버전은 ai/Dockerfile 의 uv 이미지 버전과 항상 같게 유지하세요.
+name: ci-ai
+
+on:
+  pull_request:
+    branches: [develop, main]
+    paths: ["ai/**", ".github/workflows/ci-ai.yml"]
+  push:
+    branches: [develop]
+    paths: ["ai/**", ".github/workflows/ci-ai.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ai
+    env:
+      # setup-python 이 설치한 인터프리터를 쓰고, uv 가 따로 내려받지 않게 합니다.
+      UV_PYTHON_DOWNLOADS: never
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: ai/.python-version
+      # ai/Dockerfile 의 uv 버전과 맞출 것
+      - run: python -m pip install "uv==0.13.8"
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -q
+      - run: docker build -t gdgoc-ai:ci .

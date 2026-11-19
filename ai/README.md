@@ -48,18 +48,41 @@ docker build -t gdgoc-ai ai                      # 이미지 빌드 (레포 루�
 ```
 
 - `APP_ENV`가 `local`일 때만 `/docs`가 열립니다. 기본값은 `local`입니다.
-- 채점 모델은 가짜 클라이언트(`GRADING_CLIENT=fake`)만 연결되어 있습니다.
+- 기본값은 가짜 채점 클라이언트(`GRADING_CLIENT=fake`)이며 네트워크를 쓰지 않습니다.
+- 실제 모델(Gemini)을 로컬에서 쓰려면 루트 `.env.example`을 `.env`로 복사해 `AI_STUDIO_KEY`에 개인 AI Studio 키를 넣고 `GRADING_CLIENT=gemini`로 바꿉니다. 로컬에서는 가짜 데이터만 보냅니다.
+- `dev` · `prod`는 `GRADING_CLIENT=gemini`, `GEMINI_BACKEND=vertex`만 허용하며 Vertex는 ADC로 인증합니다.
+- 채점 지시문은 `GRADING_PROMPT_PATH`의 파일에서 읽습니다. 로컬은 `scripts/seed/prompts/grading.local.yaml`(예시)을 쓰고, 운영은 Secret Manager 값을 파일로 마운트합니다.
+
+## 환경변수
+
+`ai/`에서 실행하면 루트 `.env`를 읽습니다. 값이 비어 있으면 설정하지 않은 것으로 봅니다.
+
+| 이름 | 기본값 | 설명 |
+|---|---|---|
+| `APP_ENV` | `local` | `local` · `dev` · `prod` |
+| `GRADING_CLIENT` | `fake` | `fake` · `gemini` |
+| `GEMINI_BACKEND` | `ai_studio` | `ai_studio` · `vertex` |
+| `AI_STUDIO_KEY` | - | AI Studio 키 (`ai_studio`일 때 필수, 로컬 전용) |
+| `GOOGLE_CLOUD_PROJECT` | - | GCP 프로젝트 (`vertex`일 때 필수) |
+| `GOOGLE_CLOUD_LOCATION` | `global` | Vertex 위치 |
+| `GEMINI_MODEL` | `gemini-3.8-flash` | 모델 이름 |
+| `GEMINI_THINKING_LEVEL` | `medium` | `low` · `medium` · `high` |
+| `GEMINI_TIMEOUT_SECONDS` | `90` | 모델 호출 제한 시간 (0 초과 600 이하) |
+| `GRADING_PROMPT_PATH` | - | 채점 지시문 YAML 경로 (`gemini`일 때 필수, `ai/` 기준) |
+| `LOG_DIR` | `logs` | 로컬 로그 폴더 (`local`에서만 사용, `ai/` 기준) |
+
+`local`로 실행하면 서버 로그를 `ai/logs/ai-local.log`에도 남깁니다. 요청 내용 없이 호출 메타데이터만 담기며, 매일 새 파일로 넘어가고 14일치만 보관합니다. dev · prod에서는 파일을 만들지 않습니다.
 
 ## 폴더 구조
 
 ```
 ai/
 ├─ app/
-│  ├─ main.py          앱 생성, router · 예외 처리기 등록
+│  ├─ main.py          앱 생성, router · 예외 처리기 등록, 종료 시 모델 클라이언트 정리
 │  ├─ config.py        환경변수 설정
 │  ├─ common/          공통 응답 · 에러 코드 · 예외 처리기
 │  ├─ health/          GET /health
-│  └─ grading/         POST /grading (router · service · schemas · client · dependencies)
+│  └─ grading/         POST /grading (router · service · schemas · client · prompt · dependencies)
 ├─ tests/
 ├─ Dockerfile
 └─ pyproject.toml · uv.lock

@@ -41,6 +41,23 @@ $env:GOOGLE_CLIENT_ID = '여기에 Google OAuth 웹 클라이언트 ID 입력'
 - `AUTH_ACCESS_TOKEN_SECRET`에는 무작위 32바이트 이상을 Base64로 인코딩한 값을 설정합니다. Git Bash에서 `openssl rand -base64 32`로 생성할 수 있습니다. VS Code로 실행한다면 로컬 `.env`에 키를 두고 실행 설정에 `"envFile": "${workspaceFolder}/.env"`를 지정합니다. 배포 환경에서는 환경별 비밀값을 사용합니다.
 - 브라우저 출처는 local에서 `http://localhost:5173`과 `http://127.0.0.1:5173`, dev와 prod에서 각 홈페이지 주소를 허용합니다. 필요하면 `AUTH_ALLOWED_ORIGINS`에 쉼표로 구분한 주소를 설정합니다. refresh 쿠키는 local에서 HTTP 테스트를 지원하고, dev와 prod에서는 `Secure`가 적용됩니다.
 
+### Firestore 에뮬레이터
+
+local 프로필은 Firestore 에뮬레이터(`localhost:8180`, 프로젝트 `demo-gdgoc`)에 연결합니다. 실제 Firestore에는 닿지 않습니다. 에뮬레이터를 켜지 않아도 서버는 뜨지만, DB를 쓰는 API는 실패합니다.
+
+에뮬레이터는 `infra/firebase/` 폴더에서 실행합니다. Node.js와 Java 21 이상이 필요합니다.
+
+```bash
+npx firebase-tools@15.36.0 emulators:start --only firestore --project demo-gdgoc
+```
+
+- 데이터 확인 화면: http://localhost:4000/firestore
+- 에뮬레이터를 끄면 데이터가 사라집니다.
+- 다른 주소의 에뮬레이터를 쓰려면 환경변수 `FIRESTORE_EMULATOR_HOST`(예: `localhost:8180`)를 지정합니다.
+- `FirestoreEmulatorConnectionTest`는 에뮬레이터가 켜져 있을 때만 실행되고, 꺼져 있으면 건너뜁니다. CI(`ci-backend.yml`)는 에뮬레이터를 띄운 채 테스트하므로 항상 실행됩니다.
+
+dev · prod 프로필은 Cloud Run 서비스 계정(ADC)으로 각 GCP 프로젝트(dev: `dev-gdgoc-dgu-homepage`, prod: `gdgoc-dgu-homepage`)의 Firestore에 연결합니다. 서비스 계정 키 파일은 쓰지 않습니다.
+
 ### 필요한 것
 
 - **Java 17 이상**이 PC에 하나 설치되어 있어야 합니다. `./gradlew` 자체를 실행하는 데 씁니다.

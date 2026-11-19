@@ -3,7 +3,7 @@
 > 2026-11-01 1단계(기초). 기준: 팀 명세서 v1.2 (화면 P-ACM · ABD · APJ · ACT · AMB · ARC, 기능 F-ACM~F-ARC, API-ACM~API-ARC).
 > 만들 때 쓰는 쪽지(부품 사용 예 · 폴더 약속): [`src/features/admin/README.md`](../src/features/admin/README.md).
 
-관리자 화면은 **서버 없이 예시 데이터로만 동작하는 예시 화면**입니다. 공개 사이트(gdghomepage.vercel.app/admin)에서도 열리므로 모든 화면에 '예시 화면 · 예시 데이터'가 보이고, 로그인 화면은 실제 계정을 받지 않습니다.
+관리자 화면은 **서버 없이 예시 데이터로만 동작하는 예시 화면**입니다. 공개 사이트(gdgoc-dgu.com/admin)에서도 열리므로 모든 화면에 '예시 화면 · 예시 데이터'가 보이고, 로그인 화면은 실제 계정을 받지 않습니다.
 나중에 서버가 생기면 화면은 그대로 두고 데이터 창구(Repository)만 http 구현으로 바꿉니다.
 
 ## 1. 구조
