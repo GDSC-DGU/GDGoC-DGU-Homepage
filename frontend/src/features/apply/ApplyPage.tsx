@@ -391,6 +391,7 @@ function ConsentBox({ value, error, onChange }: { value: Consents; error?: strin
         <summary>AI 자동 채점 안내 보기</summary>
         <ul className={s.policyList}>
           <li>AI에는 평가 항목에 해당하는 응답만 보냅니다. 이름 · 학번 · 학과 · 이메일은 보내지 않습니다.</li>
+          <li>AI(Google Gemini)에 보낸 응답은 Google의 AI 학습이나 서비스 개선에 쓰이지 않습니다.</li>
           <li>점수는 운영진이 검토할 때 참고하는 점수이며, 합격 여부는 운영진이 결정합니다.</li>
         </ul>
       </details>

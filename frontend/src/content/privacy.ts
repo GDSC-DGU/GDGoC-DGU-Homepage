@@ -6,6 +6,8 @@ import { CHAPTER } from '@/content'
  * 법이 요구하는 항목만 적고, 로그인 방식 · 보관 방식 같은 내부 구현은 적지 않는다 (4기 Organizer 2026-11-20).
  * - 수집 항목 · 보유 기간: F-AUTH-001 · 003 · 008, F-RCT-003 · 004, F-OPS-004 · 006
  * - 처리 위탁 · 국외 이전 · 보호책임자 · 시행일: 4기 Organizer 2026-11-20 확정
+ * - AI 채점은 Gemini API 유료(결제 연결) 사용, 가장 싼 모델 (4기 Organizer 2026-11-20). 유료는 보낸 내용을 Google 이 개선에 쓰지 않아 위탁으로 적는다.
+ *   무료로 바꾸면 Google 이 개선에 쓰고 사람이 검토할 수 있어(Gemini API 추가 약관 'Unpaid Services'), 제3자 제공으로 다시 적어야 한다.
  * 내용을 바꾸면 시행일을 새로 정하고, 지원서 동의란의 요약(features/apply/ApplyPage.tsx)도 함께 맞춘다 (F-COM-005 규칙 4).
  */
 
@@ -154,6 +156,7 @@ export const PRIVACY_SECTIONS: readonly PolicySection[] = [
         kind: 'list',
         items: [
           '지원서 응답 일부를 AI로 분석해 운영진이 참고할 점수를 만듭니다. 이름 · 학번 · 학과 · 이메일은 AI에 보내지 않습니다.',
+          'AI(Google Gemini)에 보낸 응답은 Google의 AI 학습이나 서비스 개선에 쓰이지 않습니다.',
           '합격 여부는 운영진이 결정합니다. AI 분석에 대한 문의는 아래 개인정보 보호책임자에게 할 수 있습니다.',
         ],
       },

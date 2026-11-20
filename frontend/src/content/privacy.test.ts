@@ -49,6 +49,11 @@ describe('개인정보 처리방침 (F-COM-005)', () => {
     expect(allText.join('\n')).toContain('이름 · 학번 · 학과 · 이메일은 AI에 보내지 않습니다')
   })
 
+  it('AI 에 보낸 응답은 학습 · 개선에 쓰이지 않는다고 적는다 (Gemini 유료)', () => {
+    const ai = (PRIVACY_SECTIONS.find((sec) => sec.id === 'ai')?.blocks ?? []).flatMap(textOf).join('\n')
+    expect(ai).toContain('AI 학습이나 서비스 개선에 쓰이지 않습니다')
+  })
+
   it('글자는 모두 NFC', () => {
     for (const t of allText) expect(t.normalize('NFC')).toBe(t)
   })
