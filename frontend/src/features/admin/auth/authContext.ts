@@ -3,13 +3,17 @@ import type { AdminMe } from '../data/common/accounts'
 import type { PermissionActor } from '../data/permissions'
 
 export interface AdminAuthValue {
-  /** loading: 로그인 상태를 확인하는 중 · guest: 로그인 전 · signedIn: 로그인함 */
-  status: 'loading' | 'guest' | 'signedIn'
+  /**
+   * loading: 로그인 · 예시 관리자 계정을 확인하는 중
+   * guest: 로그인 전 (공개 로그인 화면으로 보낸다)
+   * denied: 로그인했지만 일반 회원(GENERAL) (F-AUTH-007 예외 1: 안내 후 홈으로)
+   * unavailable: 운영진인데 예시 관리자 계정을 쓸 수 없음 (예시 데이터에서 비활성 등)
+   * signedIn: 관리자 화면을 쓸 수 있음
+   */
+  status: 'loading' | 'guest' | 'denied' | 'unavailable' | 'signedIn'
   me: AdminMe | null
-  /** 실패하면 AdminRepoError (message 를 그대로 보여 준다) */
-  login: (input: { loginId: string; password: string }) => Promise<AdminMe>
+  /** 로그아웃 (공개 사이트와 함께 로그아웃하고 홈으로) */
   logout: () => Promise<void>
-  changePassword: (input: { currentPassword: string; newPassword: string }) => Promise<AdminMe>
 }
 
 export const AdminAuthContext = createContext<AdminAuthValue | null>(null)

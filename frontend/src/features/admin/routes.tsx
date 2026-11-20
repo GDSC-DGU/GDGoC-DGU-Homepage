@@ -1,6 +1,5 @@
 import type { ComponentType } from 'react'
 import { useRoutes, type RouteObject } from 'react-router-dom'
-import { LoginPage } from './auth/LoginPage'
 import * as boards from './boards'
 import * as contents from './contents'
 import { DashboardPage } from './dashboard/DashboardPage'
@@ -10,6 +9,7 @@ import { ADMIN_SCREENS, adminPath, type AdminScreenId } from './screens'
 import { AdminRoutesNotFound } from './shell/AdminNotFound'
 import { RequireAdmin } from './shell/AdminLayout'
 import { Redirect } from './shell/Redirect'
+import { loginPath } from '@/features/auth/session'
 import * as users from './users'
 
 /**
@@ -44,7 +44,8 @@ const rel = (path: string) => path.replace(/^\/admin\/?/, '')
 
 /** 하위 라우트 표 (useRoutes: <Routes>/<Route> 부품을 공통 파일로 끌어오지 않게 객체로 적는다) */
 const ROUTES: RouteObject[] = [
-  { path: 'login', element: <LoginPage /> },
+  // 예전 관리자 로그인 주소: 공개 로그인(P-COM-010)으로 넘기고, 로그인하면 대시보드로 (관리자 아이디 · 비밀번호 로그인은 없앰)
+  { path: 'login', element: <Redirect to={loginPath('/admin')} /> },
   {
     element: <RequireAdmin />,
     children: [

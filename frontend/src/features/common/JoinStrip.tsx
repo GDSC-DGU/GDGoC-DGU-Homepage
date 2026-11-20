@@ -59,11 +59,16 @@ export function JoinStrip({ variant = 'default', id = 'join', title, sub }: Join
               sub={sub ?? head.sub}
             />
             <div className={`btn-row ${j.actions}`}>
-              <a className="btn-primary" href={primary.href} target="_blank" rel="noreferrer">
-                {primary.label}
-                
-                <span className="visually-hidden">{primary.hidden}</span>
-              </a>
+              {primary.external ? (
+                <a className="btn-primary" href={primary.href} target="_blank" rel="noreferrer">
+                  {primary.label}
+                  <span className="visually-hidden">{primary.hidden}</span>
+                </a>
+              ) : (
+                <Link className="btn-primary" to={primary.href}>
+                  {primary.label}
+                </Link>
+              )}
               <Link className="btn-secondary" to={PLACE_BY_ID.recruits.path}>
                 지원 방법 보기
               </Link>

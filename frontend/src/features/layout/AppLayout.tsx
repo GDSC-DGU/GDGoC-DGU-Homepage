@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Outlet, ScrollRestoration } from 'react-router-dom'
 import { preloadPages } from '@/app/pageModules'
 import { PlacePreviewProvider } from './PlacePreviewProvider'
+import { QuickMenu } from './QuickMenu'
 import { SiteFooter } from './SiteFooter'
 import { SiteHeader } from './SiteHeader'
 
@@ -18,7 +19,7 @@ function usePreloadPages() {
 }
 
 /**
- * 모든 페이지의 틀: 본문 바로가기 + 머리말 + 본문 + 꼬리말(먹색).
+ * 모든 페이지의 틀: 본문 바로가기 + 머리말 + 본문 + 꼬리말(먹색) + 오른쪽 빠른 메뉴(슈어소프트테크, 4기 Organizer 2026-11-16).
  * 페이지 끝 '{gen}기에서 만나요'(common/JoinStrip)는 여기서 붙이지 않고 각 페이지가 <main> 맨 끝에 직접 넣는다
  * (페이지마다 변형 · 생략이 다르다: /teams 는 variant="teams", /recruits 는 없음).
  * 본문이 이야기 섹션(.story)으로 끝나면 꼬리말이 위 여백 없이 바로 붙는다 (layout.module.css).
@@ -36,6 +37,7 @@ export function AppLayout() {
         <Outlet />
       </main>
       <SiteFooter />
+      <QuickMenu />
       <ScrollRestoration />
     </PlacePreviewProvider>
   )

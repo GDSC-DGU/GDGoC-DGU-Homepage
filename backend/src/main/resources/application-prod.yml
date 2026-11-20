@@ -1,0 +1,13 @@
+# prod: Cloud Run gdgoc-dgu-homepage (운영) 에서 쓰는 프로필
+server:
+  forward-headers-strategy: framework   # 프록시(Cloud Run) 뒤에서 원래 요청 주소 · https 인식
+
+logging:
+  level:
+    com.gdgocdgu.homepage: INFO
+
+app:
+  auth:
+    allowed-origins: "${AUTH_ALLOWED_ORIGINS:https://gdgoc-dgu.com}"
+  firestore:
+    project-id: ${GOOGLE_CLOUD_PROJECT:gdgoc-dgu-homepage}   # 인증은 Cloud Run 서비스 계정(ADC). 키 파일 없음

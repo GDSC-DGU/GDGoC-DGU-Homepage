@@ -1,0 +1,117 @@
+/* 첫 화면 아래 한 줄 (슈어소프트테크 'What's new'): 위아래 25px, 아래 1px 선, 왼쪽 이름 · 가운데 한 줄 창(32px) · 오른쪽 버튼 */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  margin-top: 40px;
+  padding: 25px 0;
+  border-bottom: 1px solid var(--line);
+}
+.label {
+  flex-shrink: 0;
+  margin: 0;
+  font: 700 18px/27px var(--font-kr);
+  color: var(--ink-900);
+  white-space: nowrap;
+}
+.window {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  overflow: hidden;
+}
+.item {
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+.link {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  min-width: 0;
+  max-width: 100%;
+  color: var(--ink-700);
+  text-decoration: none;
+  transition: color var(--dur-hover) var(--ease-out);
+}
+.date {
+  flex-shrink: 0;
+  font: 600 15px/32px var(--font-num);
+  color: var(--ink-500);
+}
+.name {
+  overflow: hidden;
+  font: 400 17px/32px var(--font-kr);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ctrl {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+}
+.pause {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-right: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--white);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-700);
+  cursor: pointer;
+}
+.nav {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-500);
+  cursor: pointer;
+  transition: color var(--dur-hover) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .link:hover {
+    color: var(--ink-900);
+  }
+  .pause:hover {
+    background: var(--ink-900);
+    box-shadow: none;
+    color: var(--white);
+  }
+  .nav:hover {
+    color: var(--ink-900);
+  }
+}
+
+@media (max-width: 767px) {
+  .row {
+    gap: 12px;
+    margin-top: 24px;
+    padding: 16px 0;
+  }
+  .label {
+    font-size: 15px;
+  }
+  .date {
+    font-size: 13px;
+  }
+  .name {
+    font-size: 15px;
+  }
+  .nav {
+    display: none;
+  }
+}
+

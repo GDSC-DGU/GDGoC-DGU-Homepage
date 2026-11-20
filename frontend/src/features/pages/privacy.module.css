@@ -1,0 +1,131 @@
+/*
+ * ── 개인정보 처리방침 (/privacy) ──
+ * 문서 한 단(760). 제목 · 시행일 → 머리글 → 옅은 회색 목차 판 → 조항(번호 · 제목 20 · 본문 17).
+ * 표는 두 칸이라 좁은 화면에서도 글이 줄바꿈되어 들어간다 (옆으로 넘기지 않음, 페이지 가로 넘침 0).
+ */
+.page {
+  max-width: calc(760px + var(--side) + var(--side-r));
+  padding-block: 64px 120px;
+}
+.head {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.eyebrow {
+  font: var(--t-eyebrow);
+  color: var(--ink-700);
+}
+.title {
+  font: var(--t-section);
+  letter-spacing: var(--ls-section);
+}
+.meta {
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.intro {
+  font: var(--t-body);
+  color: var(--ink-900);
+}
+
+.toc {
+  margin-block: 40px 56px;
+  padding: 24px 28px;
+  border-radius: var(--r-card);
+  background: var(--field);
+}
+.tocTitle {
+  margin-bottom: 12px;
+  font: var(--t-ui);
+}
+.tocList {
+  display: grid;
+  gap: 6px;
+  padding-left: 20px;
+  font: 400 15px/24px var(--font-kr);
+  list-style: decimal;
+}
+.tocList a {
+  color: var(--ink-900);
+  text-underline-offset: 3px;
+}
+
+.sections {
+  display: grid;
+  gap: 48px;
+  padding: 0;
+  list-style: none;
+}
+.section {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.sectionTitle {
+  font: var(--t-h3);
+  letter-spacing: var(--ls-h3);
+  scroll-margin-top: calc(var(--header-h) + 24px);
+}
+.sectionTitle:focus {
+  outline: none;
+}
+.sectionTitle:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+.text {
+  font: var(--t-body);
+  color: var(--ink-900);
+}
+.list {
+  display: grid;
+  gap: 8px;
+  padding-left: 20px;
+  font: var(--t-body);
+  list-style: disc;
+}
+
+.tableBox {
+  max-width: 100%;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 16px/26px var(--font-kr);
+}
+.table th,
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.table thead th {
+  border-bottom: 1px solid var(--line-strong);
+  font: var(--t-ui);
+  color: var(--ink-700);
+  white-space: nowrap;
+}
+.table tbody th {
+  width: 36%;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding-block: 40px 80px;
+  }
+  .toc {
+    padding: 20px;
+  }
+  .table th,
+  .table td {
+    padding: 10px 8px;
+  }
+  .table {
+    font-size: 15px;
+    line-height: 24px;
+  }
+}

@@ -1,242 +1,231 @@
 /*
- * ── 머리말 (dcamp.kr 을 따름, 4기 Organizer 2026-11-06): 위에서 16px 떠 있는 따뜻한 회색 둥근 띠(높이 64, 모서리 8).
- * 띠는 본문 폭보다 좌우로 32px 넓고, 로고와 메뉴는 본문 끝선에 맞는다. 차지하는 높이는 전과 같은 80 (폰 8 + 56 = 64).
- * 내려가면 띠 아래에 옅은 그림자.
+ * ── 머리말 (4기 Organizer 2026-11-16: 슈어소프트테크 머리말 그대로) ──
+ * 높이 90 (폰 70), 본문과 같은 90% 틀. 맨 위에서는 바탕이 비치고, 내려가면 흰 바탕 + 그림자(0 10px 50px 15%).
+ * 내리면 위로 숨고 올리면 나타난다 (0.4초). 가운데 메뉴는 1024 이상에서 (4기 Organizer 2026-11-17: 노트북 폭에서도 보이게). 평소 붙어 있다가 마우스를 올리면 벌어지며 흰 판이 내려온다.
  */
 .header {
   position: sticky;
-  top: env(safe-area-inset-top, 0px);
+  top: 0;
   z-index: 50;
-  /* 폰 머리말 버튼을 숨길 폭은 화면이 아니라 실제로 남은 폭(스크롤 막대 뺀 폭)으로 잰다 */
-  container: header / inline-size;
-  padding-top: 16px;
+  height: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   background: transparent;
   /* 페이지를 옮길 때 머리말은 그대로 두고 본문만 바뀌게 (global.css 페이지 전환) */
   view-transition-name: site-header;
+  transition:
+    transform var(--dur-header) var(--ease-reveal),
+    background var(--dur-header) var(--ease-reveal),
+    box-shadow var(--dur-header) var(--ease-reveal);
 }
-/* 노치 영역(폰 상태 표시줄 아래)으로 본문이 비치지 않게 */
-.header::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100%;
-  height: env(safe-area-inset-top, 0px);
-  background: var(--paper);
-}
-.header[data-scrolled] .bar {
-  box-shadow: 0 6px 24px -10px var(--ink-a18);
-}
-/* 검정 섹션 위: 검정 띠 · 흰 글자 (on-dark 가 글자 단계를 바꾼다) */
-.header[data-on-dark] .bar {
-  background: var(--black);
-  box-shadow: none;
-}
-.header[data-on-dark] .searchBox {
-  background: var(--band-raise);
-  color: var(--band-ink-3);
-}
-.header[data-on-dark] .searchBox:hover {
-  border-color: var(--band-line-strong);
-}
-.header[data-on-dark] .applyCta {
+.header[data-scrolled] {
   background: var(--white);
-  color: var(--black);
+  box-shadow: var(--shadow-header);
 }
-.header[data-on-dark] .applyCtaActive {
-  box-shadow: 0 0 0 2px var(--black), 0 0 0 4px var(--white);
+/* 내리면 숨는다. 노치 영역 띠까지 같이 올라간다 */
+.header[data-hidden] {
+  transform: translate3d(0, -100%, 0);
 }
-.header[data-on-dark] .navActive::after {
-  background: var(--white);
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: none;
+  }
 }
 
 .bar {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
-  gap: 24px;
-  height: 64px;
-  border-radius: var(--r-card);
-  background: var(--field);
-  transition:
-    box-shadow var(--dur-open) var(--ease),
-    background 300ms var(--ease);
+  height: var(--header-h);
 }
-/* 본문 틀(.container) 의 좌우 여백 안에서 띠만 32px 넓게: 안쪽 여백으로 로고 · 메뉴는 본문 끝선 그대로.
-   .container 의 width: 100% 는 풀어 둔다 (바깥 여백과 더해지면 화면보다 넓어진다) */
-.header .bar {
-  width: auto;
-  max-width: calc(var(--max) + 64px);
-  padding-inline: 32px;
-  margin-inline: auto;
-}
-@media (max-width: 1279px) {
-  .header .bar {
-    max-width: none;
-    margin-inline: calc(var(--side) - 32px) calc(var(--side-r) - 32px);
-  }
-}
-
 .brand {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  color: var(--ink-900);
-  text-decoration: none;
-  flex: none;
+  margin-right: auto;
+  border-radius: var(--r-control);
 }
 .brandLogo {
-  display: block;
   width: auto;
-  height: 32px;
-}
-.wordmark {
-  font: 700 18px/1 var(--font-num);
-  letter-spacing: -0.01em;
-  color: var(--ink-900);
-  white-space: nowrap;
+  height: 26px;
 }
 
-/* 가운데 검색창: 누르면 검색 창(SearchDialog)이 열린다. 생김새는 입력칸 (링커리어 · 잡코리아 머리말) */
-.searchBox {
-  display: flex;
-  flex: 0 1 auto;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: clamp(220px, 30vw, 420px);
-  height: 44px;
-  margin-inline: auto;
-  padding: 0 14px 0 16px;
-  border: 1px solid transparent;
-  border-radius: var(--r-control);
-  background: var(--paper);
-  font: 500 15px/20px var(--font-kr);
-  color: var(--ink-500);
-  text-align: left;
-  cursor: text;
-  transition: border-color var(--dur-hover) var(--ease);
+/*
+ * 가운데 메뉴 (1024 이상, 슈어소프트테크 머리말을 다시 잰 값 · 4기 Organizer 2026-11-17).
+ * 평소: 메뉴끼리 붙어 있다 (칸 좌우 30). 메뉴에 마우스를 올리거나 초점이 들어오면 0.3초 동안 칸이 좌우 60 으로 벌어지고,
+ * 머리말 꼭대기부터 흰 판이 0.4초 동안 내려와(아래로만 그림자) 메뉴마다 아래 칸(16px 회색, 32 간격, 위아래 30)이 보인다.
+ * 올린 메뉴는 주황 글자, 머리말 바닥의 2px 줄 하나가 올린 메뉴로 옆으로 미끄러진다 (0.35초).
+ * 목록 묶음은 가운데에서 오른쪽으로 30 (그 사이트처럼 왼쪽 60 을 비우고 가운데 맞춤).
+ */
+.gnb {
+  position: absolute;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  pointer-events: none;
 }
-.searchBox:hover {
-  border-color: var(--line-strong);
-}
-.searchBox:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-.searchHint {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.searchBox svg {
-  flex: none;
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: var(--ink-700);
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-.nav {
-  flex: none;
-}
-.nav ul {
-  display: flex;
-  gap: 8px;
-}
-.navLink {
+.gnbList {
+  --gnb-pad: 30px;
+  --gnb-pad-open: 60px;
   position: relative;
   display: flex;
+  height: 100%;
+  margin: 0 0 0 60px;
+  padding: 0;
+  list-style: none;
+  pointer-events: auto;
+}
+.gnbItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: var(--r-control);
-  font: 500 16px/24px var(--font-kr);
+  padding: 0 var(--gnb-pad);
+  transition: padding 0.3s var(--ease-reveal);
+}
+.header[data-gnb] .gnbItem {
+  padding: 0 var(--gnb-pad-open);
+}
+.gnbLink {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: var(--header-h);
+  font: 600 18px/1.2 var(--font-kr);
   color: var(--ink-900);
   text-decoration: none;
   white-space: nowrap;
-  transition: opacity 300ms var(--ease);
+  transition: color 0.3s var(--ease-reveal);
 }
-/* 지금 메뉴: 먹색 글자 + 2px 먹색 밑줄 (AI 티 점검 2026-11-05: 메뉴마다 다른 장소색 글자 → 한 가지 표시) */
-.navActive {
-  color: var(--ink-900);
+.gnbItem[data-hover] .gnbLink,
+.gnbLink:focus-visible {
+  color: var(--gen-text);
 }
-/* 넓은 화면의 도구 묶음은 폰 메뉴 단추뿐이라 통째로 숨긴다 (빈 칸이 간격만 차지하지 않게) */
-@media (min-width: 901px) {
-  .tools {
-    display: none;
+/* 미끄러지는 줄: 머리말 바닥(1px 걸침)에 2px */
+.gnbBar {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--gen-text);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.35s var(--ease-reveal),
+    width 0.35s var(--ease-reveal),
+    opacity 0.2s var(--ease-reveal);
+}
+.gnbBar[data-on] {
+  opacity: 1;
+}
+/* 아래 칸은 메뉴 칸 폭을 넓히지 않게 떠 있다 (그 사이트의 dl: 칸 폭 = 메뉴 글자 + 좌우 여백) */
+.sub {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 30px 0;
+  list-style: none;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s var(--ease-reveal),
+    visibility 0.3s allow-discrete;
+}
+.header[data-gnb] .sub {
+  opacity: 1;
+  visibility: visible;
+}
+.subLink {
+  display: block;
+  font: 400 16px/24px var(--font-kr);
+  color: var(--ink-500);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-hover) var(--ease-out);
+}
+/*
+ * 흰 판: 머리말 꼭대기부터 (머리말 90 + 아래 칸) 높이로 0.4초 동안 내려온다. 그림자는 판 아래쪽에만 생긴다
+ * (판이 꼭대기에서 시작해 위로 번지는 그림자가 화면 밖이다). 판 높이 = 머리말 + 위아래 30 + 줄 수 × 32 - 8
+ */
+.gnbPanel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: 0;
+  overflow: hidden;
+  background: var(--white);
+  pointer-events: none;
+  transition:
+    height 0.4s var(--ease-reveal),
+    box-shadow 0.4s var(--ease-reveal);
+}
+/* 판 안 머리말 바닥의 1px 선 (그 사이트처럼 화면 끝에서 끝까지) */
+.gnbPanel::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line);
+}
+.header[data-gnb] {
+  background: transparent;
+  box-shadow: none;
+}
+.header[data-gnb] .gnbPanel {
+  height: calc(var(--header-h) + env(safe-area-inset-top, 0px) + 60px + var(--gnb-rows-px, 88px));
+  box-shadow: var(--shadow-header);
+  pointer-events: auto;
+}
+@media (min-width: 1024px) {
+  .gnb {
+    display: flex;
   }
 }
-/* 마우스를 올린 메뉴: 옅은 회색 밑줄이 가운데에서 펴진다. 지금 메뉴는 같은 자리에 먹색 밑줄이 늘 있다 */
-.navLink::after {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 6px;
-  height: 2px;
-  content: '';
-  background: var(--line-strong);
-  opacity: 0;
-  transform: scaleX(0.4);
-  transition:
-    opacity var(--dur-hover) var(--ease),
-    transform var(--dur-open) var(--ease);
+/* 노트북 폭: 붙어 있을 때 22, 벌어질 때 40 (로고 · 오른쪽 버튼과 겹치지 않게) */
+@media (max-width: 1300px) {
+  .gnbList {
+    --gnb-pad: 22px;
+    --gnb-pad-open: 40px;
+    margin-left: 0;
+  }
+  .gnbLink {
+    font-size: 17px;
+  }
 }
-.navActive::after {
-  background: var(--ink-900);
-  opacity: 1;
-  transform: none;
-}
-/* 지원하기: 메뉴 끝의 검정 알약 단추 (40px, dcamp 버튼). 모집 중이면 앞에 주황 점(지금 기수) */
-.applyCta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  margin-left: 12px;
-  padding: 0 20px;
-  border-radius: var(--r-pill);
-  background: var(--band-bg);
-  font: 700 15px/20px var(--font-kr);
-  color: var(--white);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background var(--dur-hover) var(--ease);
-}
-.applyCta:hover {
-  background: var(--black);
-}
-.applyCta:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
-}
-.applyCtaActive {
-  box-shadow: 0 0 0 2px var(--field), 0 0 0 4px var(--ink-900);
-}
-.applyDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gen);
-}
-@media (hover: hover) {
-  .navLink:hover::after {
-    opacity: 1;
-    transform: none;
+@media (prefers-reduced-motion: reduce) {
+  .gnbItem,
+  .gnbLink,
+  .gnbBar,
+  .sub,
+  .gnbPanel {
+    transition: none;
   }
 }
 
+/* 오른쪽 도구: 검색 · 전체 메뉴 (그림 25px, 사이 30) */
 .tools {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 30px;
+  margin-right: -10px;
 }
 .iconBtn {
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
+  margin: 0 -10px;
   padding: 0;
   border: 0;
   border-radius: var(--r-control);
@@ -244,26 +233,166 @@
   color: var(--ink-900);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: background var(--dur-hover) var(--ease);
+}
+.iconBtn:active {
+  transform: scale(var(--press));
+}
+.iconBtn svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+@media (hover: hover) {
+  .subLink:hover {
+    color: var(--ink-900);
+  }
+}
+
+/*
+ * 로그인 자리 (F-COM-001): 검색 · 전체 메뉴 그림 왼쪽.
+ * 로그인 전 [로그인] 글자 버튼 (메뉴 아래 칸과 같은 15 · 600). 로그인하면 이름 버튼 하나(1440 미만은 사람 그림만)를 누르면
+ * 흰 판이 펼쳐진다: 이름 · 관리 유형 · (관리자 페이지) · 로그아웃. 가운데 메뉴가 벌어져도 겹치지 않는 폭.
+ */
+.account,
+.accountToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0 -10px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  font: var(--t-ui);
+  color: var(--ink-900);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.account:active,
+.accountToggle:active {
+  transform: scale(var(--press));
+}
+.accountMenu {
+  position: relative;
+}
+.accountIcon {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.accountToggleName {
+  max-width: 8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.accountCaret {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-hover) var(--ease);
+}
+.accountToggle[aria-expanded='true'] .accountCaret {
+  transform: rotate(180deg);
+}
+.accountPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -10px;
+  display: grid;
+  min-width: 200px;
+  padding: 8px;
+  border-radius: var(--r-card);
+  background: var(--white);
+  box-shadow: var(--shadow-float), 0 0 0 1px var(--line);
+}
+.accountPanel[hidden] {
+  display: none;
+}
+.accountPanelName {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 6px;
+  padding: 10px 12px 12px;
+  border-bottom: 1px solid var(--line);
+  font: 600 16px/24px var(--font-kr);
+  color: var(--ink-900);
+  overflow-wrap: anywhere;
+}
+.accountPanelRole {
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+.accountPanelItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-control);
+  background: none;
+  font: 500 15px/22px var(--font-kr);
+  color: var(--ink-900);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.accountPanelItem:disabled {
+  cursor: default;
+  opacity: 0.6;
 }
 @media (hover: hover) {
-  .iconBtn:hover {
+  .account:hover {
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+  }
+  .accountPanelItem:not(:disabled):hover {
     background: var(--subtle);
   }
 }
-.iconBtn:active {
-  background: var(--line);
+/* 1440 미만: 이름 · 화살표는 숨기고 사람 그림만 (가운데 메뉴가 벌어질 자리를 비운다) */
+@media (max-width: 1439px) {
+  .accountToggleName,
+  .accountCaret {
+    display: none;
+  }
 }
-.iconBtn svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
+@media (min-width: 1440px) {
+  .accountIcon {
+    width: 22px;
+    height: 22px;
+  }
 }
-.menuBtn {
-  display: none;
+
+@media (max-width: 767px) {
+  .brandLogo {
+    height: 24px;
+  }
+  .tools {
+    gap: 26px;
+  }
+  .accountIcon {
+    width: 22px;
+    height: 22px;
+  }
+  .iconBtn svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 /*
@@ -334,64 +463,6 @@
 /* .apply.* : global .btn-secondary(inline-flex)보다 앞서도록 두 class 로 */
 .apply.applyBar {
   display: none;
-}
-
-@media (max-width: 900px) {
-  .header {
-    padding-top: 8px;
-  }
-  .bar {
-    height: 56px;
-  }
-  .header .bar {
-    margin-inline: calc(var(--side) - 12px) calc(var(--side-r) - 12px);
-    padding-inline: 12px 16px;
-  }
-  .brandLogo {
-    height: 28px;
-  }
-  .nav {
-    display: none;
-  }
-  .menuBtn {
-    display: grid;
-  }
-  .searchBox {
-    display: none;
-  }
-  /* 메뉴 줄이 없으니 워드마크 오른쪽 여백은 도구 묶음과의 최소 간격만 */
-  .brand {
-    margin-right: 8px;
-  }
-  .tools {
-    gap: 0;
-    margin-left: auto;
-    margin-right: -12px; /* 아이콘 버튼 안쪽 여백만큼 바깥 줄에 맞춘다 */
-  }
-  .apply.applyWide {
-    display: none;
-  }
-  /* 폰 머리말: 글자만 (마감일 · 새 창 표시는 시트에서) */
-  .apply.applyBar {
-    display: inline-flex;
-    gap: 4px;
-    margin-right: 4px;
-    padding: 0 10px;
-  }
-}
-/*
- * 워드마크와 겹치는 아주 좁은 폭: 지원 버튼은 메뉴 시트 안에만.
- * 워드마크 149 + 버튼 + 아이콘 둘 88 + 양옆 여백 40 이 들어가는지로 정했다 ('지원 안내' 77 · '지원서 쓰기' 90)
- */
-@container header (max-width: 353px) {
-  .apply.applyBar {
-    display: none;
-  }
-}
-@container header (max-width: 366px) {
-  .apply.applyBar.applyNow {
-    display: none;
-  }
 }
 
 /* ── 폰 메뉴: 전체 화면 시트 ── */
@@ -581,7 +652,7 @@
 }
 .footerInfo {
   min-width: 0;
-  max-width: 640px;
+  max-width: 760px;
 }
 .footerBrand {
   font: 800 22px/28px var(--font-num);
@@ -594,6 +665,9 @@
   color: var(--ink-500);
 }
 .footerCopy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
   margin-top: 20px;
   font: 400 13px/20px var(--font-num);
   color: var(--ink-500);
@@ -643,28 +717,6 @@
     background: var(--line);
     color: var(--ink-900);
   }
-}
-
-/* 운영진 로그인: 오른쪽 아래 구석. 평소 보이지 않고, 키보드 초점이 오거나 마우스를 올리면 보인다 */
-.admin {
-  position: absolute;
-  right: var(--side-r);
-  bottom: -40px;
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 0 4px;
-  font: 500 13px/20px var(--font-kr);
-  color: var(--ink-700);
-  text-decoration: none;
-  opacity: 0;
-  transition: opacity var(--dur-hover) var(--ease);
-}
-.admin:hover,
-.admin:focus-visible {
-  opacity: 1;
-  text-decoration-line: underline;
-  text-underline-offset: 3px;
 }
 
 @media (max-width: 767px) {

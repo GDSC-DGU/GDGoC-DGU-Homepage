@@ -1,4 +1,4 @@
-import type { RecruitStatus } from '@/content/recruitingStatus'
+import { applyTarget, type RecruitStatus } from '@/content/recruitingStatus'
 
 /**
  * 페이지 끝 '{gen}기에서 만나요'(JoinStrip) 계산 (DOM 없음, common.test.ts 에 테스트).
@@ -6,18 +6,21 @@ import type { RecruitStatus } from '@/content/recruitingStatus'
  */
 
 export interface JoinPrimary {
-  /** apply: 모집 중이고 지원서 주소가 있을 때 '지원서 쓰기' · notify: 그 밖 '{gen}기 소식 받기' (인스타그램) */
+  /** apply: 모집 중이고 지원서가 있을 때 '지원서 쓰기' · notify: 그 밖 '{gen}기 소식 받기' (인스타그램) */
   kind: 'apply' | 'notify'
   label: string
   href: string
+  /** 새 창 링크인지 (사이트 안 지원서 /recruits/apply 면 false) */
+  external: boolean
   /** 읽기 프로그램에만 덧붙는 말 (어디로 · 새 창) */
   hidden: string
 }
 
 /** 주 버튼 하나: 모집 중이면 지원서, 아니면 소식 채널. 링크는 홈 마무리(ClosingSection)와 같은 값 */
-export function joinPrimary(st: RecruitStatus): JoinPrimary {
-  if (st.state === 'open' && st.applyUrl) return { kind: 'apply', label: '지원서 쓰기', href: st.applyUrl, hidden: ` (${st.generation}기 지원서, 새 창)` }
-  return { kind: 'notify', label: `${st.generation}기 소식 받기`, href: st.channelUrl, hidden: ' (인스타그램, 새 창)' }
+export function joinPrimary(st: RecruitStatus, live?: boolean): JoinPrimary {
+  const target = applyTarget(st, live)
+  if (target) return { kind: 'apply', label: '지원서 쓰기', href: target.href, external: target.external, hidden: target.external ? ` (${st.generation}기 지원서, 새 창)` : '' }
+  return { kind: 'notify', label: `${st.generation}기 소식 받기`, href: st.channelUrl, external: true, hidden: ' (인스타그램, 새 창)' }
 }
 
 /**

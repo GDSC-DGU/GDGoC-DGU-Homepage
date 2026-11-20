@@ -184,6 +184,11 @@
   font: 600 17px/26px var(--font-kr);
   color: var(--ink-900);
 }
+/* 판 맨 아래 '{파트} 지원하기': 내용 길이가 달라도 같은 높이에 (margin-top: auto) */
+.partAction {
+  margin-top: auto;
+  padding-top: 28px;
+}
 /* 아이콘 줄(40px + 이름): 위 글자와 붙지 않게 조금 띄운다 */
 .partIcons {
   padding-top: 4px;
@@ -407,5 +412,57 @@
   .a {
     padding: 0 18px 20px 54px;
     font-size: 15px;
+  }
+}
+
+/* ── 지원 기간이 아닐 때 팝업 (파트 '지원하기') ── */
+.modal {
+  width: min(440px, calc(100% - 32px));
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--ink-900);
+  box-shadow: var(--shadow-float);
+}
+.modal::backdrop {
+  background: var(--ink-a48);
+}
+.modalBody {
+  display: grid;
+  gap: 12px;
+  padding: 28px 24px 24px;
+}
+.modalTitle {
+  font: 700 20px/28px var(--font-kr);
+}
+.modalDesc {
+  font: 400 15px/24px var(--font-kr);
+  color: var(--ink-700);
+}
+.modalNote {
+  font: var(--t-meta);
+  color: var(--ink-500);
+}
+.modalNote a {
+  color: var(--ink-900);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.modalFoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .modal[open] {
+    animation: closedPop var(--dur-open) var(--ease-out);
+  }
+}
+@keyframes closedPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
 }

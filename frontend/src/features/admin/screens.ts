@@ -30,7 +30,8 @@ export interface AdminScreen {
 }
 
 export const ADMIN_SCREENS = [
-  { id: 'P-ACM-01', path: '/admin/login', title: '관리자 로그인', summary: 'Lead · Core 계정만 로그인합니다.', figma: '06 · 06-2', functions: 'F-ACM-001', area: 'dashboard', popups: ['P-ACM-04 비밀번호 변경 (F-ACM-002)'] },
+  // 관리자 따로 로그인은 없앴다 (F-AUTH-004 삭제): 예전 주소는 공개 로그인(/login, P-COM-010)으로 넘긴다
+  { id: 'P-ACM-01', path: '/admin/login', title: '관리자 로그인', summary: '공개 로그인 화면으로 넘깁니다. 운영진(ADMIN)만 관리자 화면에 들어옵니다.', figma: '06 · 06-2', functions: 'F-AUTH-001', area: 'dashboard' },
   { id: 'P-ACM-03', path: '/admin', title: '대시보드', summary: '로그인 후 첫 화면입니다.', figma: '07', functions: 'F-ACM-005~008', area: 'dashboard' },
   {
     id: 'P-ABD-01',

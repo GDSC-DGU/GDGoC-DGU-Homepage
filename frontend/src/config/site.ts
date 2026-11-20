@@ -69,4 +69,12 @@ export const SHOW_PLAN = import.meta.env.DEV || import.meta.env.VITE_SHOW_PLAN =
  * 기본으로 켜져 있다 (Vercel 배포 포함, 4기 Organizer 결정 2026-11-03). 끄려면 빌드 환경 변수 VITE_PROTOTYPE=false
  * → 게시판 · 관리자에 '예시 화면' 안내가 다시 붙는다. 백엔드가 붙으면 이 값 대신 실제 데이터가 그 자리를 채운다.
  */
+/**
+ * 사이트 안 지원서(/recruits/apply)로 실제 지원을 받는지. 백엔드 지원서 API 가 붙으면 true 로.
+ * false 인 동안 /recruits/apply 는 '예시 지원서'(제출해도 접수되지 않음)이고, 사이트의 '지원서 쓰기' 버튼은 그리로 가지 않는다.
+ * true 이고 recruiting.json 의 applyUrl 이 비어 있으면, 모집 중일 때 '지원서 쓰기'가 사이트 안 지원서로 간다.
+ * (applyUrl 을 적으면 그 주소(Google Forms 등)가 먼저다: content/recruitingStatus.ts 의 applyTarget)
+ */
+export const APPLY_FORM_LIVE = false
+
 export const PROTOTYPE = import.meta.env.DEV || import.meta.env.VITE_PROTOTYPE !== 'false'

@@ -1,26 +1,21 @@
-import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
 import { SITE, SPRINT } from '@/config/site'
-import { CHAPTER, EVENTS, FAQS, PUBLIC_PROJECTS, RECRUITING, SEMINARS } from '@/content'
+import { CHAPTER, FAQS, PUBLIC_PROJECTS, RECRUITING, SEMINARS } from '@/content'
 import { GLOSSARY } from '@/content/glossary'
-import { BAND, voices } from '@/content/story'
-import { recruitStatus, type RecruitStatus } from '@/content/recruitingStatus'
-import { useSchedule } from '@/data/queries'
+import { BAND } from '@/content/story'
+import { applyTarget, recruitStatus, type RecruitStatus } from '@/content/recruitingStatus'
 import { StorySection } from '@/features/common'
 import { DarkProgram, type DarkCard, type GlassStat } from '@/features/dcamp/DarkProgram'
 import { Process, type ProcessStep } from '@/features/dcamp/Process'
 import { ProgramHero, type InfoCard } from '@/features/dcamp/ProgramHero'
-import { QuoteRow } from '@/features/dcamp/QuoteRow'
 import { StickyCta } from '@/features/dcamp/StickyCta'
-import { Term } from '@/features/glossary/Term'
-import { isShowableVoice } from '@/features/home/homeData'
 import { useToday } from '@/hooks/useToday'
 import { useHashScroll } from './community/useHashScroll'
 import { Section, StateLine } from './PageParts'
-import { buildBatches } from './recruits/batches'
+import { PartApply } from './recruits/ApplyAction'
 import { FaqTabs } from './recruits/FaqTabs'
 import { Parts } from './recruits/Intro'
-import { SemesterPicture } from './recruits/Semester'
 import { ShareAction } from './recruits/ShareAction'
 import { statusView } from './recruits/status'
 import s from './pages.module.css'
@@ -70,24 +65,11 @@ const OPEN_FAQ = ['when-recruit']
  * 버튼 이름은 사이트 전체에서 '5기 소식 받기'(인스타그램) · '지원서 쓰기'(모집 중) · '친구에게 알려 주기' 세 가지만 쓴다.
  * 소식 받기는 이 페이지에서 여기 한 번 (꼬리말에도 같은 이름의 링크가 있다). 폰에서는 두 버튼이 한 줄 가득.
  */
-function StatusActions({ st, primary }: { st: RecruitStatus; primary: 'apply' | 'channel' }) {
+function StatusActions({ st }: { st: RecruitStatus }) {
   const handle = SITE.links.instagramHandle
-  const apply = primary === 'apply' && st.applyUrl
   return (
     <span className={`btn-row ${r.actions}`}>
-      {apply ? (
-        <a className="btn-primary" href={st.applyUrl} target="_blank" rel="noreferrer">
-          지원서 쓰기
-          <span className="visually-hidden"> (새 창)</span>
-          
-        </a>
-      ) : (
-        <a className="btn-primary" href={st.channelUrl} target="_blank" rel="noreferrer">
-          {st.generation}기 소식 받기
-          <span className="visually-hidden"> (인스타그램 {handle}, 새 창)</span>
-          
-        </a>
-      )}
+      <PrimaryAction st={st} />
       <ShareAction
         className="btn-secondary"
         title={`${SITE.shortName} 지원 안내`}
@@ -101,8 +83,34 @@ function StatusActions({ st, primary }: { st: RecruitStatus; primary: 'apply' | 
   )
 }
 
+/** 주 버튼: 모집 중이고 갈 지원서가 있으면 '지원서 쓰기'(applyTarget), 아니면 '{gen}기 소식 받기' */
+function PrimaryAction({ st }: { st: RecruitStatus }) {
+  const target = applyTarget(st)
+  if (target?.external)
+    return (
+      <a className="btn-primary" href={target.href} target="_blank" rel="noreferrer">
+        지원서 쓰기
+        <span className="visually-hidden"> ({st.generation}기 지원서, 새 창)</span>
+      </a>
+    )
+  if (target)
+    return (
+      <Link className="btn-primary" to={target.href}>
+        지원서 쓰기
+      </Link>
+    )
+  return (
+    <a className="btn-primary" href={st.channelUrl} target="_blank" rel="noreferrer">
+      {st.generation}기 소식 받기
+      <span className="visually-hidden"> (인스타그램 {SITE.links.instagramHandle}, 새 창)</span>
+    </a>
+  )
+}
+
 /**
  * 지원 안내 (모집 랜딩, 시안 E).
+ * 2026-11-12 정리 (BOAZ 리크루팅처럼 짧게): 멤버 회고(홈에 있음) · 달별 일정(소개에 있음)을 빼고,
+ * 파트 판마다 '{파트} 지원하기'를 붙였다. 순서: 머리(모집 상태 · 기간 · 대상 · 방법) → 주요 활동 → 파트 · 지원하기 → 모집 과정 → 자주 묻는 질문.
  * 모집 상태(날짜로 계산: content/recruitingStatus.ts) + 주 버튼 · 두 번째 버튼 → 옅은 회색 '지원 자격'(주장 + 흰 판 셋)
  * → 들어오면 이런 한 해(참고, 달별 일정 하나) → '네 파트'(2 × 2 판 + 지난 프로젝트 아이콘) → 자주 묻는 질문(참고) + 출처 한 줄.
  * 면: 흰(머리) → 옅은 회색 → 흰 → 흰 → 흰 → 먹색 꼬리말. 페이지 끝 JoinStrip 은 넣지 않는다 (이 페이지 자체가 같은 내용).
@@ -112,24 +120,13 @@ function StatusActions({ st, primary }: { st: RecruitStatus; primary: 'apply' | 
 export function RecruitsPage() {
   usePageTitle(PLACE_BY_ID.recruits.label)
   const today = useToday()
-  const { data } = useSchedule()
-  // 일정은 저장소 스냅샷과 같은 내용이다. 서버에서 받기 전에도 한 해 일정을 그릴 수 있게 스냅샷으로 먼저 그린다
-  const events = data ?? EVENTS
   const st = recruitStatus(today)
   const view = statusView(st, today, SITE.links.instagramHandle)
-  const isOpen = st.state === 'open'
-  const batches = useMemo(() => buildBatches(RECRUITING, events, isOpen), [events, isOpen])
-  const latest = batches.find((b) => b.status === 'closed')
-  const semesterGen = latest?.generation ?? st.generation - 1
+  const isOpen2 = st.state === 'open'
+  // 지금 활동 중인 기수 = 가장 최근에 모집한 기수 (recruiting.json history)
+  const semesterGen = LAST?.generation ?? st.generation - 1
   useHashScroll(true)
 
-  const yearDesc = (
-    <>
-      매주 화요일 세션 사이사이에 <Term id="g-sprint" more />와 연합 행사가 있습니다.
-    </>
-  )
-
-  const isOpen2 = isOpen
   const who = faqA('who')
   const cards: InfoCard[] = [
     {
@@ -148,7 +145,6 @@ export function RecruitsPage() {
     },
     { id: 'how', icon: 'doc', title: '지원 방법', value: faqA('how-to-apply') ?? '모집 공지에서 알려 드립니다.' },
   ]
-  const shownVoices = voices.filter(isShowableVoice)
 
   return (
     <>
@@ -180,24 +176,17 @@ export function RecruitsPage() {
             ))}
           </>
         }
-        actions={<StatusActions st={st} primary={view.primary} />}
+        actions={<StatusActions st={st} />}
         cards={cards}
       />
 
       <DarkProgram id="activities" title={<>{semesterGen}기는 {BAND.lines[0]}<br />{BAND.lines[1]}</>} stats={STATS} cardsTitle="주요 활동" cards={ACTIVITIES} />
-      <QuoteRow title="멤버 회고" voices={shownVoices} />
-
       <div className={`container ${s.page}`}>
         {FAQS.some((f) => f.id === 'parts') && (
-          <StorySection id="parts" tone="field" className={r.flush} title="파트마다 같은 문제를 각자 풀고 비교합니다" sub="파트 세션은 코어 멤버가 이끕니다.">
-            <Parts />
+          <StorySection id="parts" tone="field" className={r.flush} title="파트를 골라 지원합니다" sub="파트마다 같은 문제를 각자 풀고 비교합니다. 파트 세션은 코어 멤버가 이끕니다.">
+            <Parts action={(part) => <PartApply st={st} partId={part.id} partName={part.name} />} />
           </StorySection>
         )}
-
-        <Section id="year" title={`${semesterGen}기 달별 일정`} desc={yearDesc}>
-          {/* 휴회는 싣지 않는다 (4기 Organizer 2026-11-05: 쉬는 얘기는 브랜드에 쓸모없다) */}
-          <SemesterPicture events={events.filter((e) => e.kind !== 'rest')} today={today} generation={semesterGen} />
-        </Section>
       </div>
 
       {STEPS.length > 0 && (
@@ -225,17 +214,7 @@ export function RecruitsPage() {
           </>
         }
       >
-        {view.primary === 'apply' && st.applyUrl ? (
-          <a className="btn-primary" href={st.applyUrl} target="_blank" rel="noreferrer">
-            지원서 쓰기<span className="visually-hidden"> (새 창)</span>
-            
-          </a>
-        ) : (
-          <a className="btn-primary" href={st.channelUrl} target="_blank" rel="noreferrer">
-            {st.generation}기 소식 받기<span className="visually-hidden"> (인스타그램 {SITE.links.instagramHandle}, 새 창)</span>
-            
-          </a>
-        )}
+        <PrimaryAction st={st} />
       </StickyCta>
     </>
   )

@@ -33,7 +33,7 @@ jobs:
               return v.split(',').map(s => s.trim()).filter(Boolean);
             };
 
-            const AREAS = ['frontend', 'backend', 'ai', 'contracts', 'infra', 'ci'];
+            const AREAS = ['frontend', 'backend', 'ai', 'infra', 'ci'];
             const labels = new Set();
 
             for (const h of ['작업 영역', '의심 영역']) {

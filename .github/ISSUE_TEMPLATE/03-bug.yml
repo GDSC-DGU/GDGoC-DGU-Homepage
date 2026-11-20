@@ -31,7 +31,6 @@ body:
         - frontend
         - backend
         - ai
-        - contracts
         - infra
     validations:
       required: false

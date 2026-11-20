@@ -1,0 +1,205 @@
+/*
+ * ── 로그인 화면 (P-COM-010) ──
+ * 가운데 한 칸(480). 제목 · 한 줄 · Google 버튼(또는 예시 계정 버튼) · 안내 두 줄.
+ */
+.page {
+  padding-block: 72px 120px;
+}
+.card {
+  display: grid;
+  gap: 20px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.eyebrow {
+  font: var(--t-eyebrow);
+  color: var(--ink-700);
+}
+.title {
+  font: var(--t-section);
+  letter-spacing: var(--ls-section);
+  text-wrap: balance;
+}
+.lead {
+  font: var(--t-body);
+  color: var(--ink-700);
+}
+.subTitle {
+  font: var(--t-h3);
+  letter-spacing: var(--ls-h3);
+}
+.small {
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+
+.callout,
+.alert,
+.done {
+  padding: 14px 16px;
+  border-radius: var(--r-card);
+  font: 500 15px/24px var(--font-kr);
+}
+.callout,
+.done {
+  background: var(--field);
+  color: var(--ink-900);
+}
+.alert {
+  background: var(--tone-red-bg);
+  color: var(--tone-red-ink);
+}
+
+.google {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  min-height: 44px;
+}
+.googleSlot {
+  min-height: 44px;
+}
+
+.examples,
+.inApp {
+  display: grid;
+  gap: 12px;
+}
+.exampleList {
+  display: grid;
+  gap: 10px;
+}
+.exampleBtn {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: var(--r-card);
+  background: var(--field);
+  box-shadow: inset 0 0 0 1px var(--field-line);
+  font: var(--t-ui);
+  color: var(--ink-900);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--dur-hover) var(--ease),
+    transform var(--dur-press) var(--ease);
+}
+.exampleBtn:active {
+  transform: scale(var(--press));
+}
+.exampleBtn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.exampleBtn[aria-busy='true'] {
+  opacity: 1;
+}
+.exampleNote {
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+@media (hover: hover) {
+  .exampleBtn:not(:disabled):hover {
+    background: var(--field-line);
+  }
+}
+
+.url {
+  padding: 10px 12px;
+  border-radius: var(--r-control);
+  background: var(--field);
+  font: 500 14px/22px var(--font-kr);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.notes {
+  display: grid;
+  gap: 6px;
+  padding: 16px 0 0 18px;
+  border-top: 1px solid var(--line);
+  font: var(--t-meta);
+  color: var(--ink-700);
+  list-style: disc;
+}
+
+/*
+ * ── 화면 아래 안내 (로그인 55분 예고 · 만료 · 운영진 전용) ──
+ * 가운데 아래, 먹색 띠. 오른쪽 빠른 메뉴와 겹치지 않게 폭을 줄인다.
+ */
+.noticeDock {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 80;
+  width: min(560px, calc(100vw - 2 * var(--side, 20px)));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 14px 18px;
+  border-radius: var(--r-card);
+  background: var(--band-bg);
+  box-shadow: var(--shadow-float);
+  color: var(--band-ink);
+  pointer-events: auto;
+  animation: noticeIn var(--dur-hover, 0.2s) var(--ease-out);
+}
+.notice[data-tone='warn'] {
+  box-shadow:
+    inset 4px 0 0 var(--gen),
+    var(--shadow-float);
+}
+.noticeText {
+  flex: 1 1 220px;
+  min-width: 0;
+  font: 500 15px/22px var(--font-kr);
+}
+.noticeAction,
+.noticeClose {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-pill);
+  font: 600 14px/36px var(--font-kr);
+  cursor: pointer;
+}
+.noticeAction {
+  background: var(--band-ink);
+  color: var(--band-bg);
+  text-decoration: none;
+}
+.noticeClose {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--band-line-strong);
+  color: var(--band-ink);
+}
+@keyframes noticeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (max-width: 767px) {
+  .page {
+    padding-block: 40px 80px;
+  }
+  .noticeDock {
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notice {
+    animation: none;
+  }
+  .exampleBtn {
+    transition: none;
+  }
+}

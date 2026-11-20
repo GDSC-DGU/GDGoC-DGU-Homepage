@@ -8,10 +8,11 @@
   inset: 0;
   height: fit-content;
   flex-direction: column;
-  width: min(640px, calc(100% - 32px));
+  /* 슈어소프트테크 검색: 화면 가운데쯤 폭 넓은 흰 칸 (4기 Organizer 2026-11-16) */
+  width: min(720px, calc(100% - 40px));
   max-width: none;
   max-height: min(600px, calc(100dvh - 96px));
-  margin: max(72px, 12vh) auto auto;
+  margin: max(96px, 30vh) auto auto;
   padding: 0;
   border: 0;
   border-radius: var(--r-card);
@@ -47,7 +48,9 @@
   }
 }
 .dialog::backdrop {
-  background: var(--ink-a32);
+  /* 뒤 화면을 먹색으로 덮고 흐리게 (슈어소프트테크 검색 열기) */
+  background: color-mix(in srgb, var(--band-bg) 82%, transparent);
+  backdrop-filter: blur(6px);
   opacity: 0;
   transition:
     opacity var(--dur-short-exit) var(--ease-in),

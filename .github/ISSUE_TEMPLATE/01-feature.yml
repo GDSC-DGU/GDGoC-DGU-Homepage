@@ -46,7 +46,6 @@ body:
         - frontend
         - backend
         - ai
-        - contracts
         - infra
     validations:
       required: false
@@ -69,28 +68,6 @@ body:
         - [ ] 
     validations:
       required: true
-
-  - type: dropdown
-    id: api-change
-    attributes:
-      label: API 계약 변경
-      options:
-        - 없음
-        - 있음 (openapi.yaml)
-        - 있음 (ai-internal.yaml)
-        - 있음 (둘 다)
-      default: 0
-    validations:
-      required: true
-
-  - type: input
-    id: operation-id
-    attributes:
-      label: 변경할 operationId
-      description: API 계약 변경이 있을 때만
-      placeholder: "createTeamPost"
-    validations:
-      required: false
 
   - type: dropdown
     id: permission

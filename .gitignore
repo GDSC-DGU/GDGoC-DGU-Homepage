@@ -46,8 +46,9 @@ GEMINI.md
 # ── 결정 · 이유 · 예정 메모 (로컬 전용. 확정 규칙은 RULEBOOKS/에) ──
 PLANS/
 
-# ── 실제 채점 루브릭 (형식만 같은 가짜 예시 rubric.local.yaml만 커밋) ──
+# ── 실제 채점 루브릭 · 지시문 (형식만 같은 가짜 예시 *.local.yaml만 커밋) ──
 scripts/seed/rubric/*.private.yaml
+scripts/seed/prompts/*.private.yaml
 
 # ── Firebase 에뮬레이터 · Vercel ──
 .emulator-data/
@@ -83,6 +84,8 @@ __pycache__/
 *.egg-info/
 .coverage
 htmlcov/
+# 로컬 실행 로그 (Gemini 호출 메타데이터)
+ai/logs/
 
 # ── 에디터 · OS ──
 .idea/
@@ -90,6 +93,7 @@ htmlcov/
 *.iws
 .vscode/*
 !.vscode/extensions.json
+/backend/.vscode/launch.json
 .settings/
 .project
 .classpath

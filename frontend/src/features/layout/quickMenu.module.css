@@ -1,0 +1,158 @@
+/*
+ * 빠른 메뉴 (슈어소프트테크): 넓은 화면은 오른쪽 30px · 아래 70px 에 75 × 75 네모가 세로로, 그 아래 둥근 '맨 위로'(50).
+ * 폰(680 이하)은 화면 아래 높이 50 띠에 네 칸, '맨 위로'는 띠 위 가운데. 본문 아래에 띠 높이만큼 비워 둔다.
+ */
+.quick {
+  position: fixed;
+  right: max(30px, env(safe-area-inset-right, 0px));
+  bottom: 70px;
+  z-index: 40;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+.list ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  width: 75px;
+  height: 75px;
+  border-radius: 6px;
+  background: var(--ink-900);
+  color: var(--white);
+  text-decoration: none;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.item[data-id='apply'] {
+  background: var(--gen);
+  color: var(--on-gen);
+}
+.item[data-id='youtube'] {
+  background: var(--field);
+  color: var(--ink-900);
+}
+.item[data-id='links'] {
+  background: var(--band-raise);
+  color: var(--band-ink);
+}
+.item:active,
+.top:active {
+  transform: scale(var(--press));
+}
+.label {
+  font: 600 13px/1 var(--font-kr);
+  white-space: nowrap;
+}
+.fill {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+.line {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.top {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--ink-500);
+  color: var(--white);
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+.top svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (hover: hover) {
+  .item:hover {
+    transform: translateX(-4px);
+  }
+}
+
+@media (max-width: 680px) {
+  :global(body) {
+    padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
+  }
+  .quick {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    gap: 0;
+  }
+  .list {
+    order: 2;
+    width: 100%;
+  }
+  .list ul {
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--ink-900);
+  }
+  .item {
+    grid-auto-flow: column;
+    gap: 6px;
+    width: auto;
+    height: 50px;
+    border-radius: 0;
+  }
+  .label {
+    font-size: 12px;
+  }
+  .fill,
+  .line {
+    width: 16px;
+    height: 16px;
+  }
+  .top {
+    order: 1;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 14px;
+  }
+  /* 지원하기 페이지는 페이지의 아래 고정 띠를 쓴다 */
+  .quick[data-recruits] .list {
+    display: none;
+  }
+  .quick[data-recruits] .top {
+    margin-bottom: 84px;
+  }
+}
+@media (max-width: 680px) {
+  :global(body:has([data-recruits])) {
+    padding-bottom: 0;
+  }
+}
+
+@media (hover: hover) and (max-width: 680px) {
+  .item:hover {
+    transform: none;
+  }
+}

@@ -322,6 +322,19 @@ img {
 }
 
 /*
+ * 글 속 링크: 주변 글자 크기 · 줄 높이를 그대로 쓰고 굵게 + 밑줄만 (.link 처럼 버튼 크기로 키우지 않는다).
+ * 개인정보 처리방침처럼 눈에 띄어야 하지만 글 흐름 안에 있는 링크 (꼬리말 · 로그인 안내 · 지원서 동의란).
+ */
+.link-text {
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink-900);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/*
  * 못 누르는 버튼: 흐리게만 하지 않고 면 · 글자 · 선 · 커서를 함께 바꾼다 (hallmark 39a).
  * 회색 면 + 옅은 글자 + 점선 테두리, 누르거나 마우스를 올려도 모양이 바뀌지 않는다.
  */
@@ -653,3 +666,4 @@ html[data-vt='sheet-close']::view-transition-new(sheet-box) {
     transform: none;
   }
 }
+

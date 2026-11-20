@@ -3,7 +3,7 @@ import { PAGE_PLAN_IDS } from '@/config/pages'
 import { HomePage } from '@/features/home/HomePage'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { ErrorPage } from '@/features/pages/ErrorPage'
-import { AdminApp, ArchivePage, CampusPreview, CommunityPage, MovedTo, NotFoundPage, NowPreview, PlannedPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
+import { AdminApp, ApplyPage, ArchivePage, CampusPreview, CommunityPage, LoginPage, MovedTo, NotFoundPage, NowPreview, PlannedPage, PrivacyPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
 import { enableViewTransitions } from './viewTransitions'
 
 /** 다 만든 페이지. 준비 중 페이지를 실제로 만들면 여기로 옮긴다 */
@@ -16,11 +16,17 @@ const BUILT_ROUTES: RouteObject[] = [
   { path: 'about', element: <CommunityPage /> },
   { path: 'community', element: <MovedTo pathname="/about" /> },
   { path: 'recruits', element: <RecruitsPage /> },
+  // 지원서 작성 (P-RCT-03). 백엔드 전에는 예시 지원서 (features/apply/data/applyRepo.ts 의 APPLY_SAMPLE)
+  { path: 'recruits/apply', element: <ApplyPage /> },
   // 팀원 찾기: 백엔드 전에는 예시 게시판 (features/teams/data/teamsRepo.ts 의 TEAMS_SAMPLE)
   { path: 'teams', element: <TeamsPage /> },
   { path: 'teams/write', element: <TeamsWritePage mode="create" /> },
   { path: 'teams/:postId', element: <TeamsPostPage /> },
   { path: 'teams/:postId/edit', element: <TeamsWritePage mode="edit" /> },
+  // 로그인 (P-COM-010): 회원 · 운영진 모두 Google 로그인. ?next= 로 보던 페이지로 돌아간다 (features/auth)
+  { path: 'login', element: <LoginPage /> },
+  // 개인정보 처리방침 (P-COM-008): Google 로그인 동의 화면에 등록하는 주소. 내용은 src/content/privacy.ts
+  { path: 'privacy', element: <PrivacyPage /> },
 ]
 const BUILT = new Set(BUILT_ROUTES.map((r) => r.path))
 
@@ -41,7 +47,7 @@ const routes: RouteObject[] = [
     children: [...BUILT_ROUTES, ...PLANNED_ROUTES, ...(import.meta.env.DEV ? PREVIEW_ROUTES : []), { path: '*', element: <NotFoundPage /> }],
   },
   /**
-   * 관리자 화면 (/admin, /admin/login, /admin/boards/teams …): 공개 사이트 틀(머리말 · 꼬리말 · 페이지 전환) 밖의 관리자 전용 틀.
+   * 관리자 화면 (/admin, /admin/boards/teams …. 예전 /admin/login 은 /login 으로 넘긴다): 공개 사이트 틀(머리말 · 꼬리말 · 페이지 전환) 밖의 관리자 전용 틀.
    * 코드는 들어올 때 받는다 (공개 페이지 첫 JS 에 넣지 않음). 하위 주소는 features/admin/routes.tsx, 화면 목록은 features/admin/screens.ts.
    */
   { path: 'admin/*', element: <AdminApp />, errorElement: <ErrorPage /> },

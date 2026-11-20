@@ -99,9 +99,9 @@ PR은 squash merge되므로 **PR 제목이 develop에 남는 커밋 메시지**�
 | 요소 | 값 |
 |---|---|
 | `type` | `feat`, `design`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`, `perf`, `revert` (`release`는 릴리스 PR 전용) |
-| `scope` | `frontend`, `backend`, `ai`, `contracts`, `infra`, `ci`, `repo`, `deps` 중 하나(생략 가능). 여러 영역이면 가장 핵심인 것 하나. (`deps-dev`도 허용되지만 Dependabot 자동 PR 전용) |
+| `scope` | `frontend`, `backend`, `ai`, `infra`, `ci`, `repo`, `deps` 중 하나(생략 가능). 여러 영역이면 가장 핵심인 것 하나. (`deps-dev`도 허용되지만 Dependabot 자동 PR 전용) |
 | `요약` | 한국어 가능. "~ 추가", "~ 수정"처럼 명사형으로 끝냄. 마침표 없음. 50자 이내 |
-| `!` | 하위 호환이 깨지는 API 계약 변경이면 `type(scope)!:` |
+| `!` | 하위 호환이 깨지는 API 변경이면 `type(scope)!:` |
 
 ### 예시
 
@@ -109,7 +109,7 @@ PR은 squash merge되므로 **PR 제목이 develop에 남는 커밋 메시지**�
 feat(frontend): Teams 게시글 작성 기능 추가
 design(frontend): Teams 목록 카드 스타일 Figma 반영
 fix(backend): 지원서 중복 제출 검사 누락 수정
-feat(contracts)!: 지원서 응답에 status 필드 필수화
+feat(backend)!: 지원서 응답에 status 필드 필수화
 chore(ci): Gradle 캐시 적용
 release: 2026-11-20          ← 릴리스 PR 전용
 ```
@@ -136,7 +136,6 @@ git switch -c feature/f-hom-001-hero-section
 
 - **PR은 작게 만듭니다.** 변경 400줄 이하를 목표로 합니다(생성 코드, lock 파일, 이미지 에셋 제외). 이슈를 쓸 때는 기능이 크면 하위 이슈(sub-issue)로 나눕니다.
 - **디자인 작업은 Vercel 프리뷰 링크를 PR에 남깁니다.**
-- **API를 바꾸는 작업은 계약(`packages/contracts/openapi.yaml`)부터 고칩니다.** 계약만 담은 PR을 먼저 올려 합의해도 됩니다. 작성 방식은 `packages/contracts/examples/`를 참고합니다.
 - **일찍 Draft PR을 엽니다.**
 - **develop 최신 내용 반영**: 리뷰가 시작되기 전에는 `git rebase develop` 후 force push해도 됩니다. **리뷰가 시작된 뒤에는** force push하지 않고 PR 화면의 "Update branch" 버튼이나 `git merge develop`을 씁니다.
 
@@ -194,11 +193,11 @@ git branch -d feature/f-hom-001-hero-section
 | `feature` `design` `bug` `task` `docs` (종류) | 이슈 (이슈를 쓸 때) | 고른 이슈 템플릿 |
 | | PR | 브랜치 헤드 (`fix/`, `hotfix/` → `bug`) |
 | `hotfix` | PR | `hotfix/` 브랜치 (`bug`와 함께) |
-| `area:frontend` `backend` `ai` `contracts` `infra` `ci` `docs` | 이슈 (이슈를 쓸 때) | 이슈 폼의 "작업 영역" · "의심 영역" 선택값 (선택 사항, 디자인 · 문서 템플릿은 `area:frontend` · `area:docs` 고정) |
+| `area:frontend` `backend` `ai` `infra` `ci` `docs` | 이슈 (이슈를 쓸 때) | 이슈 폼의 "작업 영역" · "의심 영역" 선택값 (선택 사항, 디자인 · 문서 템플릿은 `area:frontend` · `area:docs` 고정) |
 | | PR | 변경된 파일 경로 |
 | `severity:critical` `high` `medium` `low` | 버그 이슈 (이슈를 쓸 때) | 버그 폼의 "심각도" 선택값 (필수) |
 | `release`, `back-merge` | PR | 브랜치 흐름 (develop→main, main→develop) |
-| `breaking` | PR | **수동**. 하위 호환이 깨지는 계약 변경 |
+| `breaking` | PR | **수동**. 하위 호환이 깨지는 API 변경 |
 | `blocked`, `good first issue`, `skip-release-notes` | 이슈·PR | **수동** |
 
 이 레포는 GitHub의 Issue type을 쓰지 않습니다. 이슈와 PR의 종류는 모두 위 **종류 라벨**로 구분하고, 릴리스 노트도 이 라벨로 분류됩니다.

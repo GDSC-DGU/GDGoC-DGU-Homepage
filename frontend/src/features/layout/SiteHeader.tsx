@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { APPLY_PLACE, HEADER_NAV, PLACE_BY_ID, headerLabel } from '@/config/places'
-import { recruitStatus } from '@/content/recruitingStatus'
-import { useToday } from '@/hooks/useToday'
-import { useCampusActions } from '@/state/useCampus'
-import { MobileMenu } from './MobileMenu'
+import { SITE_MENU } from '@/config/menu'
 import { SearchDialog } from './SearchDialog'
+import { AccountTools } from './AccountTools'
+import { SitemapMenu } from './SitemapMenu'
 import s from './layout.module.css'
 
-/** 조금이라도 내려가면 머리말 아래에 1px 선을 긋는다 */
+/** 조금이라도 내려가면 머리말에 흰 바탕 + 그림자 (슈어소프트테크) */
 function useScrolled(): boolean {
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
@@ -18,6 +16,36 @@ function useScrolled(): boolean {
     return () => window.removeEventListener('scroll', on)
   }, [])
   return scrolled
+}
+
+/**
+ * 내리면 머리말을 숨기고, 올리면 다시 보인다 (4기 Organizer 2026-11-16: 슈어소프트테크 머리말 그대로).
+ * - 맨 위 근처(머리말 높이 이내)에서는 늘 보인다. 5px 안쪽으로 조금 움직인 것은 무시한다.
+ * - 페이지 바닥에 닿아 튕기는 동안에는 바꾸지 않는다. keep 이면(메뉴 · 검색 창이 열림, 초점이 머리말 안) 숨기지 않는다.
+ */
+function useHideOnScroll(keep: boolean): boolean {
+  const [hidden, setHidden] = useState(false)
+  useEffect(() => {
+    if (keep) return
+    let last = window.scrollY
+    const DELTA = 5
+    const TOP = 80
+    const on = () => {
+      const y = window.scrollY
+      if (y <= TOP) {
+        setHidden(false)
+        last = y
+        return
+      }
+      if (Math.abs(y - last) <= DELTA) return
+      if (y > last) setHidden(true)
+      else if (y + window.innerHeight < document.documentElement.scrollHeight) setHidden(false)
+      last = y
+    }
+    window.addEventListener('scroll', on, { passive: true })
+    return () => window.removeEventListener('scroll', on)
+  }, [keep])
+  return hidden && !keep
 }
 
 /**
@@ -62,14 +90,30 @@ function useOnDark(key: string): boolean {
 /** GDG DGU 로고 그림 크기 (public/brand/gdg-dgu-logo.png 원본 비율 그대로, 화면에서는 높이 26px) */
 const LOGO = { w: 280, h: 137 } as const
 
+/** 아래 칸이 가장 긴 메뉴의 줄 수 (흰 판 높이) */
+const GNB_ROWS = Math.max(...SITE_MENU.map((g) => g.items.length))
+
 /**
- * 모든 페이지 공통 머리말 (4기 Figma 시안 2026-11): 80px 흰 띠(폰 64), 위에 붙어 있다.
- * 왼쪽 로고(= 홈, 글자 없이 로고만: 4기 Organizer 2026-11-05) · 가운데 검색창 · 오른쪽 메뉴 셋(소개 · 아카이브 · 팀원 찾기) + 먹색 상자 '지원하기'. 지금 메뉴는 먹색 글자 + 먹색 밑줄.
- * 메뉴에 마우스를 올리면 지도에서 같은 건물이 올라온다 (메뉴 = 지도).
- * 검색은 넓은 화면 가운데 검색창(4기 Organizer 2026-11-06) · Ctrl/⌘ + K · 폰 메뉴 시트에서. 폰(900px 이하)은 이름 · 메뉴 버튼 한 줄, 메뉴는 전체 화면 시트로 연다.
+ * 미끄러지는 줄의 자리: 메뉴가 다 벌어진 뒤(칸 좌우 --gnb-pad-open)를 기준으로 계산한다.
+ * 벌어지는 동안(0.3초) 지금 자리를 재면 줄이 엉뚱한 곳에 멈추므로, 글자 폭과 벌어진 여백으로 끝 자리를 바로 구한다.
+ */
+function barAt(list: HTMLUListElement | null, links: readonly (HTMLAnchorElement | null)[], i: number): { left: number; width: number } {
+  if (!list) return { left: 0, width: 0 }
+  const pad = parseFloat(getComputedStyle(list).getPropertyValue('--gnb-pad-open')) || 0
+  let left = 0
+  for (let j = 0; j < i; j++) left += (links[j]?.offsetWidth ?? 0) + pad * 2
+  return { left: left + pad, width: links[i]?.offsetWidth ?? 0 }
+}
+
+/**
+ * 모든 페이지 공통 머리말 (4기 Organizer 2026-11-16: 슈어소프트테크 머리말 그대로).
+ * - 높이 90 (폰 70), 화면 폭 90% 틀. 맨 위에서는 바탕이 비치고, 조금이라도 내려가면 흰 바탕 + 그림자. 내리면 숨고 올리면 나타난다.
+ * - 왼쪽 로고(= 홈) · 가운데 메뉴(1024 이상) · 오른쪽 검색 · 전체 메뉴 버튼.
+ * - 가운데 메뉴에 마우스를 올리거나 초점이 들어오면 흰 판이 내려오며 메뉴마다 아래 칸이 한꺼번에 보인다 (config/menu.ts).
+ * - 검정 섹션 위 맨 꼭대기에서는 글자 · 그림이 흰색 (useOnDark). 흰 바탕이 깔리면 다시 먹색.
+ * 검색은 Ctrl/⌘ + K 로도 연다.
  */
 export function SiteHeader() {
-  const { hover } = useCampusActions()
   const scrolled = useScrolled()
   // 메뉴 · 검색 창은 '연 주소' 를 기억하고, 지금 주소가 같을 때만 열려 있다.
   // 주소가 바뀌면(뒤로 가기 · 폰의 뒤로 단추 포함) 저절로 닫힌다 (QA 2026-11-05: 열린 메뉴가 새 페이지 위에 남았다)
@@ -78,15 +122,28 @@ export function SiteHeader() {
   const hereRef = useRef(here)
   const [searchAt, setSearchAt] = useState<string | null>(null)
   const [menuAt, setMenuAt] = useState<string | null>(null)
+  const [gnbAt, setGnbAt] = useState<string | null>(null)
   const searchOpen = searchAt === here
   const menuOpen = menuAt === here
+  const gnbOpen = gnbAt === here
+  const [focusIn, setFocusIn] = useState(false)
+  const hidden = useHideOnScroll(searchOpen || menuOpen || focusIn || gnbOpen)
   useEffect(() => {
     hereRef.current = here
   }, [here])
-  const recruitingOpen = recruitStatus(useToday()).state === 'open'
-  const onDark = useOnDark(here)
+  const onDark = useOnDark(here) && !scrolled && !gnbOpen
   const menuBtnRef = useRef<HTMLButtonElement>(null)
   const searchBtnRef = useRef<HTMLButtonElement>(null)
+  // 가운데 메뉴의 미끄러지는 줄: 올린 메뉴 번호 → 메뉴가 다 벌어진 뒤의 자리 · 폭
+  const gnbListRef = useRef<HTMLUListElement>(null)
+  const gnbLinkRefs = useRef<(HTMLAnchorElement | null)[]>([])
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null)
+  // 줄은 마지막 자리를 기억한다: 다시 열면 그 자리에서 다음 메뉴로 미끄러진다
+  const [bar, setBar] = useState({ left: 0, width: 0 })
+  const hoverMenu = (i: number) => {
+    setHoverIdx(i)
+    setBar(barAt(gnbListRef.current, gnbLinkRefs.current, i))
+  }
 
   // Ctrl/⌘ + K 로 어디서든 검색 창을 연다
   useEffect(() => {
@@ -101,88 +158,113 @@ export function SiteHeader() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  const openSearch = () => {
+    setMenuAt(null)
+    setGnbAt(null)
+    setSearchAt(here)
+  }
+
   return (
     <>
-      <header className={s.header} data-site-header="" data-scrolled={scrolled || undefined} data-on-dark={onDark || undefined}>
+      <header
+        className={s.header}
+        data-site-header=""
+        data-scrolled={scrolled || undefined}
+        data-on-dark={onDark || undefined}
+        data-hidden={hidden || undefined}
+        data-gnb={gnbOpen || undefined}
+        style={{ ['--gnb-rows-px' as string]: `${GNB_ROWS * 32 - 8}px` }}
+        // 메뉴 사이 빈 곳 · 흰 판 위에 있는 동안은 펼친 채로, 머리말(흰 판 포함)을 벗어나면 닫는다
+        onMouseLeave={() => {
+          setGnbAt(null)
+          setHoverIdx(null)
+        }}
+        onFocus={() => setFocusIn(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocusIn(false)
+        }}
+      >
         <div className={`container ${s.bar} ${onDark ? 'on-dark' : ''}`}>
           {/* 로고만 보이고, 읽히는 이름은 'GDGoC DGU 홈' (public/brand: 4기 Organizer 가 준 GDG DGU 로고) */}
           <Link className={s.brand} to="/">
             <img className={s.brandLogo} src={`${import.meta.env.BASE_URL}brand/gdg-dgu-logo.png`} alt="" width={LOGO.w} height={LOGO.h} />
             <span className="visually-hidden">GDGoC DGU 홈</span>
           </Link>
-          {/* 가운데 검색창 (링커리어처럼: 4기 Organizer 2026-11-06). 누르면 검색 창이 열린다. 폰에서는 메뉴 시트 안에 */}
-          <button
-            ref={searchBtnRef}
-            type="button"
-            className={s.searchBox}
-            aria-haspopup="dialog"
-            aria-expanded={searchOpen}
-            aria-keyshortcuts="Control+K Meta+K"
-            onClick={() => {
-              setMenuAt(null)
-              setSearchAt(here)
+          <nav
+            className={s.gnb}
+            aria-label="주요 메뉴"
+            onMouseEnter={() => setGnbAt(here)}
+            onFocus={() => setGnbAt(here)}
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setGnbAt(null)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setGnbAt(null)
             }}
           >
-            <span className={s.searchHint}>세미나, 프로젝트, 행사 검색</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="6.5" />
-              <path d="M16 16l4.5 4.5" />
-            </svg>
-          </button>
-          <nav className={s.nav} aria-label="주요 메뉴">
-            <ul>
-              {HEADER_NAV.map((id) => (
-                <li key={id}>
+            <ul ref={gnbListRef} className={s.gnbList}>
+              {SITE_MENU.map((g, i) => (
+                <li key={g.id} className={s.gnbItem} data-hover={(gnbOpen && hoverIdx === i) || undefined}>
                   <NavLink
-                    to={PLACE_BY_ID[id].path}
-                    className={({ isActive }) => `${s.navLink} ${isActive ? s.navActive : ''}`}
-                    onMouseEnter={() => hover(id)}
-                    onMouseLeave={() => hover(null)}
-                    onFocus={() => hover(id)}
-                    onBlur={() => hover(null)}
+                    ref={(el) => {
+                      gnbLinkRefs.current[i] = el
+                    }}
+                    to={g.to}
+                    className={({ isActive }) => `${s.gnbLink} ${isActive ? s.gnbActive : ''}`}
+                    onMouseEnter={() => hoverMenu(i)}
+                    onFocus={() => hoverMenu(i)}
+                    onClick={() => setGnbAt(null)}
                   >
-                    {/* 메뉴는 이름만 ('준비 중' 표시는 그 페이지 머리에서) */}
-                    {headerLabel(id)}
+                    {g.label}
                   </NavLink>
+                  <ul className={s.sub}>
+                    {g.items.map((it) => (
+                      <li key={it.to}>
+                        <Link className={s.subLink} to={it.to} tabIndex={gnbOpen ? undefined : -1} onMouseEnter={() => hoverMenu(i)} onFocus={() => hoverMenu(i)} onClick={() => setGnbAt(null)}>
+                          {it.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
-              {/* 지원하기: 메뉴 끝의 먹색 상자 단추 (다른 동아리 사이트처럼 지원을 따로 눈에 띄게: 4기 Organizer 2026-11-06) */}
-              <li>
-                <NavLink
-                  to={PLACE_BY_ID[APPLY_PLACE].path}
-                  className={({ isActive }) => `${s.applyCta} ${isActive ? s.applyCtaActive : ''}`}
-                  onMouseEnter={() => hover(APPLY_PLACE)}
-                  onMouseLeave={() => hover(null)}
-                  onFocus={() => hover(APPLY_PLACE)}
-                  onBlur={() => hover(null)}
-                >
-                  {recruitingOpen && <span className={s.applyDot} aria-hidden="true" />}
-                  {PLACE_BY_ID[APPLY_PLACE].label}
-                  {recruitingOpen && <span className="visually-hidden"> (모집 중)</span>}
-                </NavLink>
-              </li>
+              {/* 올린 메뉴 아래 한 줄: 메뉴를 옮기면 옆으로 미끄러진다 (슈어소프트테크 gnbBar). 꾸밈이라 읽지 않는다 */}
+              <li className={s.gnbBar} aria-hidden="true" data-on={(gnbOpen && hoverIdx !== null) || undefined} style={{ transform: `translateX(${bar.left}px)`, width: bar.width }} />
             </ul>
           </nav>
           <div className={s.tools}>
-            <button ref={menuBtnRef} type="button" className={`${s.iconBtn} ${s.menuBtn}`} aria-haspopup="dialog" aria-expanded={menuOpen} onClick={() => setMenuAt(here)}>
+            <AccountTools />
+            <button ref={searchBtnRef} type="button" className={s.iconBtn} aria-haspopup="dialog" aria-expanded={searchOpen} aria-keyshortcuts="Control+K Meta+K" onClick={openSearch}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h16" />
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="M16 16l4.5 4.5" />
               </svg>
-              <span className="visually-hidden">메뉴</span>
+              <span className="visually-hidden">검색 열기</span>
+            </button>
+            <button
+              ref={menuBtnRef}
+              type="button"
+              className={s.iconBtn}
+              aria-haspopup="dialog"
+              aria-expanded={menuOpen}
+              onClick={() => {
+                setGnbAt(null)
+                setMenuAt(here)
+              }}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 6h18M3 12h18M3 18h18" />
+              </svg>
+              <span className="visually-hidden">전체 메뉴 열기</span>
             </button>
           </div>
         </div>
+        {/* 가운데 메뉴의 아래 칸 뒤 흰 판 (꾸밈) */}
+        <div className={s.gnbPanel} aria-hidden="true" />
       </header>
-      {/* 폰 메뉴 안에서 연 검색을 닫으면 메뉴는 이미 닫혀 있다: 초점은 머리말의 메뉴 버튼으로 */}
+      {/* 전체 메뉴 안에서 연 검색을 닫으면 메뉴는 이미 닫혀 있다: 초점은 머리말의 메뉴 버튼으로 */}
       <SearchDialog open={searchOpen} onClose={() => setSearchAt(null)} returnFallbacks={[searchBtnRef, menuBtnRef]} />
-      <MobileMenu
-        open={menuOpen}
-        onClose={() => setMenuAt(null)}
-        onSearch={() => {
-          setMenuAt(null)
-          setSearchAt(here)
-        }}
-      />
+      <SitemapMenu open={menuOpen} onClose={() => setMenuAt(null)} onSearch={openSearch} />
     </>
   )
 }
