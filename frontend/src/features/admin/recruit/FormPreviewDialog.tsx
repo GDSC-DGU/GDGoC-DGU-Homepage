@@ -1,5 +1,7 @@
 import { sampleOnly } from '../sample'
 import { useId, useRef } from 'react'
+import { Link } from 'react-router-dom'
+import { PRIVACY_PROCESSOR_SUMMARY } from '@/content/privacy'
 import { kstDay } from '../data/recruit/rules'
 import type { FormQuestion } from '../data/recruit/types'
 import { Dialog } from '../ui'
@@ -145,8 +147,13 @@ export function FormPreviewDialog({ open, onClose, form }: { open: boolean; onCl
               <dt>보유 기간</dt>
               <dd>제출일로부터 1년 (지나면 삭제)</dd>
               <dt>처리 위탁</dt>
-              <dd>메일 발송 서비스, AI 채점 서비스 (업체명은 서비스 확정 후 기재)</dd>
+              <dd>{PRIVACY_PROCESSOR_SUMMARY} · 미국으로 이전</dd>
             </dl>
+            <p>
+              <Link className="link" to="/privacy" target="_blank" rel="noopener">
+                개인정보 처리방침 전문 보기<span className="visually-hidden"> (새 탭)</span>
+              </Link>
+            </p>
           </section>
         </form>
       </div>

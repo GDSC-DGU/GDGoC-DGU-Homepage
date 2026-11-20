@@ -3,6 +3,7 @@ import { Link, useBlocker, useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
 import { SITE } from '@/config/site'
 import { CHAPTER, RECRUITING } from '@/content'
+import { PRIVACY_PROCESSOR_SUMMARY } from '@/content/privacy'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useToday } from '@/hooks/useToday'
 import { monthDay, weekday } from '@/lib/date'
@@ -344,7 +345,7 @@ function Question({ q, value, error, onChange }: { q: FormQuestion; value: strin
   )
 }
 
-/** 동의 둘 (F-RCT-005 4 · 5) + 처리방침 요약. 문구는 관리자 '지원서 미리보기'와 같다 */
+/** 동의 둘 (F-RCT-005 4 · 5) + 처리방침 요약 · 전문 링크(새 탭, 쓰던 답이 남게). 문구는 관리자 '지원서 미리보기'와 같다 (F-COM-005) */
 function ConsentBox({ value, error, onChange }: { value: Consents; error?: string; onChange: (c: Consents) => void }) {
   const all = value.privacy && value.ai
   return (
@@ -371,7 +372,14 @@ function ConsentBox({ value, error, onChange }: { value: Consents; error?: strin
           <dd>본인 확인과 회원 계정 생성에만 씁니다. AI 채점에 보내지 않고, 운영진 목록에서는 가운데를 가려 보여 줍니다.</dd>
           <dt>보유 기간</dt>
           <dd>제출일로부터 1년 (지나면 삭제)</dd>
+          <dt>처리 위탁</dt>
+          <dd>{PRIVACY_PROCESSOR_SUMMARY} · 미국으로 이전</dd>
         </dl>
+        <p className={s.policyMore}>
+          <Link className="link" to="/privacy" target="_blank" rel="noopener">
+            개인정보 처리방침 전문 보기<span className="visually-hidden"> (새 탭)</span>
+          </Link>
+        </p>
       </details>
       <label className={s.check}>
         <input type="checkbox" checked={value.ai} onChange={(e) => onChange({ ...value, ai: e.target.checked })} aria-invalid={error && !value.ai ? true : undefined} />
