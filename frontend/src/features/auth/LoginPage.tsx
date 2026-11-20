@@ -14,6 +14,7 @@ import s from './auth.module.css'
  * - ?done=tab : 작성 중이던 탭이 연 새 탭. 로그인하면 '이 탭을 닫고 돌아가세요' (원래 탭도 같이 로그인된다)
  * - 앱 안 브라우저(카카오톡 등)면 Google 버튼 대신 외부 브라우저 안내 (P-COM-011)
  * - 예시 화면(VITE_DATA_SOURCE 가 http 가 아님)에서는 Google 대신 예시 계정 버튼
+ * - 아래 안내에 개인정보 처리방침 링크 (F-COM-005 규칙 3: Google 로그인으로 받는 정보)
  */
 export function LoginPage() {
   usePageTitle('로그인')
@@ -97,6 +98,13 @@ export function LoginPage() {
         <ul className={s.notes}>
           <li>처음이라면 메일로 받은 초대 링크로 Google 계정을 먼저 연결해 주세요.</li>
           <li>로그인은 1시간 동안 유지됩니다. 1시간이 지나면 다시 로그인해야 합니다.</li>
+          <li>
+            로그인하면 Google 계정 고유 식별자와 로그인 이메일을{' '}
+            <Link className="link" to="/privacy">
+              개인정보 처리방침
+            </Link>
+            에 따라 처리합니다.
+          </li>
         </ul>
         <Link className="link" to="/">
           홈으로 돌아가기
