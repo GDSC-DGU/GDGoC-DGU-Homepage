@@ -192,10 +192,6 @@
   max-width: 1360px;
   padding: 32px var(--adm-gutter) 72px;
 }
-.blocked {
-  padding: 48px 0;
-  color: var(--ink-500);
-}
 
 /* ── 1024 미만: 데스크톱 전용 안내 + 사이드바 접기 ── */
 @media (max-width: 1023px) {

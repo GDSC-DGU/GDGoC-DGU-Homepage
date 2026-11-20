@@ -54,10 +54,10 @@ const remove = useMutation({ mutationFn: (ids: string[]) => repos.boards.deleteP
   - Teams 글 · 댓글 · 작성자 = 공개 팀원 찾기의 프로토타입 데이터(`features/teams/data/sampleSeed.ts`), General 사용자 = 그 `SAMPLE_ACCOUNTS`
   - Community 공지 · 세션 · 행사 = 지금 기수의 공개 일정(`content/events.json`), 리뷰 = 홈 Interview(`content/story.ts` voices), 프로젝트 = `content/projects.json`
   - 모집 = `content/recruiting.json` 기준 (5기 모집 전: 지원폼 임시 저장본 · 지원자 0명). 관리자 계정은 `운영진A` 같은 역할 이름, 이메일은 `@example.com`
-- '예시' 표시는 `sample.ts` 의 `ADMIN_SAMPLE`(= `!PROTOTYPE`, 팀원 찾기의 `TEAMS_SAMPLE` 과 같은 규칙)일 때만: 탭 제목 '(예시)' · 사이드바 '예시 화면' · 로그인 화면의 예시 계정 안내 · 문구 끝의 '예시 화면이라 …'(`sampleOnly('…')`).
-  프로토타입 보기(개발 · 테스트 · `VITE_PROTOTYPE=true`)에서는 운영 중인 화면처럼 보이고, 로그인은 '운영진 계정으로 들어가기' 버튼 하나입니다.
+- '예시' 표시는 `sample.ts` 의 `ADMIN_SAMPLE`(= `!PROTOTYPE`, 팀원 찾기의 `TEAMS_SAMPLE` 과 같은 규칙)일 때만: 탭 제목 '(예시)' · 사이드바 '예시 화면' · 문구 끝의 '예시 화면이라 …'(`sampleOnly('…')`).
+  프로토타입 보기(개발 · 테스트 · `VITE_PROTOTYPE=true`)에서는 운영 중인 화면처럼 보입니다. 로그인은 공개 로그인(`/login`)의 [예시 운영진으로 로그인]입니다.
   공개 사이트에 없는 자리(Community 회원 글 · 댓글, 홈 소개 이미지 · 모집 포스터)도 예시 화면에서만 보입니다. `screens.test.ts` 가 두 경우를 확인합니다.
-- `data/users/seed.ts` 맨 앞의 예시 관리자 계정(`ADMIN_ACCOUNT_SEED`)은 지우지 마세요 (로그인이 깨집니다).
+- `data/users/seed.ts` 맨 앞의 예시 관리자 계정(`ADMIN_ACCOUNT_SEED`)은 지우지 마세요 (운영진A 로 들어가는 길이 깨집니다).
 - 서버 일(메일 발송 · 업로드 · AI 채점)은 흉내만: 진행 표시 → 결과. 실제 네트워크 요청 금지. 업로드는 `repos.uploads.upload(file, 'projectThumbnail')` (object URL).
 
 ## 4. 권한

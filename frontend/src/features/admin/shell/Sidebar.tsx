@@ -1,5 +1,5 @@
 import { useId, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
 import { SITE } from '@/config/site'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
@@ -20,7 +20,6 @@ const ADMIN_NARROW_QUERY = '(max-width: 1023px)'
 export function Sidebar() {
   const me = useAdminMe()
   const auth = useAdminAuth()
-  const navigate = useNavigate()
   const { pathname } = useLocation()
   // 좁은 화면의 메뉴 펼침: 연 주소를 기억해서, 주소가 바뀌면 저절로 접힌다
   const [openAt, setOpenAt] = useState<string | null>(null)
@@ -34,8 +33,8 @@ export function Sidebar() {
   const logout = async () => {
     setLeaving(true)
     try {
+      // 공개 사이트와 함께 로그아웃하고 홈으로 (F-COM-001 동작 6)
       await auth.logout()
-      navigate('/admin/login', { replace: true })
     } finally {
       setLeaving(false)
     }

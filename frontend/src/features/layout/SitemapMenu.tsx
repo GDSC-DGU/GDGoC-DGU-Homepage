@@ -1,6 +1,9 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { SITE_MENU } from '@/config/menu'
+import { useAuth } from '@/features/auth/authContext'
+import { loginPath } from '@/features/auth/session'
+import { useHerePath } from '@/hooks/useHerePath'
 import { useModalDialog } from './useModalDialog'
 import s from './sitemap.module.css'
 
@@ -73,7 +76,59 @@ export function SitemapMenu({ open, onClose, onSearch }: Props) {
             </li>
           ))}
         </ul>
+        <AccountRow onDone={close} />
       </nav>
     </dialog>
+  )
+}
+
+/**
+ * 전체 메뉴 아래 로그인 줄 (F-COM-001: 태블릿 · 폰은 메뉴 버튼으로 펼친 곳에서 로그인 · 로그아웃).
+ * 로그인 전: [로그인] / 로그인: 이름 · (운영진이면 [관리자 페이지]) · [로그아웃]
+ */
+function AccountRow({ onDone }: { onDone: () => void }) {
+  const auth = useAuth()
+  const here = useHerePath()
+  if (auth.status === 'loading') return null
+  if (auth.status === 'expired') {
+    return (
+      <div className={s.account}>
+        <Link className={s.accountBtn} to={loginPath('/', { done: 'tab' })} target="_blank" rel="noopener" onClick={onDone}>
+          다시 로그인<span className="visually-hidden"> (새 탭)</span>
+        </Link>
+      </div>
+    )
+  }
+  if (!auth.user) {
+    return (
+      <div className={s.account}>
+        <Link className={s.accountBtn} to={loginPath(here)} onClick={onDone}>
+          로그인
+        </Link>
+      </div>
+    )
+  }
+  return (
+    <div className={s.account}>
+      <p className={s.accountName}>
+        <span className="visually-hidden">로그인한 사람 </span>
+        {auth.user.name}
+      </p>
+      {auth.isAdmin && (
+        <Link className={s.accountBtn} to="/admin" onClick={onDone}>
+          관리자 페이지
+        </Link>
+      )}
+      <button
+        type="button"
+        className={s.accountBtn}
+        onClick={() => {
+          onDone()
+          void auth.logout()
+        }}
+      >
+        로그아웃
+      </button>
+    </div>
   )
 }

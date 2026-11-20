@@ -26,7 +26,7 @@ export interface DialogProps {
   footerStart?: ReactNode
   size?: 'sm' | 'md' | 'lg' | 'xl'
   /**
-   * false 면 닫을 수 없는 팝업 (P-ACM-04 비밀번호 변경: '닫을 수 없음, [로그아웃]만').
+   * false 면 닫을 수 없는 팝업 (끝까지 진행하거나 정해진 버튼으로만 나가야 하는 팝업).
    * Esc 를 막고, 브라우저가 억지로 닫으면 다시 연다. [닫기] 버튼도 없다.
    */
   dismissible?: boolean

@@ -1,5 +1,4 @@
 import { beforeAll, describe, expect, it } from 'vitest'
-import { safeReturnPath } from '../../auth/returnPath'
 import { freshLoginState } from '../common/accounts'
 import { AdminRepoError } from '../common/errors'
 import { setMockOptions } from '../common/mockContext'
@@ -129,14 +128,5 @@ describe('인증 예시 저장소 (API-ACM-001~004)', () => {
     await repos.auth.changePassword({ currentPassword: 'temp1234', newPassword: 'newpass123' })
     store.reset()
     expect((await repos.auth.me())?.mustChangePassword).toBe(true)
-  })
-
-  it('로그인 뒤 돌아갈 주소는 관리자 화면 안만', () => {
-    expect(safeReturnPath('/admin/users?type=Core')).toBe('/admin/users?type=Core')
-    expect(safeReturnPath('/admin')).toBe('/admin')
-    expect(safeReturnPath('/admin/login')).toBe('/admin')
-    expect(safeReturnPath('https://evil.example')).toBe('/admin')
-    expect(safeReturnPath('/projects')).toBe('/admin')
-    expect(safeReturnPath(undefined)).toBe('/admin')
   })
 })

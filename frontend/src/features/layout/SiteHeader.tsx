@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { SITE_MENU } from '@/config/menu'
 import { SearchDialog } from './SearchDialog'
+import { AccountTools } from './AccountTools'
 import { SitemapMenu } from './SitemapMenu'
 import s from './layout.module.css'
 
@@ -232,6 +233,7 @@ export function SiteHeader() {
             </ul>
           </nav>
           <div className={s.tools}>
+            <AccountTools />
             <button ref={searchBtnRef} type="button" className={s.iconBtn} aria-haspopup="dialog" aria-expanded={searchOpen} aria-keyshortcuts="Control+K Meta+K" onClick={openSearch}>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="11" cy="11" r="6.5" />
