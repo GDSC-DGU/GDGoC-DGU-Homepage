@@ -150,7 +150,7 @@ export function FormPreviewDialog({ open, onClose, form }: { open: boolean; onCl
               <dd>{PRIVACY_PROCESSOR_SUMMARY} · 미국으로 이전</dd>
             </dl>
             <p>
-              <Link className="link" to="/privacy" target="_blank" rel="noopener">
+              <Link className="link-text" to="/privacy" target="_blank" rel="noopener">
                 개인정보 처리방침 전문 보기<span className="visually-hidden"> (새 탭)</span>
               </Link>
             </p>

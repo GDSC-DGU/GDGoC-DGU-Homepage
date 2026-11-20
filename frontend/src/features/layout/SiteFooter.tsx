@@ -53,14 +53,14 @@ export function SiteFooter() {
             GDGoC Dongguk
           </p>
           <p className={s.footerAddress}>{SITE.address}</p>
-          {/* F-COM-002 · 005: 개인정보 처리방침은 모든 화면 아래에서 갈 수 있게 (Google 로그인 동의 화면에도 같은 주소) */}
-          <p className={s.footerLinks}>
-            <Link className={s.footerPolicy} to="/privacy">
+          {/* F-COM-002 · 005: 개인정보 처리방침은 모든 화면 아래, 저작권 줄 앞에 같은 크기 · 굵게 (다른 사이트 꼬리말과 같은 자리) */}
+          <p className={s.footerCopy}>
+            <Link className="link-text" to="/privacy">
               개인정보 처리방침
             </Link>
-          </p>
-          <p className={s.footerCopy} lang="en">
-            Copyright © <span className="num">2026</span> {SITE.fullName}. All rights reserved.
+            <span lang="en">
+              Copyright © <span className="num">2026</span> {SITE.fullName}. All rights reserved.
+            </span>
           </p>
         </div>
 

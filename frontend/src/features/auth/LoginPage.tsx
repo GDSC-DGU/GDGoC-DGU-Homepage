@@ -100,7 +100,7 @@ export function LoginPage() {
           <li>로그인은 1시간 동안 유지됩니다. 1시간이 지나면 다시 로그인해야 합니다.</li>
           <li>
             로그인하면 Google 계정 고유 식별자와 로그인 이메일을{' '}
-            <Link className="link" to="/privacy">
+            <Link className="link-text" to="/privacy">
               개인정보 처리방침
             </Link>
             에 따라 처리합니다.
