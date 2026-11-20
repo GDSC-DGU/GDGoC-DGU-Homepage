@@ -11,3 +11,12 @@ app:
     allowed-origins: "${AUTH_ALLOWED_ORIGINS:https://dev.gdgoc-dgu.com}"
   firestore:
     project-id: ${GOOGLE_CLOUD_PROJECT:dev-gdgoc-dgu-homepage}   # 인증은 Cloud Run 서비스 계정(ADC). 키 파일 없음
+  scoring:
+    task-queue:   # 채점 작업 큐 (F-RCT-004). 인증은 Cloud Run 서비스 계정(ADC)
+      mode: cloud-tasks
+      project-id: dev-gdgoc-dgu-homepage
+      location: asia-northeast3
+      queue: scoring
+      backend-url: https://backend-948542964993.asia-northeast3.run.app   # 요청 URL이자 OIDC audience
+      invoker-service-account: tasks-invoker@dev-gdgoc-dgu-homepage.iam.gserviceaccount.com
+      dispatch-deadline: 240s
