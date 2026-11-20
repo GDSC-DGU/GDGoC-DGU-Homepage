@@ -34,6 +34,8 @@ export const APPLY_PAGE = pageModule(() => import('@/features/apply'))
 export const TEAMS_PAGE = pageModule(() => import('@/features/teams'))
 export const NOW_PREVIEW = pageModule(() => import('@/features/now/NowPreview'))
 export const CAMPUS_PREVIEW = pageModule(() => import('@/features/campus/CampusPreview'))
+/** 개인정보 처리방침 (/privacy, P-COM-008) */
+export const PRIVACY_PAGE = pageModule(() => import('@/features/pages/PrivacyPage'))
 /** 로그인 (/login, P-COM-010): Google 로그인 스크립트는 이 페이지에서만 받는다 */
 export const LOGIN_PAGE = pageModule(() => import('@/features/auth/LoginPage'))
 /** 관리자 화면 (/admin/*): 틀 · 대시보드 · 공통 부품 · 구역 화면 한 덩어리. 미리 받지 않는다 (방문자는 거의 들어가지 않음) */
