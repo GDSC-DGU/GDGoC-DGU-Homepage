@@ -3,7 +3,7 @@ import { PAGE_PLAN_IDS } from '@/config/pages'
 import { HomePage } from '@/features/home/HomePage'
 import { AppLayout } from '@/features/layout/AppLayout'
 import { ErrorPage } from '@/features/pages/ErrorPage'
-import { AdminApp, ApplyPage, ArchivePage, CampusPreview, CommunityPage, LoginPage, MovedTo, NotFoundPage, NowPreview, PlannedPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
+import { AdminApp, ApplyPage, ArchivePage, CampusPreview, CommunityPage, LoginPage, MovedTo, NotFoundPage, NowPreview, PlannedPage, PrivacyPage, RecruitsPage, TeamsPage, TeamsPostPage, TeamsWritePage } from './lazyPages'
 import { enableViewTransitions } from './viewTransitions'
 
 /** 다 만든 페이지. 준비 중 페이지를 실제로 만들면 여기로 옮긴다 */
@@ -25,6 +25,8 @@ const BUILT_ROUTES: RouteObject[] = [
   { path: 'teams/:postId/edit', element: <TeamsWritePage mode="edit" /> },
   // 로그인 (P-COM-010): 회원 · 운영진 모두 Google 로그인. ?next= 로 보던 페이지로 돌아간다 (features/auth)
   { path: 'login', element: <LoginPage /> },
+  // 개인정보 처리방침 (P-COM-008): Google 로그인 동의 화면에 등록하는 주소. 내용은 src/content/privacy.ts
+  { path: 'privacy', element: <PrivacyPage /> },
 ]
 const BUILT = new Set(BUILT_ROUTES.map((r) => r.path))
 

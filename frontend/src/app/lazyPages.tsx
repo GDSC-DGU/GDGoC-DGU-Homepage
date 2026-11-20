@@ -1,7 +1,7 @@
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react'
 import type { PagePlanId } from '@/config/pages'
 import { Navigate, useLocation } from 'react-router-dom'
-import { ADMIN_APP, APPLY_PAGE, CAMPUS_PREVIEW, COMMUNITY_PAGE, LOGIN_PAGE, NOW_PREVIEW, PLANNED_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, TEAMS_PAGE, type PageModule } from './pageModules'
+import { ADMIN_APP, APPLY_PAGE, CAMPUS_PREVIEW, COMMUNITY_PAGE, LOGIN_PAGE, NOW_PREVIEW, PLANNED_PAGE, PRIVACY_PAGE, PROJECTS_PAGE, RECRUITS_PAGE, TEAMS_PAGE, type PageModule } from './pageModules'
 
 /**
  * 첫 화면(홈)만 처음 받는 파일에 넣고, 나머지 페이지는 들어갈 때 받는다.
@@ -42,6 +42,7 @@ const Now = lazyPage(NOW_PREVIEW, (m) => m.NowPreview)
 const Campus = lazyPage(CAMPUS_PREVIEW, (m) => m.CampusPreview)
 const Admin = lazyPage(ADMIN_APP, (m) => m.AdminRoot)
 const Login = lazyPage(LOGIN_PAGE, (m) => m.LoginPage)
+const Privacy = lazyPage(PRIVACY_PAGE, (m) => m.PrivacyPage)
 
 /**
  * 옮긴 주소로 그대로 넘긴다 (?p= · ?gen= · #upcoming 같은 뒤쪽은 그대로). 공유된 링크가 끊기지 않게.
@@ -93,6 +94,10 @@ export function CampusPreview() {
 /** 로그인 (/login): 회원 · 운영진 모두 Google 로그인 */
 export function LoginPage() {
   return <Login />
+}
+/** 개인정보 처리방침 (/privacy) */
+export function PrivacyPage() {
+  return <Privacy />
 }
 /** 관리자 화면 (/admin/*, 공개 사이트 틀 밖) */
 export function AdminApp() {

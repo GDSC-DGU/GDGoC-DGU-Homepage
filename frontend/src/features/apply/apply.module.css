@@ -273,6 +273,9 @@
   font-weight: 700;
   color: var(--ink-900);
 }
+.policyMore {
+  margin-top: 10px;
+}
 .policyList {
   display: grid;
   gap: 4px;
