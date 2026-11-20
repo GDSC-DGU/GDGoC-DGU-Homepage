@@ -93,6 +93,7 @@ ai/logs/
 *.iws
 .vscode/*
 !.vscode/extensions.json
+/backend/.vscode/launch.json
 .settings/
 .project
 .classpath
