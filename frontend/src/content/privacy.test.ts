@@ -31,13 +31,18 @@ describe('개인정보 처리방침 (F-COM-005)', () => {
   })
 
   it('처리 위탁: Google Cloud · Gemini · Gmail · Vercel', () => {
-    expect(PRIVACY_PROCESSORS.map((p) => p.service)).toEqual(['Google Cloud', 'Gemini API', 'Gmail', 'Vercel'])
-    expect(PRIVACY_PROCESSOR_SUMMARY).toBe('Google LLC (Google Cloud · Gemini API · Gmail), Vercel Inc. (Vercel)')
+    expect(PRIVACY_PROCESSORS.map((p) => p.service)).toEqual(['Google Cloud', 'Gemini', 'Gmail', 'Vercel'])
+    expect(PRIVACY_PROCESSOR_SUMMARY).toBe('Google LLC (Google Cloud · Gemini · Gmail), Vercel Inc. (Vercel)')
   })
 
-  it('명세의 보유 기간과 같다 (지원서 1년 · 회원 비활성 후 1년 · 로그인 1시간 · 초대 링크 72시간)', () => {
+  it('명세의 보유 기간과 같다 (지원서 제출 후 1년 · 회원 비활성화 후 1년)', () => {
     const t = allText.join('\n')
-    for (const s of ['제출일로부터 1년', '비활성화 후 1년', '로그인 후 1시간', '발송 후 72시간']) expect(t, s).toContain(s)
+    for (const s of ['제출일로부터 1년', '비활성화) 뒤 1년']) expect(t, s).toContain(s)
+  })
+
+  it('내부 구현(토큰 · 해시 · 쿠키 종류 · 실행 시각)은 적지 않는다', () => {
+    const t = allText.join('\n')
+    for (const s of ['HttpOnly', '해시', '토큰', '오전 3시', 'PIN']) expect(t, s).not.toContain(s)
   })
 
   it('AI 에는 이름 · 학번 · 학과 · 이메일을 보내지 않는다고 적는다 (F-RCT-004 규칙 2)', () => {
