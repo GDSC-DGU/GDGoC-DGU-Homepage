@@ -35,6 +35,7 @@ npm run sync:events  # gdg.community.dev 행사 목록을 src/content/events.jso
 | `/recruits/apply` | 지원서 작성: 기본 정보(이름 · 학번 · 학과 · 이메일) → 질문(관리자 지원폼과 같은 질문) → 동의 둘 → 제출 확인 → 접수 완료. 쓰던 답은 브라우저에 임시 보관. `?part=frontend` 면 지원 파트를 미리 고름. 백엔드 전에는 예시(`config/site.ts` 의 `APPLY_FORM_LIVE`) |
 | `/teams` | 제목 + 큰 행사 사진 → 팀원 찾기는 준비하고 있습니다(열리면 생길 것 세 줄) |
 | `/login` | 로그인 (P-COM-010): 회원 · 운영진 모두 Google 계정. `?next=` 로 보던 페이지로 돌아감. 앱 안 브라우저면 외부 브라우저 안내. 백엔드 전(`VITE_DATA_SOURCE` 가 http 가 아님)에는 예시 운영진 · 예시 회원 버튼 |
+| `/privacy` | 개인정보 처리방침 (P-COM-008): 시행일 · 목차 · 조항. 꼬리말 · 로그인 화면 · 지원서 동의란에서 링크하고, Google 로그인 동의 화면에 이 주소를 등록함. 내용은 `src/content/privacy.ts` |
 | `/admin` | 관리자 화면 (예시 데이터). 운영진(ADMIN)만, 머리말의 '관리자 페이지' 버튼으로 (docs/ADMIN.md) |
 
 모든 페이지는 옅은 회색 '5기에서 만나요'(JoinStrip) → 먹색 꼬리말(둘러보기 · 현재 위치 작은 지도 · 연락)로 끝납니다. /recruits 는 페이지 자체가 같은 내용이라 JoinStrip 없이 꼬리말로 바로 갑니다.
@@ -93,6 +94,7 @@ docs/WORKFLOW.md          큰 변경의 순서 (스펙 → 일감 → 만들기 
 | 5기 모집 일정이 정해지면 | `src/content/recruiting.json` 의 `current` |
 | 사이트 안 지원서로 실제 지원 받기 | 지원서 API 를 붙이고(`features/apply/data/applyRepo.ts`) `config/site.ts` 의 `APPLY_FORM_LIVE` 를 `true` 로. `applyUrl` 을 적으면 그 주소(Google Forms 등)가 먼저 |
 | 멤버 수 · 연락처 · 데모데이 | `src/content/chapter.json` |
+| 개인정보 처리방침 고치기 | `src/content/privacy.ts` (시행일도 새로, [CONTENT.md](docs/CONTENT.md)) |
 | 장소 이름 · 설명 · 색 | `src/config/places.ts` |
 | 소개 문구 · 링크 | `src/config/site.ts` (null 이면 화면에서 숨김) |
 | 새 지붕 모양 | `features/campus/roofs/` 에 컴포넌트 추가 → `roofs/index.ts` 와 `roofs/heights.ts` 에 등록 |
