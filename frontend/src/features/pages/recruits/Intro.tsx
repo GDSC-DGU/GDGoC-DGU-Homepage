@@ -1,9 +1,8 @@
-import type { ReactNode } from 'react'
 import { FAQS, PUBLIC_PROJECTS } from '@/content'
 import type { Project } from '@/domain/types'
 import { IconRow, projectIcon } from '@/features/common'
 import type { Fact } from './eligibility'
-import { PARTS, partExamples, type Part } from './parts'
+import { PARTS, partExamples } from './parts'
 import k from './recruit.module.css'
 
 const faq = (id: string) => FAQS.find((f) => f.id === id)
@@ -18,9 +17,8 @@ const iconOf = (p: Project) => (p.cover?.kind === 'logo' ? projectIcon(p) : null
  * 아이콘은 공통 IconRow 작은 크기(40px + 이름)이고, 누르면 그 프로젝트 자세히 보기(/archive?p=id).
  * 지난 예가 없는 파트(Product Design)는 아이콘 줄 없이 둔다 (지어내지도, '없다' 고 적지도 않는다).
  * 폰은 한 칸씩.
- * action 을 주면 판 맨 아래에 그 파트의 행동(지원 안내: '{파트} 지원하기')을 붙인다.
  */
-export function Parts({ action }: { action?: (part: Part) => ReactNode }) {
+export function Parts() {
   if (!faq('parts')) return null
   return (
     <>
@@ -45,7 +43,6 @@ export function Parts({ action }: { action?: (part: Part) => ReactNode }) {
                   </div>
                 </dl>
               )}
-              {action && <div className={k.partAction}>{action(part)}</div>}
             </li>
           )
         })}

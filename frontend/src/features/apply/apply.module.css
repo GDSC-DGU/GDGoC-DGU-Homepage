@@ -1,26 +1,15 @@
 /*
- * 지원서 작성 (/recruits/apply). 흰 면 하나, 가운데 좁은 단(760px).
+ * 지원서 페이지 (/recruits/apply). 흰 면 하나, 가운데 좁은 단(760px).
  * 묶음(기본 정보 · 질문 · 동의)은 위 1px 먹색 줄로 나눈다 (카드 · 그림자 없이, DESIGN dcamp 규칙).
  * 입력 · 고르기 모양은 팀원 찾기 글쓰기와 같다 (높이 44, 8px 모서리, 고르면 먹색).
  */
 .page {
   max-width: calc(760px + var(--side) + var(--side-r));
-  padding-top: 64px;
+  padding-top: 48px;
   padding-bottom: 120px;
 }
-
-.trail {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  font: var(--t-meta);
-  color: var(--ink-500);
-}
-.trail a {
-  color: var(--ink-700);
-}
-.trail a:hover {
-  color: var(--ink-900);
+.page > nav:first-child {
+  margin-bottom: 32px;
 }
 
 /* ── 머리 ─────────────────────────────── */
@@ -165,7 +154,13 @@
 .choices {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+}
+/* 문항 설명 (API description): 제목 바로 아래 옅은 한 줄 */
+.qDesc {
+  margin-top: -4px;
+  font: var(--t-meta);
+  color: var(--ink-500);
 }
 .choice {
   position: relative;
@@ -179,14 +174,15 @@
   cursor: pointer;
 }
 .choice span {
+  /* 고르기 알약은 입력칸(48px)보다 낮게: 글자에 맞춘 36px (2026-11-17, 입력칸과 비슷해 보여 어색하다는 의견) */
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  padding: 0 18px;
+  min-height: 36px;
+  padding: 0 14px;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-control);
   background: var(--paper);
-  font: 600 15px/22px var(--font-kr);
+  font: 600 14px/20px var(--font-kr);
   color: var(--ink-700);
   transition:
     border-color var(--dur-hover) var(--ease-out),
@@ -392,7 +388,7 @@
 
 @media (max-width: 767px) {
   .page {
-    padding-top: 40px;
+    padding-top: 32px;
     padding-bottom: 80px;
   }
   .grid2,

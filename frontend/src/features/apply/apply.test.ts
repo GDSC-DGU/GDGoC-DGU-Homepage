@@ -1,99 +1,122 @@
 import { describe, expect, it } from 'vitest'
 import { applyTarget, APPLY_PATH, recruitStatus, type RecruitingCurrent } from '@/content/recruitingStatus'
-import { FIXED_QUESTIONS } from '@/features/admin/data/recruit/seed'
 import { joinPrimary } from '@/features/common/joinData'
 import { statusView } from '@/features/pages/recruits/status'
+import { applyView, readPreview } from '@/features/pages/recruits/view'
+import { createHttpApplyRepository } from './data/httpRepository'
 import { ApplyError } from './data/repository'
 import {
   answerError,
-  cleanAnswers,
+  applicantError,
   draftKey,
+  emptyDraft,
   hasErrors,
+  kstDateTime,
   loadDraft,
-  maxLength,
-  periodState,
+  maxLengthOf,
   presetTrack,
   progress,
+  qKey,
   saveDraft,
-  validateApplication,
+  toRequest,
+  trackLabel,
+  validateDraft,
+  visibleQuestions,
 } from './data/rules'
-import { SAMPLE_QUESTIONS, createSampleApplyRepository } from './data/sampleRepository'
-import type { FormQuestion } from './data/types'
+import { SAMPLE_QUESTIONS, SAMPLE_RID, SAMPLE_TRACKS, createSampleApplyRepository } from './data/sampleRepository'
+import type { ApplicationForm, ApplyDraft, FormQuestion } from './data/types'
 
-const q = (over: Partial<FormQuestion>): FormQuestion => ({ id: 'q-x', title: '질문', type: 'short', required: true, options: [], fixed: false, ...over })
-const form = { questions: [...SAMPLE_QUESTIONS] }
-
-/** 모든 필수 질문에 맞게 답한 지원서 */
-const GOOD: Record<string, string> = {
-  'q-name': '예시 지원자',
-  'q-student-id': '2026000101',
-  'q-department': '컴퓨터공학전공',
-  'q-email': 'applicant@example.com',
-  'q-track': 'Frontend',
-  'q-motivation': '지원 동기 예시',
-  'q-experience': '협업 경험 예시',
-  'q-plan': '활동 계획 예시',
-  'q-session': '모두 참석할 수 있음',
-}
+const q = (over: Partial<FormQuestion>): FormQuestion => ({ questionId: 'qx', type: 'SHORT_TEXT', title: '질문', required: true, ...over })
+const form: ApplicationForm = { rid: SAMPLE_RID, formVersion: 1, questions: [...SAMPLE_QUESTIONS] }
+const TRACKS = [...SAMPLE_TRACKS]
 const AGREE = { privacy: true, ai: true }
 
-describe('예시 지원폼 질문', () => {
-  it('고정 질문 넷은 관리자 지원폼과 같다', () => {
-    expect(SAMPLE_QUESTIONS.filter((x) => x.fixed)).toEqual(FIXED_QUESTIONS)
-  })
-  it('지원 파트 선택지는 지원 안내의 네 파트 이름이다', () => {
-    expect(SAMPLE_QUESTIONS.find((x) => x.id === 'q-track')?.options).toEqual(['Frontend', 'Backend', 'AI/ML', 'Product Design'])
-  })
-})
+/** 모든 필수 칸을 맞게 채운 지원서 (Backend: FE 전용 문항이 안 보임) */
+const GOOD: ApplyDraft = {
+  applicant: { name: '예시 지원자', studentId: '2026000101', major: '컴퓨터공학전공', email: 'applicant@example.com', phone: '' },
+  track: 'BE',
+  answers: { 'q-motivation': '지원 동기 예시', 'q-experience': '협업 경험 예시', 'q-plan': '활동 계획 예시', 'q-session': '모두 참석할 수 있음' },
+}
 
-describe('답 검사', () => {
-  it('필수는 비우면 오류, 선택은 비워도 된다', () => {
-    expect(answerError(q({}), '  ')).toBe('답을 적어 주세요.')
-    expect(answerError(q({ type: 'choice', options: ['가', '나'] }), '')).toBe('하나를 골라 주세요.')
-    expect(answerError(q({ required: false }), '')).toBeNull()
+describe('기본 정보 (API-RCT-005 applicant)', () => {
+  it('필수는 비우면 오류, 연락처는 선택', () => {
+    expect(applicantError('name', ' ')).toBe('답을 적어 주세요.')
+    expect(applicantError('phone', '')).toBeNull()
+    expect(applicantError('phone', '010-1234-5678')).toBeNull()
+    expect(applicantError('phone', '12-34')).toMatch('연락처')
   })
   it('학번은 숫자 10자리, 이메일은 주소 모양', () => {
-    expect(answerError(q({ id: 'q-student-id' }), '20260001')).toMatch('10자리')
-    expect(answerError(q({ id: 'q-student-id' }), '2026000101')).toBeNull()
-    expect(answerError(q({ id: 'q-email' }), 'abc')).toMatch('이메일')
-    expect(answerError(q({ id: 'q-email' }), 'a@b.co')).toBeNull()
-  })
-  it('객관식은 선택지 안의 답만', () => {
-    expect(answerError(q({ type: 'choice', options: ['가', '나'] }), '다')).toMatch('선택지')
-  })
-  it("글자 수: 질문의 '500자 이내'를 따르고, 없으면 유형별 기본", () => {
-    expect(maxLength({ title: '지원 동기 (500자 이내)', type: 'long' })).toBe(500)
-    expect(maxLength({ title: '1,500자 이내로', type: 'long' })).toBe(1500)
-    expect(maxLength({ title: '자기소개', type: 'long' })).toBe(1000)
-    expect(maxLength({ title: '이름', type: 'short' })).toBe(100)
-    expect(answerError(q({ type: 'long', title: '(5자 이내)' }), '여섯글자예요')).toMatch('5자 이내')
-  })
-  it('모두 맞고 둘 다 동의하면 오류 없음, 동의가 하나라도 빠지면 오류', () => {
-    expect(hasErrors(validateApplication(form, GOOD, AGREE))).toBe(false)
-    expect(validateApplication(form, GOOD, { privacy: true, ai: false }).consents).toBeTruthy()
-  })
-  it('보낼 답은 앞뒤 공백을 지우고 질문에 없는 칸을 뺀다', () => {
-    expect(cleanAnswers({ questions: [q({ id: 'a' })] }, { a: ' 답 ', b: '없는 칸' })).toEqual({ a: '답' })
-  })
-  it('진행: 맞게 답한 필수 질문 수', () => {
-    expect(progress(form, {})).toEqual({ done: 0, total: 9 })
-    expect(progress(form, GOOD)).toEqual({ done: 9, total: 9 })
-    expect(progress(form, { ...GOOD, 'q-email': 'x' }).done).toBe(8)
+    expect(applicantError('studentId', '20260001')).toMatch('10자리')
+    expect(applicantError('studentId', '2026000101')).toBeNull()
+    expect(applicantError('email', 'abc')).toMatch('이메일')
   })
 })
 
-describe('지원 기간 · 파트 미리 고르기', () => {
-  it('종료일 당일까지 열려 있다', () => {
-    const f = { startDate: '2027-03-02', endDate: '2027-03-10' }
-    expect(periodState(f, '2027-03-01')).toBe('before')
-    expect(periodState(f, '2027-03-10')).toBe('open')
-    expect(periodState(f, '2027-03-11')).toBe('after')
-    expect(periodState({ startDate: null, endDate: null }, '2027-03-05')).toBe('unset')
+describe('문항 (API-RCT-002 타입별)', () => {
+  it('SHORT_TEXT · LONG_TEXT: maxLength 가 없으면 100 · 1000자', () => {
+    expect(maxLengthOf({ type: 'SHORT_TEXT' })).toBe(100)
+    expect(maxLengthOf({ type: 'LONG_TEXT' })).toBe(1000)
+    expect(maxLengthOf({ type: 'URL' })).toBe(2048)
+    expect(maxLengthOf({ type: 'LONG_TEXT', maxLength: 500 })).toBe(500)
+    expect(answerError(q({ type: 'LONG_TEXT', maxLength: 5 }), '여섯글자예요')).toMatch('5자 이내')
   })
-  it('?part= 를 지원 파트 답으로 (모르는 값은 무시)', () => {
-    expect(presetTrack(form, 'ai')).toEqual({ 'q-track': 'AI/ML' })
-    expect(presetTrack(form, 'nope')).toEqual({})
-    expect(presetTrack(form, null)).toEqual({})
+  it('URL 은 http · https 만', () => {
+    expect(answerError(q({ type: 'URL' }), 'github.com/hong')).toMatch('http')
+    expect(answerError(q({ type: 'URL' }), 'ftp://x.com')).toMatch('http')
+    expect(answerError(q({ type: 'URL' }), 'https://github.com/hong')).toBeNull()
+  })
+  it('SINGLE_CHOICE 는 선택지 안에서 하나, MULTI_CHOICE 는 하나 이상', () => {
+    expect(answerError(q({ type: 'SINGLE_CHOICE', options: ['가', '나'] }), '')).toBe('하나를 골라 주세요.')
+    expect(answerError(q({ type: 'SINGLE_CHOICE', options: ['가', '나'] }), '다')).toMatch('선택지')
+    expect(answerError(q({ type: 'MULTI_CHOICE', options: ['가', '나'] }), [])).toBe('하나 이상 골라 주세요.')
+    expect(answerError(q({ type: 'MULTI_CHOICE', options: ['가', '나'] }), ['가', '나'])).toBeNull()
+    expect(answerError(q({ type: 'MULTI_CHOICE', required: false, options: ['가'] }), [])).toBeNull()
+  })
+  it('trackOnly 문항은 그 파트에게만 보인다', () => {
+    expect(visibleQuestions(form, 'FE').some((x) => x.questionId === 'q-fe-work')).toBe(true)
+    expect(visibleQuestions(form, 'BE').some((x) => x.questionId === 'q-fe-work')).toBe(false)
+  })
+})
+
+describe('지원서 전체 검사 · 요청 본문 (API-RCT-005)', () => {
+  it('모두 맞고 둘 다 동의하면 오류 없음', () => {
+    expect(hasErrors(validateDraft(form, TRACKS, GOOD, AGREE))).toBe(false)
+  })
+  it('파트를 안 고르거나 동의가 빠지면 오류', () => {
+    expect(validateDraft(form, TRACKS, { ...GOOD, track: '' }, AGREE).track).toBeTruthy()
+    expect(validateDraft(form, TRACKS, GOOD, { privacy: true, ai: false }).consents).toBeTruthy()
+    expect(validateDraft(form, TRACKS, { ...GOOD, answers: {} }, AGREE)[qKey('q-motivation')]).toBeTruthy()
+  })
+  it('요청 본문: 명세 필드 이름 그대로, 단일 · 주관식은 value, 복수는 values, 안 보이는 문항 · 빈 답은 뺀다', () => {
+    const draft: ApplyDraft = { ...GOOD, answers: { ...GOOD.answers, 'q-interest': ['스터디', 'G-Sprint'], 'q-fe-work': 'https://x.dev', 'q-link': '  ' } }
+    const req = toRequest(form, draft, AGREE)
+    expect(Object.keys(req).sort()).toEqual(['answers', 'applicant', 'formVersion', 'privacyConsent', 'track'])
+    expect(Object.keys(req.applicant).sort()).toEqual(['email', 'major', 'name', 'phone', 'studentId'])
+    expect(req.track).toBe('BE')
+    expect(req.privacyConsent).toBe(true)
+    expect(req.formVersion).toBe(1)
+    expect(req.answers).toContainEqual({ questionId: 'q-motivation', value: '지원 동기 예시' })
+    expect(req.answers).toContainEqual({ questionId: 'q-interest', values: ['스터디', 'G-Sprint'] })
+    expect(req.answers.some((a) => a.questionId === 'q-fe-work')).toBe(false)
+    expect(req.answers.some((a) => a.questionId === 'q-link')).toBe(false)
+  })
+  it('진행: 기본 정보 필수 4 + 파트 1 + 보이는 필수 문항', () => {
+    expect(progress(form, TRACKS, emptyDraft())).toEqual({ done: 0, total: 9 })
+    expect(progress(form, TRACKS, GOOD)).toEqual({ done: 9, total: 9 })
+  })
+})
+
+describe('지원 파트 · 시각', () => {
+  it('파트 코드 이름 · ?part= 미리 고르기', () => {
+    expect(trackLabel('FE')).toBe('Frontend')
+    expect(trackLabel('Mobile')).toBe('Mobile')
+    expect(presetTrack(TRACKS, 'frontend')).toBe('FE')
+    expect(presetTrack(['BE', 'Mobile'], 'mobile')).toBe('Mobile')
+    expect(presetTrack(TRACKS, 'nope')).toBe('')
+  })
+  it('ISO 시각을 KST 로', () => {
+    expect(kstDateTime('2027-02-20T00:00:00+09:00')).toBe('2027.02.20(토) 00:00')
+    expect(kstDateTime('2027-03-05T14:59:59Z')).toBe('2027.03.05(금) 23:59')
   })
 })
 
@@ -102,18 +125,18 @@ describe('임시 보관', () => {
     const m = new Map<string, string>()
     return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), removeItem: (k: string) => void m.delete(k), m }
   }
-  it('빈 칸은 빼고 남기고, 다 비면 지운다', () => {
+  it('회차별로 남기고, 비면 지운다', () => {
     const st = mem()
-    saveDraft(5, { a: '답', b: ' ' }, st)
-    expect(loadDraft(5, st)).toEqual({ a: '답' })
-    saveDraft(5, { a: '' }, st)
-    expect(st.m.has(draftKey(5))).toBe(false)
+    saveDraft('rct_5', { ...GOOD, answers: { ...GOOD.answers, 'q-interest': ['스터디'] } }, st)
+    expect(loadDraft('rct_5', st).answers['q-interest']).toEqual(['스터디'])
+    expect(loadDraft('rct_5', st).applicant.studentId).toBe('2026000101')
+    saveDraft('rct_5', emptyDraft(), st)
+    expect(st.m.has(draftKey('rct_5'))).toBe(false)
   })
   it('깨진 값 · 저장소 오류는 조용히 넘어간다', () => {
-    expect(loadDraft(5, { getItem: () => '{not json' })).toEqual({})
-    expect(loadDraft(5, { getItem: () => '["x"]' })).toEqual({})
+    expect(loadDraft('rct_5', { getItem: () => '{not json' })).toEqual(emptyDraft())
     expect(() =>
-      saveDraft(5, { a: '답' }, {
+      saveDraft('rct_5', GOOD, {
         setItem: () => {
           throw new Error('quota')
         },
@@ -123,20 +146,54 @@ describe('임시 보관', () => {
   })
 })
 
-describe('예시 저장소', () => {
-  it('제출하면 접수 번호, 같은 학번은 두 번 낼 수 없다', async () => {
+describe('예시 저장소 (명세와 같은 응답 · 오류)', () => {
+  it('제출하면 aid · submittedAt, 같은 학번 · 이메일은 APPLICATION_DUPLICATED', async () => {
     const repo = createSampleApplyRepository({ delay: 0, now: () => Date.parse('2027-03-05T03:00:00Z') })
-    const f = await repo.getForm()
-    expect(f?.questions.length).toBe(SAMPLE_QUESTIONS.length)
-    const r = await repo.submit({ generation: 5, answers: GOOD, consents: AGREE })
-    expect(r).toEqual({ no: 1, submittedAt: '2027-03-05T03:00:00.000Z', email: 'applicant@example.com' })
-    await expect(repo.submit({ generation: 5, answers: GOOD, consents: AGREE })).rejects.toMatchObject({ code: 'DUPLICATE' })
+    const cur = await repo.getCurrent()
+    expect(cur.rid).toBe(SAMPLE_RID)
+    expect(cur.tracks).toEqual(TRACKS)
+    const f = await repo.getForm(cur.rid)
+    const r = await repo.submit(cur.rid, toRequest(f, GOOD, AGREE))
+    expect(r).toEqual({ aid: 'a_sample_1', submittedAt: '2027-03-05T03:00:00.000Z' })
+    expect(await repo.checkDuplicate(cur.rid, '2026000101')).toEqual({ duplicated: true })
+    await expect(repo.submit(cur.rid, toRequest(f, GOOD, AGREE))).rejects.toMatchObject({ code: 'APPLICATION_DUPLICATED' })
   })
-  it('검사에 걸리면 칸별 오류를 돌려준다', async () => {
+  it('폼 버전이 다르면 FORM_CHANGED, 입력이 틀리면 VALIDATION_FAILED', async () => {
     const repo = createSampleApplyRepository({ delay: 0 })
-    const err = await repo.submit({ generation: 5, answers: { ...GOOD, 'q-email': 'x' }, consents: AGREE }).catch((e: unknown) => e)
+    await expect(repo.submit(SAMPLE_RID, { ...toRequest(form, GOOD, AGREE), formVersion: 99 })).rejects.toMatchObject({ code: 'FORM_CHANGED' })
+    const err = await repo.submit(SAMPLE_RID, toRequest(form, { ...GOOD, applicant: { ...GOOD.applicant, email: 'x' } }, AGREE)).catch((e: unknown) => e)
     expect(err).toBeInstanceOf(ApplyError)
-    expect((err as ApplyError).fields?.['q-email']).toBeTruthy()
+    expect((err as ApplyError).code).toBe('VALIDATION_FAILED')
+  })
+})
+
+describe('HTTP 구현 (API 명세 주소 · 응답 감싸기)', () => {
+  const fake = (status: number, body: unknown) => {
+    const calls: { url: string; init?: RequestInit }[] = []
+    const fetcher = (async (url: string, init?: RequestInit) => {
+      calls.push({ url, init })
+      return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
+    }) as unknown as typeof fetch
+    return { calls, repo: createHttpApplyRepository('/api', fetcher) }
+  }
+  it('성공이면 data 만 돌려준다', async () => {
+    const { calls, repo } = fake(201, { success: true, data: { aid: 'a_7f3c', submittedAt: '2027-02-25T14:10:00+09:00' } })
+    const r = await repo.submit('rct_5', toRequest(form, GOOD, AGREE))
+    expect(r.aid).toBe('a_7f3c')
+    expect(calls[0].url).toBe('/api/v1/recruitments/rct_5/applications')
+    expect(calls[0].init?.method).toBe('POST')
+    expect(JSON.parse(String(calls[0].init?.body)).applicant.studentId).toBe('2026000101')
+  })
+  it('실패면 code · message 를 ApplyError 로', async () => {
+    const { repo } = fake(409, { success: false, code: 'APPLICATION_DUPLICATED', message: '이미 제출된 지원서가 있습니다.' })
+    await expect(repo.submit('rct_5', toRequest(form, GOOD, AGREE))).rejects.toMatchObject({ code: 'APPLICATION_DUPLICATED', status: 409 })
+  })
+  it('현재 모집 · 폼 · 중복 확인 주소', async () => {
+    const { calls, repo } = fake(200, { success: true, data: { duplicated: false } })
+    await repo.checkDuplicate('rct_5', '2026000101')
+    await repo.getForm('rct_5')
+    await repo.getCurrent()
+    expect(calls.map((c) => c.url)).toEqual(['/api/v1/recruitments/rct_5/applications/check', '/api/v1/recruitments/rct_5/form', '/api/v1/recruitments/current'])
   })
 })
 
@@ -161,5 +218,25 @@ describe("'지원서 쓰기'가 갈 곳 (applyTarget)", () => {
     expect(joinPrimary(open, false)).toMatchObject({ kind: 'notify' })
     expect(statusView(open, '2027-03-05', '@gdg', true).primary).toBe('apply')
     expect(statusView(open, '2027-03-05', '@gdg', false).primary).toBe('channel')
+  })
+})
+
+describe('지원하기: 모집 중(지원하기 → 지원서 페이지) 또는 모집 기간 아님(지원하기 꺼짐)', () => {
+  const src = (cur: Partial<RecruitingCurrent>) => ({ current: { generation: 5, channel: 'https://www.instagram.com/gdg.donggukuniv/', ...cur }, history: [] })
+  const open = recruitStatus('2027-03-05', src({ opensAt: '2027-03-01', deadline: '2027-03-10' }))
+  const openUrl = recruitStatus('2027-03-05', src({ opensAt: '2027-03-01', deadline: '2027-03-10', applyUrl: 'https://forms.gle/x' }))
+  const closed = recruitStatus('2027-03-05', src({}))
+  it('모집 중이고 사이트 지원서가 열려 있을 때만 지원서', () => {
+    expect(applyView(open, null, true)).toBe('form')
+    expect(applyView(open, null, false)).toBe('closed')
+    expect(applyView(openUrl, null, true)).toBe('closed')
+    expect(applyView(closed, null, true)).toBe('closed')
+  })
+  it('개발 화면에서만 ?preview= 로 두 화면을 바꿔 본다', () => {
+    expect(readPreview('open', true)).toBe('open')
+    expect(readPreview('open', false)).toBeNull()
+    expect(readPreview('zz', true)).toBeNull()
+    expect(applyView(closed, 'open', false)).toBe('form')
+    expect(applyView(open, 'closed', true)).toBe('closed')
   })
 })
