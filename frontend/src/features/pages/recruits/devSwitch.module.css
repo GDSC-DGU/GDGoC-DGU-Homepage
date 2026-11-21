@@ -1,0 +1,45 @@
+/* 개발 화면 전용: 왼쪽 아래 떠 있는 작은 상자 (아래 고정 띠 위) */
+.box {
+  position: fixed;
+  left: 16px;
+  bottom: 96px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 12px;
+  border: 1px dashed var(--gen);
+  border-radius: var(--r-pill);
+  background: var(--paper);
+  box-shadow: var(--shadow-float);
+  font: 600 13px/20px var(--font-kr);
+  color: var(--ink-700);
+}
+.tag {
+  padding: 0 8px;
+  border-radius: var(--r-tag);
+  background: var(--gen);
+  font-size: 12px;
+  color: var(--on-gen);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: var(--r-pill);
+  background: var(--ink-900);
+  color: var(--white);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+@media (max-width: 767px) {
+  .box {
+    left: 8px;
+    right: 8px;
+    bottom: 84px;
+    justify-content: space-between;
+  }
+}

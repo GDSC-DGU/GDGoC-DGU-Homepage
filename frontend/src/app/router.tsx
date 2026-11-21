@@ -16,7 +16,7 @@ const BUILT_ROUTES: RouteObject[] = [
   { path: 'about', element: <CommunityPage /> },
   { path: 'community', element: <MovedTo pathname="/about" /> },
   { path: 'recruits', element: <RecruitsPage /> },
-  // 지원서 작성 (P-RCT-03). 백엔드 전에는 예시 지원서 (features/apply/data/applyRepo.ts 의 APPLY_SAMPLE)
+  // 지원서 (P-RCT-03): 지원하기 첫 화면의 '지원하기'로 온다. 백엔드 전에는 예시 지원서 (features/apply/data/applyRepo.ts 의 APPLY_SAMPLE)
   { path: 'recruits/apply', element: <ApplyPage /> },
   // 팀원 찾기: 백엔드 전에는 예시 게시판 (features/teams/data/teamsRepo.ts 의 TEAMS_SAMPLE)
   { path: 'teams', element: <TeamsPage /> },

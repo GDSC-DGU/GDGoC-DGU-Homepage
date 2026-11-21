@@ -1,43 +1,97 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useBlocker, useSearchParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { PLACE_BY_ID } from '@/config/places'
-import { SITE } from '@/config/site'
+import { DEV_SWITCH, SITE } from '@/config/site'
 import { CHAPTER, RECRUITING } from '@/content'
 import { PRIVACY_PROCESSOR_SUMMARY } from '@/content/privacy'
+import { Crumbs } from '@/features/dcamp/Crumbs'
+import { DevSwitch } from '@/features/pages/recruits/DevSwitch'
+import { readPreview } from '@/features/pages/recruits/view'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { useToday } from '@/hooks/useToday'
-import { monthDay, weekday } from '@/lib/date'
-import { APPLY_SAMPLE, useApplyForm, useSubmitApplication } from './data/applyRepo'
+import { APPLY_SAMPLE, applyKeys, useApplicationForm, useApplyRepo, useCurrentRecruitment, useSubmitApplication } from './data/applyRepo'
 import { ApplyError, applyErrorText } from './data/repository'
-import { FIXED_ID, clearDraft, hasErrors, loadDraft, maxLength, periodState, presetTrack, progress, saveDraft, toInput, validateApplication, type ApplyErrors } from './data/rules'
-import type { ApplyReceipt, Consents, FormQuestion, PublicApplyForm } from './data/types'
+import {
+  APPLICANT_FIELDS,
+  clearDraft,
+  closedTitle,
+  hasErrors,
+  isStudentId,
+  kstDateTime,
+  loadDraft,
+  maxLengthOf,
+  presetTrack,
+  progress,
+  qKey,
+  saveDraft,
+  toRequest,
+  trackLabel,
+  validateDraft,
+  visibleQuestions,
+  type ApplyErrors,
+} from './data/rules'
+import type { Applicant, ApplicationForm, ApplicationResult, ApplyDraft, Consents, CurrentRecruitment, FormQuestion } from './data/types'
 import s from './apply.module.css'
 
 const NO_CONSENT: Consents = { privacy: false, ai: false }
 
-/** '2026.03.02(월)' */
-const fullDay = (ymd: string) => `${ymd.slice(0, 4)}.${monthDay(ymd)}(${weekday(ymd)})`
-
-const PLACEHOLDER: Record<string, string> = { [FIXED_ID.studentId]: '숫자 10자리', [FIXED_ID.email]: 'name@example.com', [FIXED_ID.name]: '홍길동', [FIXED_ID.department]: '컴퓨터공학전공' }
+const PLACEHOLDER: Partial<Record<keyof Applicant, string>> = { name: '이름', studentId: '숫자 10자리', major: '예: 컴퓨터공학전공', email: 'name@example.com', phone: '010-0000-0000' }
 
 /**
- * 지원서 작성 (/recruits/apply, P-RCT-03).
- * 운영진이 게시한 지원폼(관리자 /admin/recruit/form)의 질문을 그대로 그린다: 단답 · 장문 · 객관식, 필수는 *.
- * 위 '기본 정보'(고정 질문 넷) → '질문'(번호) → 동의 둘 → [제출] → 확인 팝업 → 접수 완료.
- * - 쓰던 답은 이 브라우저에 기수별로 임시 보관한다 (새로고침 · 실수로 닫아도 남게). 제출하면 지운다.
- * - 지원 안내의 파트 카드에서 오면(?part=frontend) 지원 파트를 미리 골라 둔다.
- * - 지원 기간이 아니면 양식 대신 안내를 보여 준다. 예시(APPLY_SAMPLE)일 때는 디자인 확인을 위해 양식을 그대로 보인다.
+ * 지원서 페이지 (/recruits/apply, P-RCT-03). 지원하기(/recruits) 첫 화면의 '지원하기'를 누르면 이 페이지로 온다.
+ * 데이터는 API 명세(docs/api/openapi.yaml)의 공개 모집 API 를 그대로 쓴다 (data/types.ts):
+ *  - RCT-001 현재 모집(rid · cohort · 기간 · tracks · canApply) → 지원할 수 있을 때만 양식
+ *  - RCT-002 게시된 문항 (SHORT_TEXT · LONG_TEXT · SINGLE_CHOICE · MULTI_CHOICE · URL, trackOnly)
+ *  - RCT-003 학번을 다 적으면 중복 지원 미리 확인
+ *  - RCT-005 제출 (applicant · track · answers · privacyConsent · formVersion)
+ * 화면: 지금 위치 → '{cohort}기 지원서' → 기본 정보 → 지원 파트 → 문항(번호) → 동의 둘 → [제출] → 확인 팝업 → 접수 완료(같은 페이지).
+ * - 쓰던 답은 이 브라우저에 회차(rid)별로 임시 보관한다. 제출하면 지운다. 쓰다가 다른 페이지로 가려 하면 한 번 묻는다.
+ * - ?part=frontend 로 오면 지원 파트를 미리 골라 둔다.
+ * - 개발 화면(DEV_SWITCH)에서는 왼쪽 아래 '개발' 버튼으로 모집 중 ↔ 모집 기간 아님을 오간다 (?preview=). 예시(APPLY_SAMPLE)면 위에 '예시' 안내.
  */
 export function ApplyPage() {
-  const form = useApplyForm()
-  const generation = form.data?.generation ?? RECRUITING.current.generation
-  usePageTitle(`${generation}기 지원서`, PLACE_BY_ID.recruits.label)
-  const [receipt, setReceipt] = useState<ApplyReceipt | null>(null)
+  const [params] = useSearchParams()
+  const preview = readPreview(params.get('preview'), DEV_SWITCH)
+  const cur = useCurrentRecruitment()
+  const cohort = cur.data?.cohort ?? RECRUITING.current.generation
+  usePageTitle(`${cohort}기 지원서`, PLACE_BY_ID.recruits.label)
 
+  const open = preview === 'open' ? true : preview === 'closed' ? false : !!cur.data?.canApply
   let body: ReactNode
-  if (form.isPending) body = <p className={s.state}>지원서를 불러오는 중입니다.</p>
-  else if (form.isError)
-    body = (
+  if (cur.isPending && preview !== 'closed') body = <p className={s.state}>모집 정보를 불러오는 중입니다.</p>
+  else if (cur.isError && preview !== 'closed') {
+    const notFound = cur.error instanceof ApplyError && cur.error.code === 'NOT_FOUND'
+    body = notFound ? (
+      <Closed cohort={cohort} current={null} />
+    ) : (
+      <div className={s.state}>
+        <p>모집 정보를 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>
+        <button type="button" className="btn-secondary btn-sm" onClick={() => void cur.refetch()}>
+          다시 불러오기
+        </button>
+      </div>
+    )
+  } else if (open && cur.data) body = <ApplyBody current={cur.data} />
+  else body = <Closed cohort={cohort} current={cur.data ?? null} />
+
+  return (
+    <div className={`container ${s.page}`}>
+      <Crumbs trail={[PLACE_BY_ID.recruits.label, '지원서']} />
+      {body}
+      {DEV_SWITCH && <DevSwitch mode={open ? 'form' : 'closed'} />}
+    </div>
+  )
+}
+
+function ApplyBody({ current }: { current: CurrentRecruitment }) {
+  const form = useApplicationForm(current.rid)
+  const [result, setResult] = useState<{ res: ApplicationResult; email: string } | null>(null)
+
+  if (form.isPending) return <p className={s.state}>지원서를 불러오는 중입니다.</p>
+  if (form.isError) {
+    const notPublished = form.error instanceof ApplyError && (form.error.code === 'FORM_NOT_PUBLISHED' || form.error.code === 'NOT_FOUND')
+    if (notPublished) return <p className={s.state}>지원서를 준비하고 있습니다. 모집 소식은 인스타그램 {SITE.links.instagramHandle}에 올립니다.</p>
+    return (
       <div className={s.state}>
         <p>지원서를 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>
         <button type="button" className="btn-secondary btn-sm" onClick={() => void form.refetch()}>
@@ -45,39 +99,41 @@ export function ApplyPage() {
         </button>
       </div>
     )
-  else if (receipt) body = <Done receipt={receipt} generation={generation} />
-  else if (!form.data) body = <NotOpen generation={generation} why="unset" />
-  else body = <Gate form={form.data} onDone={setReceipt} />
+  }
+  if (result) return <Done result={result.res} email={result.email} cohort={current.cohort} />
+  if (!form.data) return null
+  return <ApplyForm current={current} form={form.data} onDone={(res, email) => setResult({ res, email })} />
+}
 
+/** 지원할 수 없을 때 (모집 전 · 마감 · 폼 미게시 · 주소를 직접 열었을 때) */
+function Closed({ cohort, current }: { cohort: number; current: CurrentRecruitment | null }) {
   return (
-    <div className={`container ${s.page}`}>
-      <nav className={s.trail} aria-label="지금 위치">
-        <Link to="/recruits">{PLACE_BY_ID.recruits.label}</Link>
-        <span aria-hidden="true">›</span>
-        <span aria-current="page">지원서</span>
-      </nav>
-      {body}
-    </div>
+    <section className={s.done} aria-labelledby="apply-closed">
+      <h1 id="apply-closed" className={s.title}>
+        {closedTitle(current?.applyState ?? null, cohort, current?.applyStartAt)}
+      </h1>
+      <p className={s.lead}>모집 일정과 결과는 인스타그램 {SITE.links.instagramHandle}에 가장 먼저 올립니다.</p>
+      <div className="btn-row">
+        <a className="btn-primary" href={RECRUITING.current.channel} target="_blank" rel="noreferrer">
+          {cohort}기 소식 받기<span className="visually-hidden"> (인스타그램, 새 창)</span>
+        </a>
+        <Link to="/recruits" className="btn-secondary">
+          지원 안내 보기
+        </Link>
+      </div>
+    </section>
   )
 }
 
-/** 지원 기간이면 양식, 아니면 안내 (예시면 늘 양식) */
-function Gate({ form, onDone }: { form: PublicApplyForm; onDone: (r: ApplyReceipt) => void }) {
-  const today = useToday()
-  const period = periodState(form, today)
-  if (period !== 'open' && !APPLY_SAMPLE) return <NotOpen generation={form.generation} why={period} startDate={form.startDate} />
-  return <ApplyForm form={form} period={period} onDone={onDone} />
-}
-
-function Head({ form }: { form: PublicApplyForm }) {
-  const { startDate, endDate } = form
+function Head({ current }: { current: CurrentRecruitment }) {
+  const { applyStartAt, applyEndAt } = current
   return (
     <header className={s.head}>
-      <h1 className={s.title}>{form.generation}기 지원서</h1>
+      <h1 className={s.title}>{current.cohort}기 지원서</h1>
       <p className={s.lead}>
-        {startDate && endDate ? (
+        {applyStartAt && applyEndAt ? (
           <>
-            지원 기간 <span className="num">{fullDay(startDate)} 00:00</span> ~ <span className="num">{fullDay(endDate)} 23:59</span>
+            지원 기간 <span className="num">{kstDateTime(applyStartAt)}</span> ~ <span className="num">{kstDateTime(applyEndAt)}</span>
           </>
         ) : (
           '지원 기간은 정해지면 이곳과 인스타그램에 알립니다.'
@@ -87,44 +143,71 @@ function Head({ form }: { form: PublicApplyForm }) {
         <span className={s.star} aria-hidden="true">
           *
         </span>{' '}
-        표시는 꼭 답해야 하는 질문입니다. 쓰는 동안 답은 이 브라우저에 임시로 남습니다.
+        표시는 꼭 답해야 하는 칸입니다. 쓰는 동안 답은 이 브라우저에 임시로 남습니다.
       </p>
     </header>
   )
 }
 
-function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: ReturnType<typeof periodState>; onDone: (r: ApplyReceipt) => void }) {
+function ApplyForm({ current, form, onDone }: { current: CurrentRecruitment; form: ApplicationForm; onDone: (r: ApplicationResult, email: string) => void }) {
   const [params] = useSearchParams()
-  const submit = useSubmitApplication()
+  const repo = useApplyRepo()
+  const queryClient = useQueryClient()
+  const submit = useSubmitApplication(form.rid)
   const formRef = useRef<HTMLFormElement>(null)
-  const [answers, setAnswers] = useState<Record<string, string>>(() => ({ ...presetTrack(form, params.get('part')), ...loadDraft(form.generation) }))
+  const tracks = current.tracks
+  const [draft, setDraft] = useState<ApplyDraft>(() => {
+    const d = loadDraft(form.rid)
+    return d.track ? d : { ...d, track: presetTrack(tracks, params.get('part')) }
+  })
   const [consents, setConsents] = useState<Consents>(NO_CONSENT)
   const [errors, setErrors] = useState<ApplyErrors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [confirming, setConfirming] = useState(false)
   const sent = useRef(false)
+  const checkedId = useRef('')
 
   // 임시 보관: 입력이 멈추고 0.4초 뒤
   useEffect(() => {
-    const t = setTimeout(() => saveDraft(form.generation, answers), 400)
+    const t = setTimeout(() => saveDraft(form.rid, draft), 400)
     return () => clearTimeout(t)
-  }, [answers, form.generation])
+  }, [draft, form.rid])
 
-  const dirty = Object.values(answers).some((v) => v.trim())
+  const dirty = Object.values(draft.applicant).some((v) => v.trim()) || Object.keys(draft.answers).length > 0
   const leave = useLeaveGuard(dirty && !submit.isPending, sent)
 
-  const fixed = form.questions.filter((q) => q.fixed)
-  const rest = form.questions.filter((q) => !q.fixed)
-  const { done, total } = useMemo(() => progress(form, answers), [form, answers])
+  const questions = visibleQuestions(form, draft.track)
+  const { done, total } = useMemo(() => progress(form, tracks, draft), [form, tracks, draft])
 
-  const set = (id: string, v: string) => {
-    setAnswers((a) => ({ ...a, [id]: v }))
-    if (errors[id]) setErrors((e) => ({ ...e, [id]: undefined }))
+  const clearError = (key: string) => {
+    if (errors[key]) setErrors((e) => ({ ...e, [key]: undefined }))
+  }
+  const setApplicant = (key: keyof Applicant, v: string) => {
+    setDraft((d) => ({ ...d, applicant: { ...d.applicant, [key]: v } }))
+    clearError(`applicant.${key}`)
+  }
+  const setAnswer = (id: string, v: string | string[]) => {
+    setDraft((d) => ({ ...d, answers: { ...d.answers, [id]: v } }))
+    clearError(qKey(id))
+  }
+
+  // RCT-003: 학번 칸을 벗어날 때 10자리면 중복 지원을 미리 확인한다 (같은 학번은 한 번만)
+  const checkStudentId = async () => {
+    const id = draft.applicant.studentId.trim()
+    if (!isStudentId(id) || checkedId.current === id) return
+    checkedId.current = id
+    try {
+      const r = await repo.checkDuplicate(form.rid, id)
+      if (r.duplicated) setErrors((e) => ({ ...e, 'applicant.studentId': `이 학번으로 낸 ${current.cohort}기 지원서가 이미 있습니다. 고칠 내용이 있으면 운영진 메일로 알려 주세요.` }))
+    } catch {
+      checkedId.current = '' // 확인 못 하면 제출 때 서버가 다시 막는다
+    }
   }
 
   const check = () => {
     setFormError(null)
-    const found = validateApplication(form, answers, consents)
+    const found = validateDraft(form, tracks, draft, consents)
+    if (errors['applicant.studentId']?.includes('이미')) found['applicant.studentId'] = errors['applicant.studentId']
     if (hasErrors(found)) {
       setErrors(found)
       const n = Object.values(found).filter(Boolean).length
@@ -136,31 +219,36 @@ function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: Re
   }
 
   const send = () => {
-    submit.mutate(toInput(form, answers, consents), {
+    const req = toRequest(form, draft, consents)
+    submit.mutate(req, {
       onSuccess: (r) => {
         sent.current = true
-        clearDraft(form.generation)
+        clearDraft(form.rid)
         setConfirming(false)
-        onDone(r)
+        onDone(r, req.applicant.email)
         window.scrollTo({ top: 0 })
       },
       onError: (e) => {
         setConfirming(false)
-        if (e instanceof ApplyError && e.fields) setErrors(e.fields)
         setFormError(applyErrorText(e))
+        if (!(e instanceof ApplyError)) return
+        if (e.code === 'APPLICATION_DUPLICATED') setErrors((x) => ({ ...x, 'applicant.studentId': '이 학번 또는 이메일로 낸 지원서가 이미 있습니다.' }))
+        // 폼이 바뀌었으면 새 문항을 받아 온다 (쓴 답은 남는다)
+        if (e.code === 'FORM_CHANGED') void queryClient.invalidateQueries({ queryKey: applyKeys.all })
+        if (e.code === 'RECRUITMENT_CLOSED') void queryClient.invalidateQueries({ queryKey: applyKeys.current })
       },
     })
   }
 
   return (
     <>
-      <Head form={form} />
+      <Head current={current} />
       {APPLY_SAMPLE && (
         <aside className={s.sample} aria-label="예시 화면 안내">
           <span className="sample-badge">예시</span>
           <p>
-            지원서 화면을 준비하는 동안 보여 드리는 예시입니다. 질문은 예시이고, 제출해도 접수되지 않습니다.
-            {period !== 'open' && ` 실제 ${form.generation}기 지원은 모집이 열리면 받습니다.`}
+            지원서 API 를 붙이기 전이라 보여 드리는 예시입니다. 문항은 예시이고, 제출해도 접수되지 않습니다.
+            {!current.canApply && ` 실제 ${current.cohort}기 지원은 모집이 열리면 받습니다.`}
           </p>
         </aside>
       )}
@@ -180,10 +268,49 @@ function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: Re
           </h2>
           <p className={s.blockSub}>합격 안내와 회원 계정을 만들 때 씁니다. AI 채점에는 보내지 않습니다.</p>
           <div className={s.grid2}>
-            {fixed.map((q) => (
-              <Question key={q.id} q={q} value={answers[q.id] ?? ''} error={errors[q.id]} onChange={(v) => set(q.id, v)} />
+            {APPLICANT_FIELDS.map((f) => (
+              <ApplicantField
+                key={f.key}
+                field={f}
+                value={draft.applicant[f.key]}
+                error={errors[`applicant.${f.key}`]}
+                onChange={(v) => setApplicant(f.key, v)}
+                onBlur={f.key === 'studentId' ? () => void checkStudentId() : undefined}
+              />
             ))}
           </div>
+        </section>
+
+        <section className={s.block} aria-labelledby="apply-track">
+          <h2 id="apply-track" className={s.blockTitle}>
+            지원 파트
+          </h2>
+          <fieldset className={s.field} aria-describedby={errors.track ? 'apply-track-err' : undefined}>
+            <legend className="visually-hidden">지원 파트 (필수)</legend>
+            <div className={s.choices}>
+              {tracks.map((t) => (
+                <label key={t} className={s.choice}>
+                  <input
+                    type="radio"
+                    name="track"
+                    value={t}
+                    checked={draft.track === t}
+                    aria-invalid={errors.track ? true : undefined}
+                    onChange={() => {
+                      setDraft((d) => ({ ...d, track: t }))
+                      clearError('track')
+                    }}
+                  />
+                  <span lang="en">{trackLabel(t)}</span>
+                </label>
+              ))}
+            </div>
+            {errors.track && (
+              <p id="apply-track-err" className={s.error}>
+                {errors.track}
+              </p>
+            )}
+          </fieldset>
         </section>
 
         <section className={s.block} aria-labelledby="apply-questions">
@@ -191,12 +318,12 @@ function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: Re
             질문
           </h2>
           <ol className={s.questions}>
-            {rest.map((q, i) => (
-              <li key={q.id} className={s.qItem}>
+            {questions.map((q, i) => (
+              <li key={q.questionId} className={s.qItem}>
                 <span className={`${s.qNo} num`} aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <Question q={q} value={answers[q.id] ?? ''} error={errors[q.id]} onChange={(v) => set(q.id, v)} />
+                <Question q={q} value={draft.answers[q.questionId]} error={errors[qKey(q.questionId)]} onChange={(v) => setAnswer(q.questionId, v)} />
               </li>
             ))}
           </ol>
@@ -211,14 +338,14 @@ function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: Re
             error={errors.consents}
             onChange={(c) => {
               setConsents(c)
-              if (errors.consents) setErrors((e) => ({ ...e, consents: undefined }))
+              clearError('consents')
             }}
           />
         </section>
 
         <div className={s.foot}>
           <p className={s.progress}>
-            필수 질문 <span className="num">{done}</span> / <span className="num">{total}</span>
+            필수 항목 <span className="num">{done}</span> / <span className="num">{total}</span>
           </p>
           <p className={s.formMsg} role="alert">
             {formError && <span className={s.errorText}>{formError}</span>}
@@ -234,7 +361,7 @@ function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: Re
         onClose={() => !submit.isPending && setConfirming(false)}
         onSubmit={send}
         title="지원서를 제출할까요?"
-        description={`제출한 뒤에는 직접 고칠 수 없습니다. 결과는 ${answers[FIXED_ID.email]?.trim() || '적은 이메일'}로 알려 드립니다.`}
+        description={`제출한 뒤에는 직접 고칠 수 없습니다. 결과는 ${draft.applicant.email.trim() || '적은 이메일'}로 알려 드립니다.`}
         footer={
           <>
             <button type="button" className="btn-secondary btn-sm" onClick={() => setConfirming(false)} disabled={submit.isPending}>
@@ -267,27 +394,83 @@ function ApplyForm({ form, period, onDone }: { form: PublicApplyForm; period: Re
   )
 }
 
-/** 질문 하나: 단답(input) · 장문(textarea + 글자 수) · 객관식(알약 고르기) */
-function Question({ q, value, error, onChange }: { q: FormQuestion; value: string; error?: string; onChange: (v: string) => void }) {
+function RequiredMark({ required }: { required: boolean }) {
+  return required ? (
+    <>
+      <span className={s.star} aria-hidden="true">
+        {' '}
+        *
+      </span>
+      <span className="visually-hidden"> (필수)</span>
+    </>
+  ) : (
+    <span className={s.optional}>선택</span>
+  )
+}
+
+/** 기본 정보 칸 하나 (API-RCT-005 applicant) */
+function ApplicantField({
+  field,
+  value,
+  error,
+  onChange,
+  onBlur,
+}: {
+  field: (typeof APPLICANT_FIELDS)[number]
+  value: string
+  error?: string
+  onChange: (v: string) => void
+  onBlur?: () => void
+}) {
   const id = useId()
   const errId = `${id}-err`
+  const { key } = field
+  return (
+    <div className={s.field}>
+      <label className={s.label} htmlFor={id}>
+        {field.label}
+        <RequiredMark required={field.required} />
+      </label>
+      <input
+        id={id}
+        className={s.input}
+        value={value}
+        type={key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'}
+        inputMode={key === 'studentId' ? 'numeric' : key === 'phone' ? 'tel' : undefined}
+        autoComplete={key === 'name' ? 'name' : key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'off'}
+        maxLength={key === 'studentId' ? 10 : key === 'phone' ? 13 : 100}
+        placeholder={PLACEHOLDER[key]}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errId : undefined}
+        onChange={(e) => onChange(key === 'studentId' ? e.target.value.replace(/\D/g, '') : e.target.value)}
+        onBlur={onBlur}
+      />
+      {error && (
+        <p id={errId} className={s.error}>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/** 문항 하나: SHORT_TEXT · URL(input) · LONG_TEXT(textarea + 글자 수) · SINGLE_CHOICE(하나 고르기) · MULTI_CHOICE(여러 개 고르기) */
+function Question({ q, value, error, onChange }: { q: FormQuestion; value: string | string[] | undefined; error?: string; onChange: (v: string | string[]) => void }) {
+  const id = useId()
+  const errId = `${id}-err`
+  const descId = `${id}-desc`
   const countId = `${id}-count`
-  const max = maxLength(q)
+  const max = maxLengthOf(q)
   const label = (
     <>
       {q.title}
-      {q.required ? (
-        <>
-          <span className={s.star} aria-hidden="true">
-            {' '}
-            *
-          </span>
-          <span className="visually-hidden"> (필수)</span>
-        </>
-      ) : (
-        !/선택/.test(q.title) && <span className={s.optional}>선택</span>
-      )}
+      <RequiredMark required={q.required} />
     </>
+  )
+  const desc = q.description && (
+    <p id={descId} className={s.qDesc}>
+      {q.description}
+    </p>
   )
   const err = error && (
     <p id={errId} className={s.error}>
@@ -295,49 +478,74 @@ function Question({ q, value, error, onChange }: { q: FormQuestion; value: strin
     </p>
   )
 
-  if (q.type === 'choice')
+  if (q.type === 'SINGLE_CHOICE' || q.type === 'MULTI_CHOICE') {
+    const multi = q.type === 'MULTI_CHOICE'
+    const picked = multi ? (Array.isArray(value) ? value : []) : typeof value === 'string' ? value : ''
+    const describedBy = [q.description ? descId : null, error ? errId : null].filter(Boolean).join(' ') || undefined
     return (
-      <fieldset className={s.field} aria-describedby={error ? errId : undefined}>
-        <legend className={s.label}>{label}</legend>
+      <fieldset className={s.field} aria-describedby={describedBy}>
+        <legend className={s.label}>
+          {label}
+          {multi && <span className={s.optional}>여러 개 고를 수 있어요</span>}
+        </legend>
+        {desc}
         <div className={s.choices}>
-          {q.options.map((o) => (
-            <label key={o} className={s.choice}>
-              <input type="radio" name={q.id} value={o} checked={value === o} onChange={() => onChange(o)} aria-invalid={error ? true : undefined} />
-              <span>{o}</span>
-            </label>
-          ))}
+          {(q.options ?? []).map((o) => {
+            const on = multi ? (picked as string[]).includes(o) : picked === o
+            return (
+              <label key={o} className={s.choice}>
+                <input
+                  type={multi ? 'checkbox' : 'radio'}
+                  name={q.questionId}
+                  value={o}
+                  checked={on}
+                  aria-invalid={error ? true : undefined}
+                  onChange={() => {
+                    if (!multi) return onChange(o)
+                    const list = picked as string[]
+                    onChange(on ? list.filter((x) => x !== o) : [...list, o])
+                  }}
+                />
+                <span>{o}</span>
+              </label>
+            )
+          })}
         </div>
         {err}
       </fieldset>
     )
+  }
 
-  const describedBy = [error ? errId : null, q.type === 'long' ? countId : null].filter(Boolean).join(' ') || undefined
+  const text = typeof value === 'string' ? value : ''
+  const long = q.type === 'LONG_TEXT'
+  const describedBy = [q.description ? descId : null, error ? errId : null, long && max ? countId : null].filter(Boolean).join(' ') || undefined
   return (
     <div className={s.field}>
       <label className={s.label} htmlFor={id}>
         {label}
       </label>
-      {q.type === 'long' ? (
+      {desc}
+      {long ? (
         <>
-          <textarea id={id} className={`${s.input} ${s.textarea}`} value={value} rows={6} aria-invalid={error ? true : undefined} aria-describedby={describedBy} onChange={(e) => onChange(e.target.value)} />
-          <p id={countId} className={`${s.counter} num`} data-over={value.trim().length > max || undefined}>
-            {value.trim().length.toLocaleString()} / {max.toLocaleString()}
-            <span className="visually-hidden">자</span>
-          </p>
+          <textarea id={id} className={`${s.input} ${s.textarea}`} value={text} rows={6} aria-invalid={error ? true : undefined} aria-describedby={describedBy} onChange={(e) => onChange(e.target.value)} />
+          {max && (
+            <p id={countId} className={`${s.counter} num`} data-over={text.trim().length > max || undefined}>
+              {text.trim().length.toLocaleString()} / {max.toLocaleString()}
+              <span className="visually-hidden">자</span>
+            </p>
+          )}
         </>
       ) : (
         <input
           id={id}
           className={s.input}
-          value={value}
-          type={q.id === FIXED_ID.email ? 'email' : q.id === 'q-link' ? 'url' : 'text'}
-          inputMode={q.id === FIXED_ID.studentId ? 'numeric' : undefined}
-          autoComplete={q.id === FIXED_ID.name ? 'name' : q.id === FIXED_ID.email ? 'email' : 'off'}
-          maxLength={q.id === FIXED_ID.studentId ? 10 : undefined}
-          placeholder={PLACEHOLDER[q.id]}
+          value={text}
+          type={q.type === 'URL' ? 'url' : 'text'}
+          inputMode={q.type === 'URL' ? 'url' : undefined}
+          placeholder={q.type === 'URL' ? 'https://' : undefined}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          onChange={(e) => onChange(q.id === FIXED_ID.studentId ? e.target.value.replace(/\D/g, '') : e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
         />
       )}
       {err}
@@ -345,7 +553,7 @@ function Question({ q, value, error, onChange }: { q: FormQuestion; value: strin
   )
 }
 
-/** 동의 둘 (F-RCT-005 4 · 5) + 처리방침 요약 · 전문 링크(새 탭, 쓰던 답이 남게). 문구는 관리자 '지원서 미리보기'와 같다 (F-COM-005) */
+/** 동의 둘 (F-RCT-005) + 처리방침 요약 · 전문 링크(새 탭, 쓰던 답이 남게, F-COM-005). 둘 다 체크해야 제출되지만, API 에는 privacyConsent 만 보낸다 (AI 채점 동의는 체크박스로만, 2026-11-17 결정) */
 function ConsentBox({ value, error, onChange }: { value: Consents; error?: string; onChange: (c: Consents) => void }) {
   const all = value.privacy && value.ai
   return (
@@ -365,7 +573,7 @@ function ConsentBox({ value, error, onChange }: { value: Consents; error?: strin
         <summary>개인정보 처리방침 요약 보기</summary>
         <dl className={s.policy}>
           <dt>수집 항목</dt>
-          <dd>이름 · 학번 · 학과 · 이메일 · 응답</dd>
+          <dd>이름 · 학번 · 학과 · 이메일 · 연락처(선택) · 지원 파트 · 응답</dd>
           <dt>이용 목적</dt>
           <dd>지원자 선발 · 결과 안내, 합격 후 회원 계정 생성</dd>
           <dt>학번 관리</dt>
@@ -390,7 +598,7 @@ function ConsentBox({ value, error, onChange }: { value: Consents; error?: strin
       <details className={s.details}>
         <summary>AI 자동 채점 안내 보기</summary>
         <ul className={s.policyList}>
-          <li>AI에는 평가 항목에 해당하는 응답만 보냅니다. 이름 · 학번 · 학과 · 이메일은 보내지 않습니다.</li>
+          <li>AI에는 평가 항목에 해당하는 응답만 보냅니다. 이름 · 학번 · 학과 · 이메일 · 연락처는 보내지 않습니다.</li>
           <li>AI(Google Gemini)에 보낸 응답은 Google의 AI 학습이나 서비스 개선에 쓰이지 않습니다.</li>
           <li>점수는 운영진이 검토할 때 참고하는 점수이며, 합격 여부는 운영진이 결정합니다.</li>
         </ul>
@@ -404,25 +612,27 @@ function ConsentBox({ value, error, onChange }: { value: Consents; error?: strin
   )
 }
 
-/** 접수 완료 */
-function Done({ receipt, generation }: { receipt: ApplyReceipt; generation: number }) {
+/** 접수 완료 (API-RCT-005 201: aid · submittedAt) */
+function Done({ result, email, cohort }: { result: ApplicationResult; email: string; cohort: number }) {
   const headRef = useRef<HTMLHeadingElement>(null)
   useEffect(() => headRef.current?.focus(), [])
   return (
     <section className={s.done} aria-labelledby="apply-done">
       <h1 id="apply-done" ref={headRef} tabIndex={-1} className={s.title}>
-        지원서를 받았습니다
+        {cohort}기 지원서를 받았습니다
       </h1>
       <dl className={s.receipt}>
         <div>
           <dt>접수 번호</dt>
-          <dd className="num">
-            {generation}-{String(receipt.no).padStart(3, '0')}
-          </dd>
+          <dd className="num">{result.aid}</dd>
+        </div>
+        <div>
+          <dt>제출 시각</dt>
+          <dd className="num">{kstDateTime(result.submittedAt)}</dd>
         </div>
         <div>
           <dt>결과 안내 받을 곳</dt>
-          <dd>{receipt.email}</dd>
+          <dd>{email}</dd>
         </div>
       </dl>
       <p className={s.lead}>서류 결과는 이 메일로 알려 드립니다. 메일이 보이지 않으면 스팸함도 확인해 주세요.</p>
@@ -431,33 +641,9 @@ function Done({ receipt, generation }: { receipt: ApplyReceipt; generation: numb
         고칠 내용이 있으면 <a href={`mailto:${CHAPTER.email}`}>{CHAPTER.email}</a>로 알려 주세요.
       </p>
       <div className="btn-row">
-        <Link to="/" className="btn-primary">
-          홈으로
-        </Link>
-        <a className="btn-secondary" href={SITE.links.instagram ?? RECRUITING.current.channel} target="_blank" rel="noreferrer">
+        <a className="btn-primary" href={SITE.links.instagram ?? RECRUITING.current.channel} target="_blank" rel="noreferrer">
           인스타그램 보기<span className="visually-hidden"> (새 창)</span>
         </a>
-      </div>
-    </section>
-  )
-}
-
-/** 지원 기간이 아닐 때 (예시가 아닐 때만) */
-function NotOpen({ generation, why, startDate }: { generation: number; why: ReturnType<typeof periodState>; startDate?: string | null }) {
-  const title = why === 'after' ? `${generation}기 지원이 마감됐습니다` : why === 'before' && startDate ? `${generation}기 지원은 ${monthDay(startDate)}에 열립니다` : '지금은 지원 기간이 아닙니다'
-  return (
-    <section className={s.done} aria-labelledby="apply-closed">
-      <h1 id="apply-closed" className={s.title}>
-        {title}
-      </h1>
-      <p className={s.lead}>모집 일정과 결과는 인스타그램 {SITE.links.instagramHandle}에 가장 먼저 올립니다.</p>
-      <div className="btn-row">
-        <a className="btn-primary" href={RECRUITING.current.channel} target="_blank" rel="noreferrer">
-          {generation}기 소식 받기<span className="visually-hidden"> (인스타그램, 새 창)</span>
-        </a>
-        <Link to="/recruits" className="btn-secondary">
-          지원 안내 보기
-        </Link>
       </div>
     </section>
   )

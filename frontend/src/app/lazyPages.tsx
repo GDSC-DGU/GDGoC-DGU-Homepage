@@ -63,7 +63,7 @@ export function CommunityPage() {
 export function RecruitsPage() {
   return <Recruits />
 }
-/** 지원서 작성 (/recruits/apply) */
+/** 지원서 페이지 (/recruits/apply) */
 export function ApplyPage() {
   return <Apply />
 }

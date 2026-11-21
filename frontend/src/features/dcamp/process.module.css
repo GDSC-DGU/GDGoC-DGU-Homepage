@@ -30,6 +30,8 @@
   background: var(--line-strong);
 }
 .n {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
   width: 32px;
@@ -38,6 +40,62 @@
   background: var(--gen-text);
   font: 600 12px/1 var(--font-num);
   color: var(--white);
+  transition: transform 0.4s var(--ease-out);
+}
+/* 차오르는 선: 회색 선(::after) 위에 같은 자리 주황 선. 처음엔 길이 0 */
+.fill {
+  position: absolute;
+  left: 44px;
+  right: -16px;
+  top: 16px;
+  z-index: 1;
+  height: 1px;
+  background: var(--gen-text);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.5s var(--ease-out);
+}
+.fill[data-on] {
+  transform: scaleX(1);
+}
+/* 마우스가 없는 화면: 보일 때 01 → 04 로 차례로 */
+.steps[data-seen] .fill {
+  transform: scaleX(1);
+  transition-duration: 0.6s;
+  transition-delay: calc(var(--i) * 0.35s);
+}
+.stepTitle,
+.when,
+.note {
+  transition: opacity 0.4s var(--ease-out);
+}
+@media (hover: hover) {
+  .step {
+    cursor: default;
+  }
+  .step[data-state='on'] .n {
+    transform: scale(1.18);
+  }
+  .step[data-state='next'] .stepTitle,
+  .step[data-state='next'] .when,
+  .step[data-state='next'] .note,
+  .step[data-state='next'] .n {
+    opacity: 0.4;
+  }
+  .n {
+    transition:
+      transform 0.4s var(--ease-out),
+      opacity 0.4s var(--ease-out);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fill,
+  .n,
+  .stepTitle,
+  .when,
+  .note {
+    transition: none;
+  }
 }
 .stepTitle {
   margin-top: 20px;
@@ -84,12 +142,21 @@
   .stepTitle {
     margin-top: 4px;
   }
-  .step:not(:last-child)::after {
+  .step:not(:last-child)::after,
+  .fill {
     left: 16px;
     right: auto;
     top: 40px;
     bottom: -24px;
     width: 1px;
     height: auto;
+  }
+  .fill {
+    transform: scaleY(0);
+    transform-origin: 50% 0;
+  }
+  .fill[data-on],
+  .steps[data-seen] .fill {
+    transform: scaleY(1);
   }
 }
