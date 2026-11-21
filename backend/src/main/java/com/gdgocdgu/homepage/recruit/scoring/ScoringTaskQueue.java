@@ -18,8 +18,8 @@ package com.gdgocdgu.homepage.recruit.scoring;
  *
  * <p>구현
  * <ul>
- *   <li>{@link LoggingScoringTaskQueue}: 로그만 남긴다. (이 PR)</li>
- *   <li>Cloud Tasks 구현: dev · prod용으로 이후 PR에서 추가한다.</li>
+ *   <li>{@link LoggingScoringTaskQueue}: 로그만 남긴다. local에서 쓴다.</li>
+ *   <li>{@link CloudTasksScoringTaskQueue}: Cloud Tasks 큐에 등록한다. dev · prod에서 쓴다.</li>
  * </ul>
  */
 public interface ScoringTaskQueue {
