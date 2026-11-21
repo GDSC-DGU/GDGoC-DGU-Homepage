@@ -153,12 +153,25 @@ graph TD
 |---|---|---|
 | `status` | string | `PENDING` · `RUNNING` · `DONE` · `FAILED` |
 | `criteriaVersion` | number | 이 지원서가 따라야 할 기준 버전. 결과가 다른 버전이면 버림(`SKIPPED_STALE`) |
-| `totalScore` | number \| null | 0~100. 목록의 `aiScore` |
-| `items` | array\<map\> | `{ itemId, name, level, weight, score, reason }` |
+| `runId` | string \| null | 지금 유효한 채점 실행 번호. RCT-028이 시작할 때 새로 기록하고, 결과는 이 값이 같을 때만 저장(늦게 끝난 이전 실행 결과 버림) |
+| `totalScore` | number \| null | 항목 점수의 합. 소수 1자리(0.0~100.0). 목록의 `aiScore` |
+| `items` | array\<map\> | `{ itemId, name, level, weight, score, reason }`. `score = level / 5 × weight`, 소수 1자리(항상 0.2 배수) |
 | `model` · `promptVersion` · `instructionIgnored` | | AI 응답 그대로 |
 | `requestedAt` · `startedAt` · `scoredAt` | timestamp | RCT-031이 `PENDING` 5분 · `RUNNING` 10분 초과를 찾을 때 씀 |
 | `attempts` | number | 3회 초과 시 `FAILED` |
 | `error` | string \| null | 실패 사유 코드 |
+
+상태 전이 (RCT-028 · 031):
+
+```text
+PENDING ──(028 시작, runId 기록)──▶ RUNNING ──(결과 저장, runId 일치)──▶ DONE
+   ▲                                   │
+   ├──(028 AI 일시 실패, attempts+1)───┤──(AI 422 · 3회 초과)──▶ FAILED
+   └──(031: RUNNING 10분 초과)─────────┘
+```
+
+- `RUNNING`을 그대로 다시 넣으면 RCT-028이 "이미 RUNNING"으로 건너뛰므로, 다시 넣을 때는 항상 `PENDING`으로 바꾼다.
+- 점수는 실수 오차를 피하려고 0.1 단위 정수(`level × weight × 2`)로 계산한 뒤 소수 1자리로 저장한다.
 
 `stages` (RCT-016 · 019 · 021 · 024 · 029):
 
@@ -242,7 +255,9 @@ stages: {
 | RCT-011 게시 | 기준 버전 확인 → 폼 버전 `PUBLISHED` → 회차 `publishedFormVersion` 갱신 | |
 | RCT-013 기준 저장 | 새 기준 버전 생성 → 회차 `currentCriteriaVersion` 갱신 | `needsRescore`는 저장 후 집계 |
 | RCT-019 일괄 결과 | 최대 500건이라 **배치 쓰기**를 나눠 실행. 건별로 지원서 갱신 + 이력 | 건별 성공 · 제외를 모아 응답 |
-| RCT-028 채점 결과 | 지원서를 다시 읽어 `criteriaVersion`이 같을 때만 결과 저장 | AI 호출은 트랜잭션 **밖**(재시도 때 중복 호출 방지) |
+| RCT-028 채점 시작 | `PENDING`이면 `RUNNING` + 새 `runId` 기록. 이미 `RUNNING`이면 건너뜀 | |
+| RCT-028 채점 결과 | 지원서를 다시 읽어 `criteriaVersion` · `runId`가 같을 때만 결과 저장. AI 일시 실패면 `PENDING`으로 되돌림 | AI 호출은 트랜잭션 **밖**(재시도 때 중복 호출 방지) |
+| RCT-031 멈춘 채점 | 여전히 멈춘 상태인지 확인 후 `PENDING` + `requestedAt` 갱신 | 채점 작업 다시 등록 |
 | RCT-029 메일 1건 | 수신자 `SENT` + 지원서 `stages.{stage}.mailStatus = SENT` · `resultFixed = true` | Gmail 호출은 트랜잭션 **밖**. 이미 `SENT`면 호출 안 함 |
 | RCT-033 삭제 | 지원서 `deleted = true` + 키 2개 삭제 + 이력 | |
 
