@@ -64,6 +64,12 @@ npx firebase-tools@15.36.0 emulators:start --only firestore --project demo-gdgoc
 
 dev · prod 프로필은 Cloud Run 서비스 계정(ADC)으로 각 GCP 프로젝트(dev: `dev-gdgoc-dgu-homepage`, prod: `gdgoc-dgu-homepage`)의 Firestore에 연결합니다. 서비스 계정 키 파일은 쓰지 않습니다.
 
+### AI 채점 (API-RCT-028)
+
+- `POST /internal/scoring`은 Cloud Tasks가 호출하는 내부 API입니다. dev · prod에서는 `tasks-invoker` 서비스 계정의 OIDC 토큰만 통과하고(`app.internal-auth`), local에서는 인증을 끕니다.
+- local은 AI 서버를 `http://localhost:8000`으로 호출합니다. 다른 주소를 쓰려면 `AI_BASE_URL`을 지정합니다. dev · prod는 Cloud Run 서비스 계정(ADC)의 Google ID 토큰을 붙여 각 환경의 `ai` 서비스를 호출합니다.
+- `FirestoreScoringRepositoryEmulatorTest`는 에뮬레이터가 켜져 있을 때만 실행됩니다.
+
 ### 필요한 것
 
 - **Java 17 이상**이 PC에 하나 설치되어 있어야 합니다. `./gradlew` 자체를 실행하는 데 씁니다.
