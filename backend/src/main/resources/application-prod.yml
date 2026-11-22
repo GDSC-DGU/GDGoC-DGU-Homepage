@@ -20,3 +20,8 @@ app:
       backend-url: https://backend-534333328238.asia-northeast3.run.app   # 요청 URL이자 OIDC audience
       invoker-service-account: tasks-invoker@gdgoc-dgu-homepage.iam.gserviceaccount.com
       dispatch-deadline: 240s
+  internal-auth:   # /internal/** 는 Cloud Tasks(tasks-invoker)의 OIDC 토큰만 허용
+    mode: oidc
+    audience: ${app.scoring.task-queue.backend-url}
+    allowed-service-accounts:
+      - ${app.scoring.task-queue.invoker-service-account}

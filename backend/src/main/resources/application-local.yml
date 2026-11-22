@@ -9,6 +9,8 @@ app:
   scoring:
     task-queue:
       mode: logging   # 큐에 넣지 않고 로그만 남김. Cloud Tasks를 직접 확인하려면 cloud-tasks로 바꾸고 나머지 값을 채운다
+  internal-auth:
+    mode: disabled   # /internal/** 인증 끔. local 전용 (시작할 때 WARN 로그)
 
 logging:
   level:
