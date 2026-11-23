@@ -16,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class FirestoreScoringRecoveryEmulatorTest {
 
-    private static final Instant NOW = Instant.now();
+    // Firestore는 시각을 마이크로초까지만 저장한다. Linux의 Instant.now()는 나노초까지 있어 저장 후 값과 달라지므로 맞춰 자른다.
+    private static final Instant NOW = Instant.now().truncatedTo(ChronoUnit.MICROS);
     private static final Instant PENDING_CUTOFF = NOW.minus(Duration.ofMinutes(5));
     private static final Instant RUNNING_CUTOFF = NOW.minus(Duration.ofMinutes(10));
 
