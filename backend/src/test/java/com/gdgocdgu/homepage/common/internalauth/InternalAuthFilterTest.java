@@ -22,8 +22,8 @@ class InternalAuthFilterTest {
     private int chainCalls;
     private final FilterChain chain = (req, res) -> chainCalls++;
 
-    private InternalAuthFilter filter(boolean disabled) {
-        return new InternalAuthFilter(verifier, disabled, JsonMapper.builder().build());
+    private InternalAuthFilter filter() {
+        return new InternalAuthFilter(verifier, JsonMapper.builder().build());
     }
 
     private MockHttpServletResponse run(InternalAuthFilter filter, String path, String authorization) throws Exception {
@@ -38,7 +38,7 @@ class InternalAuthFilterTest {
 
     @Test
     void 헤더가_없으면_401과_표준_오류_본문이다() throws Exception {
-        MockHttpServletResponse response = run(filter(false), "/internal/scoring", null);
+        MockHttpServletResponse response = run(filter(), "/internal/scoring", null);
 
         assertThat(response.getStatus()).isEqualTo(401);
         assertThat(response.getContentType()).startsWith("application/json");
@@ -50,31 +50,26 @@ class InternalAuthFilterTest {
 
     @Test
     void Bearer가_아니거나_토큰이_틀리면_401이다() throws Exception {
-        assertThat(run(filter(false), "/internal/scoring", "Basic abc").getStatus()).isEqualTo(401);
-        assertThat(run(filter(false), "/internal/scoring", "Bearer ").getStatus()).isEqualTo(401);
-        assertThat(run(filter(false), "/internal/scoring", "Bearer bad-token").getStatus()).isEqualTo(401);
+        assertThat(run(filter(), "/internal/scoring", "Basic abc").getStatus()).isEqualTo(401);
+        assertThat(run(filter(), "/internal/scoring", "Bearer ").getStatus()).isEqualTo(401);
+        assertThat(run(filter(), "/internal/scoring", "Bearer bad-token").getStatus()).isEqualTo(401);
         assertThat(chainCalls).isZero();
     }
 
     @Test
     void 올바른_토큰이면_다음으로_넘긴다() throws Exception {
-        MockHttpServletResponse response = run(filter(false), "/internal/scoring", "Bearer " + VALID);
+        MockHttpServletResponse response = run(filter(), "/internal/scoring", "Bearer " + VALID);
 
         assertThat(response.getStatus()).isEqualTo(200);
         assertThat(chainCalls).isEqualTo(1);
     }
 
     @Test
-    void 내부_경로가_아니면_검사하지_않는다() throws Exception {
-        assertThat(run(filter(false), "/api/v1/health", null).getStatus()).isEqualTo(200);
-        assertThat(run(filter(false), "/internalfoo", null).getStatus()).isEqualTo(200);
-        assertThat(chainCalls).isEqualTo(2);
-        assertThat(verified).isEmpty();
-    }
-
-    @Test
-    void disabled_모드는_내부_경로도_통과시킨다() throws Exception {
-        assertThat(run(filter(true), "/internal/scoring", null).getStatus()).isEqualTo(200);
-        assertThat(chainCalls).isEqualTo(1);
+    void 필터에_도달하면_경로와_상관없이_항상_토큰을_요구한다() throws Exception {
+        // 어떤 경로를 검사할지는 필터 등록(/internal/*, 컨테이너가 정규화한 경로)이 정한다. 필터는 경로를 보지 않는다.
+        assertThat(run(filter(), "/%69nternal/scoring", null).getStatus()).isEqualTo(401);
+        assertThat(run(filter(), "/internal;x=1/scoring", null).getStatus()).isEqualTo(401);
+        assertThat(run(filter(), "/anything", null).getStatus()).isEqualTo(401);
+        assertThat(chainCalls).isZero();
     }
 }

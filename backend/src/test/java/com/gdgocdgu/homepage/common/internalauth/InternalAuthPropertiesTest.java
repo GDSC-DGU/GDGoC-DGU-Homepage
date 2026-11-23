@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -40,7 +41,12 @@ class InternalAuthPropertiesTest {
                 "app.internal-auth.allowed-service-accounts[0]=tasks-invoker@example.iam.gserviceaccount.com")
                 .run(context -> {
                     assertThat(context).hasNotFailed();
-                    assertThat(context).hasSingleBean(InternalAuthFilter.class);
+                    assertThat(context).hasSingleBean(FilterRegistrationBean.class);
+                    // 필터 자체는 빈이 아니어야 /* 에 자동 등록되지 않는다.
+                    assertThat(context).doesNotHaveBean(InternalAuthFilter.class);
+                    FilterRegistrationBean<?> registration = context.getBean(FilterRegistrationBean.class);
+                    assertThat(registration.isEnabled()).isTrue();
+                    assertThat(registration.getUrlPatterns()).containsExactly("/internal/*");
                 });
     }
 
@@ -48,7 +54,8 @@ class InternalAuthPropertiesTest {
     void disabled는_값_없이도_시작된다() {
         runner.withPropertyValues("app.internal-auth.mode=disabled").run(context -> {
             assertThat(context).hasNotFailed();
-            assertThat(context).hasSingleBean(InternalAuthFilter.class);
+            assertThat(context).doesNotHaveBean(InternalAuthFilter.class);
+            assertThat(context.getBean(FilterRegistrationBean.class).isEnabled()).isFalse();
         });
     }
 
