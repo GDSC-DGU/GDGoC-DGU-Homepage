@@ -90,7 +90,7 @@ graph TD
 |---|---|---|
 | `version` | number | |
 | `status` | string | `DRAFT` · `PUBLISHED` |
-| `questions` | array\<map\> | `{ questionId, type, title, description, maxLength, options[], trackOnly[] }` |
+| `questions` | array\<map\> | `{ questionId, type, title, description, required, maxLength, options[], trackOnly[] }` |
 | `updatedAt` · `updatedBy` · `updatedByName` | | RCT-009 응답의 `updatedBy`(이름)를 위해 이름도 복사 |
 | `publishedAt` · `publishedBy` | timestamp · string | 게시 때만 |
 

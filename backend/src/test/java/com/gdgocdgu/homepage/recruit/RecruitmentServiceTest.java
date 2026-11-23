@@ -23,7 +23,7 @@ class RecruitmentServiceTest {
     }
 
     static RecruitmentService serviceWith(Recruitment... recruitments) {
-        return new RecruitmentService(() -> List.of(recruitments), NOW);
+        return new RecruitmentService(InMemoryRecruitmentRepository.of(recruitments), NOW);
     }
 
     @Test
