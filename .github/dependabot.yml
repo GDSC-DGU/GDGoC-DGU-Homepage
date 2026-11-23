@@ -91,6 +91,11 @@ updates:
       timezone: "Asia/Seoul"
     cooldown:
       default-days: 7
+    ignore:
+      # ai의 Python 버전은 pyproject.toml(requires-python) · .python-version · uv.lock과 함께 올려야 이미지가 빌드된다.
+      # 베이스 이미지만 바꾸는 PR은 받지 않는다. 3.15로 올릴 때 이 규칙을 지우고 위 파일들과 한 PR로 바꾼다.
+      - dependency-name: "python"
+        versions: [">=3.15"]
     commit-message:
       prefix: "chore"
       include: "scope"
