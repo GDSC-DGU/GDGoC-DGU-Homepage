@@ -64,6 +64,8 @@ class ScoringService {
         try {
             request = GradingRequestBuilder.build(aid, input);
         } catch (InvalidScoringInputException e) {
+            // 메시지에는 오류 코드와 어떤 제한인지만 있다(답안 · 기준 문구 없음).
+            log.warn("채점 입력 검증 실패: aid={}, criteriaVersion={}, {}", aid, criteriaVersion, e.getMessage());
             return failPermanently(aid, criteriaVersion, runId, e.errorCode());
         }
 

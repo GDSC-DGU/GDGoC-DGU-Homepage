@@ -13,6 +13,7 @@ import java.util.Set;
 
 /**
  * 기준 · 폼 · 지원서 답안을 AI 요청으로 바꾼다.
+ * 만든 요청이 AI 서버 제한({@link GradingLimits})을 넘으면 호출하지 않도록 {@link InvalidScoringInputException}을 던진다.
  * 기준 항목이 가리키는 문항의 답만 보내고(중복 제거, 처음 나온 순서), 지원자 개인정보는 입력에 없다.
  */
 final class GradingRequestBuilder {
@@ -41,7 +42,9 @@ final class GradingRequestBuilder {
             }
             answers.add(new GradingRequest.Answer(questionId, title, text(answersById.get(questionId))));
         }
-        return new GradingRequest(aid, items, answers);
+        GradingRequest request = new GradingRequest(aid, items, answers);
+        GradingLimits.check(request);
+        return request;
     }
 
     /** 단답 · 서술은 value, 선택형은 values를 ", "로 이어 붙인다. 답이 없으면 빈 문자열. */

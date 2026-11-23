@@ -10,6 +10,12 @@ class InvalidScoringInputException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    /** {@code detail}에는 내용 없이 어떤 제한인지만 적는다(로그에 남는다). */
+    InvalidScoringInputException(String errorCode, String detail) {
+        super(errorCode + ": " + detail);
+        this.errorCode = errorCode;
+    }
+
     String errorCode() {
         return errorCode;
     }

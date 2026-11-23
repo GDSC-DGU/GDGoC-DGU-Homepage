@@ -205,4 +205,107 @@ class ScoringServiceTest {
         assertThat(doc.error).isEqualTo("FORM_QUESTION_NOT_FOUND");
         assertThat(requests).isEmpty();
     }
+
+    // --- AI 서버 제한 사전 검증 (ai/app/grading/schemas.py와 같은 값) ---
+
+    private static ScoringInput inputWith(int itemCount, int questionsPerItem, String answerText, String guide) {
+        List<CriteriaItem> items = new ArrayList<>();
+        Map<String, String> titles = new java.util.HashMap<>();
+        List<AnswerValue> answers = new ArrayList<>();
+        int q = 0;
+        for (int i = 0; i < itemCount; i++) {
+            List<String> ids = new ArrayList<>();
+            for (int j = 0; j < questionsPerItem; j++) {
+                String id = "q" + q++;
+                ids.add(id);
+                titles.put(id, "제목" + id);
+                answers.add(new AnswerValue(id, answerText, null));
+            }
+            items.add(new CriteriaItem("i" + i, "항목" + i, ids, guide, 1));
+        }
+        return new ScoringInput(items, answers, titles);
+    }
+
+    private static ScoringInput itemsOnSameQuestion(int itemCount) {
+        List<CriteriaItem> items = new ArrayList<>();
+        for (int i = 0; i < itemCount; i++) {
+            items.add(new CriteriaItem("i" + i, "항목" + i, List.of("q0"), "guide", 1));
+        }
+        return new ScoringInput(items, List.of(new AnswerValue("q0", "답", null)), Map.of("q0", "제목"));
+    }
+
+    private void assertTooLarge(ScoringInput input) {
+        FakeScoringRepository.Doc doc = repository.add(AID);
+        repository.input = input;
+
+        assertThat(service.score(AID, 1)).isEqualTo(ScoringStatus.FAILED);
+        assertThat(doc.status).isEqualTo("FAILED");
+        assertThat(doc.error).isEqualTo("GRADING_INPUT_TOO_LARGE");
+        assertThat(requests).isEmpty();
+    }
+
+    private void assertPasses(ScoringInput input) {
+        repository.add(AID);
+        repository.input = input;
+        outcome = new Transient("AI_UNAVAILABLE");
+
+        assertThatThrownBy(() -> service.score(AID, 1)).isInstanceOf(ApiException.class);
+        assertThat(requests).hasSize(1);
+    }
+
+    @Test
+    void 참조_문항이_10개면_AI를_호출한다() {
+        assertPasses(inputWith(1, 10, "답", "guide"));
+    }
+
+    @Test
+    void 참조_문항이_11개면_AI를_부르지_않고_FAILED_GRADING_INPUT_TOO_LARGE이다() {
+        assertTooLarge(inputWith(2, 6, "답", "guide")); // 서로 다른 문항 12개
+        repository.docs.clear();
+        requests.clear();
+        assertTooLarge(inputWith(1, 11, "답", "guide")); // 한 항목이 11개를 가리킴(항목당 10개 제한도 걸린다)
+    }
+
+    @Test
+    void 서로_다른_문항이_정확히_11개면_FAILED이다() {
+        List<CriteriaItem> items = List.of(
+                new CriteriaItem("a", "A", List.of("q0", "q1", "q2", "q3", "q4", "q5"), "g", 50),
+                new CriteriaItem("b", "B", List.of("q5", "q6", "q7", "q8", "q9", "q10"), "g", 50));
+        Map<String, String> titles = new java.util.HashMap<>();
+        for (int i = 0; i <= 10; i++) {
+            titles.put("q" + i, "제목");
+        }
+        assertTooLarge(new ScoringInput(items, List.of(), titles));
+    }
+
+    @Test
+    void 답안_텍스트_5000자는_통과하고_5001자는_FAILED이다() {
+        assertPasses(inputWith(1, 1, "가".repeat(5000), "guide"));
+        repository.docs.clear();
+        requests.clear();
+        assertTooLarge(inputWith(1, 1, "가".repeat(5001), "guide"));
+    }
+
+    @Test
+    void 항목_20개는_통과하고_21개는_FAILED이다() {
+        // 항목이 모두 같은 문항 하나를 가리켜 답변 수 제한(10)과 분리한다.
+        assertPasses(itemsOnSameQuestion(20));
+        repository.docs.clear();
+        requests.clear();
+        assertTooLarge(itemsOnSameQuestion(21));
+    }
+
+    @Test
+    void 가이드_2000자는_통과하고_2001자는_FAILED이다() {
+        assertPasses(inputWith(1, 1, "답", "가".repeat(2000)));
+        repository.docs.clear();
+        requests.clear();
+        assertTooLarge(inputWith(1, 1, "답", "가".repeat(2001)));
+    }
+
+    @Test
+    void 길이는_코드_포인트_수로_센다() {
+        // 이모지는 UTF-16 2칸이지만 파이썬 len으로는 1이다. 5000개면 통과해야 한다.
+        assertPasses(inputWith(1, 1, "😀".repeat(5000), "guide"));
+    }
 }
