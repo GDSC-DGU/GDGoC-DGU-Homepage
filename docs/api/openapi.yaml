@@ -7012,7 +7012,9 @@ paths:
                               type: string
                               format: date-time
                             aiScore:
-                              type: integer
+                              type: number
+                              description: AI 총점. 소수 1자리(0.0~100.0), 채점 전이면 null
+                              nullable: true
                             scoringStatus:
                               type: string
                             stage:
@@ -7062,7 +7064,7 @@ paths:
                       major: 컴퓨터AI학부
                       track: BE
                       submittedAt: '2027-02-25T14:10:00+09:00'
-                      aiScore: 78
+                      aiScore: 66.6
                       scoringStatus: DONE
                       stage: DOCUMENT
                       result: PENDING
@@ -7099,7 +7101,7 @@ paths:
         **상세 규칙**
 
         - 원본 개인정보는 검토 · 연락에 필요한 이름 · 학번 · 학과 · 이메일 · 전화번호만 반환합니다.
-        - 점수 계산(backend): 항목 점수 = `level / 5 × weight`, 총점 = 항목 점수 합을 정수로 반올림(0~100).
+        - 점수 계산(backend): 항목 점수 = `level / 5 × weight`, 총점 = 항목 점수의 합. 둘 다 소수 1자리(총점 0.0~100.0)입니다. 항목 점수는 항상 0.2의 배수라 반올림 없이 정확하고, 항목 점수를 더하면 총점과 같습니다.
       parameters:
         - name: aid
           in: path
@@ -7167,7 +7169,8 @@ paths:
                           criteriaVersion:
                             type: integer
                           totalScore:
-                            type: integer
+                            type: number
+                            description: 항목 점수의 합. 소수 1자리(0.0~100.0)
                           items:
                             type: array
                             items:
@@ -7182,7 +7185,8 @@ paths:
                                 weight:
                                   type: integer
                                 score:
-                                  type: integer
+                                  type: number
+                                  description: level / 5 × weight. 소수 1자리(항상 0.2의 배수)
                                 reason:
                                   type: string
                           model:
@@ -7268,13 +7272,19 @@ paths:
                   scoring:
                     status: DONE
                     criteriaVersion: 2
-                    totalScore: 78
+                    totalScore: 66.6
                     items:
                       - itemId: motivation
                         name: 지원 동기
                         level: 4
-                        weight: 30
-                        score: 24
+                        weight: 33
+                        score: 26.4
+                        reason: ...
+                      - itemId: experience
+                        name: 개발 경험
+                        level: 3
+                        weight: 67
+                        score: 40.2
                         reason: ...
                     model: gemini-flash
                     scoredAt: '2027-02-25T14:12:00+09:00'
@@ -8532,7 +8542,8 @@ paths:
 
         **호출 1 — Cloud Tasks → backend** (이 API)
         - 호출 주체: Cloud Tasks 큐 `scoring`, 서비스 계정 OIDC 토큰, audience = backend URL. 사용자 JWT로는 호출할 수 없습니다.
-        - 이미 `RUNNING`이면 채점하지 않고 `RUNNING`을 돌려줍니다. 지원서의 현재 기준 버전과 요청의 `criteriaVersion`이 다르면 `SKIPPED_STALE`.
+        - 시작: 트랜잭션에서 `PENDING → RUNNING`으로 바꾸고 이번 실행 번호(`runId`)를 새로 기록합니다. 이미 `RUNNING`이면 채점하지 않고 `RUNNING`을 돌려줍니다. 지원서의 현재 기준 버전과 요청의 `criteriaVersion`이 다르면 `SKIPPED_STALE`.
+        - 결과 저장: 지원서의 `runId`가 이번 실행 번호와 같을 때만 저장합니다. 늦게 끝난 이전 실행의 결과는 버립니다(RCT-031 재등록 · 재채점과 겹칠 때).
 
         **호출 2 — backend → AI** `POST {AI_URL}/grading` (FastAPI, 서비스 계정 인증)
         ```json
@@ -8542,8 +8553,8 @@ paths:
         ```
         AI 응답: `{ success, applicationId, results: [{ itemId, level(1~5), reason }], instructionIgnored, model, promptVersion }`
         - 변환: 이름 · 학번 · 학과 · 이메일 · 전화번호는 보내지 않습니다. 선택형 답은 선택지 문자열을 `, `로 이어 `text`에 넣습니다.
-        - 점수: backend가 `level / 5 × weight`로 항목 점수를, 합을 정수 반올림해 총점을 계산합니다(AI는 level만 반환).
-        - 실패 처리: AI 422(입력 오류)는 영구 실패 → `FAILED`로 저장하고 200. AI 503 · 502 · 500은 일시 실패 → 503을 돌려 Cloud Tasks가 재시도(최대 3회). 3회 초과 시 `FAILED`.
+        - 점수: backend가 `level / 5 × weight`로 항목 점수를, 항목 점수의 합으로 총점을 계산합니다(AI는 level만 반환). 둘 다 소수 1자리이고, 항목 점수는 항상 0.2의 배수라 반올림 없이 정확합니다. 실수 오차를 피하려면 0.1 단위 정수(`level × weight × 2`)로 계산합니다.
+        - 실패 처리: AI 422(입력 오류)는 영구 실패 → `FAILED`로 저장하고 200. AI 503 · 502 · 500은 일시 실패 → **`PENDING`으로 되돌리고**(`attempts` +1) 503을 돌려 Cloud Tasks가 재시도(최대 3회). `RUNNING`으로 남기면 재시도가 "이미 RUNNING"에 걸려 채점되지 않습니다. 3회 초과 시 `FAILED`.
       security:
         - serviceAccount: []
       responses:
@@ -8736,6 +8747,8 @@ paths:
 
         - 호출 주체: Cloud Scheduler 작업 `scoring-recovery`(모집이 있는 달만, 예: `*/10 * * 2-3 *`), 서비스 계정 OIDC 토큰.
         - `PENDING` 5분 초과 · `RUNNING` 10분 초과 지원서를 지원서의 현재 `criteriaVersion`으로 다시 넣습니다.
+        - 다시 넣기 전에 트랜잭션에서 여전히 멈춘 상태인지 확인하고 **`PENDING`으로 바꿉니다**(`requestedAt` 갱신). `RUNNING` 그대로 넣으면 RCT-028이 "이미 RUNNING"으로 건너뛰어 계속 채점되지 않습니다.
+        - 멈춘 줄 알았던 이전 실행이 늦게 끝나더라도 RCT-028의 `runId` 확인으로 그 결과는 버려집니다.
       security:
         - serviceAccount: []
       responses:
