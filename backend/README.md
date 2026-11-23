@@ -41,6 +41,12 @@ $env:GOOGLE_CLIENT_ID = '여기에 Google OAuth 웹 클라이언트 ID 입력'
 - `AUTH_ACCESS_TOKEN_SECRET`에는 무작위 32바이트 이상을 Base64로 인코딩한 값을 설정합니다. Git Bash에서 `openssl rand -base64 32`로 생성할 수 있습니다. VS Code로 실행한다면 로컬 `.env`에 키를 두고 실행 설정에 `"envFile": "${workspaceFolder}/.env"`를 지정합니다. 배포 환경에서는 환경별 비밀값을 사용합니다.
 - 브라우저 출처는 local에서 `http://localhost:5173`과 `http://127.0.0.1:5173`, dev와 prod에서 각 홈페이지 주소를 허용합니다. 필요하면 `AUTH_ALLOWED_ORIGINS`에 쉼표로 구분한 주소를 설정합니다. refresh 쿠키는 local에서 HTTP 테스트를 지원하고, dev와 prod에서는 `Secure`가 적용됩니다.
 
+### 지원 중복 방지 키
+
+- `RECRUIT_KEY_HMAC_SECRET`에는 무작위 32바이트 이상을 Base64로 인코딩한 값을 설정합니다. Git Bash에서 `openssl rand -base64 32`로 생성할 수 있습니다. `AUTH_ACCESS_TOKEN_SECRET`과 다른 값을 쓰고, dev와 prod도 서로 다른 값을 씁니다.
+- 값이 비어 있어도 서버는 시작하지만 중복 확인(API-RCT-003)은 500으로 실패합니다.
+- 모집 중에는 이 값을 바꾸지 않습니다. 바꾸면 기존 지원자의 키와 맞지 않아 같은 학번이 다시 지원할 수 있습니다.
+
 ### Firestore 에뮬레이터
 
 local 프로필은 Firestore 에뮬레이터(`localhost:8180`, 프로젝트 `demo-gdgoc`)에 연결합니다. 실제 Firestore에는 닿지 않습니다. 에뮬레이터를 켜지 않아도 서버는 뜨지만, DB를 쓰는 API는 실패합니다.
