@@ -7,7 +7,7 @@ Spring Boot(Java)로 만든 백엔드입니다. Cloud Run에 배포하며, 데�
 | 담당 팀 | Homepage-BE (`homepage-be`) |
 | PR 영역 라벨 | `area:backend` |
 | CI | `.github/workflows/ci-backend.yml` (Homepage-BE가 작성 · 관리) |
-| 스택 · 도구 | Spring Boot 4.1, Java 25, Gradle 9.8 |
+| 스택 · 도구 | Spring Boot 4.1, Java 25, Gradle 9.9 |
 | 로컬 주소 | http://localhost:8080 (Docker 컨테이너) |
 
 ## 빌드 · 실행
