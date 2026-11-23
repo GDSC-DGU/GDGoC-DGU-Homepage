@@ -20,3 +20,13 @@ app:
       backend-url: https://backend-948542964993.asia-northeast3.run.app   # 요청 URL이자 OIDC audience
       invoker-service-account: tasks-invoker@dev-gdgoc-dgu-homepage.iam.gserviceaccount.com
       dispatch-deadline: 240s
+    ai:   # AI 채점 서버 호출 (API-RCT-028). 인증은 Cloud Run 서비스 계정의 Google ID 토큰(ADC)
+      base-url: https://ai-948542964993.asia-northeast3.run.app   # ai 서비스 고정 주소 (2026-11-22 gcloud로 확인)
+      auth: id-token
+      connect-timeout: 5s
+      read-timeout: 90s   # AI 90s < backend 120s < Cloud Run 180s < Cloud Tasks 240s
+  internal-auth:   # /internal/** 는 Cloud Tasks(tasks-invoker)의 OIDC 토큰만 허용
+    mode: oidc
+    audience: ${app.scoring.task-queue.backend-url}
+    allowed-service-accounts:
+      - ${app.scoring.task-queue.invoker-service-account}
