@@ -6,6 +6,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -29,6 +30,12 @@ class FirestoreRecruitmentRepository implements RecruitmentRepository {
                 .getDocuments().stream()
                 .map(FirestoreRecruitmentRepository::toRecruitment)
                 .toList();
+    }
+
+    @Override
+    public Optional<Recruitment> findById(String rid) {
+        DocumentSnapshot doc = FirestoreFutures.await(firestore.collection(COLLECTION).document(rid).get());
+        return doc.exists() ? Optional.of(toRecruitment(doc)) : Optional.empty();
     }
 
     static Recruitment toRecruitment(DocumentSnapshot doc) {
