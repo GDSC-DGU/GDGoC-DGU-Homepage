@@ -128,6 +128,33 @@ class FirestoreScoringRepositoryEmulatorTest {
         assertThat(app().getString("scoring.status")).isEqualTo("FAILED");
     }
 
+    @Test
+    void 일시_실패로_PENDING으로_되돌리면_requestedAt을_갱신한다() throws Exception {
+        repository.start(aid, 1, "run-1");
+        assertThat(app().getTimestamp("scoring.requestedAt")).isNull();
+
+        repository.releaseForRetry(aid, 1, "run-1", "AI_UNAVAILABLE", 3);
+
+        assertThat(app().getTimestamp("scoring.requestedAt")).isNotNull();
+    }
+
+    @Test
+    void formVersion이_숫자가_아니면_APPLICATION_INVALID로_FAILED_처리한다() throws Exception {
+        firestore.collection("applications").document(aid).update("formVersion", "1").get();
+
+        assertThat(repository.start(aid, 1, "run-1")).isEqualTo(new ScoringModels.Finished(ScoringStatus.FAILED));
+        assertThat(app().getString("scoring.status")).isEqualTo("FAILED");
+        assertThat(app().getString("scoring.error")).isEqualTo("APPLICATION_INVALID");
+    }
+
+    @Test
+    void criteriaVersion이_숫자가_아니면_APPLICATION_INVALID로_FAILED_처리한다() throws Exception {
+        firestore.collection("applications").document(aid).update("scoring.criteriaVersion", "1").get();
+
+        assertThat(repository.start(aid, 1, "run-1")).isEqualTo(new ScoringModels.Finished(ScoringStatus.FAILED));
+        assertThat(app().getString("scoring.error")).isEqualTo("APPLICATION_INVALID");
+    }
+
     private static boolean isReachable(String hostPort) {
         int colon = hostPort.lastIndexOf(':');
         try (Socket socket = new Socket()) {

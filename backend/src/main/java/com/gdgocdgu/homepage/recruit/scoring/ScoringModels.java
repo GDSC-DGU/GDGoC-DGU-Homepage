@@ -74,7 +74,7 @@ final class ScoringModels {
     enum RequeueOutcome {
         /** PENDING으로 되돌렸다. 큐에 다시 등록해야 한다. */
         REQUEUED,
-        /** 시도 횟수를 넘겨 FAILED로 저장했다. 큐에 등록하지 않는다. */
+        /** 시도 횟수를 넘겼거나 기준 버전이 없거나 잘못돼 FAILED로 저장했다. 큐에 등록하지 않는다. */
         FAILED,
         /** 문서가 없거나 삭제됐거나 이미 멈춘 상태가 아니라 건드리지 않았다. */
         SKIPPED

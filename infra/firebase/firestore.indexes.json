@@ -5,6 +5,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "scoring.status", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" },
         { "fieldPath": "scoring.requestedAt", "order": "ASCENDING" }
       ]
     },
@@ -13,6 +14,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "scoring.status", "order": "ASCENDING" },
+        { "fieldPath": "deleted", "order": "ASCENDING" },
         { "fieldPath": "scoring.startedAt", "order": "ASCENDING" }
       ]
     }

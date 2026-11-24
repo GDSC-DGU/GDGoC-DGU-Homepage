@@ -26,6 +26,10 @@ class FakeScoringRepository implements ScoringRepository {
         boolean deleted;
         String status = "PENDING";
         int criteriaVersion = 1;
+        /** true이면 scoring.criteriaVersion이 없는 문서(재처리 때 CRITERIA_NOT_FOUND로 FAILED). */
+        boolean criteriaMissing;
+        /** true이면 scoring.criteriaVersion이 숫자가 아닌 문서(재처리 때 APPLICATION_INVALID로 FAILED). */
+        boolean criteriaWrongType;
         String runId;
         long attempts;
         String error;
@@ -122,6 +126,7 @@ class FakeScoringRepository implements ScoringRepository {
         }
         doc.status = "PENDING";
         doc.error = errorCode;
+        doc.requestedAt = Instant.now();
         return RetryResult.RETRY;
     }
 
@@ -131,7 +136,7 @@ class FakeScoringRepository implements ScoringRepository {
 
     private static boolean isStuck(Doc doc, StuckKind kind, Instant cutoff) {
         Instant time = timeOf(doc, kind);
-        return kind.status.equals(doc.status) && time != null && time.isBefore(cutoff);
+        return !doc.deleted && kind.status.equals(doc.status) && time != null && time.isBefore(cutoff);
     }
 
     @Override
@@ -154,6 +159,12 @@ class FakeScoringRepository implements ScoringRepository {
             return new RequeueResult(RequeueOutcome.SKIPPED, 0);
         }
         doc.runId = null;
+        if (doc.criteriaWrongType || doc.criteriaMissing) {
+            doc.status = "FAILED";
+            doc.error = doc.criteriaWrongType ? "APPLICATION_INVALID" : "CRITERIA_NOT_FOUND";
+            events.add("update:" + aid);
+            return new RequeueResult(RequeueOutcome.FAILED, 0);
+        }
         if (kind == StuckKind.RUNNING && ++doc.attempts > maxAttempts) {
             doc.status = "FAILED";
             doc.error = ScoringRecoveryService.ERROR_SCORING_TIMEOUT;

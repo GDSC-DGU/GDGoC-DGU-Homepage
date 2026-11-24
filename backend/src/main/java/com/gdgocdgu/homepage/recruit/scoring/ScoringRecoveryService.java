@@ -60,7 +60,7 @@ class ScoringRecoveryService {
                         requeued++;
                     } else if (result.outcome() == RequeueOutcome.FAILED) {
                         failed++;
-                        log.warn("멈춘 채점이 시도 횟수를 넘겨 FAILED 처리: aid={}, status={}", candidate.aid(), kind);
+                        log.warn("멈춘 채점을 FAILED 처리(시도 횟수 초과 또는 기준 버전 오류): aid={}, status={}", candidate.aid(), kind);
                     }
                 } catch (RuntimeException e) {
                     errors++;

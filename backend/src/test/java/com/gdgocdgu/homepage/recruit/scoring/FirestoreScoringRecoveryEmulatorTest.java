@@ -180,6 +180,48 @@ class FirestoreScoringRecoveryEmulatorTest {
         assertThat(read(refreshed).getTimestamp("scoring.requestedAt")).isEqualTo(toTimestamp(NOW.minusSeconds(30)));
     }
 
+    @Test
+    void 삭제된_멈춘_문서가_100건_넘어도_정상_문서를_찾아_재처리한다() throws Exception {
+        for (int i = 0; i < 101; i++) {
+            String aid = prefix + "del" + i;
+            created.add(aid);
+            firestore.collection("applications").document(aid).set(Map.of("deleted", true, "scoring", Map.of(
+                    "status", "PENDING", "criteriaVersion", 2, "attempts", 0,
+                    "requestedAt", toTimestamp(NOW.minus(Duration.ofDays(2)))))).get();
+        }
+        String normal = put("normal", "PENDING", Duration.ofMinutes(6), Map.of());
+
+        List<String> candidates = repository.findStuck(StuckKind.PENDING, PENDING_CUTOFF, 100).stream()
+                .map(StuckApplication::aid).filter(aid -> aid.startsWith(prefix)).toList();
+        assertThat(candidates).containsExactly(normal);
+        assertThat(repository.requeueIfStuck(normal, StuckKind.PENDING, PENDING_CUTOFF, NOW, 3).outcome())
+                .isEqualTo(RequeueOutcome.REQUEUED);
+    }
+
+    @Test
+    void 기준_버전이_없으면_CRITERIA_NOT_FOUND로_FAILED_처리하고_등록하지_않는다() throws Exception {
+        String aid = put("nov", "PENDING", Duration.ofMinutes(6), Map.of());
+        firestore.collection("applications").document(aid)
+                .update("scoring.criteriaVersion", com.google.cloud.firestore.FieldValue.delete()).get();
+
+        RequeueResult result = repository.requeueIfStuck(aid, StuckKind.PENDING, PENDING_CUTOFF, NOW, 3);
+
+        assertThat(result).isEqualTo(new RequeueResult(RequeueOutcome.FAILED, 0));
+        assertThat(read(aid).getString("scoring.status")).isEqualTo("FAILED");
+        assertThat(read(aid).getString("scoring.error")).isEqualTo("CRITERIA_NOT_FOUND");
+    }
+
+    @Test
+    void 기준_버전이_문자열이면_APPLICATION_INVALID로_FAILED_처리한다() throws Exception {
+        String aid = put("strv", "PENDING", Duration.ofMinutes(6), Map.of("criteriaVersion", "2"));
+
+        RequeueResult result = repository.requeueIfStuck(aid, StuckKind.PENDING, PENDING_CUTOFF, NOW, 3);
+
+        assertThat(result).isEqualTo(new RequeueResult(RequeueOutcome.FAILED, 0));
+        assertThat(read(aid).getString("scoring.status")).isEqualTo("FAILED");
+        assertThat(read(aid).getString("scoring.error")).isEqualTo("APPLICATION_INVALID");
+    }
+
     private static boolean isReachable(String hostPort) {
         int colon = hostPort.lastIndexOf(':');
         try (Socket socket = new Socket()) {
