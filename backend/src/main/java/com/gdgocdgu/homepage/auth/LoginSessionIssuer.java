@@ -1,5 +1,6 @@
 package com.gdgocdgu.homepage.auth;
 
+import com.gdgocdgu.homepage.common.error.ApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -55,9 +56,15 @@ class LoginSessionIssuer {
     /**
      * 갱신(API-AUTH-002)용 access token. 세션은 그대로 두고 access token만 새로 만든다.
      * 수명은 15분과 세션 최종 만료까지 남은 시간 중 짧은 쪽이라, 갱신해도 로그인 1시간은 늘어나지 않는다.
+     * 요청을 확인하는 사이(회원 조회 등)에 최종 만료가 지났을 수 있으므로, 토큰을 만들기 직전에 다시 확인한다.
+     * 지났으면 남은 시간이 0초 이하인 토큰을 주지 않고 SESSION_EXPIRED 로 다시 로그인하게 한다.
      */
     AccessGrant reissue(LoginMember member, String sessionId, Instant sessionExpiresAt) {
-        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant current = Instant.now();
+        if (!sessionExpiresAt.isAfter(current)) {
+            throw new ApiException(AuthErrorCode.SESSION_EXPIRED);
+        }
+        Instant now = current.truncatedTo(ChronoUnit.SECONDS);
         Instant accessExpiresAt = now.plus(ACCESS_TOKEN_LIFETIME);
         if (sessionExpiresAt.isBefore(accessExpiresAt)) {
             accessExpiresAt = sessionExpiresAt;
