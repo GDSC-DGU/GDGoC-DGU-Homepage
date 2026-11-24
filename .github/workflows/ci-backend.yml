@@ -1,5 +1,5 @@
 # backend/ 변경 시 빌드 · 테스트를 검사합니다. (Homepage-BE가 작성 · 관리)
-# - Firestore 에뮬레이터를 띄운 채로 ./gradlew test 를 실행합니다. 테스트가 끝나면 에뮬레이터도 내려갑니다.
+# - test 잡: Firestore 에뮬레이터를 띄운 채로 ./gradlew test 를 실행합니다. 테스트가 끝나면 에뮬레이터도 내려갑니다.
 # - 파트별 CI는 필수 체크에 넣지 않습니다. (RULEBOOKS/repo-settings.md 3번)
 # - Java 버전은 backend/build.gradle 의 toolchain과, firebase-tools 버전은 backend/README.md 의 실행 명령과 같게 유지하세요.
 name: ci-backend
@@ -44,3 +44,13 @@ jobs:
           npx --yes firebase-tools@15.36.0 emulators:exec
           --only firestore --project demo-gdgoc
           "cd ../../backend && ./gradlew test --no-daemon --console=plain"
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # 이미지는 빌드만 합니다 (push · 로그인 없음). 테스트는 위 test 잡에서 실행합니다.
+      - run: docker build -t gdgoc-backend:ci backend
