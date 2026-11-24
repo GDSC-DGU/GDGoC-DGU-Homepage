@@ -1,0 +1,137 @@
+# staging(dev) 환경의 Cloud Run `backend` · `ai`를 배포합니다. (scripts/deploy.sh 가 실행)
+# - workflow_dispatch 전용입니다. develop 머지만으로는 배포되지 않습니다.
+# - guard 잡이 develop 이 아닌 ref 를 막고, Environment `staging` 도 develop 만 허용합니다. (RULEBOOKS/local-and-deploy.md 3-3)
+# - Cloud Run 서비스 설정(환경변수 · 시크릿 · 서비스 계정 · 스케일링 · ingress · IAM)은 GCP 에서 관리합니다.
+#   이 workflow 는 이미지와 라벨만 바꾸며, 설정 플래그를 넘기지 않습니다.
+# - frontend 는 아직 이 workflow 로 배포하지 않습니다. (Vercel 이 Actions 밖에서 처리)
+name: deploy-staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "배포 대상 (쉼표 구분: backend, ai, frontend)"
+        type: string
+        default: "backend,ai"
+
+permissions: {}
+
+concurrency:
+  group: staging
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      services: ${{ steps.check.outputs.services }}
+    steps:
+      - id: check
+        env:
+          REF: ${{ github.ref }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          if [ "$REF" != "refs/heads/develop" ]; then
+            echo "::error::staging 배포는 develop 에서만 가능합니다. (현재: $REF)"
+            exit 1
+          fi
+          services=""
+          for name in $(echo "$ONLY" | tr ',' ' '); do
+            case "$name" in
+              backend|ai)
+                case ",$services," in
+                  *",$name,"*) ;;
+                  *) services="${services:+$services,}$name" ;;
+                esac
+                ;;
+              frontend)
+                echo "::notice::frontend 는 아직 이 workflow 로 배포하지 않습니다. 건너뜁니다."
+                ;;
+              *)
+                echo "::error::알 수 없는 대상: $name (backend, ai, frontend 중에서 고르세요)"
+                exit 1
+                ;;
+            esac
+          done
+          if [ -z "$services" ]; then
+            echo "::notice::배포할 대상이 없습니다."
+            echo "services=[]" >> "$GITHUB_OUTPUT"
+          else
+            echo "services=[\"${services//,/\",\"}\"]" >> "$GITHUB_OUTPUT"
+          fi
+
+  deploy:
+    needs: guard
+    if: needs.guard.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.guard.outputs.services) }}
+    env:
+      PROJECT_ID: dev-gdgoc-dgu-homepage
+      REGION: asia-northeast3
+      AR_REPO: asia-northeast3-docker.pkg.dev/dev-gdgoc-dgu-homepage/containers
+      SERVICE: ${{ matrix.service }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SA }}
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+      - name: Artifact Registry 로그인
+        run: gcloud auth configure-docker asia-northeast3-docker.pkg.dev --quiet
+      - name: 이미지 빌드 · push
+        run: |
+          # 태그는 커밋 SHA 앞 12자리 (수동 배포 태그 방식과 동일)
+          tag="${GITHUB_SHA::12}"
+          echo "IMAGE=$AR_REPO/$SERVICE:$tag" >> "$GITHUB_ENV"
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          docker build -t "$AR_REPO/$SERVICE:$tag" "$SERVICE/"
+          docker push "$AR_REPO/$SERVICE:$tag"
+      - name: Cloud Run 배포
+        run: |
+          # 기존 서비스 설정은 GCP 에서 관리합니다. 이미지와 라벨만 바꿉니다.
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE" \
+            --region "$REGION" \
+            --project "$PROJECT_ID" \
+            --update-labels "commit=$TAG" \
+            --quiet
+      - name: 배포 확인
+        run: |
+          if [ "$SERVICE" = "backend" ]; then
+            url="https://backend-948542964993.asia-northeast3.run.app/api/v1/health"
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" || true)
+              echo "시도 $i: HTTP $code"
+              if [ "$code" = "200" ]; then exit 0; fi
+              sleep 6
+            done
+            echo "::error::backend health check 실패 ($url)"
+            exit 1
+          fi
+          # ai 는 외부에 공개되지 않아 서비스 상태로 확인합니다.
+          read -r latest_ready latest_created ready < <(gcloud run services describe "$SERVICE" \
+            --region "$REGION" --project "$PROJECT_ID" \
+            --format 'value(status.latestReadyRevisionName,status.latestCreatedRevisionName,status.conditions[0].status)')
+          echo "ready=$latest_ready created=$latest_created Ready=$ready"
+          if [ "$latest_ready" != "$latest_created" ] || [ "$ready" != "True" ]; then
+            echo "::error::ai 최신 리비전이 Ready 상태가 아닙니다."
+            exit 1
+          fi
+      - name: 요약
+        run: |
+          revision=$(gcloud run services describe "$SERVICE" \
+            --region "$REGION" --project "$PROJECT_ID" \
+            --format 'value(status.latestReadyRevisionName)')
+          echo "- \`$SERVICE\` 배포 완료: 이미지 \`$IMAGE\`, 리비전 \`$revision\`" >> "$GITHUB_STEP_SUMMARY"
