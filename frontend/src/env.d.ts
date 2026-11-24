@@ -3,7 +3,9 @@ interface ImportMetaEnv {
   /** 'http' 이면 Spring Boot API, 아니면 예시 데이터 */
   readonly VITE_DATA_SOURCE?: 'mock' | 'http'
   readonly VITE_API_BASE?: string
-  /** Google 로그인 버튼의 웹 클라이언트 ID (공개 값. VITE_DATA_SOURCE=http 일 때 쓴다) */
+  /** 로그인 방식. 'google' 이면 실제 Google 로그인, 'example' 이면 예시 계정. 비우면 VITE_DATA_SOURCE 를 따른다 (http → google) */
+  readonly VITE_AUTH?: 'google' | 'example'
+  /** Google 로그인 버튼의 웹 클라이언트 ID (공개 값. 로그인 방식이 google 일 때 쓴다) */
   readonly VITE_GOOGLE_CLIENT_ID?: string
   /** 'hash' 이면 #/projects 형태 주소 (정적 미리보기용), 아니면 /projects */
   readonly VITE_ROUTER?: 'browser' | 'hash'
