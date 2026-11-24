@@ -51,7 +51,7 @@ class AccessTokenVerifier {
             throw new ApiException(CommonErrorCode.AUTH_REQUIRED);
         }
 
-        // 다음 단계에서 사용자와 세션을 조회할 때 필요한 ID만 넘긴다.
+        // 세션 조회에 필요한 ID만 넘긴다. 역할은 회원 문서에서 확인한다.
         if (!(token.getClaims().get(JwtClaimNames.SUB) instanceof String userId) || userId.isBlank()
                 || !(token.getClaims().get("sid") instanceof String sessionId) || !isSessionId(sessionId)) {
             throw new ApiException(CommonErrorCode.AUTH_REQUIRED);

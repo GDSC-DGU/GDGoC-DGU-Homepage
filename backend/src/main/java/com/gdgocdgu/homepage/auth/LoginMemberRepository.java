@@ -2,6 +2,8 @@ package com.gdgocdgu.homepage.auth;
 
 import com.gdgocdgu.homepage.common.error.ApiException;
 import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -19,6 +21,8 @@ import java.util.function.Function;
 
 @Repository
 class LoginMemberRepository {
+
+    private static final String SESSIONS_COLLECTION = "authSessions";
 
     private final Firestore firestore;
     private final String usersCollection;
@@ -58,7 +62,7 @@ class LoginMemberRepository {
                 }
 
                 LoginSession session = issueSession.apply(readMember(members.getFirst()));
-                transaction.create(firestore.collection("authSessions").document(session.id()), sessionFields(session));
+                transaction.create(firestore.collection(SESSIONS_COLLECTION).document(session.id()), sessionFields(session));
                 return Optional.of(session);
             }).get();
         } catch (InterruptedException e) {
@@ -74,7 +78,41 @@ class LoginMemberRepository {
         }
     }
 
-    private LoginMember readMember(QueryDocumentSnapshot document) {
+    Optional<SessionMember> findSessionMember(String sessionId, String userId) {
+        if (usersCollection.isBlank() || activeField.isBlank()) {
+            throw new IllegalStateException("Firestore 회원 조회 설정이 비어 있습니다.");
+        }
+
+        DocumentReference sessionRef = firestore.collection(SESSIONS_COLLECTION).document(sessionId);
+        DocumentReference memberRef = firestore.collection(usersCollection).document(userId);
+        List<DocumentSnapshot> documents;
+        try {
+            documents = firestore.getAll(sessionRef, memberRef).get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Firestore 인증 조회가 중단됐습니다.", e);
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Firestore 인증 조회에 실패했습니다.", e);
+        }
+
+        DocumentSnapshot session = documents.getFirst();
+        DocumentSnapshot member = documents.getLast();
+        if (!session.exists() || !member.exists()) {
+            return Optional.empty();
+        }
+
+        String sessionUserId = session.getString("userId");
+        Timestamp expiresAt = session.getTimestamp("expiresAt");
+        if (sessionUserId == null || expiresAt == null
+                || !(session.get("authVersion") instanceof Long sessionVersion) || sessionVersion < 0) {
+            throw new IllegalStateException("Firestore 세션 정보를 읽을 수 없습니다.");
+        }
+
+        return Optional.of(new SessionMember(readMember(member), sessionUserId, sessionVersion,
+                Instant.ofEpochSecond(expiresAt.getSeconds(), expiresAt.getNanos()), session.get("revokedAt") != null));
+    }
+
+    private LoginMember readMember(DocumentSnapshot document) {
         Object active = document.get(activeField);
         if (!(active instanceof Boolean isActive)) {
             throw new IllegalStateException("Firestore 회원의 활성 상태를 읽을 수 없습니다.");
@@ -107,5 +145,9 @@ class LoginMemberRepository {
 
     private static Timestamp asTimestamp(Instant instant) {
         return Timestamp.ofTimeSecondsAndNanos(instant.getEpochSecond(), instant.getNano());
+    }
+
+    record SessionMember(LoginMember member, String sessionUserId, long sessionAuthVersion,
+                         Instant sessionExpiresAt, boolean sessionRevoked) {
     }
 }
