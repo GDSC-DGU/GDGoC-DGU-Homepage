@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ADMIN_ACCOUNT_SEED, EXAMPLE_ACCOUNTS } from '@/features/admin/data/common/accounts'
-import { AuthError, createExampleAuthApi, createHttpAuthApi, EXAMPLE_MEMBERS, isSignedOutError } from './authApi'
+import { AuthError, authModeFrom, createExampleAuthApi, createHttpAuthApi, EXAMPLE_MEMBERS, isSignedOutError } from './authApi'
 import { isInAppBrowser, loginPath, newerSession, parseSession, REFRESH_EARLY_MS, safeNextPath, sessionTimers, WARN_BEFORE_MS } from './session'
 
 const T0 = Date.parse('2026-11-18T06:00:00Z')
@@ -104,7 +104,20 @@ function fakeFetch(reply: (url: string, init: RequestInit) => { status: number; 
   return { fetcher, calls }
 }
 
-describe('로그인 API (VITE_DATA_SOURCE=http)', () => {
+describe('로그인 방식 (VITE_AUTH)', () => {
+  it('VITE_AUTH 가 있으면 그대로 쓴다 (공개 데이터 VITE_DATA_SOURCE 와 따로)', () => {
+    expect(authModeFrom({ VITE_AUTH: 'google', VITE_DATA_SOURCE: 'mock' })).toBe('google')
+    expect(authModeFrom({ VITE_AUTH: 'example', VITE_DATA_SOURCE: 'http' })).toBe('example')
+  })
+  it('VITE_AUTH 가 없거나 모르는 값이면 VITE_DATA_SOURCE 를 따른다', () => {
+    expect(authModeFrom({ VITE_DATA_SOURCE: 'http' })).toBe('google')
+    expect(authModeFrom({ VITE_DATA_SOURCE: 'mock' })).toBe('example')
+    expect(authModeFrom({})).toBe('example')
+    expect(authModeFrom({ VITE_AUTH: '', VITE_DATA_SOURCE: 'mock' })).toBe('example')
+  })
+})
+
+describe('로그인 API (VITE_AUTH=google)', () => {
   it('Google ID 토큰을 POST /api/v1/auth/google 로, 쿠키를 주고받게 보낸다', async () => {
     const { fetcher, calls } = fakeFetch(() => ({ status: 200, body: okBody() }))
     const api = createHttpAuthApi('/api', fetcher, () => T0)

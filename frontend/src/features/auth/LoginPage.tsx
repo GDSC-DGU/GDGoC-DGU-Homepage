@@ -13,7 +13,7 @@ import s from './auth.module.css'
  * - ?reason=expired : 1시간이 끝나 들어왔다는 안내
  * - ?done=tab : 작성 중이던 탭이 연 새 탭. 로그인하면 '이 탭을 닫고 돌아가세요' (원래 탭도 같이 로그인된다)
  * - 앱 안 브라우저(카카오톡 등)면 Google 버튼 대신 외부 브라우저 안내 (P-COM-011)
- * - 예시 화면(VITE_DATA_SOURCE 가 http 가 아님)에서는 Google 대신 예시 계정 버튼
+ * - 로그인 방식이 example(VITE_AUTH, 없으면 VITE_DATA_SOURCE 를 따름)이면 Google 대신 예시 계정 버튼
  * - 아래 안내에 개인정보 처리방침 링크 (F-COM-005 규칙 3: Google 로그인으로 받는 정보)
  */
 export function LoginPage() {

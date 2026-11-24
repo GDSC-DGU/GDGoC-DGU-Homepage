@@ -34,7 +34,7 @@ npm run sync:events  # gdg.community.dev 행사 목록을 src/content/events.jso
 | `/recruits` | 지원하기: 첫 화면(화면 꽉 채움, 검정 + 주황 빛(마우스를 천천히 따라옴), 큰 한 문장 · 짧은 소개 · 모집 상태 · '지원하기') → 지원 안내(대상 · 방법) → 인재상(자유 · 열정 · 끈기, 검정 면 · 주황 선 아이콘) → 파트 → 주요 활동 → 모집 과정(마우스를 올린 단계까지 선이 차오름) → 자주 묻는 질문. 모집 중이면 '지원하기'가 지원서 페이지로, 아니면 꺼지고 '5기 소식 받기'. 개발 화면(`npm run dev`)에서는 왼쪽 아래 '개발' 버튼으로 두 상태를 오간다 |
 | `/recruits/apply` | 지원서: API 명세(`docs/api/openapi.yaml`) RCT-001 · 002 · 003 · 005 그대로. 기본 정보(이름 · 학번 · 학과 · 이메일 · 연락처) → 지원 파트(tracks) → 문항(SHORT_TEXT · LONG_TEXT · SINGLE_CHOICE · MULTI_CHOICE · URL, trackOnly) → 동의 → 제출 확인 → 접수 완료(aid · submittedAt). 학번을 다 적으면 중복 지원 미리 확인. 쓰던 답은 브라우저에 임시 보관, `?part=frontend` 면 파트를 미리 고름. 지원할 수 없으면(canApply false) 안내. API 붙기 전에는 예시(`config/site.ts` 의 `APPLY_FORM_LIVE`, true 면 `/api/v1/recruitments/...` 호출) |
 | `/teams` | 제목 + 큰 행사 사진 → 팀원 찾기는 준비하고 있습니다(열리면 생길 것 세 줄) |
-| `/login` | 로그인 (P-COM-010): 회원 · 운영진 모두 Google 계정. `?next=` 로 보던 페이지로 돌아감. 앱 안 브라우저면 외부 브라우저 안내. 백엔드 전(`VITE_DATA_SOURCE` 가 http 가 아님)에는 예시 운영진 · 예시 회원 버튼 |
+| `/login` | 로그인 (P-COM-010): 회원 · 운영진 모두 Google 계정. `?next=` 로 보던 페이지로 돌아감. 앱 안 브라우저면 외부 브라우저 안내. 로그인 방식이 example(`VITE_AUTH`, 없으면 `VITE_DATA_SOURCE` 를 따름)이면 예시 운영진 · 예시 회원 버튼 |
 | `/privacy` | 개인정보 처리방침 (P-COM-008): 시행일 · 목차 · 조항. 꼬리말 · 로그인 화면 · 지원서 동의란에서 링크하고, Google 로그인 동의 화면에 이 주소를 등록함. 내용은 `src/content/privacy.ts` |
 | `/admin` | 관리자 화면 (예시 데이터). 운영진(ADMIN)만, 머리말의 '관리자 페이지' 버튼으로 (docs/ADMIN.md) |
 
@@ -99,6 +99,7 @@ docs/WORKFLOW.md          큰 변경의 순서 (스펙 → 일감 → 만들기 
 | 소개 문구 · 링크 | `src/config/site.ts` (null 이면 화면에서 숨김) |
 | 새 지붕 모양 | `features/campus/roofs/` 에 컴포넌트 추가 → `roofs/index.ts` 와 `roofs/heights.ts` 에 등록 |
 | Spring Boot API 붙이기 | `.env.local` 에 `VITE_DATA_SOURCE=http` → 주소는 `data/http/httpRepositories.ts`, 응답 모양 차이는 `data/http/adapters.ts` 에서 맞춤 |
+| 로그인만 실제로 켜기 | Vercel 환경변수 `VITE_AUTH=google` + `VITE_GOOGLE_CLIENT_ID` (공개 데이터는 예시 그대로). 배포본의 `/api` 는 `vercel.json` 이 Cloud Run 으로 넘긴다: gdgoc-dgu.com → prod `backend`, 그 밖(dev.gdgoc-dgu.com · PR 미리보기) → dev `backend` |
 | 준비 중 페이지를 실제로 만들기 | `features/pages/` 에 새 페이지 → `app/lazyPages.tsx` 와 `app/router.tsx` 의 `BUILT_ROUTES` 에 추가 → `config/pages.ts` 에서 계획 지우기 |
 
 ## 실제 정보가 필요한 것

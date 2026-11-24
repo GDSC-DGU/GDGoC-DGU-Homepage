@@ -24,7 +24,7 @@ export interface AuthSession {
   user: AuthUser
 }
 
-/** 예시 화면(VITE_DATA_SOURCE 가 http 가 아닐 때)에서 Google 대신 고르는 예시 계정 */
+/** 로그인 방식이 example 일 때 Google 대신 고르는 예시 계정 (authModeFrom) */
 export interface ExampleMember extends AuthUser {
   /** 로그인 화면 버튼 글자 */
   button: string
