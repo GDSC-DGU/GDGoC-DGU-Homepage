@@ -1,9 +1,13 @@
 package com.gdgocdgu.homepage.auth;
 
 import com.gdgocdgu.homepage.common.error.ApiException;
+import com.gdgocdgu.homepage.common.error.CommonErrorCode;
+import com.gdgocdgu.homepage.common.error.ErrorResponse;
 import com.gdgocdgu.homepage.common.response.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +30,7 @@ import java.util.List;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     private static final String REFRESH_COOKIE = "refreshToken";
     // refresh 쿠키는 이 경로 아래(/google · /refresh · /logout)에만 실려 간다.
     private static final String REFRESH_COOKIE_PATH = "/api/v1/auth";
@@ -75,18 +80,31 @@ public class AuthController {
                         grant.sessionExpiresAt(), grant.member())));
     }
 
-    /** [API-AUTH-003] 로그아웃. 쿠키가 없거나 이미 끝난 세션이어도 200 이고, 언제나 쿠키를 지운다 */
+    /**
+     * [API-AUTH-003] 로그아웃. 쿠키가 없거나 이미 끝난 세션이어도 200 이고, 언제나 쿠키를 지운다.
+     * 세션 무효화가 실패하면 쿠키는 지우되 500 으로 알린다: 이 브라우저는 로그아웃되지만 서버 세션은 최종 만료까지 남기 때문에
+     * 성공(200)이라고 답하지 않는다.
+     */
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(
+    public ResponseEntity<?> logout(
             @CookieValue(name = REFRESH_COOKIE, required = false) String refreshToken,
             @RequestHeader(name = HttpHeaders.ORIGIN, required = false) String origin) {
         checkOrigin(origin);
+        String clearCookie = refreshCookie("", Duration.ZERO).toString();
         if (refreshToken != null && !refreshToken.isBlank()) {
-            authService.logout(refreshToken);
+            try {
+                authService.logout(refreshToken);
+            } catch (RuntimeException e) {
+                log.error("로그아웃 세션 무효화 실패. 쿠키만 지우고 500 으로 알린다.", e);
+                return ResponseEntity.status(CommonErrorCode.INTERNAL_ERROR.status())
+                        .cacheControl(CacheControl.noStore())
+                        .header(HttpHeaders.SET_COOKIE, clearCookie)
+                        .body(ErrorResponse.of(CommonErrorCode.INTERNAL_ERROR, CommonErrorCode.INTERNAL_ERROR.defaultMessage()));
+            }
         }
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
-                .header(HttpHeaders.SET_COOKIE, refreshCookie("", Duration.ZERO).toString())
+                .header(HttpHeaders.SET_COOKIE, clearCookie)
                 .body(ApiResponse.ok(null));
     }
 

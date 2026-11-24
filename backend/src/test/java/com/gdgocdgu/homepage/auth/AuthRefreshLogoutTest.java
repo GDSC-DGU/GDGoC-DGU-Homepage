@@ -276,11 +276,18 @@ class AuthRefreshLogoutTest {
     }
 
     @Test
-    void 무효화에_실패해도_200이고_쿠키는_지운다() throws Exception {
+    void 무효화에_실패하면_500으로_알리고_쿠키는_지운다() throws Exception {
         givenValidSession(Duration.ofMinutes(30), 0);
         when(transaction.get(sessionDocument)).thenReturn(ApiFutures.immediateFailedFuture(new IllegalStateException()));
 
-        expectCookieCleared(logout(REFRESH_TOKEN));
+        logout(REFRESH_TOKEN)
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, "no-store"))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("refreshToken=;")))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("Max-Age=0")))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, containsString("Path=/api/v1/auth")));
     }
 
     @Test

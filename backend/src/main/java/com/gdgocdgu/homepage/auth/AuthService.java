@@ -1,8 +1,6 @@
 package com.gdgocdgu.homepage.auth;
 
 import com.gdgocdgu.homepage.common.error.ApiException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -12,8 +10,6 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final GoogleTokenVerifier googleTokenVerifier;
     private final LoginMemberRepository loginMemberRepository;
@@ -62,18 +58,14 @@ public class AuthService {
     }
 
     /**
-     * 로그아웃 (API-AUTH-003). 쿠키가 가리키는 세션을 무효화한다. 쿠키가 없거나 맞지 않아도 조용히 끝낸다.
-     * 무효화에 실패해도 예외를 밖으로 내지 않는다: 응답에서 쿠키는 지워지므로 이 브라우저는 로그아웃되고,
-     * 남은 세션은 최종 만료(최대 1시간)에 끝난다. 로그아웃 버튼이 오류로 막히는 것보다 낫다.
+     * 로그아웃 (API-AUTH-003). 쿠키가 가리키는 세션을 무효화한다. 쿠키가 없거나 맞지 않으면 할 일이 없다.
+     * Firestore 조회 · 기록이 실패하면 예외를 그대로 던진다. 세션이 서버에 살아 있는데 성공이라고 답하지 않기 위해서다
+     * (쿠키를 지우는 일과 500 응답은 AuthController 가 한다).
      */
     void logout(String refreshToken) {
-        try {
-            findSession(refreshToken)
-                    .filter(session -> !session.revoked())
-                    .ifPresent(session -> loginSessionRepository.revoke(session.id(), Instant.now()));
-        } catch (RuntimeException e) {
-            log.warn("로그아웃 세션 무효화 실패. 쿠키만 지운다.", e);
-        }
+        findSession(refreshToken)
+                .filter(session -> !session.revoked())
+                .ifPresent(session -> loginSessionRepository.revoke(session.id(), Instant.now()));
     }
 
     /** 쿠키 → 세션 ID → 세션 문서 → 해시 비교. 하나라도 맞지 않으면 비어 있다 */
