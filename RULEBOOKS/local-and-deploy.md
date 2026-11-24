@@ -10,7 +10,7 @@
 | 띄우는 방법 | 작업 브랜치에서 `./scripts/deploy.sh` | develop에서 `./scripts/deploy.sh` | main 머지 + Lead 승인 |
 | 누가 | 누구나 | 레포 Write 이상 누구나 | Lead 승인 필수 |
 | frontend | Vite 개발 서버 | Vercel (dev 도메인 alias) | Vercel (production) |
-| backend · ai | Docker 컨테이너 | Cloud Run `backend` · `ai` (GCP `gdgoc-dgu-dev`) | Cloud Run `backend` · `ai` (GCP `gdgoc-dgu-prod`) |
+| backend · ai | Docker 컨테이너 | Cloud Run `backend` · `ai` (GCP `dev-gdgoc-dgu-homepage`) | Cloud Run `backend` · `ai` (GCP `gdgoc-dgu-homepage`) |
 | DB · 로그인 · 파일 | Firebase 에뮬레이터 (가짜 데이터) | dev 프로젝트의 Firestore · Auth · Storage | prod 프로젝트의 Firestore · Auth · Storage |
 | 메일 | Mailpit (발송 안 됨, 화면으로 확인) | 실제 발송 (팀원 주소로만 테스트) | 실제 발송 |
 | AI | 실제 AI API (개인 `.env` 키) | 실제 AI API (dev 키, Secret Manager) | 실제 AI API (prod 키, Secret Manager) |
