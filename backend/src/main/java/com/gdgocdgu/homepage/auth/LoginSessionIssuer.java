@@ -26,9 +26,10 @@ class LoginSessionIssuer {
     static final Duration ACCESS_TOKEN_LIFETIME = Duration.ofMinutes(15);
     static final Duration SESSION_LIFETIME = Duration.ofHours(1);
 
-    private static final String ISSUER = "gdgoc-dgu-homepage";
+    static final String ISSUER = "gdgoc-dgu-homepage";
+    static final MacAlgorithm ACCESS_TOKEN_ALGORITHM = MacAlgorithm.HS256;
     private static final Base64.Encoder TOKEN_ENCODER = Base64.getUrlEncoder().withoutPadding();
-    private static final JwsHeader ACCESS_TOKEN_HEADER = JwsHeader.with(MacAlgorithm.HS256).build();
+    private static final JwsHeader ACCESS_TOKEN_HEADER = JwsHeader.with(ACCESS_TOKEN_ALGORITHM).build();
 
     private final SecureRandom random = new SecureRandom();
     private final JwtEncoder accessTokenEncoder;
@@ -64,6 +65,10 @@ class LoginSessionIssuer {
     }
 
     private static JwtEncoder createEncoder(String signingSecret) {
+        return NimbusJwtEncoder.withSecretKey(readSigningKey(signingSecret)).build();
+    }
+
+    static SecretKeySpec readSigningKey(String signingSecret) {
         byte[] key;
         try {
             key = Base64.getDecoder().decode(signingSecret);
@@ -73,7 +78,7 @@ class LoginSessionIssuer {
         if (key.length < 32) {
             throw new IllegalArgumentException("AUTH_ACCESS_TOKEN_SECRET은 디코딩 후 최소 32바이트여야 합니다.");
         }
-        return NimbusJwtEncoder.withSecretKey(new SecretKeySpec(key, "HmacSHA256")).build();
+        return new SecretKeySpec(key, "HmacSHA256");
     }
 
     private static String hash(String token) {
