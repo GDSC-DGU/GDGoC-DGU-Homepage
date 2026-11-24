@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM eclipse-temurin:25.0.5.1_2-jdk-noble AS builder
+FROM eclipse-temurin:26.0.2.1_1-jdk-noble AS builder
 WORKDIR /app
 # 이미지의 JDK 25를 그대로 쓴다. toolchain 자동 다운로드(foojay)는 끈다
 ENV GRADLE_OPTS="-Dorg.gradle.java.installations.auto-download=false"
@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew bootJar -x test --no-daemon --console=plain \
     && java -Djarmode=tools -jar build/libs/backend-*-SNAPSHOT.jar extract --layers --launcher --destination /app/layers
 
-FROM eclipse-temurin:25.0.5.1_2-jre-noble
+FROM eclipse-temurin:26.0.2.1_1-jre-noble
 RUN useradd --system --no-create-home app
 WORKDIR /app
 # 자주 바뀌는 층일수록 아래에 둔다
