@@ -5,18 +5,22 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.Instant;
+import java.util.Optional;
 
 @Service
 public class AuthService {
 
     private final GoogleTokenVerifier googleTokenVerifier;
     private final LoginMemberRepository loginMemberRepository;
+    private final LoginSessionRepository loginSessionRepository;
     private final LoginSessionIssuer sessionIssuer;
 
     public AuthService(GoogleTokenVerifier googleTokenVerifier, LoginMemberRepository loginMemberRepository,
-                       LoginSessionIssuer sessionIssuer) {
+                       LoginSessionRepository loginSessionRepository, LoginSessionIssuer sessionIssuer) {
         this.googleTokenVerifier = googleTokenVerifier;
         this.loginMemberRepository = loginMemberRepository;
+        this.loginSessionRepository = loginSessionRepository;
         this.sessionIssuer = sessionIssuer;
     }
 
@@ -26,15 +30,65 @@ public class AuthService {
                 .orElseThrow(() -> new ApiException(AuthErrorCode.GOOGLE_ACCOUNT_NOT_LINKED));
     }
 
+    /**
+     * 로그인 토큰 갱신 (API-AUTH-002). refresh token 쿠키로 세션을 찾아 아래 순서로 확인한 뒤 access token 만 새로 준다.
+     * 1. 쿠키 모양 · 세션 존재 · 해시 일치 → 아니면 INVALID_REFRESH_TOKEN
+     * 2. 로그아웃으로 무효화된 세션 → SESSION_REVOKED
+     * 3. 최초 로그인부터 1시간 지남 → SESSION_EXPIRED
+     * 4. 회원이 사라졌거나 비활성화 · 관리 유형 변경(authVersion 증가) → SESSION_REVOKED
+     */
+    AccessGrant refresh(String refreshToken) {
+        StoredSession session = findSession(refreshToken)
+                .orElseThrow(() -> new ApiException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+        if (session.revoked()) {
+            throw new ApiException(AuthErrorCode.SESSION_REVOKED);
+        }
+        if (!session.expiresAt().isAfter(Instant.now())) {
+            throw new ApiException(AuthErrorCode.SESSION_EXPIRED);
+        }
+
+        // 세션을 만든 뒤 회원 상태가 바뀌었을 수 있으므로 회원 문서를 다시 읽는다.
+        LoginMember member = loginMemberRepository.findById(session.userId())
+                .filter(LoginMember::active)
+                // 역할 변경 · 비활성화 때 회원의 authVersion 이 오르므로, 세션의 값과 다르면 예전 로그인이다.
+                .filter(current -> current.authVersion() == session.authVersion())
+                .orElseThrow(() -> new ApiException(AuthErrorCode.SESSION_REVOKED));
+        requireMemberInfo(member);
+        return sessionIssuer.reissue(member, session.id(), session.expiresAt());
+    }
+
+    /**
+     * 로그아웃 (API-AUTH-003). 쿠키가 가리키는 세션을 무효화한다. 쿠키가 없거나 맞지 않으면 할 일이 없다.
+     * Firestore 조회 · 기록이 실패하면 예외를 그대로 던진다. 세션이 서버에 살아 있는데 성공이라고 답하지 않기 위해서다
+     * (쿠키를 지우는 일과 500 응답은 AuthController 가 한다).
+     */
+    void logout(String refreshToken) {
+        findSession(refreshToken)
+                .filter(session -> !session.revoked())
+                .ifPresent(session -> loginSessionRepository.revoke(session.id(), Instant.now()));
+    }
+
+    /** 쿠키 → 세션 ID → 세션 문서 → 해시 비교. 하나라도 맞지 않으면 비어 있다 */
+    private Optional<StoredSession> findSession(String refreshToken) {
+        String hash = LoginSessionIssuer.hash(refreshToken);
+        return LoginSessionIssuer.sessionIdOf(refreshToken)
+                .flatMap(loginSessionRepository::find)
+                .filter(session -> session.hasRefreshTokenHash(hash));
+    }
+
     private LoginSession issueForActiveMember(LoginMember member) {
         if (!member.active()) {
             throw new ApiException(AuthErrorCode.USER_INACTIVE);
         }
+        requireMemberInfo(member);
+        return sessionIssuer.issue(member);
+    }
+
+    private static void requireMemberInfo(LoginMember member) {
         if (member.name() == null || member.name().isBlank()
                 || (!"ADMIN".equals(member.role()) && !"GENERAL".equals(member.role()))) {
             throw new IllegalStateException("Firestore 회원의 이름 또는 관리 유형을 읽을 수 없습니다.");
         }
-        return sessionIssuer.issue(member);
     }
 
     private String verifyGoogleToken(String idToken) {
