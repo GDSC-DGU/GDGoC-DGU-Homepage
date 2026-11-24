@@ -10,6 +10,7 @@ import com.google.cloud.firestore.Firestore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestComponent;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,10 +40,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "AUTH_ACCESS_TOKEN_SECRET=" + AuthMemberLookupTest.TEST_SIGNING_KEY
 })
 @AutoConfigureMockMvc
-@Import(AccessAuthenticationTest.MemberTestController.class)
+@Import({AccessAuthenticationTest.MemberTestController.class, AccessAuthenticationTest.AdminTestController.class})
 class AccessAuthenticationTest {
 
     private static final String MEMBER_PATH = "/test-support/auth/member";
+    private static final String ADMIN_METHOD_PATH = "/test-support/auth/admin-method";
+    private static final String ADMIN_CONTROLLER_PATH = "/test-support/auth/admin-controller";
     private static final String USER_ID = "test-member";
 
     @Autowired
@@ -75,6 +80,38 @@ class AccessAuthenticationTest {
     void 공개_API는_인증_헤더_없이_응답한다() throws Exception {
         mockMvc.perform(get("/api/v1/health"))
                 .andExpect(status().isOk());
+        verifyNoInteractions(firestore);
+    }
+
+    @Test
+    void 운영진은_통과하고_컨트롤러는_같은_인증_결과를_받는다() throws Exception {
+        LoginSession login = issueSession();
+        SessionDocuments documents = givenValidSession(login);
+        when(documents.member().getString("role")).thenReturn("ADMIN");
+
+        mockMvc.perform(get(ADMIN_METHOD_PATH).header(HttpHeaders.AUTHORIZATION, bearer(login)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.userId").value(USER_ID))
+                .andExpect(jsonPath("$.data.role").value("ADMIN"));
+        verify(firestore).getAll(any(DocumentReference.class), any(DocumentReference.class));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {ADMIN_METHOD_PATH, ADMIN_CONTROLLER_PATH})
+    void 현재_역할이_일반_회원이면_운영진_API는_403을_반환한다(String path) throws Exception {
+        LoginSession login = issueSession();
+        givenValidSession(login);
+
+        mockMvc.perform(get(path).header(HttpHeaders.AUTHORIZATION, bearer(login)).param("role", "ADMIN"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test
+    void 운영진_API에서_토큰이_없으면_401을_반환한다() throws Exception {
+        mockMvc.perform(get(ADMIN_CONTROLLER_PATH))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("AUTH_REQUIRED"));
         verifyNoInteractions(firestore);
     }
 
@@ -164,6 +201,23 @@ class AccessAuthenticationTest {
         @GetMapping(MEMBER_PATH)
         ApiResponse<AuthenticatedMember> currentMember(AuthenticatedMember member) {
             return ApiResponse.ok(member);
+        }
+
+        @AdminOnly
+        @GetMapping(ADMIN_METHOD_PATH)
+        ApiResponse<AuthenticatedMember> adminMember(AuthenticatedMember member) {
+            return ApiResponse.ok(member);
+        }
+    }
+
+    @TestComponent
+    @RestController
+    @AdminOnly
+    static class AdminTestController {
+
+        @GetMapping(ADMIN_CONTROLLER_PATH)
+        ApiResponse<Void> adminOnly() {
+            return ApiResponse.ok(null);
         }
     }
 }

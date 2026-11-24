@@ -36,4 +36,10 @@ class AccessAuthenticationService {
         }
         return new AuthenticatedMember(member.userId(), role);
     }
+
+    void requireAdmin(AuthenticatedMember member) {
+        if (!"ADMIN".equals(member.role())) {
+            throw new ApiException(CommonErrorCode.FORBIDDEN);
+        }
+    }
 }
