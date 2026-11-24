@@ -73,7 +73,7 @@ dev · prod 프로필은 Cloud Run 서비스 계정(ADC)으로 각 GCP 프로젝
 ### 멈춘 채점 재처리 (API-RCT-031)
 
 - `POST /internal/jobs/scoring-recovery`는 Cloud Scheduler가 모집 시즌에 10분마다 호출합니다(`/internal/**` OIDC 인증, 본문 없음). 응답은 `{"success":true,"data":{"requeued":N}}`입니다.
-- `PENDING`(`requestedAt`) 5분 초과, `RUNNING`(`startedAt`) 10분 초과 지원서를 상태별로 최대 100건씩 찾아, 트랜잭션에서 여전히 멈춘 상태인지 확인한 뒤 `PENDING`으로 되돌리고 큐에 다시 등록합니다. `RUNNING`에서 되돌리면 시도 1회로 세고, 3회를 넘으면 `FAILED`(`SCORING_TIMEOUT`)로 저장하고 등록하지 않습니다.
+- `PENDING`(`requestedAt`) 5분 초과, `RUNNING`(`startedAt`) 10분 초과 지원서를 상태별로 최대 100건씩 찾아, 트랜잭션에서 여전히 멈춘 상태인지 확인한 뒤 `PENDING`으로 되돌리고 큐에 다시 등록합니다. `RUNNING`에서 되돌리면 시도 1회로 세고, 3회를 넘으면 `FAILED`(`SCORING_TIMEOUT`)로 저장하고 등록하지 않습니다. 삭제된 지원서(`deleted=true`)는 조회에서 제외하고, `scoring.criteriaVersion`이 없으면 `CRITERIA_NOT_FOUND`, 숫자가 아니면 `APPLICATION_INVALID`로 `FAILED` 저장해 다음 조회 묶음을 계속 차지하지 않게 합니다.
 - 두 조회에 복합 색인이 필요합니다(`infra/firebase/firestore.indexes.json`). **에뮬레이터는 색인을 검사하지 않으므로 dev 배포 전에 색인을 먼저 배포해야 합니다.** 색인이 없으면 dev에서 이 API가 500을 돌려줍니다.
 
 ### 필요한 것

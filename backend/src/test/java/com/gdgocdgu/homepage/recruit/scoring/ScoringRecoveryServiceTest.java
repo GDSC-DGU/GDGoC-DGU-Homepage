@@ -97,6 +97,22 @@ class ScoringRecoveryServiceTest {
     }
 
     @Test
+    void 기준_버전이_없거나_잘못된_문서는_FAILED로_저장하고_등록하지_않는다() {
+        FakeScoringRepository.Doc missing = pending("a1", Duration.ofMinutes(30));
+        missing.criteriaMissing = true;
+        FakeScoringRepository.Doc wrong = pending("a2", Duration.ofMinutes(30));
+        wrong.criteriaWrongType = true;
+
+        assertThat(service.recover()).isZero();
+
+        assertThat(missing.status).isEqualTo("FAILED");
+        assertThat(missing.error).isEqualTo("CRITERIA_NOT_FOUND");
+        assertThat(wrong.status).isEqualTo("FAILED");
+        assertThat(wrong.error).isEqualTo("APPLICATION_INVALID");
+        assertThat(enqueued).isEmpty();
+    }
+
+    @Test
     void 삭제된_지원서는_건너뛴다() {
         pending("a1", Duration.ofMinutes(30)).deleted = true;
 

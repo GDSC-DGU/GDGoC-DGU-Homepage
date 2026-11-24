@@ -60,11 +60,21 @@ class FirestoreScoringRepository implements ScoringRepository {
                 log.warn("채점 대상 지원서 없음 또는 삭제됨: aid={}", aid);
                 return new Finished(ScoringStatus.SKIPPED_STALE);
             }
-            Long storedVersion = app.getLong("scoring.criteriaVersion");
+            String status = app.getString("scoring.status");
+            Long storedVersion;
+            try {
+                storedVersion = readLong(app, "scoring.criteriaVersion");
+            } catch (MalformedDocumentException e) {
+                if (!"PENDING".equals(status)) {
+                    return new Finished(ScoringStatus.SKIPPED_STALE);
+                }
+                log.warn("채점 입력 문서 오류: aid={}, error={}", aid, e.errorCode);
+                tx.update(ref, failedFields(e.errorCode));
+                return new Finished(ScoringStatus.FAILED);
+            }
             if (storedVersion == null || storedVersion != criteriaVersion) {
                 return new Finished(ScoringStatus.SKIPPED_STALE);
             }
-            String status = app.getString("scoring.status");
             if ("RUNNING".equals(status)) {
                 return new Finished(ScoringStatus.RUNNING);
             }
@@ -82,8 +92,15 @@ class FirestoreScoringRepository implements ScoringRepository {
             String errorCode = null;
             ScoringInput input = null;
             String rid = app.getString("rid");
-            Long formVersion = app.getLong("formVersion");
-            if (rid == null || rid.isBlank() || formVersion == null) {
+            Long formVersion = null;
+            try {
+                formVersion = readLong(app, "formVersion");
+            } catch (MalformedDocumentException e) {
+                errorCode = e.errorCode;
+            }
+            if (errorCode != null) {
+                // formVersion 타입 오류. 아래에서 FAILED로 저장한다.
+            } else if (rid == null || rid.isBlank() || formVersion == null) {
                 errorCode = "APPLICATION_INVALID";
             } else {
                 DocumentSnapshot criteria = tx.get(versionRef(rid, "criteriaVersions", criteriaVersion)).get();
@@ -183,6 +200,7 @@ class FirestoreScoringRepository implements ScoringRepository {
                 return RetryResult.FAILED;
             }
             fields.put("scoring.status", "PENDING");
+            fields.put("scoring.requestedAt", Timestamp.now());
             fields.put("scoring.error", errorCode);
             tx.update(ref, fields);
             return RetryResult.RETRY;
@@ -194,6 +212,7 @@ class FirestoreScoringRepository implements ScoringRepository {
         try {
             Query query = firestore.collection(APPLICATIONS)
                     .whereEqualTo("scoring.status", kind.status)
+                    .whereEqualTo("deleted", false)
                     .whereLessThan(kind.timeField, toTimestamp(cutoff))
                     .orderBy(kind.timeField)
                     .limit(limit);
@@ -221,16 +240,33 @@ class FirestoreScoringRepository implements ScoringRepository {
                 return skipped;
             }
             Timestamp time = app.getTimestamp(kind.timeField);
-            Long criteriaVersion = app.getLong("scoring.criteriaVersion");
             if (!kind.status.equals(app.getString("scoring.status")) || time == null
-                    || time.compareTo(toTimestamp(cutoff)) >= 0 || criteriaVersion == null) {
+                    || time.compareTo(toTimestamp(cutoff)) >= 0) {
                 return skipped;
+            }
+            // 큐에 넣을 수 없는 문서는 FAILED로 닫아 다음 조회 묶음을 계속 차지하지 않게 한다.
+            Long criteriaVersion;
+            try {
+                criteriaVersion = readLong(app, "scoring.criteriaVersion");
+            } catch (MalformedDocumentException e) {
+                tx.update(ref, failedFields(e.errorCode));
+                return new RequeueResult(RequeueOutcome.FAILED, 0);
+            }
+            if (criteriaVersion == null) {
+                tx.update(ref, failedFields("CRITERIA_NOT_FOUND"));
+                return new RequeueResult(RequeueOutcome.FAILED, 0);
             }
 
             Map<String, Object> fields = new HashMap<>();
             fields.put("scoring.runId", null);
             if (kind == StuckKind.RUNNING) {
-                Long stored = app.getLong("scoring.attempts");
+                Long stored;
+                try {
+                    stored = readLong(app, "scoring.attempts");
+                } catch (MalformedDocumentException e) {
+                    tx.update(ref, failedFields(e.errorCode));
+                    return new RequeueResult(RequeueOutcome.FAILED, 0);
+                }
                 long attempts = (stored == null ? 0 : stored) + 1;
                 fields.put("scoring.attempts", attempts);
                 if (attempts > maxAttempts) {
@@ -259,6 +295,15 @@ class FirestoreScoringRepository implements ScoringRepository {
         Long storedVersion = app.getLong("scoring.criteriaVersion");
         return storedVersion != null && storedVersion == criteriaVersion
                 && runId.equals(app.getString("scoring.runId"));
+    }
+
+    /** 숫자가 아닌 값이 들어 있으면 APPLICATION_INVALID로 처리하도록 {@link MalformedDocumentException}을 던진다. */
+    private static Long readLong(DocumentSnapshot app, String field) {
+        try {
+            return app.getLong(field);
+        } catch (RuntimeException e) {
+            throw new MalformedDocumentException("APPLICATION_INVALID");
+        }
     }
 
     private static Map<String, Object> failedFields(String errorCode) {
