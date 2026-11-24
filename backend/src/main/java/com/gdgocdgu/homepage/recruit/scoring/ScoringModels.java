@@ -51,4 +51,36 @@ final class ScoringModels {
         /** 기준 버전 · 실행 번호가 달라 건드리지 않았다. */
         STALE
     }
+
+    /** 멈춘 채점의 종류. 어느 시각 필드({@code requestedAt} · {@code startedAt})로 판단할지 정한다. */
+    enum StuckKind {
+        PENDING("PENDING", "scoring.requestedAt"),
+        RUNNING("RUNNING", "scoring.startedAt");
+
+        final String status;
+        final String timeField;
+
+        StuckKind(String status, String timeField) {
+            this.status = status;
+            this.timeField = timeField;
+        }
+    }
+
+    /** 멈춘 것으로 보이는 지원서. 다시 넣기 전에 트랜잭션에서 한 번 더 확인한다. */
+    record StuckApplication(String aid, StuckKind kind) {
+    }
+
+    /** 멈춘 채점을 다시 넣은 결과. */
+    enum RequeueOutcome {
+        /** PENDING으로 되돌렸다. 큐에 다시 등록해야 한다. */
+        REQUEUED,
+        /** 시도 횟수를 넘겨 FAILED로 저장했다. 큐에 등록하지 않는다. */
+        FAILED,
+        /** 문서가 없거나 삭제됐거나 이미 멈춘 상태가 아니라 건드리지 않았다. */
+        SKIPPED
+    }
+
+    /** {@code criteriaVersion}은 {@code REQUEUED}일 때 큐에 넣을 기준 버전이다(그 밖에는 0). */
+    record RequeueResult(RequeueOutcome outcome, int criteriaVersion) {
+    }
 }

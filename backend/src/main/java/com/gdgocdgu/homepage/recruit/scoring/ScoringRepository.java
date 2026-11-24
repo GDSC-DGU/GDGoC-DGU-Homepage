@@ -1,8 +1,13 @@
 package com.gdgocdgu.homepage.recruit.scoring;
 
+import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.RequeueResult;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.RetryResult;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.ScoredResult;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.StartResult;
+import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.StuckApplication;
+import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.StuckKind;
+import java.time.Instant;
+import java.util.List;
 
 /**
  * 채점 상태 저장소. 메서드 하나가 Firestore 트랜잭션 하나다.
@@ -28,4 +33,17 @@ interface ScoringRepository {
      * 아니면 PENDING으로 되돌린다(RUNNING으로 두면 재시도가 "이미 RUNNING"에 걸린다).
      */
     RetryResult releaseForRetry(String aid, int criteriaVersion, String runId, String errorCode, int maxAttempts);
+
+    /**
+     * 멈춘 지원서를 찾는다(API-RCT-031). {@code kind}의 상태이고 시각 필드가 {@code cutoff}보다 이전인 문서를
+     * 시각 오름차순으로 최대 {@code limit}건 돌려준다. 삭제된 문서는 여기서 거르지 않고 {@link #requeueIfStuck}가 건너뛴다.
+     */
+    List<StuckApplication> findStuck(StuckKind kind, Instant cutoff, int limit);
+
+    /**
+     * 트랜잭션에서 문서를 다시 읽어 여전히 멈춰 있을 때만 PENDING으로 되돌린다({@code requestedAt = now}, {@code runId = null}).
+     * RUNNING에서 되돌리면 실패한 시도로 보고 attempts를 1 올리며, {@code maxAttempts}를 넘으면 FAILED({@code SCORING_TIMEOUT})로 저장한다.
+     * 기준 버전은 바꾸지 않는다.
+     */
+    RequeueResult requeueIfStuck(String aid, StuckKind kind, Instant cutoff, Instant now, int maxAttempts);
 }

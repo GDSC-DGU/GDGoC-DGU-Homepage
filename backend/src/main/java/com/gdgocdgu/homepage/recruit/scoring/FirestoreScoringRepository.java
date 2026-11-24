@@ -3,17 +3,24 @@ package com.gdgocdgu.homepage.recruit.scoring;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.AnswerValue;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.CriteriaItem;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.Finished;
+import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.RequeueOutcome;
+import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.RequeueResult;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.RetryResult;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.ScoredItem;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.ScoredResult;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.ScoringInput;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.StartResult;
 import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.Started;
+import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.StuckApplication;
+import com.gdgocdgu.homepage.recruit.scoring.ScoringModels.StuckKind;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.Transaction;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -180,6 +187,68 @@ class FirestoreScoringRepository implements ScoringRepository {
             tx.update(ref, fields);
             return RetryResult.RETRY;
         });
+    }
+
+    @Override
+    public List<StuckApplication> findStuck(StuckKind kind, Instant cutoff, int limit) {
+        try {
+            Query query = firestore.collection(APPLICATIONS)
+                    .whereEqualTo("scoring.status", kind.status)
+                    .whereLessThan(kind.timeField, toTimestamp(cutoff))
+                    .orderBy(kind.timeField)
+                    .limit(limit);
+            List<StuckApplication> found = new ArrayList<>();
+            for (QueryDocumentSnapshot doc : query.get().get().getDocuments()) {
+                found.add(new StuckApplication(doc.getId(), kind));
+            }
+            return found;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("멈춘 채점 조회가 중단됐습니다.");
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("멈춘 채점 조회에 실패했습니다: "
+                    + (e.getCause() == null ? "unknown" : e.getCause().getClass().getSimpleName()));
+        }
+    }
+
+    @Override
+    public RequeueResult requeueIfStuck(String aid, StuckKind kind, Instant cutoff, Instant now, int maxAttempts) {
+        RequeueResult skipped = new RequeueResult(RequeueOutcome.SKIPPED, 0);
+        return inTransaction(tx -> {
+            DocumentReference ref = firestore.collection(APPLICATIONS).document(aid);
+            DocumentSnapshot app = tx.get(ref).get();
+            if (!app.exists() || Boolean.TRUE.equals(app.getBoolean("deleted"))) {
+                return skipped;
+            }
+            Timestamp time = app.getTimestamp(kind.timeField);
+            Long criteriaVersion = app.getLong("scoring.criteriaVersion");
+            if (!kind.status.equals(app.getString("scoring.status")) || time == null
+                    || time.compareTo(toTimestamp(cutoff)) >= 0 || criteriaVersion == null) {
+                return skipped;
+            }
+
+            Map<String, Object> fields = new HashMap<>();
+            fields.put("scoring.runId", null);
+            if (kind == StuckKind.RUNNING) {
+                Long stored = app.getLong("scoring.attempts");
+                long attempts = (stored == null ? 0 : stored) + 1;
+                fields.put("scoring.attempts", attempts);
+                if (attempts > maxAttempts) {
+                    fields.put("scoring.status", "FAILED");
+                    fields.put("scoring.error", ScoringRecoveryService.ERROR_SCORING_TIMEOUT);
+                    tx.update(ref, fields);
+                    return new RequeueResult(RequeueOutcome.FAILED, 0);
+                }
+            }
+            fields.put("scoring.status", "PENDING");
+            fields.put("scoring.requestedAt", toTimestamp(now));
+            tx.update(ref, fields);
+            return new RequeueResult(RequeueOutcome.REQUEUED, criteriaVersion.intValue());
+        });
+    }
+
+    private static Timestamp toTimestamp(Instant instant) {
+        return Timestamp.ofTimeSecondsAndNanos(instant.getEpochSecond(), instant.getNano());
     }
 
     /** 문서가 있고 삭제되지 않았으며, 기준 버전과 실행 번호가 이번 실행과 같으면 true. */
