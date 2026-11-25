@@ -183,7 +183,8 @@ PENDING ──(028 시작: runId · startedAt 기록)──▶ RUNNING ──(�
 - 실패 코드: `attempts`는 두 경우가 함께 쓰는 하나의 값이다. 3을 넘게 만든 것이 RCT-028 일시 실패면 `AI_UNAVAILABLE`, RCT-031의 `RUNNING` 복구면 `SCORING_TIMEOUT`.
 - RCT-031은 `criteriaVersion`이 없거나 숫자가 아닌 지원서를 다시 넣지 않고 `FAILED`(`CRITERIA_NOT_FOUND` · `APPLICATION_INVALID`)로 닫는다. 같은 문서가 조회 묶음을 계속 차지하지 않게 하려는 것이다.
 - RCT-031은 삭제되지 않은 지원서만, 상태별로 오래된 순 최대 100건씩 처리한다. 남은 건은 다음 실행(10분 뒤)이 처리한다.
-- 한계: `PENDING` 재등록은 시도로 세지 않으므로, 채점 시작 전에 계속 실패하는 문서는 `FAILED`로 닫히지 않고 10분마다 다시 등록된다(7장 미결 사항).
+- `PENDING` 재등록은 일부러 시도로 세지 않는다. Cloud Tasks 장애가 길어질 때 정상 지원서까지 `FAILED`가 되지 않고, 인프라가 복구되면 다시 처리되게 하려는 것이다.
+- 데이터 오류는 재등록을 반복하지 않고 RCT-028 시작 트랜잭션에서 `RUNNING` 전에 `FAILED`로 닫는다(`APPLICATION_INVALID` · `CRITERIA_NOT_FOUND` · `CRITERIA_INVALID` · `FORM_NOT_FOUND` · `FORM_INVALID`). `FAILED`는 RCT-031 조회에서 빠진다.
 - 점수는 실수 오차를 피하려고 0.1 단위 정수(`level × weight × 2`)로 계산한 뒤 소수 1자리로 저장한다.
 
 `stages` (RCT-016 · 019 · 021 · 024 · 029):
@@ -312,4 +313,3 @@ stages: {
 4. **메일 템플릿 범위**: 회차 공용(이 초안)인지, 회차별인지.
 5. **`currentStage` 전환 시점**: 서류 `PASS` 저장 때 바로 `INTERVIEW`로 바꿀지, 서류 전형 확정(RCT-020) 때 바꿀지.
 6. **이력 보존**: 지원서 삭제(OPS-011) 때 이력도 함께 지울지.
-7. **`PENDING` 재등록 상한**: RCT-031의 `PENDING` 재등록은 `attempts`로 세지 않는다(큐 등록 실패를 시도로 보지 않으려는 것). 채점 시작 전에 계속 실패하는 문서를 닫으려면 별도 횟수(예: `scoring.requeueCount`)와 상한이 필요하다.
