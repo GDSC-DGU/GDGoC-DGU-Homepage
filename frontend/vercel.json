@@ -5,7 +5,15 @@
     { "source": "/projects", "destination": "/archive", "permanent": true },
     { "source": "/community", "destination": "/about", "permanent": true }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index" }],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "has": [{ "type": "host", "value": "gdgoc-dgu.com" }],
+      "destination": "https://backend-534333328238.asia-northeast3.run.app/api/:path*"
+    },
+    { "source": "/api/:path*", "destination": "https://backend-948542964993.asia-northeast3.run.app/api/:path*" },
+    { "source": "/(.*)", "destination": "/index" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

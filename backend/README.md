@@ -7,7 +7,7 @@ Spring Boot(Java)로 만든 백엔드입니다. Cloud Run에 배포하며, 데�
 | 담당 팀 | Homepage-BE (`homepage-be`) |
 | PR 영역 라벨 | `area:backend` |
 | CI | `.github/workflows/ci-backend.yml` (Homepage-BE가 작성 · 관리) |
-| 스택 · 도구 | Spring Boot 4.1, Java 25, Gradle 9.8 |
+| 스택 · 도구 | Spring Boot 4.1, Java 25, Gradle 9.9 |
 | 로컬 주소 | http://localhost:8080 (Docker 컨테이너) |
 
 ## 빌드 · 실행
@@ -41,6 +41,18 @@ $env:GOOGLE_CLIENT_ID = '여기에 Google OAuth 웹 클라이언트 ID 입력'
 - `AUTH_ACCESS_TOKEN_SECRET`에는 무작위 32바이트 이상을 Base64로 인코딩한 값을 설정합니다. Git Bash에서 `openssl rand -base64 32`로 생성할 수 있습니다. VS Code로 실행한다면 로컬 `.env`에 키를 두고 실행 설정에 `"envFile": "${workspaceFolder}/.env"`를 지정합니다. 배포 환경에서는 환경별 비밀값을 사용합니다.
 - 브라우저 출처는 local에서 `http://localhost:5173`과 `http://127.0.0.1:5173`, dev와 prod에서 각 홈페이지 주소를 허용합니다. 필요하면 `AUTH_ALLOWED_ORIGINS`에 쉼표로 구분한 주소를 설정합니다. refresh 쿠키는 local에서 HTTP 테스트를 지원하고, dev와 prod에서는 `Secure`가 적용됩니다.
 
+### 로그인 갱신 · 로그아웃 확인
+
+- `POST /api/v1/auth/refresh` (API-AUTH-002): refresh 쿠키의 앞부분(세션 ID)으로 `authSessions` 문서를 찾고, 쿠키 전체의 해시가 `refreshTokenHash`와 같은지 봅니다. 무효화(`revokedAt`) · 최종 만료(`expiresAt`) · 회원 비활성화 · `authVersion` 변경을 차례로 확인한 뒤 access token만 새로 줍니다. 수명은 15분과 최종 만료까지 남은 시간 중 짧은 쪽이고, 쿠키는 다시 보내지 않습니다. 확인하는 사이 최종 만료가 지나면 토큰을 만들기 직전에 다시 확인해 `SESSION_EXPIRED`를 줍니다.
+- `POST /api/v1/auth/logout` (API-AUTH-003): 쿠키가 맞으면 세션의 `revokedAt` · `deleteAfter`를 지금으로 적고, 쿠키가 없거나 맞지 않아도 200과 함께 쿠키를 지웁니다. 무효화가 실패하면 쿠키는 지우되 `500 INTERNAL_ERROR`로 알립니다(서버 세션이 남아 있는데 성공이라고 답하지 않음).
+- Firestore 없이 분기를 확인하려면 `backend/`의 PowerShell에서 `./gradlew.bat test --tests "*AuthRefreshLogoutTest"`를 실행합니다.
+
+### 지원 중복 방지 키
+
+- `RECRUIT_KEY_HMAC_SECRET`에는 무작위 32바이트 이상을 Base64로 인코딩한 값을 설정합니다. Git Bash에서 `openssl rand -base64 32`로 생성할 수 있습니다. `AUTH_ACCESS_TOKEN_SECRET`과 다른 값을 쓰고, dev와 prod도 서로 다른 값을 씁니다.
+- 값이 비어 있어도 서버는 시작하지만 중복 확인(API-RCT-003)은 500으로 실패합니다.
+- 모집 중에는 이 값을 바꾸지 않습니다. 바꾸면 기존 지원자의 키와 맞지 않아 같은 학번이 다시 지원할 수 있습니다.
+
 ### Firestore 에뮬레이터
 
 local 프로필은 Firestore 에뮬레이터(`localhost:8180`, 프로젝트 `demo-gdgoc`)에 연결합니다. 실제 Firestore에는 닿지 않습니다. 에뮬레이터를 켜지 않아도 서버는 뜨지만, DB를 쓰는 API는 실패합니다.
@@ -57,6 +69,18 @@ npx firebase-tools@15.36.0 emulators:start --only firestore --project demo-gdgoc
 - `FirestoreEmulatorConnectionTest`는 에뮬레이터가 켜져 있을 때만 실행되고, 꺼져 있으면 건너뜁니다. CI(`ci-backend.yml`)는 에뮬레이터를 띄운 채 테스트하므로 항상 실행됩니다.
 
 dev · prod 프로필은 Cloud Run 서비스 계정(ADC)으로 각 GCP 프로젝트(dev: `dev-gdgoc-dgu-homepage`, prod: `gdgoc-dgu-homepage`)의 Firestore에 연결합니다. 서비스 계정 키 파일은 쓰지 않습니다.
+
+### AI 채점 (API-RCT-028)
+
+- `POST /internal/scoring`은 Cloud Tasks가 호출하는 내부 API입니다. dev · prod에서는 `tasks-invoker` 서비스 계정의 OIDC 토큰만 통과하고(`app.internal-auth`), local에서는 인증을 끕니다.
+- local은 AI 서버를 `http://localhost:8000`으로 호출합니다. 다른 주소를 쓰려면 `AI_BASE_URL`을 지정합니다. dev · prod는 Cloud Run 서비스 계정(ADC)의 Google ID 토큰을 붙여 각 환경의 `ai` 서비스를 호출합니다.
+- `FirestoreScoringRepositoryEmulatorTest`는 에뮬레이터가 켜져 있을 때만 실행됩니다.
+
+### 멈춘 채점 재처리 (API-RCT-031)
+
+- `POST /internal/jobs/scoring-recovery`는 Cloud Scheduler가 모집 시즌에 10분마다 호출합니다(`/internal/**` OIDC 인증, 본문 없음). 응답은 `{"success":true,"data":{"requeued":N}}`입니다.
+- `PENDING`(`requestedAt`) 5분 초과, `RUNNING`(`startedAt`) 10분 초과 지원서를 상태별로 최대 100건씩 찾아, 트랜잭션에서 여전히 멈춘 상태인지 확인한 뒤 `PENDING`으로 되돌리고 큐에 다시 등록합니다. `RUNNING`에서 되돌리면 시도 1회로 세고, 3회를 넘으면 `FAILED`(`SCORING_TIMEOUT`)로 저장하고 등록하지 않습니다. 삭제된 지원서(`deleted=true`)는 조회에서 제외하고, `scoring.criteriaVersion`이 없으면 `CRITERIA_NOT_FOUND`, 숫자가 아니면 `APPLICATION_INVALID`로 `FAILED` 저장해 다음 조회 묶음을 계속 차지하지 않게 합니다.
+- 두 조회에 복합 색인이 필요합니다(`infra/firebase/firestore.indexes.json`). **에뮬레이터는 색인을 검사하지 않으므로 dev 배포 전에 색인을 먼저 배포해야 합니다.** 색인이 없으면 dev에서 이 API가 500을 돌려줍니다.
 
 ### 필요한 것
 

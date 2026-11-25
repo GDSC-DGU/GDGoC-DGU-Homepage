@@ -90,7 +90,7 @@ graph TD
 |---|---|---|
 | `version` | number | |
 | `status` | string | `DRAFT` · `PUBLISHED` |
-| `questions` | array\<map\> | `{ questionId, type, title, description, maxLength, options[], trackOnly[] }` |
+| `questions` | array\<map\> | `{ questionId, type, title, description, required, maxLength, options[], trackOnly[] }` |
 | `updatedAt` · `updatedBy` · `updatedByName` | | RCT-009 응답의 `updatedBy`(이름)를 위해 이름도 복사 |
 | `publishedAt` · `publishedBy` | timestamp · string | 게시 때만 |
 
@@ -111,8 +111,8 @@ graph TD
 
 | 문서 ID | 예 |
 |---|---|
-| `sid_` + 해시(정규화 학번) | 학번 공백 제거, 숫자 10자리 |
-| `email_` + 해시(정규화 이메일) | 소문자 · 공백 제거 |
+| `sid_` + 해시(정규화 학번) | 학번 앞뒤 공백 제거, 숫자 10자리 |
+| `email_` + 해시(정규화 이메일) | 앞뒤 공백 제거 · 소문자 |
 
 | 필드 | 타입 |
 |---|---|
@@ -124,7 +124,7 @@ graph TD
 - **RCT-005**: 트랜잭션 안에서 두 키 문서를 읽고, 하나라도 있으면 `APPLICATION_DUPLICATED`, 없으면 지원서와 두 키를 함께 만듭니다. 동시 제출도 한쪽만 성공합니다.
 - **RCT-032**: 이전 이메일 키를 지우고 새 키를 만듭니다(트랜잭션). 새 키가 이미 있으면 `APPLICATION_DUPLICATED`.
 - **RCT-033**: 지원서를 삭제 상태로 바꾸면서 두 키를 지워 재지원을 허용합니다.
-- 해시는 문서 ID에 학번 · 이메일 원문이 드러나지 않게 하려는 것입니다. 학번은 경우의 수가 적어 단순 해시는 되돌리기 쉬우므로 **HMAC(서버 비밀 키)** 를 권장합니다(7장 미결 사항).
+- 해시는 문서 ID에 학번 · 이메일 원문이 드러나지 않게 하려는 것입니다. 학번은 경우의 수가 적어 단순 해시는 되돌리기 쉬우므로 **HMAC-SHA256(서버 비밀 키 `RECRUIT_KEY_HMAC_SECRET`)** 을 쓰고, 결과는 소문자 16진수로 저장합니다. 비밀 키는 환경별로 다르게 두고 모집 중에는 바꾸지 않습니다.
 
 ### 3-5. `applications/{aid}` — 지원서
 
@@ -147,18 +147,34 @@ graph TD
 | `member` | map \| null | RCT-027 결과 `{ status, userId, registeredAt, reason }` |
 | `updatedAt` | timestamp | |
 
+- **RCT-005가 만드는 초기값**: `deleted: false`, `currentStage: DOCUMENT`, `stages.*`는 `result: PENDING` · `resultFixed: false` · `mailStatus: NOT_SENT`(`INTERVIEW.interview: null`), `member: null`, `scoring`은 `status: PENDING` · 회차의 `currentCriteriaVersion` · `runId: null` · `attempts: 0` · `requestedAt = submittedAt`. RCT-031은 `requestedAt`이 있어야 멈춘 `PENDING`을 찾습니다.
+- 학번 · 이메일은 정규화한 값을 저장합니다. 답변은 폼 문항 순서로, 빈 선택 문항은 저장하지 않습니다.
+
 `scoring` (RCT-014 · 016 · 028 · 031):
 
 | 필드 | 타입 | 설명 |
 |---|---|---|
 | `status` | string | `PENDING` · `RUNNING` · `DONE` · `FAILED` |
 | `criteriaVersion` | number | 이 지원서가 따라야 할 기준 버전. 결과가 다른 버전이면 버림(`SKIPPED_STALE`) |
-| `totalScore` | number \| null | 0~100. 목록의 `aiScore` |
-| `items` | array\<map\> | `{ itemId, name, level, weight, score, reason }` |
+| `runId` | string \| null | 지금 유효한 채점 실행 번호. RCT-028이 시작할 때 새로 기록하고, 결과는 이 값이 같을 때만 저장(늦게 끝난 이전 실행 결과 버림) |
+| `totalScore` | number \| null | 항목 점수의 합. 소수 1자리(0.0~100.0). 목록의 `aiScore` |
+| `items` | array\<map\> | `{ itemId, name, level, weight, score, reason }`. `score = level / 5 × weight`, 소수 1자리(항상 0.2 배수) |
 | `model` · `promptVersion` · `instructionIgnored` | | AI 응답 그대로 |
 | `requestedAt` · `startedAt` · `scoredAt` | timestamp | RCT-031이 `PENDING` 5분 · `RUNNING` 10분 초과를 찾을 때 씀 |
 | `attempts` | number | 3회 초과 시 `FAILED` |
 | `error` | string \| null | 실패 사유 코드 |
+
+상태 전이 (RCT-028 · 031):
+
+```text
+PENDING ──(028 시작, runId 기록)──▶ RUNNING ──(결과 저장, runId 일치)──▶ DONE
+   ▲                                   │
+   ├──(028 AI 일시 실패, attempts+1)───┤──(AI 422 · 3회 초과)──▶ FAILED
+   └──(031: RUNNING 10분 초과)─────────┘
+```
+
+- `RUNNING`을 그대로 다시 넣으면 RCT-028이 "이미 RUNNING"으로 건너뛰므로, 다시 넣을 때는 항상 `PENDING`으로 바꾼다.
+- 점수는 실수 오차를 피하려고 0.1 단위 정수(`level × weight × 2`)로 계산한 뒤 소수 1자리로 저장한다.
 
 `stages` (RCT-016 · 019 · 021 · 024 · 029):
 
@@ -242,7 +258,9 @@ stages: {
 | RCT-011 게시 | 기준 버전 확인 → 폼 버전 `PUBLISHED` → 회차 `publishedFormVersion` 갱신 | |
 | RCT-013 기준 저장 | 새 기준 버전 생성 → 회차 `currentCriteriaVersion` 갱신 | `needsRescore`는 저장 후 집계 |
 | RCT-019 일괄 결과 | 최대 500건이라 **배치 쓰기**를 나눠 실행. 건별로 지원서 갱신 + 이력 | 건별 성공 · 제외를 모아 응답 |
-| RCT-028 채점 결과 | 지원서를 다시 읽어 `criteriaVersion`이 같을 때만 결과 저장 | AI 호출은 트랜잭션 **밖**(재시도 때 중복 호출 방지) |
+| RCT-028 채점 시작 | `PENDING`이면 `RUNNING` + 새 `runId` 기록. 이미 `RUNNING`이면 건너뜀 | |
+| RCT-028 채점 결과 | 지원서를 다시 읽어 `criteriaVersion` · `runId`가 같을 때만 결과 저장. AI 일시 실패면 `PENDING`으로 되돌림 | AI 호출은 트랜잭션 **밖**(재시도 때 중복 호출 방지) |
+| RCT-031 멈춘 채점 | 여전히 멈춘 상태인지 확인 후 `PENDING` + `requestedAt` 갱신 | 채점 작업 다시 등록 |
 | RCT-029 메일 1건 | 수신자 `SENT` + 지원서 `stages.{stage}.mailStatus = SENT` · `resultFixed = true` | Gmail 호출은 트랜잭션 **밖**. 이미 `SENT`면 호출 안 함 |
 | RCT-033 삭제 | 지원서 `deleted = true` + 키 2개 삭제 + 이력 | |
 
@@ -275,7 +293,7 @@ stages: {
 
 ## 7. 미결 사항
 
-1. **중복 키 해시**: HMAC 비밀 키를 둘지(권장), 둔다면 Secret Manager · 환경변수 이름.
+1. **중복 키 비밀값 등록**: HMAC-SHA256으로 결정. 배포 환경의 `RECRUIT_KEY_HMAC_SECRET`을 Secret Manager에 등록해야 함.
 2. **지원서 원본 개인정보 암호화**: 필드 단위 암호화까지 할지, Firestore 기본 암호화로 충분한지.
 3. **검토 메모**: "작성자별로 쌓인다"가 운영진 1명당 메모 1개인지, 여러 개인지. 이 초안은 1개로 봄.
 4. **메일 템플릿 범위**: 회차 공용(이 초안)인지, 회차별인지.

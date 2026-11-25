@@ -3,12 +3,10 @@ package com.gdgocdgu.homepage.common.firestore;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import com.gdgocdgu.homepage.support.FirestoreEmulator;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,8 +29,7 @@ class FirestoreEmulatorConnectionTest {
 
     @BeforeEach
     void 에뮬레이터가_켜져_있을_때만_실행한다() {
-        assumeTrue(properties.usesEmulator(), "에뮬레이터 설정이 없는 프로필");
-        assumeTrue(isReachable(properties.emulatorHost()), "에뮬레이터가 꺼져 있음: " + properties.emulatorHost());
+        assumeTrue(FirestoreEmulator.isRunning(properties), "에뮬레이터가 꺼져 있음");
     }
 
     @Test
@@ -47,18 +44,6 @@ class FirestoreEmulatorConnectionTest {
             assertThat(snapshot.getString("message")).isEqualTo("hello");
         } finally {
             doc.delete().get();
-        }
-    }
-
-    private static boolean isReachable(String hostPort) {
-        int colon = hostPort.lastIndexOf(':');
-        String host = hostPort.substring(0, colon);
-        int port = Integer.parseInt(hostPort.substring(colon + 1));
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(host, port), 500);
-            return true;
-        } catch (IOException e) {
-            return false;
         }
     }
 }

@@ -12,12 +12,14 @@
 
 | 현재 브랜치 | 동작 |
 |---|---|
-| `develop` | `deploy-staging.yml`을 실행해 dev.gdgoc-dgu.com에 배포 |
+| `develop` | `origin/develop` 기준으로 `deploy-staging.yml`을 실행해 dev에 배포하고, 진행 상황을 터미널에 표시 |
 | `main` | 실행 거부 |
-| 그 외 (`feature/` 등) | 로컬 전체 실행 (docker compose + frontend 개발 서버) |
+| 그 외 (`feature/` 등) | 로컬 전체 실행은 아직 구현되지 않아 안내 후 종료 |
 | detached HEAD | 거부 |
 
-옵션은 `--only frontend,backend,ai`, `--dry-run`, `-y` / `--yes`, `--down`입니다.
+옵션은 `--only backend,ai,frontend`(기본 `backend,ai`), `--dry-run`, `-y` / `--yes`, `--down`(로컬 실행용, 아직 미구현), `-h` / `--help`입니다. `frontend`는 아직 workflow가 배포하지 않아 건너뜁니다.
+
+실행하려면 `gh`가 설치되고 로그인돼 있어야 합니다. bash 3.2(macOS)와 Git Bash에서 동작합니다.
 
 ## 지킬 것
 

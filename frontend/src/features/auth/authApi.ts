@@ -52,7 +52,7 @@ async function toError(res: Response): Promise<AuthError> {
 }
 
 /**
- * Spring Boot API (VITE_DATA_SOURCE=http).
+ * Spring Boot API (VITE_AUTH=google, 또는 VITE_AUTH 없이 VITE_DATA_SOURCE=http).
  * credentials: 'include' 로 refresh token 쿠키(HttpOnly, Path=/api/v1/auth)를 주고받는다.
  * 프론트와 API 가 같은 사이트(같은 도메인 또는 /api 를 넘겨 주는 주소)여야 쿠키(SameSite=Lax)가 붙는다.
  */
@@ -189,7 +189,17 @@ export function createExampleAuthApi(storage: StorageLike | null = safeLocalStor
   }
 }
 
-/** .env 의 VITE_DATA_SOURCE=http 면 실제 서버, 아니면 예시 로그인 (공개 사이트 RepositoryProvider 와 같은 기준) */
+/**
+ * 로그인 방식 정하기. 로그인만 실제 서버로 돌리고 공개 사이트 데이터는 예시로 둘 수 있게 VITE_DATA_SOURCE 와 따로 둔다.
+ * - VITE_AUTH=google : 실제 Google 로그인 (백엔드 /api/v1/auth)
+ * - VITE_AUTH=example : 예시 계정 로그인
+ * - 비어 있으면 VITE_DATA_SOURCE 를 따른다 (http → google, 그 밖 → example)
+ */
+export function authModeFrom(env: { VITE_AUTH?: string; VITE_DATA_SOURCE?: string }): AuthApi['mode'] {
+  if (env.VITE_AUTH === 'google' || env.VITE_AUTH === 'example') return env.VITE_AUTH
+  return env.VITE_DATA_SOURCE === 'http' ? 'google' : 'example'
+}
+
 export function createAuthApi(): AuthApi {
-  return import.meta.env.VITE_DATA_SOURCE === 'http' ? createHttpAuthApi(import.meta.env.VITE_API_BASE ?? '/api') : createExampleAuthApi()
+  return authModeFrom(import.meta.env) === 'google' ? createHttpAuthApi(import.meta.env.VITE_API_BASE ?? '/api') : createExampleAuthApi()
 }

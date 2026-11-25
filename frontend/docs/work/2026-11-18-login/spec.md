@@ -23,7 +23,7 @@
 
 ## 구현 결정
 
-- `VITE_DATA_SOURCE=http` 면 실제 API, 아니면 예시 로그인 (예시 운영진 = 관리자 예시 데이터의 운영진A, 예시 회원). 예시 로그인도 access 15분 · 로그인 1시간 · 연장 없음을 흉내 낸다.
+- `VITE_AUTH=google` 이면 실제 API, `example` 이면 예시 로그인 (예시 운영진 = 관리자 예시 데이터의 운영진A, 예시 회원). 비우면 `VITE_DATA_SOURCE` 를 따름(http → google). 공개 데이터는 예시로 두고 로그인만 켤 수 있게 따로 둠 (2026-11-24). 예시 로그인도 access 15분 · 로그인 1시간 · 연장 없음을 흉내 낸다.
 - Google 클라이언트 ID 는 `VITE_GOOGLE_CLIENT_ID` (공개 값, 백엔드 `GOOGLE_CLIENT_ID` 와 같은 값). 비어 있으면 버튼 대신 안내.
 - CSP(`vercel.json`)에 Google 로그인 주소 (`script-src …/gsi/client`, `style-src …/gsi/style`, `connect-src` · `frame-src …/gsi/`).
 - 관리자 데이터는 아직 예시다. 운영진은 예시 데이터의 운영진A(Lead 권한)로 들어간다. 명세상 운영진은 모두 같은 권한이라 지금 동작과 맞는다.

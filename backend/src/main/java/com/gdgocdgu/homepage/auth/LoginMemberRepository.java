@@ -22,8 +22,6 @@ import java.util.function.Function;
 @Repository
 class LoginMemberRepository {
 
-    private static final String SESSIONS_COLLECTION = "authSessions";
-
     private final Firestore firestore;
     private final String usersCollection;
     private final String googleSubjectField;
@@ -42,9 +40,7 @@ class LoginMemberRepository {
 
     Optional<LoginSession> createSessionForGoogleSubject(
             String googleSubject, Function<LoginMember, LoginSession> issueSession) {
-        if (usersCollection.isBlank() || googleSubjectField.isBlank() || activeField.isBlank()) {
-            throw new IllegalStateException("Firestore 회원 조회 설정이 비어 있습니다.");
-        }
+        requireSettings();
 
         // 한 Google 계정에 회원이 중복 연결됐는지 확인하기 위해 최대 두 건을 읽는다.
         Query matchingMembers = firestore.collection(usersCollection)
@@ -62,7 +58,8 @@ class LoginMemberRepository {
                 }
 
                 LoginSession session = issueSession.apply(readMember(members.getFirst()));
-                transaction.create(firestore.collection(SESSIONS_COLLECTION).document(session.id()), sessionFields(session));
+                transaction.create(firestore.collection(LoginSessionRepository.COLLECTION).document(session.id()),
+                        sessionFields(session));
                 return Optional.of(session);
             }).get();
         } catch (InterruptedException e) {
@@ -83,7 +80,7 @@ class LoginMemberRepository {
             throw new IllegalStateException("Firestore 회원 조회 설정이 비어 있습니다.");
         }
 
-        DocumentReference sessionRef = firestore.collection(SESSIONS_COLLECTION).document(sessionId);
+        DocumentReference sessionRef = firestore.collection(LoginSessionRepository.COLLECTION).document(sessionId);
         DocumentReference memberRef = firestore.collection(usersCollection).document(userId);
         List<DocumentSnapshot> documents;
         try {
@@ -110,6 +107,27 @@ class LoginMemberRepository {
 
         return Optional.of(new SessionMember(readMember(member), sessionUserId, sessionVersion,
                 Instant.ofEpochSecond(expiresAt.getSeconds(), expiresAt.getNanos()), session.get("revokedAt") != null));
+    }
+
+    /** 갱신(API-AUTH-002)에서 세션의 회원이 아직 로그인할 수 있는지 다시 확인할 때 쓴다. 문서가 없으면 비어 있다 */
+    Optional<LoginMember> findById(String userId) {
+        requireSettings();
+        DocumentSnapshot document;
+        try {
+            document = firestore.collection(usersCollection).document(userId).get().get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Firestore 회원 조회가 중단됐습니다.");
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Firestore 회원 조회에 실패했습니다.", e);
+        }
+        return document.exists() ? Optional.of(readMember(document)) : Optional.empty();
+    }
+
+    private void requireSettings() {
+        if (usersCollection.isBlank() || googleSubjectField.isBlank() || activeField.isBlank()) {
+            throw new IllegalStateException("Firestore 회원 조회 설정이 비어 있습니다.");
+        }
     }
 
     private LoginMember readMember(DocumentSnapshot document) {
