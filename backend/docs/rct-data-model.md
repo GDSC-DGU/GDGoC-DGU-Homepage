@@ -111,8 +111,8 @@ graph TD
 
 | 문서 ID | 예 |
 |---|---|
-| `sid_` + 해시(정규화 학번) | 학번 공백 제거, 숫자 10자리 |
-| `email_` + 해시(정규화 이메일) | 소문자 · 공백 제거 |
+| `sid_` + 해시(정규화 학번) | 학번 앞뒤 공백 제거, 숫자 10자리 |
+| `email_` + 해시(정규화 이메일) | 앞뒤 공백 제거 · 소문자 |
 
 | 필드 | 타입 |
 |---|---|
@@ -146,6 +146,9 @@ graph TD
 | `stages` | map | 아래 표 |
 | `member` | map \| null | RCT-027 결과 `{ status, userId, registeredAt, reason }` |
 | `updatedAt` | timestamp | |
+
+- **RCT-005가 만드는 초기값**: `deleted: false`, `currentStage: DOCUMENT`, `stages.*`는 `result: PENDING` · `resultFixed: false` · `mailStatus: NOT_SENT`(`INTERVIEW.interview: null`), `member: null`, `scoring`은 `status: PENDING` · 회차의 `currentCriteriaVersion` · `runId: null` · `attempts: 0` · `requestedAt = submittedAt`. RCT-031은 `requestedAt`이 있어야 멈춘 `PENDING`을 찾습니다.
+- 학번 · 이메일은 정규화한 값을 저장합니다. 답변은 폼 문항 순서로, 빈 선택 문항은 저장하지 않습니다.
 
 `scoring` (RCT-014 · 016 · 028 · 031):
 
