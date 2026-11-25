@@ -2,13 +2,10 @@ package com.gdgocdgu.homepage.recruit;
 
 import com.gdgocdgu.homepage.common.error.ApiException;
 import com.gdgocdgu.homepage.common.error.CommonErrorCode;
-import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ApplicationCheckService {
-
-    private static final Pattern STUDENT_ID = Pattern.compile("[0-9]{10}");
 
     private final RecruitmentRepository recruitmentRepository;
     private final ApplicationKeyRepository applicationKeyRepository;
@@ -36,8 +33,8 @@ public class ApplicationCheckService {
     }
 
     private static String normalizeStudentId(String studentId) {
-        String normalized = studentId == null ? "" : studentId.strip();
-        if (!STUDENT_ID.matcher(normalized).matches()) {
+        String normalized = ApplicantNormalizer.studentId(studentId);
+        if (normalized == null) {
             throw new ApiException(CommonErrorCode.VALIDATION_FAILED, "학번 형식이 올바르지 않습니다.");
         }
         return normalized;

@@ -32,6 +32,11 @@ public class ApplicationKeyGenerator {
         return "sid_" + hmac(normalizedStudentId);
     }
 
+    /** @param normalizedEmail 정규화된 이메일. 예외 메시지와 로그에 넣지 않는다. */
+    String emailKey(String normalizedEmail) {
+        return "email_" + hmac(normalizedEmail);
+    }
+
     private String hmac(String value) {
         if (secretKey == null) {
             throw new IllegalStateException("RECRUIT_KEY_HMAC_SECRET이 설정되지 않았습니다.");
