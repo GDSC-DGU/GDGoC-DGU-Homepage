@@ -160,20 +160,30 @@ graph TD
 | `totalScore` | number \| null | 항목 점수의 합. 소수 1자리(0.0~100.0). 목록의 `aiScore` |
 | `items` | array\<map\> | `{ itemId, name, level, weight, score, reason }`. `score = level / 5 × weight`, 소수 1자리(항상 0.2 배수) |
 | `model` · `promptVersion` · `instructionIgnored` | | AI 응답 그대로 |
-| `requestedAt` · `startedAt` · `scoredAt` | timestamp | RCT-031이 `PENDING` 5분 · `RUNNING` 10분 초과를 찾을 때 씀 |
-| `attempts` | number | 3회 초과 시 `FAILED` |
-| `error` | string \| null | 실패 사유 코드 |
+| `requestedAt` | timestamp | 채점 대기를 시작한 시각. 제출(RCT-005), AI 일시 실패 복귀(RCT-028), 재등록(RCT-031) 때 갱신. RCT-031이 `PENDING` 5분 초과를 찾을 때 씀 |
+| `startedAt` | timestamp | 마지막으로 `RUNNING`이 된 시각(RCT-028 시작). RCT-031이 `RUNNING` 10분 초과를 찾을 때 씀 |
+| `scoredAt` | timestamp | 결과 저장 시각 |
+| `attempts` | number | 실패한 채점 시도 수. RCT-028 AI 일시 실패와 RCT-031의 `RUNNING` 복구 때 +1, 3회를 넘으면 `FAILED`. `PENDING` 재등록은 세지 않음 |
+| `error` | string \| null | 실패 사유 코드. 예: `AI_UNAVAILABLE`(일시 실패로 `attempts` 3 초과), `SCORING_TIMEOUT`(`RUNNING` 복구로 `attempts` 3 초과), `CRITERIA_NOT_FOUND`, `APPLICATION_INVALID` |
 
 상태 전이 (RCT-028 · 031):
 
 ```text
-PENDING ──(028 시작, runId 기록)──▶ RUNNING ──(결과 저장, runId 일치)──▶ DONE
-   ▲                                   │
-   ├──(028 AI 일시 실패, attempts+1)───┤──(AI 422 · 3회 초과)──▶ FAILED
-   └──(031: RUNNING 10분 초과)─────────┘
+PENDING ──(028 시작: runId · startedAt 기록)──▶ RUNNING ──(결과 저장, runId 일치)──▶ DONE
+ ▲  │                                            │
+ │  │                                            ├──(028 AI 일시 실패, attempts+1)───────▶ PENDING
+ │  │                                            ├──(031 startedAt 10분 초과, attempts+1)──▶ PENDING
+ │  │                                            └──(AI 422 · attempts 3회 초과)───────────▶ FAILED
+ │  └──(031 requestedAt 5분 초과: 다시 등록, attempts 그대로)
+ └──────┘
 ```
 
 - `RUNNING`을 그대로 다시 넣으면 RCT-028이 "이미 RUNNING"으로 건너뛰므로, 다시 넣을 때는 항상 `PENDING`으로 바꾼다.
+- `PENDING`으로 되돌릴 때는 `runId = null`, `requestedAt = 지금`으로 바꾼다. 늦게 끝난 이전 실행의 결과는 `runId`가 달라 버려진다.
+- 실패 코드: `attempts`는 두 경우가 함께 쓰는 하나의 값이다. 3을 넘게 만든 것이 RCT-028 일시 실패면 `AI_UNAVAILABLE`, RCT-031의 `RUNNING` 복구면 `SCORING_TIMEOUT`.
+- RCT-031은 `criteriaVersion`이 없거나 숫자가 아닌 지원서를 다시 넣지 않고 `FAILED`(`CRITERIA_NOT_FOUND` · `APPLICATION_INVALID`)로 닫는다. 같은 문서가 조회 묶음을 계속 차지하지 않게 하려는 것이다.
+- RCT-031은 삭제되지 않은 지원서만, 상태별로 오래된 순 최대 100건씩 처리한다. 남은 건은 다음 실행(10분 뒤)이 처리한다.
+- 한계: `PENDING` 재등록은 시도로 세지 않으므로, 채점 시작 전에 계속 실패하는 문서는 `FAILED`로 닫히지 않고 10분마다 다시 등록된다(7장 미결 사항).
 - 점수는 실수 오차를 피하려고 0.1 단위 정수(`level × weight × 2`)로 계산한 뒤 소수 1자리로 저장한다.
 
 `stages` (RCT-016 · 019 · 021 · 024 · 029):
@@ -258,9 +268,9 @@ stages: {
 | RCT-011 게시 | 기준 버전 확인 → 폼 버전 `PUBLISHED` → 회차 `publishedFormVersion` 갱신 | |
 | RCT-013 기준 저장 | 새 기준 버전 생성 → 회차 `currentCriteriaVersion` 갱신 | `needsRescore`는 저장 후 집계 |
 | RCT-019 일괄 결과 | 최대 500건이라 **배치 쓰기**를 나눠 실행. 건별로 지원서 갱신 + 이력 | 건별 성공 · 제외를 모아 응답 |
-| RCT-028 채점 시작 | `PENDING`이면 `RUNNING` + 새 `runId` 기록. 이미 `RUNNING`이면 건너뜀 | |
-| RCT-028 채점 결과 | 지원서를 다시 읽어 `criteriaVersion` · `runId`가 같을 때만 결과 저장. AI 일시 실패면 `PENDING`으로 되돌림 | AI 호출은 트랜잭션 **밖**(재시도 때 중복 호출 방지) |
-| RCT-031 멈춘 채점 | 여전히 멈춘 상태인지 확인 후 `PENDING` + `requestedAt` 갱신 | 채점 작업 다시 등록 |
+| RCT-028 채점 시작 | `PENDING`이면 `RUNNING` + 새 `runId` · `startedAt` 기록. 이미 `RUNNING`이면 건너뜀 | |
+| RCT-028 채점 결과 | 지원서를 다시 읽어 `criteriaVersion` · `runId`가 같을 때만 결과 저장. AI 일시 실패면 `PENDING` + `attempts` +1 + `requestedAt` 갱신(3회 초과면 `FAILED`) | AI 호출은 트랜잭션 **밖**(재시도 때 중복 호출 방지) |
+| RCT-031 멈춘 채점 | 지원서마다 따로: 여전히 멈춘 상태인지 다시 확인 → `PENDING` + `runId = null` + `requestedAt` 갱신. `RUNNING`에서 되돌리면 `attempts` +1(3회 초과면 `FAILED`) | 커밋 뒤 채점 작업 다시 등록. 등록 실패는 5분 뒤 다시 잡힘 |
 | RCT-029 메일 1건 | 수신자 `SENT` + 지원서 `stages.{stage}.mailStatus = SENT` · `resultFixed = true` | Gmail 호출은 트랜잭션 **밖**. 이미 `SENT`면 호출 안 함 |
 | RCT-033 삭제 | 지원서 `deleted = true` + 키 2개 삭제 + 이력 | |
 
@@ -272,13 +282,16 @@ stages: {
 - 이유 2: `track` · `stage` · `result` · `scoringStatus` × `sort` 조합마다 복합 인덱스가 필요해집니다.
 - 지원자가 수천 건으로 늘면 이 방식을 다시 검토합니다.
 
-`infra/firebase/firestore.indexes.json`에 넣을 복합 인덱스(초안):
+`infra/firebase/firestore.indexes.json`의 복합 인덱스:
 
-| 컬렉션 | 필드 | 쓰는 곳 |
-|---|---|---|
-| `applications` | `rid` ASC, `deleted` ASC, `submittedAt` DESC | RCT-015 목록 기본 조회 |
-| `applications` | `scoring.status` ASC, `scoring.requestedAt` ASC | RCT-031 멈춘 채점 찾기 |
-| `applications` | `rid` ASC, `stages.INTERVIEW.interview.interviewerIds` CONTAINS | RCT-021 면접관 일정 겹침 |
+| 컬렉션 | 필드 | 쓰는 곳 | 상태 |
+|---|---|---|---|
+| `applications` | `scoring.status` ASC, `deleted` ASC, `scoring.requestedAt` ASC | RCT-031 멈춘 `PENDING` 찾기 | 반영됨 |
+| `applications` | `scoring.status` ASC, `deleted` ASC, `scoring.startedAt` ASC | RCT-031 멈춘 `RUNNING` 찾기 | 반영됨 |
+| `applications` | `rid` ASC, `deleted` ASC, `submittedAt` DESC | RCT-015 목록 기본 조회 | 초안 |
+| `applications` | `rid` ASC, `stages.INTERVIEW.interview.interviewerIds` CONTAINS | RCT-021 면접관 일정 겹침 | 초안 |
+
+- 에뮬레이터는 인덱스를 검사하지 않으므로, 인덱스를 바꾸면 dev · prod에 backend보다 **먼저** 배포한다. 없으면 해당 조회가 500으로 실패한다.
 
 `recruitments`는 문서가 몇 개뿐이라 전부 읽어 메모리에서 고릅니다(RCT-001 현재 회차, RCT-030 일일 작업).
 
@@ -299,3 +312,4 @@ stages: {
 4. **메일 템플릿 범위**: 회차 공용(이 초안)인지, 회차별인지.
 5. **`currentStage` 전환 시점**: 서류 `PASS` 저장 때 바로 `INTERVIEW`로 바꿀지, 서류 전형 확정(RCT-020) 때 바꿀지.
 6. **이력 보존**: 지원서 삭제(OPS-011) 때 이력도 함께 지울지.
+7. **`PENDING` 재등록 상한**: RCT-031의 `PENDING` 재등록은 `attempts`로 세지 않는다(큐 등록 실패를 시도로 보지 않으려는 것). 채점 시작 전에 계속 실패하는 문서를 닫으려면 별도 횟수(예: `scoring.requeueCount`)와 상한이 필요하다.
