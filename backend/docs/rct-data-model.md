@@ -80,7 +80,8 @@ graph TD
 | `createdBy` · `updatedBy` | string | userId |
 
 - `applyState`와 `canApply`는 **저장하지 않고** 매번 계산합니다(RCT-001 · 005 · 030이 같은 함수 사용).
-- 지원자 수(`applicationCount`, RCT-006)도 저장하지 않고 `count()` 집계로 구합니다. 회차가 적어 비용이 작습니다.
+- 지원자 수(`applicationCount`, RCT-006)도 저장하지 않고 `count()` 집계로 구합니다(`rid` 같음 + `deleted == false`, 삭제된 지원서 제외). 회차가 적어 비용이 작습니다.
+- **기수 변경(RCT-008)**: 문서 ID가 `rct_{cohort}`라 기수를 바꾸면 ID도 바뀝니다. 그래서 **지원서가 하나도 없을 때만** 허용하고, 한 트랜잭션에서 회차 문서와 `formVersions` · `criteriaVersions` · `applicationKeys`를 새 ID로 옮깁니다. 지원서가 있거나 `membersRegistered`면 `COHORT_LOCKED`, 새 ID가 이미 있으면 `COHORT_EXISTS`.
 
 ### 3-2. `recruitments/{rid}/formVersions/{version}` — 지원폼 버전
 

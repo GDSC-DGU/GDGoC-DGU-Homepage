@@ -6177,7 +6177,9 @@ paths:
         | `CLOSED`(수동) | `OPEN` | 재개. 현재 ≤ applyEndAt 일 때만 |
 
         - `SCHEDULED → OPEN`, `OPEN → CLOSED`(기간 종료)는 RCT-030이 저장합니다. 단 지원 가능 판단은 저장된 값이 아니라 RCT-001의 규칙으로 매번 계산합니다.
-        - 기간을 바꾸면 모집 마감 일정(HOM)도 함께 바뀝니다.
+        - 지금과 같은 `status`를 보내면 바뀌지 않고 200입니다. 재개(`OPEN`)는 `applyEndAt`을 함께 늦추면 종료 뒤에도 가능합니다.
+        - 기수(`cohort`)를 바꾸면 회차 ID(`rid = rct_{cohort}`)도 바뀌어 응답의 `rid`가 새 값입니다. **지원서가 하나도 없을 때만** 바꿀 수 있고, 지원서가 있거나 합격자 등록 후면 `COHORT_LOCKED`, 같은 기수의 회차가 있으면 `COHORT_EXISTS`입니다.
+        - 기간을 바꾸면 모집 마감 일정(HOM)도 함께 바뀝니다. (HOM 연동은 아직 구현되지 않았습니다.)
       parameters:
         - name: rid
           in: path
