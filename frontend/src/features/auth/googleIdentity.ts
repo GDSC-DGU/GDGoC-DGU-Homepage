@@ -47,35 +47,44 @@ export const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '').tr
 let loading: Promise<GoogleAccountsId> | null = null
 
 /**
- * renderButton 이 만든 버튼 iframe 이 다 불러와질 때까지 기다린다.
+ * renderButton 이 만든 진짜 버튼(iframe)이 화면에 나올 때까지 기다린다. 나오면 true, timeoutMs 안에 안 나오면 false.
  * Google 은 iframe 이 오기 전에 임시 버튼을 먼저 그리고 그 크기를 inline style 로 맞춘다. 우리 CSP 는
  * style-src 에 'unsafe-inline' 을 두지 않아 그 inline style 이 막히고, 임시 버튼의 G 그림이 칸 너비만큼 커진다.
- * 그래서 iframe 이 준비될 때까지 버튼 자리를 숨겨 둔다 (LoginPage). 오래 걸리면 timeoutMs 뒤에 그냥 보인다.
+ * 그래서 진짜 버튼이 나올 때까지 버튼 자리를 숨겨 둔다 (LoginPage).
+ * iframe 은 Google 이 높이를 준 뒤(0 → 44px)에야 보인다. 이 주소가 클라이언트의 '승인된 JavaScript 원본'에 없으면
+ * (PR 미리보기 주소, http://localhost 가 빠진 로컬 등) 높이가 끝까지 0 이라 false 를 돌려준다.
  */
-export function waitForButtonFrame(slot: HTMLElement, timeoutMs = 5000): Promise<void> {
+export function waitForButtonFrame(slot: HTMLElement, timeoutMs = 6000): Promise<boolean> {
   return new Promise((resolve) => {
     let done = false
     let timer = 0
-    const observer = new MutationObserver(() => {
+    let sizes: ResizeObserver | null = null
+    const added = new MutationObserver(() => {
       const frame = slot.querySelector('iframe')
       if (frame) {
-        observer.disconnect()
+        added.disconnect()
         watch(frame)
       }
     })
-    const finish = () => {
+    const finish = (shown: boolean) => {
       if (done) return
       done = true
-      observer.disconnect()
+      added.disconnect()
+      sizes?.disconnect()
       window.clearTimeout(timer)
-      resolve()
+      resolve(shown)
     }
-    // load 직후 Google 이 임시 버튼을 치우는 한 프레임을 기다린다
-    const watch = (frame: HTMLIFrameElement) => frame.addEventListener('load', () => window.setTimeout(finish, 50), { once: true })
-    timer = window.setTimeout(finish, timeoutMs)
+    const watch = (frame: HTMLIFrameElement) => {
+      sizes = new ResizeObserver(() => {
+        // 높이가 생긴 직후 Google 이 임시 버튼을 치우는 한 프레임을 기다린다
+        if (frame.getBoundingClientRect().height > 0) window.setTimeout(() => finish(true), 50)
+      })
+      sizes.observe(frame)
+    }
+    timer = window.setTimeout(() => finish(false), timeoutMs)
     const frame = slot.querySelector('iframe')
     if (frame) watch(frame)
-    else observer.observe(slot, { childList: true, subtree: true })
+    else added.observe(slot, { childList: true, subtree: true })
   })
 }
 

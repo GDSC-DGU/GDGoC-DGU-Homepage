@@ -114,7 +114,10 @@ export function LoginPage() {
   )
 }
 
-/** Google 이 그려 주는 로그인 버튼. 클라이언트 ID 가 없거나 스크립트를 못 받으면 안내 한 줄 */
+/** Vercel PR 미리보기 주소. Google 클라이언트의 승인된 원본에 없어 로그인 버튼이 나오지 않는다 */
+const isPreviewHost = () => typeof window !== 'undefined' && window.location.hostname.endsWith('.vercel.app')
+
+/** Google 이 그려 주는 로그인 버튼. 클라이언트 ID 가 없거나, 스크립트를 못 받거나, 버튼이 끝내 안 나오면 안내 한 줄 */
 function GoogleSignIn({ onCredential, busy }: { onCredential: (credential: string) => void; busy: boolean }) {
   const slot = useRef<HTMLDivElement>(null)
   const callback = useRef(onCredential)
@@ -133,9 +136,9 @@ function GoogleSignIn({ onCredential, busy }: { onCredential: (credential: strin
         id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: (r) => callback.current(r.credential), ux_mode: 'popup', auto_select: false, cancel_on_tap_outside: true, context: 'signin', itp_support: true })
         el.replaceChildren()
         id.renderButton(el, { type: 'standard', theme: 'outline', size: 'large', text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: 320, locale: 'ko' })
-        // 버튼 iframe 이 준비되면 보인다 (그 전의 임시 버튼은 CSP 때문에 크게 그려져서 숨김)
-        return waitForButtonFrame(el).then(() => {
-          if (alive) setState('ready')
+        // 진짜 버튼(iframe)이 나오면 보이고, 끝내 안 나오면 안내로 바꾼다 (임시 버튼은 CSP 때문에 크게 그려져서 숨김)
+        return waitForButtonFrame(el).then((shown) => {
+          if (alive) setState(shown ? 'ready' : 'failed')
         })
       })
       .catch(() => {
@@ -156,7 +159,7 @@ function GoogleSignIn({ onCredential, busy }: { onCredential: (credential: strin
   }
   return (
     <div className={s.google}>
-      <div ref={slot} className={s.googleSlot} data-ready={state === 'ready' || undefined} aria-busy={busy || undefined} />
+      <div ref={slot} className={s.googleSlot} data-state={state} aria-busy={busy || undefined} />
       {state === 'loading' && (
         <p className={s.small} role="status">
           Google 로그인 버튼을 불러오는 중입니다
@@ -164,7 +167,8 @@ function GoogleSignIn({ onCredential, busy }: { onCredential: (credential: strin
       )}
       {state === 'failed' && (
         <p className={s.alert} role="alert">
-          Google 로그인 버튼을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+          {isPreviewHost() ? 'PR 미리보기 주소에서는 Google 로그인을 쓸 수 없습니다. dev.gdgoc-dgu.com 에서 확인해 주세요.' : 'Google 로그인 버튼을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'}
+          {import.meta.env.DEV && <span className={s.small}> (개발: Google 클라이언트의 승인된 JavaScript 원본에 http://localhost 와 http://localhost:5173 이 둘 다 있어야 합니다)</span>}
         </p>
       )}
       {busy && (
