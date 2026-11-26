@@ -1832,6 +1832,7 @@ paths:
         **상세 규칙**
 
         - `pinned`는 Community + 전체 탭(category 없음) + 검색어 없음일 때만 채움. 그 외에는 빈 배열이고 공지도 `content`에 최신순으로 섞임.
+        - `pinned`는 최신 공지(NOTICE) 최대 3개. 4번째부터의 공지는 일반 글처럼 `content`에 최신순으로 나옴.
         - 고정 공지는 페이지당 10개에 포함하지 않음. `totalElements`도 `content` 기준.
         - 관리자 글은 `authorName`이 '운영진'이고, 작성자 검색은 '운영진'으로만 걸림.
         - 삭제 상태 글은 제외. Teams 글만 `recruitStatus` · 기간 포함.
@@ -1892,6 +1893,7 @@ paths:
                     properties:
                       pinned:
                         type: array
+                        maxItems: 3
                         items:
                           type: object
                           properties:
@@ -2034,9 +2036,10 @@ paths:
                   description: Community는 INFO · ETC만
                 title:
                   type: string
+                  description: 300byte 이하 (UTF-8)
                 content:
                   type: string
-                  description: 일반 텍스트
+                  description: 일반 텍스트, 3000byte 이하 (UTF-8)
                 startDate:
                   type: string
                   format: date
@@ -2047,9 +2050,10 @@ paths:
                   description: Teams 필수, startDate와 같거나 이후
                 attachmentIds:
                   type: array
+                  maxItems: 2
                   items:
                     type: integer
-                  description: 최대 3개, 첨부 업로드 API로 받은 ID
+                  description: 최대 2개, 첨부 업로드 API로 받은 ID
             example:
               board: TEAMS
               category: string
@@ -2067,7 +2071,7 @@ paths:
         **상세 규칙**
 
         - Teams 글은 등록 시 `recruitStatus`를 RECRUITING으로 저장.
-        - 제목 · 내용 글자 수 제한은 미정.
+        - 제목 300byte · 내용 3000byte 이하 (UTF-8 기준, 한글 1자는 보통 3byte). 넘으면 400 VALIDATION_ERROR.
       security:
         - accessToken: []
       responses:
@@ -2096,8 +2100,8 @@ paths:
                   postId: 42
         '400':
           description: |-
-            - 필수값 누락 · 종료일이 시작일보다 이전
-            - 첨부 3개 초과 · 없거나 이미 연결된 첨부 ID
+            - 필수값 누락 · 종료일이 시작일보다 이전 · 제목 · 내용 길이 초과
+            - 첨부 2개 초과 · 없거나 이미 연결된 첨부 ID
           content:
             application/json:
               schema:
@@ -2110,11 +2114,11 @@ paths:
                     code: VALIDATION_ERROR
                     message: 필수 항목입니다.
                 INVALID_ATTACHMENT:
-                  summary: 첨부 3개 초과 · 없거나 이미 연결된 첨부 ID
+                  summary: 첨부 2개 초과 · 없거나 이미 연결된 첨부 ID
                   value:
                     success: false
                     code: INVALID_ATTACHMENT
-                    message: 파일은 최대 3개까지 첨부할 수 있어요.
+                    message: 파일은 최대 2개까지 첨부할 수 있어요.
         '401':
           description: 토큰 만료, 없음
           content:
@@ -2157,7 +2161,7 @@ paths:
         - `isMine`이 true일 때만 FE가 수정 · 삭제 버튼 표시. 관리자 글(`isAdminPost: true`)은 항상 false.
         - 기간(startDate · endDate)은 Teams 글과 Community 세션 · 행사 글에만 값이 있고 나머지는 null.
         - 삭제된 글은 404가 아니라 410 → FE가 '삭제된 게시글입니다.' 안내 후 목록 이동.
-        - 같은 사용자 반복 조회 시 조회수 제한 방식은 미정.
+        - 같은 사용자가 반복 조회해도 매번 조회수 1 증가 (제한 없음).
       parameters:
         - name: postId
           in: path
@@ -2295,9 +2299,10 @@ paths:
                   description: Community는 INFO · ETC만
                 title:
                   type: string
+                  description: 300byte 이하 (UTF-8)
                 content:
                   type: string
-                  description: 일반 텍스트
+                  description: 일반 텍스트, 3000byte 이하 (UTF-8)
                 startDate:
                   type: string
                   format: date
@@ -2308,9 +2313,10 @@ paths:
                   description: Teams 필수, startDate와 같거나 이후
                 attachmentIds:
                   type: array
+                  maxItems: 2
                   items:
                     type: integer
-                  description: 최대 3개, 첨부 업로드 API로 받은 ID
+                  description: 최대 2개, 첨부 업로드 API로 받은 ID
                 recruitStatus:
                   type: string
                   enum:
@@ -2337,6 +2343,7 @@ paths:
         - 직접 CLOSED로 바꾸면 종료일 전이라도 바로 마감, 자동 마감 재계산 대상에서 빠짐.
         - 모집 상태는 그대로 두고 종료일만 바꾸면 모집 상태를 다시 계산.
         - 로그인 시간(1시간)이 끝나 401이 나와도 FE는 입력 내용을 유지.
+        - 제목 300byte · 내용 3000byte 이하 (UTF-8 기준). 넘으면 400 VALIDATION_ERROR.
       parameters:
         - name: postId
           in: path
@@ -2371,9 +2378,9 @@ paths:
                   postId: 42
         '400':
           description: |-
-            - 필수값 누락 · 종료일이 시작일보다 이전
+            - 필수값 누락 · 종료일이 시작일보다 이전 · 제목 · 내용 길이 초과
             - 기간이 끝난 글을 모집중으로 변경
-            - 첨부 3개 초과 · 잘못된 첨부 ID
+            - 첨부 2개 초과 · 잘못된 첨부 ID
           content:
             application/json:
               schema:
@@ -2392,11 +2399,11 @@ paths:
                     code: RECRUIT_PERIOD_ENDED
                     message: 모집 기간이 끝난 글은 종료일을 바꿔야 모집중으로 바꿀 수 있어요.
                 INVALID_ATTACHMENT:
-                  summary: 첨부 3개 초과 · 잘못된 첨부 ID
+                  summary: 첨부 2개 초과 · 잘못된 첨부 ID
                   value:
                     success: false
                     code: INVALID_ATTACHMENT
-                    message: 파일은 최대 3개까지 첨부할 수 있어요.
+                    message: 파일은 최대 2개까지 첨부할 수 있어요.
         '401':
           description: 토큰 없음, 만료
           content:
@@ -2465,6 +2472,7 @@ paths:
 
         - 실제로 지우지 않고 삭제 상태로 변경. 목록 · 검색 · 캘린더에서 빠짐.
         - 삭제된 글의 첨부파일은 다운로드 불가.
+        - 삭제한 글은 복구할 수 없음 (복구 API 없음).
       parameters:
         - name: postId
           in: path
@@ -2612,11 +2620,17 @@ paths:
 
         **상세 규칙**
 
-        - 댓글이 많을 때 페이지 · 더보기 방식은 미정이라 우선 전체 반환.
+        - 한 페이지에 100개씩 작성 순서(오래된 것부터)로 반환. FE는 스크롤이 끝에 닿으면 다음 page를 요청.
       parameters:
         - name: postId
           in: path
           required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          description: 기본 0, 한 페이지 100개
           schema:
             type: integer
       security: []
@@ -2652,6 +2666,14 @@ paths:
                             createdAt:
                               type: string
                               format: date-time
+                      page:
+                        type: integer
+                      size:
+                        type: integer
+                      totalElements:
+                        type: integer
+                      totalPages:
+                        type: integer
               example:
                 success: true
                 data:
@@ -2660,6 +2682,10 @@ paths:
                       content: 참여하고 싶어요!
                       authorName: 김철수
                       createdAt: '2026-11-06T10:00:00+09:00'
+                  page: 0
+                  size: 100
+                  totalElements: 1
+                  totalPages: 1
         '404':
           description: 없는 게시글
           content:
@@ -2704,6 +2730,7 @@ paths:
               properties:
                 content:
                   type: string
+                  description: 500byte 이하 (UTF-8)
             example:
               content: string
       description: |-
@@ -2714,7 +2741,7 @@ paths:
         **상세 규칙**
 
         - 회원의 댓글 수정 · 삭제 API는 없음 (관리자만 삭제).
-        - 글자 수 제한은 미정.
+        - 500byte 이하 (UTF-8 기준, 한글 약 166자). 넘으면 400 VALIDATION_ERROR.
       parameters:
         - name: postId
           in: path
@@ -2748,14 +2775,14 @@ paths:
                 data:
                   commentId: 7
         '400':
-          description: 내용 없음
+          description: 내용 없음 · 500byte 초과
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
                 VALIDATION_ERROR:
-                  summary: 내용 없음
+                  summary: 내용 없음 · 500byte 초과
                   value:
                     success: false
                     code: VALIDATION_ERROR
@@ -2828,9 +2855,8 @@ paths:
         **상세 규칙**
 
         - 업로드 직후에는 미연결 상태. 24시간 안에 게시글에 연결 안 되면 F-OPS-005 배치가 삭제.
-        - 게시글당 3개 제한은 업로드가 아니라 작성 · 수정 API에서 검사.
+        - 게시글당 최대 2개 제한은 업로드가 아니라 작성 · 수정 API에서 검사.
         - 회원 토큰, 관리자 토큰 둘 다 받음 (관리자 게시글). 권한 옵션에 '회원'이 없으면 팀 노션에 추가 필요.
-        - 용량 · 개수는 미정 사항이라 확정되면 숫자만 변경.
       security:
         - accessToken: []
       responses:
@@ -2902,7 +2928,7 @@ paths:
 
         **상세 규칙**
 
-        - 주소 유효 시간은 미정 (예: 5분). FE는 받은 `downloadUrl`로 바로 이동.
+        - 주소는 발급 후 5분 동안 유효. FE는 받은 `downloadUrl`로 바로 이동하고, 5분이 지나면 다시 발급받음.
         - 파일 저장소(GCS · S3 등) 서명 URL을 쓰면 저장소 호출 부분은 BE-EX 성격.
       parameters:
         - name: fileId
@@ -2967,9 +2993,9 @@ paths:
 
         **상세 규칙**
 
-        - 삭제 상태 글은 제외 (복구 기능 미정).
+        - 삭제 상태 글은 제외 (복구 기능 없음).
         - 제목 클릭 시 FE가 사용자 조회 화면(API-BRD-002)을 새 탭으로 엶.
-        - 페이지당 개수는 미정.
+        - 페이지당 10개.
       parameters:
         - name: board
           in: query
@@ -3000,7 +3026,7 @@ paths:
         - name: size
           in: query
           required: false
-          description: 기본 20
+          description: 기본 10
           schema:
             type: integer
       security:
@@ -3066,9 +3092,9 @@ paths:
                       commentCount: 2
                       createdAt: '2026-11-01T10:00:00+09:00'
                   page: 0
-                  size: 20
+                  size: 10
                   totalElements: 57
-                  totalPages: 3
+                  totalPages: 6
         '400':
           description: board 누락 · 잘못된 값
           content:
@@ -3141,6 +3167,7 @@ paths:
         - 행별 삭제도 같은 API에 1개만 담아 보냄.
         - 없거나 이미 삭제된 ID는 건너뛰고 실제 삭제된 개수만 `deletedCount`로 반환.
         - 삭제한 글이 SESSION · EVENT면 연결된 일정도 함께 제거
+        - 삭제한 글은 복구할 수 없음 (복구 API 없음).
       security:
         - accessToken: []
       responses:
@@ -3233,9 +3260,10 @@ paths:
                     - ETC
                 title:
                   type: string
+                  description: 300byte 이하 (UTF-8)
                 content:
                   type: string
-                  description: 일반 텍스트
+                  description: 일반 텍스트, 3000byte 이하 (UTF-8)
                 startDate:
                   type: string
                   format: date
@@ -3246,9 +3274,10 @@ paths:
                   description: SESSION · EVENT 필수, startDate와 같거나 이후
                 attachmentIds:
                   type: array
+                  maxItems: 2
                   items:
                     type: integer
-                  description: 최대 3개
+                  description: 최대 2개
             example:
               category: NOTICE
               title: string
@@ -3267,7 +3296,8 @@ paths:
         - board는 항상 COMMUNITY라 받지 않음.
         - SESSION · EVENT 글을 등록하면 A의 일정(캘린더)을 자동 생성하고, 일정에 원본 postId를 저장.
         - NOTICE는 Community 목록 상단 고정 대상(API-BRD-001 `pinned`).
-        - 게시 예약은 미정.
+        - 게시 예약 기능 없음 (등록하면 바로 게시).
+        - 제목 300byte · 내용 3000byte 이하 (UTF-8 기준). 넘으면 400 VALIDATION_ERROR.
       security:
         - accessToken: []
       responses:
@@ -3296,9 +3326,9 @@ paths:
                   postId: 5
         '400':
           description: |-
-            - 필수값 누락 · 종료일이 시작일보다 이전
+            - 필수값 누락 · 종료일이 시작일보다 이전 · 제목 · 내용 길이 초과
             - 세션 · 행사인데 기간 없음
-            - 첨부 3개 초과 · 잘못된 첨부 ID
+            - 첨부 2개 초과 · 잘못된 첨부 ID
           content:
             application/json:
               schema:
@@ -3317,11 +3347,11 @@ paths:
                     code: PERIOD_REQUIRED
                     message: 세션 · 행사는 기간을 입력해 주세요.
                 INVALID_ATTACHMENT:
-                  summary: 첨부 3개 초과 · 잘못된 첨부 ID
+                  summary: 첨부 2개 초과 · 잘못된 첨부 ID
                   value:
                     success: false
                     code: INVALID_ATTACHMENT
-                    message: 파일은 최대 3개까지 첨부할 수 있어요.
+                    message: 파일은 최대 2개까지 첨부할 수 있어요.
         '401':
           description: 토큰 없음, 만료
           content:
@@ -3364,6 +3394,7 @@ paths:
 
         - 삭제 상태 댓글과 삭제된 글의 댓글은 제외.
         - 게시글 제목 클릭 시 FE가 해당 글을 새 탭으로 엶.
+        - 페이지당 10개.
       parameters:
         - name: board
           in: query
@@ -3388,7 +3419,7 @@ paths:
         - name: size
           in: query
           required: false
-          description: 기본 20
+          description: 기본 10
           schema:
             type: integer
       security:
@@ -3448,9 +3479,9 @@ paths:
                       authorName: 김철수
                       createdAt: '2026-11-06T10:00:00+09:00'
                   page: 0
-                  size: 20
+                  size: 10
                   totalElements: 12
-                  totalPages: 1
+                  totalPages: 2
         '400':
           description: board 누락 · 잘못된 값
           content:
@@ -3521,6 +3552,7 @@ paths:
         **상세 규칙**
 
         - 없거나 이미 삭제된 ID는 건너뜀.
+        - 삭제한 댓글은 복구할 수 없음 (복구 API 없음).
       security:
         - accessToken: []
       responses:
@@ -3744,9 +3776,10 @@ paths:
                     - ETC
                 title:
                   type: string
+                  description: 300byte 이하 (UTF-8)
                 content:
                   type: string
-                  description: 일반 텍스트
+                  description: 일반 텍스트, 3000byte 이하 (UTF-8)
                 startDate:
                   type: string
                   format: date
@@ -3757,9 +3790,10 @@ paths:
                   description: SESSION · EVENT 필수, startDate와 같거나 이후
                 attachmentIds:
                   type: array
+                  maxItems: 2
                   items:
                     type: integer
-                  description: 최대 3개
+                  description: 최대 2개
             example:
               category: NOTICE
               title: string
@@ -3778,6 +3812,7 @@ paths:
         - 회원 글은 이 API로 수정 불가 (관리자는 회원 글을 삭제만 함).
         - `attachmentIds`는 최종 첨부 목록 전체.
         - 기간 · 분류를 바꾸면 연결된 일정도 함께 변경. SESSION · EVENT가 아닌 분류로 바꾸면 일정 제거, 반대면 생성.
+        - 제목 300byte · 내용 3000byte 이하 (UTF-8 기준). 넘으면 400 VALIDATION_ERROR.
       parameters:
         - name: postId
           in: path
@@ -3812,9 +3847,9 @@ paths:
                   postId: 5
         '400':
           description: |-
-            - 필수값 누락 · 종료일이 시작일보다 이전
+            - 필수값 누락 · 종료일이 시작일보다 이전 · 제목 · 내용 길이 초과
             - 세션 · 행사인데 기간 없음
-            - 첨부 3개 초과 · 잘못된 첨부 ID
+            - 첨부 2개 초과 · 잘못된 첨부 ID
           content:
             application/json:
               schema:
@@ -3833,11 +3868,11 @@ paths:
                     code: PERIOD_REQUIRED
                     message: 세션 · 행사는 기간을 입력해 주세요.
                 INVALID_ATTACHMENT:
-                  summary: 첨부 3개 초과 · 잘못된 첨부 ID
+                  summary: 첨부 2개 초과 · 잘못된 첨부 ID
                   value:
                     success: false
                     code: INVALID_ATTACHMENT
-                    message: 파일은 최대 3개까지 첨부할 수 있어요.
+                    message: 파일은 최대 2개까지 첨부할 수 있어요.
         '401':
           description: 토큰 없음, 만료
           content:
