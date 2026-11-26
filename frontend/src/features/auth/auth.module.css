@@ -57,8 +57,14 @@
   gap: 10px;
   min-height: 44px;
 }
+/* Google 버튼 자리. iframe 버튼이 준비될 때까지 숨기고(data-ready 없음), 임시 버튼이 커져도 자리를 넘지 않게 높이를 고정한다 */
 .googleSlot {
-  min-height: 44px;
+  height: 44px;
+  overflow: hidden;
+  visibility: hidden;
+}
+.googleSlot[data-ready] {
+  visibility: visible;
 }
 
 .examples,

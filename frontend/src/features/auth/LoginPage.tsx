@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { AuthError } from './authApi'
 import { useAuth } from './authContext'
-import { GOOGLE_CLIENT_ID, loadGoogleIdentity } from './googleIdentity'
+import { GOOGLE_CLIENT_ID, loadGoogleIdentity, waitForButtonFrame } from './googleIdentity'
 import { isInAppBrowser, safeNextPath, SESSION_EXPIRED, TEMPORARY_ERROR } from './session'
 import s from './auth.module.css'
 
@@ -133,7 +133,10 @@ function GoogleSignIn({ onCredential, busy }: { onCredential: (credential: strin
         id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: (r) => callback.current(r.credential), ux_mode: 'popup', auto_select: false, cancel_on_tap_outside: true, context: 'signin', itp_support: true })
         el.replaceChildren()
         id.renderButton(el, { type: 'standard', theme: 'outline', size: 'large', text: 'signin_with', shape: 'pill', logo_alignment: 'left', width: 320, locale: 'ko' })
-        setState('ready')
+        // 버튼 iframe 이 준비되면 보인다 (그 전의 임시 버튼은 CSP 때문에 크게 그려져서 숨김)
+        return waitForButtonFrame(el).then(() => {
+          if (alive) setState('ready')
+        })
       })
       .catch(() => {
         if (alive) setState('failed')
@@ -153,7 +156,7 @@ function GoogleSignIn({ onCredential, busy }: { onCredential: (credential: strin
   }
   return (
     <div className={s.google}>
-      <div ref={slot} className={s.googleSlot} aria-busy={busy || undefined} />
+      <div ref={slot} className={s.googleSlot} data-ready={state === 'ready' || undefined} aria-busy={busy || undefined} />
       {state === 'loading' && (
         <p className={s.small} role="status">
           Google 로그인 버튼을 불러오는 중입니다
