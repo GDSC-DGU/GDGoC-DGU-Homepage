@@ -21,6 +21,37 @@
 
 실행하려면 `gh`가 설치되고 로그인돼 있어야 합니다. bash 3.2(macOS)와 Git Bash에서 동작합니다.
 
+## `seed/rct-dev.mjs` — RCT 테스트 모집 데이터
+
+운영진용 모집 · 폼 · 평가 기준 API(RCT-006 ~ 013)가 생기기 전까지, 지원 흐름(RCT-001 · 002 · 003 · 005)을 확인할 가짜 회차를 넣고 지웁니다. Node 18 이상만 있으면 되고 설치할 패키지는 없습니다.
+
+| 명령 | 동작 |
+|---|---|
+| `seed` | `recruitments/rct_900`(진행 중, 오늘 기준 어제 ~ 14일 뒤)과 지원폼 · 평가 기준 버전 1을 만듭니다. 이미 있으면 멈추고, `--force`면 덮어씁니다 |
+| `clean` | 그 회차, 지원폼 · 평가 기준 · 중복 방지 키, 그 회차로 제출된 지원서를 모두 지웁니다 |
+
+옵션은 `--project <id>`, `--cohort <n>`(기본 900, 회차 ID `rct_<n>`), `--force`, `-h` / `--help`입니다.
+
+**로컬 에뮬레이터**
+
+```bash
+FIRESTORE_EMULATOR_HOST=localhost:8180 node scripts/seed/rct-dev.mjs seed
+```
+
+**dev (`dev-gdgoc-dgu-homepage`)**
+
+```bash
+gcloud auth login
+node scripts/seed/rct-dev.mjs seed --project dev-gdgoc-dgu-homepage
+# 테스트가 끝나면
+node scripts/seed/rct-dev.mjs clean --project dev-gdgoc-dgu-homepage
+```
+
+- 토큰은 `gcloud auth print-access-token`으로 얻습니다. gcloud가 없으면 GCP 콘솔의 Cloud Shell에서 실행하거나, `GOOGLE_OAUTH_ACCESS_TOKEN`에 토큰을 넣습니다. 계정에 dev Firestore 쓰기 권한이 있어야 합니다.
+- 운영 프로젝트(`gdgoc-dgu-homepage`)와 그 밖의 프로젝트에는 쓰지 않고 멈춥니다.
+- 테스트 회차는 지원 시작일이 가장 늦어 dev의 "현재 모집"(RCT-001)으로 보입니다. dev는 팀이 함께 쓰므로 테스트가 끝나면 `clean`을 실행합니다.
+- dev에서 지원서를 제출하면 Cloud Tasks를 거쳐 AI 채점까지 실제로 실행됩니다. 중복 확인 · 제출에는 dev Cloud Run에 `RECRUIT_KEY_HMAC_SECRET`이 설정돼 있어야 합니다(없으면 500).
+
 ## 지킬 것
 
 - 시드 데이터는 가짜 데이터만 씁니다. 실제 지원자·회원 정보(이름, 학번, 이메일)를 넣지 않습니다.
