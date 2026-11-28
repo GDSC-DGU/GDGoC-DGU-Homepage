@@ -9,7 +9,7 @@ import s from './teams.module.css'
  * 팀원 찾기 화면 조각: 분류 · 상태 · 파트 표시, 예시 안내, 쪽 번호, 팝업(본인 확인 · 확인).
  * 분류 색: 장소색과 같은 구글 4색을 글자 · 테두리에 쓸 때는 흰 바탕 4.5:1 이상으로 짙게 (tokens.css 의 --place-*-text).
  */
-const CATEGORY_TONE: Record<TeamsCategory, string> = {
+export const CATEGORY_TONE: Record<TeamsCategory, string> = {
   프로젝트: 'project',
   스터디: 'study',
   소모임: 'club',

@@ -6,6 +6,15 @@
 .page {
   padding-bottom: 0;
 }
+/*
+ * 오른쪽 빠른 메뉴(화면 오른쪽 30px + 75px 네모)가 옆 칸 · 조회수를 가리지 않게,
+ * 넓은 화면에서는 오른쪽 여백을 메뉴 너비 + 20px 이상으로 (2026-11-28)
+ */
+@media (min-width: 681px) {
+  .page {
+    --side-r: max(20px, 5vw, 125px, env(safe-area-inset-right, 0px));
+  }
+}
 .narrow {
   max-width: calc(880px + var(--side) + var(--side-r));
   padding-top: 48px;
@@ -178,11 +187,24 @@
   --story-bottom: 96px;
   scroll-margin-top: 96px;
 }
-.tabs {
+.tabBar {
   display: flex;
-  gap: 4px;
-  overflow-x: auto;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
   border-bottom: 1px solid var(--line);
+}
+.tabBar .switch {
+  flex: none;
+  margin-bottom: 2px;
+}
+.tabs {
+  position: relative;
+  display: flex;
+  flex: 1;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
   scrollbar-width: none;
 }
 .tab {
@@ -199,24 +221,83 @@
 .tab[aria-pressed='true'] {
   color: var(--ink-900);
 }
-.tab[aria-pressed='true']::after {
-  content: '';
+/* 고른 탭 밑줄: 탭마다 따로 그리지 않고 하나(.tabLine)가 고른 탭으로 미끄러져 간다. 너비 1px 을 scaleX 로 늘린다 */
+.tabLine {
   position: absolute;
-  inset: auto 8px -1px;
+  left: 0;
+  bottom: 0;
+  width: 1px;
   height: 2px;
   background: var(--ink-900);
+  transform-origin: left;
+  pointer-events: none;
 }
-.toolbar {
+.tabLine[data-ready] {
+  transition: transform 420ms var(--ease-out);
+}
+.controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px 24px;
-  padding: 20px 0 16px;
+  padding: 20px 0;
 }
 .count {
-  font: var(--t-ui);
-  color: var(--ink-900);
+  margin-bottom: 12px;
+  font: var(--t-meta);
+  color: var(--ink-700);
+}
+/* 글 수 숫자: 옛 숫자와 새 숫자를 한 칸에 겹쳐 두고 위 · 아래로 넘긴다 */
+.roll {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.roll > span {
+  grid-area: 1 / 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .roll[data-dir] .rollIn {
+    animation: rollInUp 360ms var(--ease-out) both;
+  }
+  .roll[data-dir] .rollOut {
+    animation: rollOutUp 360ms var(--ease-out) both;
+  }
+  .roll[data-dir='down'] .rollIn {
+    animation-name: rollInDown;
+  }
+  .roll[data-dir='down'] .rollOut {
+    animation-name: rollOutDown;
+  }
+}
+.rollOut {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rollOut {
+    visibility: visible;
+  }
+}
+@keyframes rollInUp {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes rollOutUp {
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes rollInDown {
+  from {
+    transform: translateY(-100%);
+  }
+}
+@keyframes rollOutDown {
+  to {
+    transform: translateY(100%);
+  }
 }
 .tools {
   display: flex;
@@ -295,14 +376,6 @@
   min-width: 0;
 }
 
-/* 거르기 줄: 모집 중만 보기 · 파트 */
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 20px;
-  padding-top: 20px;
-}
 .switch {
   position: relative;
   display: inline-flex;
@@ -410,6 +483,7 @@
   cursor: pointer;
 }
 .writeBtn {
+  flex: none;
   gap: 6px;
 }
 .writeBtn .icon {
@@ -424,9 +498,17 @@
   font: 500 13px/20px var(--font-num);
   color: var(--ink-500);
 }
+/*
+ * 마감 임박(3일 안): 먹색 면 + 흰 글자 작은 칸으로 한눈에 (2026-11-28).
+ * 주황은 '지금 기수' 에만 쓰는 색이라(DESIGN 4장) 쓰지 않았다.
+ */
 .deadline[data-soon] {
+  height: 22px;
+  padding: 0 7px;
+  border-radius: var(--r-tag);
+  background: var(--ink-900);
   font-weight: 700;
-  color: var(--ink-900);
+  color: var(--white);
 }
 /* 새 글: 글자 '새 글' 하나 (주황은 '지금 기수' 에만 쓴다: DESIGN 4장) */
 .newTag {
@@ -460,27 +542,109 @@
   opacity: 0.6;
 }
 .row {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 24px;
   align-items: center;
-  padding: 20px 4px;
+  padding: 22px 48px 22px 16px;
   border-bottom: 1px solid var(--line);
   color: inherit;
   text-decoration: none;
-  transition: background var(--dur-hover) var(--ease);
+  transition:
+    background var(--dur-hover) var(--ease),
+    transform var(--dur-lift) var(--ease-soft),
+    box-shadow var(--dur-lift) var(--ease-soft);
+}
+/* 분류 색 (제목 앞 네모와 같은 색): 왼쪽 세로줄에 쓴다 */
+.row[data-tone='project'] {
+  --tone: var(--place-projects);
+}
+.row[data-tone='study'] {
+  --tone: var(--place-community);
+}
+.row[data-tone='club'] {
+  --tone: var(--place-recruits);
+}
+.row[data-tone='contest'] {
+  --tone: var(--place-teams);
+}
+/* 왼쪽 세로줄 3px: 마우스를 올리면 아래에서 위로 차오른다 (scaleY) */
+.row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--tone, var(--ink-500));
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 320ms var(--ease-out);
+}
+/* 오른쪽 끝 화살표: 마우스를 올리면 왼쪽에서 밀려 나온다 */
+.rowArrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  fill: none;
+  stroke: var(--ink-900);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity var(--dur-short) var(--ease-out),
+    transform 320ms var(--ease-out);
 }
 @media (hover: hover) {
+  .row:hover::before,
+  .row:focus-visible::before {
+    transform: scaleY(1);
+  }
+  .row:hover .rowArrow,
+  .row:focus-visible .rowArrow {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* 글 묶음이 바뀌면 위에서부터 0.04초 간격으로 10px 아래에서 떠오른다. li 에 걸어 a 의 hover 떠오름과 겹치지 않게,
+ * backwards 로 끝난 뒤에는 transform 을 남기지 않는다 (남으면 줄마다 쌓임 맥락이 생겨 미리보기 카드가 아래 줄에 가려진다) */
+@media (prefers-reduced-motion: no-preference) {
+  .rowItem {
+    animation: rowIn 450ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+}
+@keyframes rowIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* 마우스를 올리면 옅은 면 + 2px 떠오름 (DESIGN 카드 hover 와 같은 값) */
+@media (hover: hover) {
   .row:hover {
+    z-index: 1;
     background: var(--subtle);
   }
-  .row:hover .rowTitle {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-decoration-thickness: 1px;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .row:hover {
+    transform: translateY(var(--lift));
+    box-shadow: var(--shadow-lift);
   }
 }
 .rowMain {
+  position: relative;
   display: grid;
   gap: 6px;
   min-width: 0;
@@ -489,35 +653,129 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 6px 8px;
+  margin-bottom: 2px;
 }
 .rowTitle {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
-  font: 700 17px/26px var(--font-kr);
-  letter-spacing: -0.01em;
+  font: 700 19px/28px var(--font-kr);
+  letter-spacing: -0.02em;
   color: var(--ink-900);
   overflow-wrap: anywhere;
 }
+/* 마감된 글: 제목 · 본문 · 작성자를 회색으로 (목록에서 한 단계 뒤로) */
 .row[data-closed] .rowTitle,
-.row[data-closed] .rowExcerpt {
+.row[data-closed] .rowName,
+.row[data-closed] .part {
   color: var(--ink-500);
 }
-.rowExcerpt {
+/*
+ * 제목 밑줄: 마우스를 올리면 왼쪽에서 오른쪽으로 그어진다 (scaleX, 움직임은 transform 만).
+ * 제목은 한 줄, 넘치면 '…'.
+ */
+.row:focus-visible {
+  z-index: 1;
+}
+.rowTitleText {
+  position: relative;
+  min-width: 0;
   overflow: hidden;
-  font: 400 14px/22px var(--font-kr);
-  color: var(--ink-700);
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.rowTitleText::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 360ms var(--ease-out);
+}
+/*
+ * 미리보기 카드: 평소엔 숨기고, 마우스를 0.25초 올려 두면 제목 아래로 살짝 떠오른다 (opacity + 4px).
+ * 아래 글 줄 위에 겹쳐 뜨므로 목록 높이는 그대로. 손가락 화면(hover 없음)에서는 뜨지 않는다.
+ */
+.rowPreview {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: calc(100% + 10px);
+  display: -webkit-box;
+  width: min(100%, 520px);
+  padding: 12px 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-control);
+  background: var(--paper);
+  box-shadow: var(--shadow-lift);
+  font: 400 14px/22px var(--font-kr);
+  color: var(--ink-700);
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition:
+    opacity var(--dur-short) var(--ease-out),
+    transform var(--dur-short) var(--ease-out);
+}
+@media (hover: hover) {
+  .row:hover .rowTitleText::after,
+  .row:focus-visible .rowTitleText::after {
+    transform: scaleX(1);
+  }
+  .row:hover .rowPreview,
+  .row:focus-visible .rowPreview {
+    opacity: 1;
+    transform: none;
+    transition-delay: 250ms;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rowTitleText::after,
+  .rowPreview,
+  .row::before,
+  .rowArrow,
+  .tabLine[data-ready] {
+    transition: none;
+  }
+  .rowPreview {
+    transform: none;
+  }
+}
+/* 검색 중: 본문에서 찾은 낱말이 보이게 미리보기를 카드 대신 제목 아래 한 줄로 늘 보여 준다 */
+.row[data-q] .rowPreview {
+  position: static;
+  display: block;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--ink-500);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 1;
+  transform: none;
+}
+@media (max-width: 767px) {
+  .row:not([data-q]) .rowPreview {
+    display: none;
+  }
 }
 .rowInfo {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 12px;
-  margin-top: 2px;
+  margin-top: 4px;
   font: var(--t-meta);
   color: var(--ink-500);
 }
@@ -533,8 +791,8 @@
   gap: 8px;
 }
 .rowName {
-  font: 600 14px/20px var(--font-kr);
-  color: var(--ink-900);
+  font: 500 14px/20px var(--font-kr);
+  color: var(--ink-700);
   white-space: nowrap;
 }
 .rowStats {
@@ -606,6 +864,7 @@
 }
 .sideLink {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   min-height: 44px;
@@ -638,6 +897,32 @@
   color: var(--ink-900);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* 마감 임박 막대: 글 줄 아래 2px. 처음 보일 때 왼쪽에서 차오른다 */
+.leftBar {
+  flex-basis: 100%;
+  height: 2px;
+  margin-top: -4px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: var(--line);
+}
+.leftBarFill {
+  display: block;
+  height: 100%;
+  background: var(--ink-900);
+  transform: scaleX(var(--ratio, 0));
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .leftBarFill {
+    animation: barIn 700ms var(--ease-out) both;
+  }
+}
+@keyframes barIn {
+  from {
+    transform: scaleX(0);
+  }
 }
 .sideCount {
   flex: none;
@@ -710,7 +995,7 @@
   }
 }
 @media (max-width: 1023px) {
-  .toolbar {
+  .controls {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -736,10 +1021,24 @@
   .select {
     width: 100%;
   }
+  .tabBar {
+    flex-wrap: wrap;
+    border-bottom: 0;
+  }
+  .tabs {
+    flex-basis: 100%;
+    border-bottom: 1px solid var(--line);
+  }
+  .tabBar .switch {
+    margin-top: 12px;
+  }
   .row {
     grid-template-columns: minmax(0, 1fr);
     gap: 10px;
-    padding: 16px 0;
+    padding: 16px 4px 16px 12px;
+  }
+  .rowArrow {
+    display: none;
   }
   .rowSide {
     display: flex;
@@ -748,8 +1047,8 @@
     min-width: 0;
   }
   .rowTitle {
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 17px;
+    line-height: 26px;
   }
   .aside {
     grid-template-columns: minmax(0, 1fr);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { PLACE_BY_ID } from '@/config/places'
 import { CONTENT_UPDATED_AT } from '@/content'
@@ -6,10 +6,11 @@ import { DetourLink } from '@/features/pages/community/Signage'
 import { dateLabel } from '@/features/pages/format'
 import { PageHero } from '@/features/pagehero/PageHero'
 import { useToday } from '@/hooks/useToday'
+import { daysUntil } from '@/lib/date'
 import { authorLabel, isNew, listSearch, parseListParams, periodLabel, timeAgo } from './data/rules'
 import { TEAMS_SAMPLE, TEAMS_SAMPLE_DATA, useTeamsList, useTeamsSummary } from './data/teamsRepo'
 import { SORTS, TEAMS_CATEGORIES, TEAM_PARTS, type ListQuery, type PostBrief, type TeamPost } from './data/types'
-import { Avatar, CategoryTag, DeadlineTag, NewTag, Pagination, PartTags, SampleNotice, SearchIcon, StatusTag } from './parts'
+import { Avatar, CATEGORY_TONE, CategoryTag, DeadlineTag, NewTag, Pagination, PartTags, SampleNotice, SearchIcon, StatusTag } from './parts'
 import s from './teams.module.css'
 import { usePageTitle } from '@/hooks/usePageTitle'
 
@@ -31,7 +32,8 @@ const LEAD = (
 /**
  * 팀원 찾기 목록 (/teams, P-TEM-001). 참고: 인프런 스터디 · 링커리어 · 홀라 같은 모집 게시판.
  * 건물 머리 → [게시판 | 옆 칸] 두 칸.
- * - 게시판: 분류 탭 → 거르기 줄(모집 중만 · 파트 · 정렬 · 검색 · 글쓰기) → 글 줄(두 줄: 표시 · 제목 · 본문 첫 줄 · 모집 정보 | 작성자 · 시각 · 조회 · 댓글) → 쪽 번호
+ * - 글쓰기: 제목 오른쪽 버튼
+ * - 게시판: [분류 탭 | 모집 중만] → [파트 | 정렬 · 검색] → 글 수 → 글 줄(두 줄: 표시 · 제목 · 본문 첫 줄 · 모집 정보 | 작성자 · 시각 · 조회 · 댓글) → 쪽 번호
  * - 옆 칸(넓은 화면): 마감 임박 · 이번 주 많이 본 글
  * 거르기 · 검색 · 정렬 · 쪽은 주소(?cat=&status=&part=&sort=&q=&page=)에 둔다: 뒤로 가기 · 목록으로 돌아올 때 그대로다.
  */
@@ -46,6 +48,30 @@ export function TeamsListPage() {
   const location = useLocation()
   const flash = (location.state as FromList | null)?.flash
   const boardRef = useRef<HTMLElement>(null)
+  const tabsRef = useRef<HTMLDivElement>(null)
+  const tabLineRef = useRef<HTMLSpanElement>(null)
+
+  /**
+   * 분류 탭 밑줄: 고른 탭 아래로 미끄러져 간다 (translateX + scaleX, 2026-11-28).
+   * 처음 자리 잡을 때는 움직이지 않고, 그 뒤부터 data-ready 로 움직임을 켠다. 탭 너비가 바뀌면(글꼴 · 화면 폭) 다시 잰다.
+   */
+  useLayoutEffect(() => {
+    const wrap = tabsRef.current
+    const line = tabLineRef.current
+    if (!wrap || !line) return
+    const place = () => {
+      const on = wrap.querySelector<HTMLElement>('[aria-pressed="true"]')
+      if (!on) return
+      line.style.transform = `translateX(${on.offsetLeft + 8}px) scaleX(${Math.max(on.offsetWidth - 16, 0)})`
+      if (!line.dataset.ready) requestAnimationFrame(() => (line.dataset.ready = 'true'))
+    }
+    place()
+    if (typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(place)
+    ro.observe(wrap)
+    wrap.querySelectorAll('button').forEach((b) => ro.observe(b))
+    return () => ro.disconnect()
+  }, [query.category])
 
   /** 거르기를 바꾸면 1쪽으로 (검색어는 유지, P-TEM-001 3) */
   const update = (patch: Partial<ListQuery>) => {
@@ -80,7 +106,19 @@ export function TeamsListPage() {
 
   return (
     <div className={`container ${s.page}`}>
-      <PageHero place="teams" title={PLACE_BY_ID.teams.label} lead={LEAD} meta={meta} banner={{ title: '스터디, 프로젝트, 공모전 팀원을 여기서 구해 보세요', to: '/teams/write' }} />
+      {/* 검정 띠(글쓰기로 가는 카드)는 소개 문장과 겹쳐 뺐고, 글쓰기는 제목 오른쪽 버튼 하나로 (2026-11-28) */}
+      <PageHero
+        place="teams"
+        title={PLACE_BY_ID.teams.label}
+        lead={LEAD}
+        meta={meta}
+        action={
+          <Link to="/teams/write" className={`btn-primary ${s.writeBtn}`}>
+            <PenIcon />
+            글쓰기
+          </Link>
+        }
+      />
 
       <section id="board" ref={boardRef} className={`story paper ${s.board}`} aria-labelledby="board-title">
         <h2 id="board-title" className="visually-hidden">
@@ -95,22 +133,25 @@ export function TeamsListPage() {
 
         <div className={s.boardGrid}>
           <div className={s.boardMain}>
-            {/* 분류 탭 */}
-            <div className={s.tabs} role="group" aria-label="분류">
-              {[undefined, ...TEAMS_CATEGORIES].map((c) => (
-                <button key={c ?? 'all'} type="button" className={s.tab} aria-pressed={query.category === c} onClick={() => update({ category: c })}>
-                  {c ?? '전체'}
-                </button>
-              ))}
-            </div>
-
-            {/* 거르기 줄 */}
-            <div className={s.filters}>
+            {/* 1줄: 분류 탭 | 모집 중만 보기 */}
+            <div className={s.tabBar}>
+              <div ref={tabsRef} className={s.tabs} role="group" aria-label="분류">
+                {[undefined, ...TEAMS_CATEGORIES].map((c) => (
+                  <button key={c ?? 'all'} type="button" className={s.tab} aria-pressed={query.category === c} onClick={() => update({ category: c })}>
+                    {c ?? '전체'}
+                  </button>
+                ))}
+                <span ref={tabLineRef} className={s.tabLine} aria-hidden="true" />
+              </div>
               <label className={s.switch}>
                 <input type="checkbox" role="switch" checked={query.status === '모집중'} onChange={(e) => update({ status: e.target.checked ? '모집중' : undefined })} />
                 <span className={s.switchTrack} aria-hidden="true" />
                 모집 중만 보기
               </label>
+            </div>
+
+            {/* 2줄: 파트 | 정렬 · 검색 */}
+            <div className={s.controls}>
               <div className={s.partFilter} role="group" aria-label="구하는 파트">
                 {[undefined, ...TEAM_PARTS.map((p) => p.id)].map((id) => (
                   <button key={id ?? 'all'} type="button" className={s.partBtn} aria-pressed={query.part === id} onClick={() => update({ part: id })} lang={id ? 'en' : undefined}>
@@ -118,21 +159,6 @@ export function TeamsListPage() {
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className={s.toolbar}>
-              <p className={s.count} aria-live="polite">
-                {filtered ? '찾은 글' : '전체'} <span className="num">{data?.total ?? 0}</span>개
-                {query.q && (
-                  <>
-                    {' '}
-                    ‘{query.q}’ 검색{' '}
-                    <button type="button" className={s.clearQ} onClick={() => update({ q: undefined })}>
-                      지우기
-                    </button>
-                  </>
-                )}
-              </p>
               <div className={s.tools}>
                 <label className={s.selectWrap}>
                   <span className="visually-hidden">정렬</span>
@@ -150,12 +176,21 @@ export function TeamsListPage() {
                     <SearchIcon />
                   </button>
                 </form>
-                <Link to="/teams/write" className={`btn-primary btn-sm ${s.writeBtn}`}>
-                  <PenIcon />
-                  글쓰기
-                </Link>
               </div>
             </div>
+
+            <p className={s.count} aria-live="polite">
+              {filtered ? '찾은 글' : '전체'} <RollingNumber value={data?.total ?? 0} />개
+              {query.q && (
+                <>
+                  {' '}
+                  ‘{query.q}’ 검색{' '}
+                  <button type="button" className={s.clearQ} onClick={() => update({ q: undefined })}>
+                    지우기
+                  </button>
+                </>
+              )}
+            </p>
 
             {list.isPending ? (
               <p className={s.state}>글을 불러오는 중입니다.</p>
@@ -183,9 +218,10 @@ export function TeamsListPage() {
                 </div>
               )
             ) : data ? (
-              <ul className={s.rows} aria-busy={list.isFetching || undefined}>
-                {data.items.map((p) => (
-                  <PostRow key={p.id} post={p} from={location.search} today={today} now={now} q={query.q} />
+              // 글 묶음이 바뀌면(처음 · 거르기 · 쪽) ul 을 새로 그려 글이 위에서부터 차례로 떠오르게 한다
+              <ul key={`${data.page}:${data.items.map((p) => p.id).join(',')}`} className={s.rows} aria-busy={list.isFetching || undefined}>
+                {data.items.map((p, i) => (
+                  <PostRow key={p.id} index={i} post={p} from={location.search} today={today} now={now} q={query.q} />
                 ))}
               </ul>
             ) : null}
@@ -204,7 +240,14 @@ export function TeamsListPage() {
 
           {/* 옆 칸: 마감 임박 · 많이 본 글 */}
           <aside className={s.aside} aria-label="게시판 요약">
-            <SideBox title="마감 임박" items={sum?.closingSoon} empty="곧 마감되는 글이 없습니다." from={location.search} render={(p) => <DeadlineTag endDate={p.endDate} status={p.status} today={today} />} />
+            <SideBox
+              title="마감 임박"
+              items={sum?.closingSoon}
+              empty="곧 마감되는 글이 없습니다."
+              from={location.search}
+              render={(p) => <DeadlineTag endDate={p.endDate} status={p.status} today={today} />}
+              below={(p) => <LeftBar days={daysUntil(p.endDate, today)} />}
+            />
             <SideBox title="이번 주 많이 본 글" items={sum?.popular} empty="아직 글이 없습니다." from={location.search} ranked render={(p) => <span className={`${s.sideCount} num`}>{p.views}</span>} />
             <div className={s.sideNote}>
               <p className={s.sideNoteTitle}>처음 글을 쓴다면</p>
@@ -217,12 +260,23 @@ export function TeamsListPage() {
   )
 }
 
-/** 글 한 줄: [표시 · 제목 · 본문 첫 줄 · 모집 정보] | [작성자 · 시각 · 조회 · 댓글]. 줄 전체가 링크 */
-function PostRow({ post: p, from, today, now, q }: { post: TeamPost; from: string; today: string; now: number; q?: string }) {
-  const firstLine = p.content.split('\n').find((l) => l.trim()) ?? ''
+/** 미리보기 글: 본문 앞부분 120자 (줄바꿈은 띄어쓰기로) */
+const PREVIEW_MAX = 120
+function previewText(content: string) {
+  const flat = content.replace(/\s+/g, ' ').trim()
+  return flat.length > PREVIEW_MAX ? `${flat.slice(0, PREVIEW_MAX).trimEnd()}…` : flat
+}
+
+/**
+ * 글 한 줄: [표시 · 제목 · 파트 · 인원 · 기간] | [작성자 · 시각 · 조회 · 댓글]. 줄 전체가 링크.
+ * 본문 첫 줄은 목록에서 빼고(침하하처럼 촘촘하게, 2026-11-28), 마우스를 올리면 제목 아래에 미리보기 카드로 떠오른다.
+ * 검색 중에는 본문에서 찾은 낱말이 보이도록 미리보기를 늘 보여 준다.
+ */
+function PostRow({ post: p, index, from, today, now, q }: { post: TeamPost; index: number; from: string; today: string; now: number; q?: string }) {
+  const preview = previewText(p.content)
   return (
-    <li>
-      <Link to={`/teams/${p.id}`} state={{ from } satisfies FromList} className={s.row} data-closed={p.status === '마감' || undefined}>
+    <li className={s.rowItem} style={{ '--i': index } as CSSProperties}>
+      <Link to={`/teams/${p.id}`} state={{ from } satisfies FromList} className={s.row} data-tone={CATEGORY_TONE[p.category]} data-closed={p.status === '마감' || undefined} data-q={q ? true : undefined}>
         <span className={s.rowMain}>
           <span className={s.rowTags}>
             <CategoryTag category={p.category} />
@@ -231,12 +285,16 @@ function PostRow({ post: p, from, today, now, q }: { post: TeamPost; from: strin
             {isNew(p.createdAt, now) && <NewTag />}
           </span>
           <span className={s.rowTitle}>
-            <Highlight text={p.title} q={q} />
+            <span className={s.rowTitleText}>
+              <Highlight text={p.title} q={q} />
+            </span>
             {p.attachments.length > 0 && <ClipIcon />}
           </span>
-          <span className={s.rowExcerpt}>
-            <Highlight text={firstLine} q={q} />
-          </span>
+          {preview && (
+            <span className={s.rowPreview}>
+              <Highlight text={preview} q={q} />
+            </span>
+          )}
           <span className={s.rowInfo}>
             <PartTags parts={p.parts} />
             {p.headcount && (
@@ -262,12 +320,13 @@ function PostRow({ post: p, from, today, now, q }: { post: TeamPost; from: strin
             </span>
           </span>
         </span>
+        <ArrowIcon />
       </Link>
     </li>
   )
 }
 
-function SideBox({ title, items, empty, from, render, ranked = false }: { title: string; items?: PostBrief[]; empty: string; from: string; render: (p: PostBrief) => ReactNode; ranked?: boolean }) {
+function SideBox({ title, items, empty, from, render, below, ranked = false }: { title: string; items?: PostBrief[]; empty: string; from: string; render: (p: PostBrief) => ReactNode; below?: (p: PostBrief) => ReactNode; ranked?: boolean }) {
   return (
     <section className={s.sideBox} aria-label={title}>
       <h3 className={s.sideTitle}>{title}</h3>
@@ -283,12 +342,47 @@ function SideBox({ title, items, empty, from, render, ranked = false }: { title:
                 {ranked && <span className={`${s.rank} num`}>{i + 1}</span>}
                 <span className={s.sideText}>{p.title}</span>
                 {render(p)}
+                {below?.(p)}
               </Link>
             </li>
           ))}
         </ol>
       )}
     </section>
+  )
+}
+
+/**
+ * 마감 임박 막대: 마감 3일 전부터 남은 날만큼 차 있다가 줄어든다 (D-3 가득 → 오늘 마감 한 칸).
+ * 목록 요약(PostBrief)에는 시작일이 없어서 '모집 기간 전체'가 아니라 마지막 3일을 기준으로 그린다. 처음 보일 때 왼쪽에서 차오른다.
+ */
+function LeftBar({ days }: { days: number }) {
+  const ratio = Math.min(Math.max((days + 1) / 4, 0), 1)
+  return (
+    <span className={s.leftBar} aria-hidden="true">
+      <span className={s.leftBarFill} style={{ '--ratio': ratio } as CSSProperties} />
+    </span>
+  )
+}
+
+/**
+ * 글 수 숫자: 바뀌면 옛 숫자는 밀려나고 새 숫자가 들어온다 (늘면 위로, 줄면 아래로).
+ * 직전 값은 그리는 중에 비교해 기억한다 (effect 안 setState 없이, React 문서 '이전 값 저장' 방식).
+ */
+function RollingNumber({ value }: { value: number }) {
+  const [roll, setRoll] = useState({ value, prev: null as number | null, dir: null as 'up' | 'down' | null, n: 0 })
+  if (roll.value !== value) setRoll({ value, prev: roll.value, dir: value > roll.value ? 'up' : 'down', n: roll.n + 1 })
+  return (
+    <span className={`${s.roll} num`} data-dir={roll.dir ?? undefined}>
+      {roll.prev !== null && (
+        <span key={`o${roll.n}`} className={s.rollOut} aria-hidden="true">
+          {roll.prev}
+        </span>
+      )}
+      <span key={`i${roll.n}`} className={s.rollIn}>
+        {roll.value}
+      </span>
+    </span>
   )
 }
 
@@ -332,6 +426,13 @@ function ChatIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className={s.statIcon}>
       <path d="M4 5.5h16v10H9l-5 4v-14z" />
+    </svg>
+  )
+}
+function ArrowIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={s.rowArrow}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   )
 }

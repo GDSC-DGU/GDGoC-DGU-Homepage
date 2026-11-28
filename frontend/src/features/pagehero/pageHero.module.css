@@ -11,6 +11,17 @@
   color: var(--ink-900);
   word-break: keep-all;
 }
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin-top: 72px;
+}
+.titleRow .title {
+  margin-top: 0;
+}
 .lead {
   max-width: 44em;
   margin-top: 16px;
@@ -81,6 +92,9 @@
   .title {
     margin-top: 40px;
     font-size: 30px;
+  }
+  .titleRow {
+    margin-top: 40px;
   }
   .banner {
     padding: 20px 56px 20px 20px;

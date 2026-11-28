@@ -16,11 +16,19 @@ export interface HeroBanner {
  * 목록 페이지 머리 (dcamp.kr 'Story' · 'Startup' 을 따름, 4기 Organizer 2026-11-06: 큰 사진은 부담스럽다).
  * 지금 위치(⌂ › 아카이브) → 왼쪽 정렬 큰 제목(40) → 한 줄 소개 · (행동) → (검정 띠 카드 하나).
  */
-export function PageHero({ place, title, lead, meta, banner }: { place: PlaceId; title: ReactNode; lead?: ReactNode; meta?: ReactNode; banner?: HeroBanner }) {
+/** action: 제목 오른쪽 끝에 두는 버튼 하나 (예: 팀원 찾기 '글쓰기'). 좁은 화면은 제목 아래로 내려간다 */
+export function PageHero({ place, title, lead, meta, banner, action }: { place: PlaceId; title: ReactNode; lead?: ReactNode; meta?: ReactNode; banner?: HeroBanner; action?: ReactNode }) {
   return (
     <header className={s.hero}>
       <Crumbs trail={[PLACE_BY_ID[place].label]} />
-      <h1 className={s.title}>{title}</h1>
+      {action ? (
+        <div className={s.titleRow}>
+          <h1 className={s.title}>{title}</h1>
+          {action}
+        </div>
+      ) : (
+        <h1 className={s.title}>{title}</h1>
+      )}
       {lead && <p className={s.lead}>{lead}</p>}
       {meta && <div className={s.meta}>{meta}</div>}
       {banner && (
