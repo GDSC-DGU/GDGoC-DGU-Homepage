@@ -38,10 +38,35 @@
     transform 0.6s var(--ease-soft),
     border-color 0.6s var(--ease-soft);
 }
-/* 마우스를 올리면: 2px 떠오르고 테두리가 은은한 주황, 아이콘 바깥 점선 원이 천천히 돈다 */
+/*
+ * 마우스를 올리면 (2026-11-28 더 크게): 카드가 8px 떠오르고 테두리가 주황, 나머지 두 카드는 옅어지며 살짝 작아진다.
+ * 아이콘은 1.25배로 커지며 튀어 오르고(스프링), 바깥 원이 퍼져 나가고, 그림 속 움직임(비행기 · 불꽃 · 깃발)이 빨라진다. 이름도 주황.
+ */
+.item {
+  transition:
+    transform 0.6s var(--ease-soft),
+    border-color 0.6s var(--ease-soft),
+    opacity 0.6s var(--ease-soft);
+}
 .item:hover {
-  transform: translateY(var(--lift));
-  border-color: var(--brand-a45);
+  transform: translateY(-8px);
+  border-color: var(--brand);
+}
+.list:has(.item:hover) .item:not(:hover) {
+  opacity: 0.45;
+  transform: scale(0.97);
+}
+.icon {
+  transition: transform 0.7s var(--ease-spring);
+}
+.item:hover .icon {
+  transform: translateY(-8px) scale(1.25);
+}
+.name {
+  transition: color 0.4s var(--ease-out);
+}
+.item:hover .name {
+  color: var(--brand);
 }
 .no {
   margin-top: 20px;
@@ -78,6 +103,11 @@
 .ring {
   stroke: var(--band-line);
   stroke-width: 1;
+  transform-origin: 50% 50%;
+  transition: stroke 0.6s var(--ease-soft);
+}
+.item:hover .ring {
+  stroke: var(--brand);
 }
 .ringInner {
   stroke: var(--band-line);
@@ -108,7 +138,25 @@
 /* ── 움직임: transform · opacity 만, 작게 · 느리게. 동작 줄이기면 멈춘 그림 ── */
 @media (prefers-reduced-motion: no-preference) {
   .item:hover .ringInner {
-    animation: spin 12s linear infinite;
+    animation: spin 4s linear infinite;
+  }
+  .item:hover .ring {
+    animation: ripple 1.6s var(--ease-out) infinite;
+  }
+  .item:hover .plane {
+    animation-duration: 1.4s;
+  }
+  .item:hover .flame {
+    animation-duration: 0.8s;
+  }
+  .item:hover .flameInner {
+    animation-duration: 0.6s;
+  }
+  .item:hover .flag {
+    animation-duration: 1s;
+  }
+  .item:hover .spark {
+    animation-duration: 1s;
   }
   .plane {
     animation: drift 4.2s var(--ease-in-out) infinite;
@@ -139,6 +187,17 @@
   }
   .step {
     animation: blink 2.6s var(--ease-in-out) infinite;
+  }
+}
+/* 바깥 원이 퍼지며 사라진다 */
+@keyframes ripple {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.25);
   }
 }
 @keyframes spin {
@@ -202,6 +261,28 @@
   }
   50% {
     transform: scaleX(0.9) skewY(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item,
+  .icon {
+    transition: none;
+  }
+  .item:hover,
+  .item:hover .icon,
+  .list:has(.item:hover) .item:not(:hover) {
+    transform: none;
+  }
+}
+/* 손가락 화면은 누를 때 '떠오름'이 남아 어색하므로 옅어짐 · 커짐을 쓰지 않는다 */
+@media (hover: none) {
+  .list:has(.item:hover) .item:not(:hover) {
+    opacity: 1;
+    transform: none;
+  }
+  .item:hover .icon {
+    transform: none;
   }
 }
 

@@ -1,6 +1,8 @@
+import { useRef } from 'react'
 import { FAQS, PUBLIC_PROJECTS } from '@/content'
 import type { Project } from '@/domain/types'
 import { IconRow, projectIcon } from '@/features/common'
+import { useStaggerReveal } from '@/hooks/useStaggerReveal'
 import type { Fact } from './eligibility'
 import { PARTS, partExamples } from './parts'
 import k from './recruit.module.css'
@@ -19,10 +21,13 @@ const iconOf = (p: Project) => (p.cover?.kind === 'logo' ? projectIcon(p) : null
  * 폰은 한 칸씩.
  */
 export function Parts() {
+  // 네 판이 화면에 들어올 때 차례로 떠오른다 (2026-11-28)
+  const listRef = useRef<HTMLUListElement>(null)
+  useStaggerReveal(listRef)
   if (!faq('parts')) return null
   return (
     <>
-      <ul className={k.parts} aria-label="파트">
+      <ul ref={listRef} className={k.parts} aria-label="파트">
         {PARTS.map((part) => {
           const ex = EXAMPLES[part.id]
           const icons = ex ? ex.shown.map(iconOf) : []

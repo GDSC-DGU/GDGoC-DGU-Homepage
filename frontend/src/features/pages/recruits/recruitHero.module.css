@@ -122,6 +122,58 @@
   min-width: 168px;
 }
 
+/*
+ * 글자 물결 (2026-11-28): 마우스가 닿은 글자는 10px 올라가며 주황, 바로 옆 글자는 5px, 그 옆은 2px.
+ * 기수('5기')는 늘 주황 (주황 = 지금 기수, DESIGN 4장). 손가락 화면 · 동작 줄이기면 움직이지 않는다.
+ */
+.word {
+  white-space: nowrap;
+}
+.char {
+  display: inline-block;
+  transition:
+    transform 520ms var(--ease-spring),
+    color 300ms var(--ease-out);
+}
+.char[data-accent] {
+  color: var(--brand);
+}
+@media (hover: hover) {
+  .char:hover {
+    color: var(--brand);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .char:hover {
+    transform: translateY(-10px);
+  }
+  .char:hover + .char,
+  .char:has(+ .char:hover) {
+    transform: translateY(-5px);
+  }
+  .char:hover + .char + .char,
+  .char:has(+ .char + .char:hover) {
+    transform: translateY(-2px);
+  }
+}
+/* 첫 화면 등장: 줄(.line)과 소개 · 상태 · 버튼(.rise)이 --d 만큼 늦게 24px 아래에서 떠오른다. backwards 라 끝난 뒤 transform 이 남지 않는다 */
+.line {
+  display: block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .line,
+  .rise {
+    animation: heroRise 800ms var(--ease-out) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+}
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
 @media (max-width: 1023px) {
   .title {
     font-size: 56px;

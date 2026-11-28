@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+import { useStaggerReveal } from '@/hooks/useStaggerReveal'
 import k from './values.module.css'
 
 /**
@@ -93,6 +95,9 @@ function ValueIcon({ id }: { id: Value['id'] }) {
 }
 
 export function Values({ generation, name }: { generation: number; name: string }) {
+  // 세 칸이 화면에 들어올 때 차례로 떠오른다 (2026-11-28)
+  const listRef = useRef<HTMLUListElement>(null)
+  useStaggerReveal(listRef)
   return (
     <section className={`on-dark ${k.section}`} data-band="dark" aria-labelledby="values-title">
       <div className={`container ${k.inner}`}>
@@ -101,7 +106,7 @@ export function Values({ generation, name }: { generation: number; name: string 
           <br />
           함께 성장하고 싶은 사람이에요
         </h2>
-        <ul className={k.list}>
+        <ul ref={listRef} className={k.list}>
           {VALUES.map((v, i) => (
             <li key={v.id} className={k.item}>
               <ValueIcon id={v.id} />

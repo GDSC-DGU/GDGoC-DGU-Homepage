@@ -50,8 +50,37 @@
   transform: translateY(var(--lift));
   box-shadow: var(--shadow-lift);
 }
+/* accent (지원하기): 왼쪽 4px 지금 기수 색 줄이 아래에서 차오르고, 선 그림이 살짝 들리며 기운다 */
+.cards[data-accent] .card {
+  overflow: hidden;
+}
+.cards[data-accent] .card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--gen);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.6s var(--ease-soft);
+}
+.cards[data-accent] .icon {
+  transition: transform 0.6s var(--ease-soft);
+}
+@media (hover: hover) {
+  .cards[data-accent] .card:hover::before {
+    transform: scaleY(1);
+  }
+  .cards[data-accent] .card:hover .icon {
+    transform: translateY(-6px) rotate(-6deg);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .card {
+  .card,
+  .cards[data-accent] .card::before,
+  .cards[data-accent] .icon {
     transition: none;
   }
 }

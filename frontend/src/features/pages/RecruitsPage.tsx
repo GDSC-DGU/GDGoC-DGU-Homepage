@@ -11,9 +11,11 @@ import { Process, type ProcessStep } from '@/features/dcamp/Process'
 import { InfoCards, type InfoCard } from '@/features/dcamp/ProgramHero'
 import { StickyCta } from '@/features/dcamp/StickyCta'
 import { useToday } from '@/hooks/useToday'
+import { daysUntil } from '@/lib/date'
 import { useHashScroll } from './community/useHashScroll'
 import { Section, StateLine } from './PageParts'
 import { RecruitHero } from './recruits/RecruitHero'
+import { DaysLeft } from './recruits/DaysLeft'
 import { DevSwitch } from './recruits/DevSwitch'
 import { Values } from './recruits/Values'
 import { applyView, readPreview, type Preview } from './recruits/view'
@@ -136,18 +138,27 @@ export function RecruitsPage() {
     { id: 'how', icon: 'doc', title: '지원 방법', value: faqA('how-to-apply') ?? '모집 공지에서 알려 드립니다.' },
   ]
 
-  // 첫 화면 상태 한 줄: '5기 모집 중 · 03.10 마감 · D-5' / '5기 모집은 아직 열리지 않았습니다'
+  // 남은 일수 (2026-11-28: 'D-5' 대신 '마감까지 5일', 처음 보일 때 기간 전체 일수에서 줄어든다)
+  const daysLeft =
+    st.state === 'open' && st.deadline
+      ? { days: daysUntil(st.deadline, today), from: st.opensAt ? daysUntil(st.deadline, st.opensAt) : daysUntil(st.deadline, today) + 7, what: '마감까지' }
+      : st.state === 'soon' && st.opensAt
+        ? { days: daysUntil(st.opensAt, today), from: daysUntil(st.opensAt, today) + 7, what: '열리기까지' }
+        : null
+  // 첫 화면 상태 한 줄: '5기 모집 중 · 03.10 마감 · 마감까지 5일' / '5기 모집은 아직 열리지 않았습니다'
   const heroStatus =
     preview === 'open' ? (
-      `${st.generation}기 모집 중 (개발 화면 예시)`
+      <>
+        {st.generation}기 모집 중 (개발 화면 예시) · <DaysLeft days={5} from={14} what="마감까지" />
+      </>
     ) : (
       <>
         {view.title}
         {view.titleSub && ` · ${view.titleSub}`}
-        {view.dday && (
+        {daysLeft && (
           <>
             {' · '}
-            <span className="num">{view.dday.label}</span>
+            <DaysLeft {...daysLeft} />
           </>
         )}
       </>
@@ -163,7 +174,8 @@ export function RecruitsPage() {
     <>
       <RecruitHero
         trail={[PLACE_BY_ID.recruits.label]}
-        title={`같이 만들고 배울 ${st.generation}기를 찾습니다`}
+        title={['같이 만들고 배울', `${st.generation}기를 찾습니다`]}
+        accent={`${st.generation}기`}
         intro={['GDGoC DGU는 동국대학교 개발자 커뮤니티입니다.', '매주 화요일 파트별로 모이고, 한 학기 동안 팀을 짜서 서비스를 만듭니다.']}
         status={heroStatus}
         action={
@@ -186,7 +198,7 @@ export function RecruitsPage() {
           <h2 id="guide-title" className={r.guideTitle}>
             지원 안내
           </h2>
-          <InfoCards cards={cards} headingLevel={3} />
+          <InfoCards cards={cards} headingLevel={3} accent reveal />
         </div>
       </section>
 
@@ -204,6 +216,7 @@ export function RecruitsPage() {
 
       {STEPS.length > 0 && (
         <Process
+          reveal
           title="Process"
           steps={STEPS}
           note={`${LAST?.generation}기 모집 기준입니다. ${st.generation}기 일정은 정해지면 인스타그램 ${SITE.links.instagramHandle}에 공지합니다.`}
@@ -221,6 +234,7 @@ export function RecruitsPage() {
       </div>
 
       <StickyCta
+        hideOver="[data-recruit-hero]"
         label={
           <>
             {SITE.shortName} <span className="dark">{st.generation}기</span>

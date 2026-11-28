@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
+import { useStaggerReveal } from '@/hooks/useStaggerReveal'
 import { Crumbs } from './Crumbs'
 import s from './programHero.module.css'
 
@@ -53,11 +54,16 @@ export function ProgramHero({
   )
 }
 
-/** 따뜻한 회색 정보 카드 (제목 · 값 · • 메모, 오른쪽 아래 선 그림). 머리 밖에서도 쓴다 (지원하기: 지원서 아래 '지원 안내') */
-export function InfoCards({ cards, headingLevel = 2 }: { cards: readonly InfoCard[]; headingLevel?: 2 | 3 }) {
+/**
+ * 따뜻한 회색 정보 카드 (제목 · 값 · • 메모, 오른쪽 아래 선 그림). 머리 밖에서도 쓴다 (지원하기: '지원 안내').
+ * accent: 마우스를 올리면 왼쪽에 지금 기수 색 세로줄이 차오르고 선 그림이 살짝 들린다. reveal: 화면에 들어올 때 차례로 떠오른다 (지원하기, 2026-11-28)
+ */
+export function InfoCards({ cards, headingLevel = 2, accent = false, reveal = false }: { cards: readonly InfoCard[]; headingLevel?: 2 | 3; accent?: boolean; reveal?: boolean }) {
   const H = headingLevel === 3 ? 'h3' : 'h2'
+  const listRef = useRef<HTMLUListElement>(null)
+  useStaggerReveal(listRef)
   return (
-        <ul className={s.cards} data-count={cards.length}>
+        <ul ref={reveal ? listRef : undefined} className={s.cards} data-count={cards.length} data-accent={accent || undefined}>
           {cards.map((c) => (
             <li key={c.id} className={s.card}>
               <H className={s.cardTitle}>{c.title}</H>

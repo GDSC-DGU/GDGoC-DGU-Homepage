@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useStaggerReveal } from '@/hooks/useStaggerReveal'
 import s from './process.module.css'
 
 export interface ProcessStep {
@@ -13,10 +14,13 @@ export interface ProcessStep {
  * 2026-11-12: 마우스를 올린 단계까지 잇는 선이 주황으로 차오르고(scaleX), 그 단계 번호가 살짝 커지며, 뒤 단계는 옅어진다.
  * 마우스가 없는 화면(폰)에서는 섹션이 보일 때 선이 01 → 04 로 한 번 차오른다. 움직임은 transform · opacity 만, 동작 줄이기면 바로 채운다.
  */
-export function Process({ title, steps, note }: { title: string; steps: readonly ProcessStep[]; note?: ReactNode }) {
+export function Process({ title, steps, note, reveal = false }: { title: string; steps: readonly ProcessStep[]; note?: ReactNode; reveal?: boolean }) {
   const [active, setActive] = useState<number | null>(null)
   const [seen, setSeen] = useState(false)
   const ref = useRef<HTMLElement>(null)
+  // reveal: 단계가 화면에 들어올 때 01 → 04 로 차례로 떠오른다 (지원하기, 2026-11-28)
+  const listRef = useRef<HTMLOListElement>(null)
+  useStaggerReveal(listRef)
 
   // 마우스가 없는 화면: 보일 때 한 번 차오른다
   useEffect(() => {
@@ -42,7 +46,7 @@ export function Process({ title, steps, note }: { title: string; steps: readonly
         <h2 id="process-title" className={s.title} lang="en">
           {title}
         </h2>
-        <ol className={s.steps} data-hovering={active !== null || undefined} data-seen={seen || undefined} onMouseLeave={() => setActive(null)}>
+        <ol ref={reveal ? listRef : undefined} className={s.steps} data-hovering={active !== null || undefined} data-seen={seen || undefined} onMouseLeave={() => setActive(null)}>
           {steps.map((st, i) => (
             <li
               key={st.id}
